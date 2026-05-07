@@ -1,0 +1,2212 @@
+<!-- File: spkb_v3_databased.html -->
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SPKB v3 — Sistem Teguh Berasaskan Data</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --primary:#1a3c6e; --secondary:#2e86c1; --accent:#f39c12;
+  --success:#27ae60; --danger:#e74c3c; --warning:#f1c40f;
+  --purple:#8e44ad; --teal:#1abc9c; --pink:#e91e63;
+  --light:#ecf0f1; --dark:#2c3e50; --white:#ffffff;
+  --card-shadow:0 4px 20px rgba(0,0,0,0.10);
+  --khs-blue:#1e5fa8; --khs-gold:#f4b942;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f4f8;color:var(--dark);}
+
+/* ===== SIDEBAR KANAN (SISTEM PENTADBIR) ===== */
+.admin-sidebar{position:fixed;right:0;top:0;width:280px;height:100vh;background:linear-gradient(180deg,#0d2447 0%,var(--primary) 100%);z-index:1000;transition:transform 0.3s ease;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.15);transform:translateX(260px);}
+.admin-sidebar.open{transform:translateX(0);}
+.admin-sidebar-header{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;gap:12px;background:rgba(0,0,0,0.2);}
+.admin-sidebar-icon{width:42px;height:42px;background:var(--khs-gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.admin-sidebar-title{color:#fff;font-weight:800;font-size:14px;}
+.admin-sidebar-title span{display:block;font-size:10px;font-weight:400;opacity:0.7;margin-top:2px;}
+.admin-sidebar-body{padding:16px 14px;}
+.admin-sidebar-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.5);padding:8px 6px;font-weight:700;margin-top:10px;}
+.admin-sys-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.08);border-radius:10px;color:#fff;text-decoration:none;margin-bottom:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all 0.2s;}
+.admin-sys-item:hover{background:rgba(244,185,66,0.2);border-color:var(--khs-gold);transform:translateX(-4px);}
+.admin-sys-icon{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.admin-sys-info{flex:1;}
+.admin-sys-name{font-size:13px;font-weight:700;}
+.admin-sys-desc{font-size:10px;opacity:0.7;margin-top:2px;line-height:1.4;}
+
+.sidebar-toggle{position:fixed;right:0;top:50%;transform:translateY(-50%);background:linear-gradient(135deg,var(--khs-blue),var(--primary));color:#fff;border:none;padding:16px 10px;border-radius:10px 0 0 10px;cursor:pointer;z-index:999;box-shadow:-4px 0 12px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:1px;transition:right 0.3s;}
+.sidebar-toggle i{font-size:18px;color:var(--khs-gold);}
+.sidebar-toggle.open{right:280px;}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:998;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.sidebar-overlay.open{opacity:1;pointer-events:auto;}
+
+/* ===== MAIN ===== */
+.main-wrap{padding:24px;max-width:1600px;margin:0 auto;}
+
+/* ===== DATA SOURCE BANNER (Baharu dalam V3) ===== */
+.data-banner{background:linear-gradient(135deg,#eafaf1 0%,#d5f5e3 100%);border:2px solid var(--success);border-radius:14px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.data-banner-left{display:flex;align-items:center;gap:12px;font-size:12px;}
+.data-banner-left i{font-size:20px;color:var(--success);}
+.data-status{display:flex;align-items:center;gap:6px;background:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;color:var(--success);}
+.data-status .pulse{width:8px;height:8px;background:var(--success);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+@keyframes slideDown {
+  from { transform: translate(-50%, -20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* ===== HEADER ===== */
+.khs-header{background:linear-gradient(135deg,var(--khs-blue) 0%,var(--primary) 100%);color:#fff;padding:24px 30px;border-radius:16px;margin-bottom:24px;box-shadow:0 6px 24px rgba(30,95,168,0.3);position:relative;overflow:hidden;}
+.khs-header::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(244,185,66,0.2) 0%,transparent 70%);border-radius:50%;}
+.khs-header-content{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.khs-logo-area{display:flex;align-items:center;gap:16px;}
+.khs-logo{width:64px;height:64px;background:var(--khs-gold);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.khs-title h1{font-size:22px;margin-bottom:4px;letter-spacing:0.5px;}
+.khs-title p{font-size:13px;opacity:0.9;}
+.khs-session{background:rgba(255,255,255,0.15);padding:10px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);text-align:right;}
+.khs-session .label{font-size:10px;opacity:0.8;text-transform:uppercase;letter-spacing:1px;}
+.khs-session .value{font-size:15px;font-weight:700;margin-top:3px;}
+
+/* ===== STATS ===== */
+.stat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+@media(max-width:1100px){.stat-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:700px){.stat-row{grid-template-columns:repeat(2,1fr);}}
+.stat-box{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:var(--card-shadow);display:flex;align-items:center;gap:14px;border-left:4px solid var(--khs-blue);}
+.stat-box.green{border-left-color:var(--success);}
+.stat-box.orange{border-left-color:var(--accent);}
+.stat-box.red{border-left-color:var(--danger);}
+.stat-box.purple{border-left-color:var(--purple);}
+.stat-box-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#ebf5fb;color:var(--khs-blue);}
+.stat-box.green .stat-box-icon{background:#eafaf1;color:var(--success);}
+.stat-box.orange .stat-box-icon{background:#fef9e7;color:var(--accent);}
+.stat-box.red .stat-box-icon{background:#fdedec;color:var(--danger);}
+.stat-box.purple .stat-box-icon{background:#f4ecf7;color:var(--purple);}
+.stat-box-info .num{font-size:22px;font-weight:800;line-height:1;}
+.stat-box-info .lbl{font-size:11px;color:#7f8c8d;margin-top:4px;}
+
+/* ===== FORMS ZONE ===== */
+.forms-zone{background:linear-gradient(135deg,#eafaf1 0%,#d5f5e3 100%);border-radius:16px;padding:22px;margin-bottom:24px;border:2px dashed var(--success);}
+.forms-zone-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.forms-zone-title{font-size:15px;font-weight:800;color:var(--success);display:flex;align-items:center;gap:10px;}
+.forms-count-badge{background:var(--success);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.zone-subtitle{font-size:11px;color:#7f8c8d;margin-top:3px;}
+.forms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:900px){.forms-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.forms-grid{grid-template-columns:1fr;}}
+.form-card{background:#fff;border-radius:12px;padding:14px;cursor:pointer;border:1px solid #e8f5e9;position:relative;transition:all 0.2s;}
+.form-card:hover{transform:translateY(-3px);border-color:var(--success);box-shadow:0 6px 18px rgba(39,174,96,0.2);}
+.form-card.special{border:2px solid var(--purple);background:linear-gradient(135deg,#fff 0%,#f9f3fc 100%);}
+.form-card.special::before{content:'⭐ KBAT';position:absolute;top:-8px;right:10px;background:var(--purple);color:#fff;font-size:9px;font-weight:800;padding:2px 10px;border-radius:10px;letter-spacing:0.5px;}
+.form-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.form-icon{width:40px;height:40px;background:#eafaf1;color:var(--success);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.form-card.special .form-icon{background:#f4ecf7;color:var(--purple);}
+.form-info{flex:1;min-width:0;}
+.form-name{font-size:12px;font-weight:700;line-height:1.3;}
+.form-desc{font-size:10px;color:#7f8c8d;margin-top:3px;line-height:1.4;}
+.form-meta{display:flex;justify-content:space-between;font-size:10px;color:#95a5a6;margin-top:8px;padding-top:8px;border-top:1px dashed #e0e0e0;}
+.form-actions{display:flex;gap:6px;margin-top:10px;}
+.form-btn{flex:1;padding:6px;border-radius:6px;border:1px solid #e0e0e0;background:#f8fafc;color:var(--dark);cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;transition:all 0.2s;text-decoration:none;}
+.form-btn:hover{background:var(--success);color:#fff;border-color:var(--success);}
+.form-btn.primary{background:var(--success);color:#fff;border-color:var(--success);}
+.form-btn.special{background:var(--purple);color:#fff;border-color:var(--purple);}
+
+/* ===== FILTER ===== */
+.filter-bar{background:#fff;border-radius:14px;padding:14px 18px;box-shadow:var(--card-shadow);margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.search-input{flex:1;min-width:240px;padding:9px 14px;border:1px solid #dfe6ec;border-radius:8px;font-size:13px;}
+.filter-tab{padding:7px 16px;border:1px solid #dfe6ec;border-radius:20px;font-size:12px;background:#fff;cursor:pointer;color:#7f8c8d;font-weight:600;transition:all 0.2s;}
+.filter-tab.active,.filter-tab:hover{background:var(--khs-blue);color:#fff;border-color:var(--khs-blue);}
+
+/* ===== CATEGORY ===== */
+.cat-section{background:#fff;border-radius:16px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--card-shadow);}
+.cat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;flex-wrap:wrap;gap:10px;}
+.cat-header-left{display:flex;align-items:center;gap:12px;}
+.cat-code-badge{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;}
+.cat-code-badge.A{background:linear-gradient(135deg,#27ae60,#1e8449);}
+.cat-code-badge.B{background:linear-gradient(135deg,#2e86c1,#1a3c6e);}
+.cat-code-badge.C{background:linear-gradient(135deg,#8e44ad,#6c3483);}
+.cat-code-badge.D{background:linear-gradient(135deg,#e91e63,#ad1457);}
+.cat-code-badge.S{background:linear-gradient(135deg,#f39c12,#d35400);}
+.cat-name{font-size:15px;font-weight:800;}
+.cat-subname{font-size:11px;color:#7f8c8d;margin-top:2px;}
+.cat-count{background:var(--light);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+
+/* ===== CLUB CARDS ===== */
+.club-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media(max-width:1200px){.club-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){.club-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.club-grid{grid-template-columns:1fr;}}
+.club-card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.3s;}
+.club-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(30,95,168,0.18);border-color:var(--khs-blue);}
+.club-thumb{height:100px;position:relative;overflow:hidden;}
+.club-thumb.A{background:linear-gradient(135deg,#27ae60,#1e8449);}
+.club-thumb.B{background:linear-gradient(135deg,#2e86c1,#1a3c6e);}
+.club-thumb.C{background:linear-gradient(135deg,#8e44ad,#6c3483);}
+.club-thumb.D{background:linear-gradient(135deg,#e91e63,#ad1457);}
+.club-thumb.S{background:linear-gradient(135deg,#f39c12,#d35400);}
+.club-code{position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.25);backdrop-filter:blur(10px);color:#fff;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;}
+.club-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;background:rgba(255,255,255,0.95);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--khs-blue);transition:all 0.2s;}
+.club-card:hover .club-play-btn{transform:translate(-50%,-50%) scale(1.1);background:var(--khs-gold);}
+.club-health{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;border:2px solid #fff;}
+.club-health.green{background:#2ecc71;}
+.club-health.yellow{background:#f1c40f;}
+.club-health.orange{background:#e67e22;}
+.club-health.red{background:#e74c3c;}
+.club-body{padding:12px 14px;}
+.club-title{font-size:12px;font-weight:700;line-height:1.3;min-height:32px;}
+.club-stats{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:#7f8c8d;}
+.club-stat i{color:var(--khs-blue);font-size:9px;}
+
+/* ===== BUTTONS ===== */
+.btn{padding:9px 16px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;text-decoration:none;}
+.btn-primary{background:var(--khs-blue);color:#fff;}
+.btn-outline{background:#fff;border:2px solid var(--khs-blue);color:var(--khs-blue);}
+.btn-accent{background:var(--khs-gold);color:var(--dark);}
+.btn-success{background:var(--success);color:#fff;}
+
+/* ===== LOADING STATE ===== */
+.loading-state{text-align:center;padding:40px 20px;color:#95a5a6;}
+.loading-state i{font-size:32px;color:var(--khs-blue);margin-bottom:12px;animation:spin 1.5s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:16px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal-header{background:linear-gradient(135deg,var(--success),#1e8449);color:#fff;padding:20px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;}
+.modal-header h3{font-size:16px;}
+.modal-close{background:rgba(255,255,255,0.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;}
+.modal-body{padding:24px;}
+
+/* ===== CODE BLOCKS ===== */
+.code-sample{background:#2c3e50;color:#f0f4f8;padding:14px;border-radius:8px;font-family:'Courier New',monospace;font-size:11px;line-height:1.7;margin:10px 0;overflow-x:auto;}
+.code-sample .cm{color:#95a5a6;}
+.code-sample .kw{color:#f4b942;}
+.code-sample .str{color:#2ecc71;}
+
+/* ===== HALAMAN INDIVIDU KELAB ===== */
+.page{display:none;animation:fadeIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;}}
+
+.detail-back-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:#fff;border:1px solid #dfe6ec;border-radius:8px;color:var(--khs-blue);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:16px;text-decoration:none;}
+.detail-back-btn:hover{background:var(--khs-blue);color:#fff;}
+
+.detail-hero{background:linear-gradient(135deg,var(--khs-blue) 0%,var(--primary) 100%);color:#fff;border-radius:16px;overflow:hidden;margin-bottom:24px;box-shadow:0 6px 24px rgba(30,95,168,0.3);}
+.detail-stars{background:linear-gradient(90deg,var(--khs-gold) 0%,#e67e22 50%,var(--khs-gold) 100%);padding:8px;text-align:center;font-size:14px;color:var(--dark);letter-spacing:3px;}
+.detail-hero-body{padding:24px 30px;display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;}
+@media(max-width:900px){.detail-hero-body{grid-template-columns:1fr;text-align:center;}}
+.detail-emblem{width:90px;height:90px;background:var(--khs-gold);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:44px;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+.detail-info h2{font-size:24px;margin-bottom:6px;}
+.detail-info p{font-size:13px;opacity:0.9;}
+.detail-quick-stats{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;}
+.dqs{background:rgba(255,255,255,0.15);padding:8px 14px;border-radius:8px;font-size:11px;border:1px solid rgba(255,255,255,0.25);}
+.dqs strong{font-size:18px;display:block;margin-top:2px;}
+.detail-video-btn{background:var(--khs-gold);color:var(--dark);padding:14px 20px;border-radius:12px;font-weight:800;font-size:13px;cursor:pointer;border:none;display:flex;align-items:center;gap:10px;}
+
+/* SKPM Score Panel */
+.skpm-panel{background:#fff;border-radius:16px;padding:22px;margin-bottom:24px;box-shadow:var(--card-shadow);}
+.skpm-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.skpm-title{font-size:15px;font-weight:800;color:var(--khs-blue);}
+.skpm-overall{font-size:32px;font-weight:900;color:var(--success);}
+.skpm-overall.yellow{color:#d4a017;}
+.skpm-overall.orange{color:#e67e22;}
+.skpm-overall.red{color:var(--danger);}
+.skpm-criteria{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:800px){.skpm-criteria{grid-template-columns:1fr;}}
+.skpm-card{background:#f8fafc;border-radius:12px;padding:14px;border-left:4px solid var(--khs-blue);}
+.skpm-card-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:6px;}
+.skpm-card-value{font-size:20px;font-weight:800;color:var(--khs-blue);}
+.skpm-card-target{font-size:11px;color:#7f8c8d;margin-top:2px;}
+.skpm-card-bar{height:6px;background:#e0e0e0;border-radius:3px;margin-top:8px;overflow:hidden;}
+.skpm-card-bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease;}
+.skpm-formula{background:#eafaf1;border-left:3px solid var(--success);padding:10px 14px;border-radius:8px;font-size:11px;color:#555;margin-top:14px;line-height:1.6;}
+
+/* Action Buttons (6 biru) */
+.action-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:24px;}
+@media(max-width:900px){.action-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:500px){.action-grid{grid-template-columns:repeat(2,1fr);}}
+.action-btn{background:linear-gradient(135deg,var(--khs-blue),var(--secondary));color:#fff;padding:14px 10px;border-radius:10px;border:none;cursor:pointer;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;text-align:center;transition:transform 0.2s;}
+.action-btn:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(30,95,168,0.3);}
+.action-btn i{font-size:20px;}
+
+/* Cluster Grid */
+.cluster-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+@media(max-width:1200px){.cluster-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:700px){.cluster-grid{grid-template-columns:repeat(2,1fr);}}
+.cluster-card{background:#fff;border:2px solid #eee;border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;}
+.cluster-card:hover{border-color:var(--khs-blue);transform:translateY(-2px);}
+.cluster-badge{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px;margin-bottom:10px;background:var(--khs-blue);}
+.cluster-title{font-size:12px;font-weight:700;line-height:1.3;min-height:32px;}
+.cluster-meta{font-size:10px;color:#7f8c8d;margin-top:6px;}
+.cluster-status{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:6px;}
+.cluster-status.complete{background:#eafaf1;color:var(--success);}
+.cluster-status.partial{background:#fef9e7;color:#e67e22;}
+.cluster-status.empty{background:#fdedec;color:var(--danger);}
+
+/* ===== SENARAI GURU PENASIHAT ===== */
+.guru-section{background:#fff;border-radius:16px;padding:22px;margin-bottom:24px;box-shadow:var(--card-shadow);}
+.guru-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.guru-title{font-size:15px;font-weight:800;color:var(--khs-blue);display:flex;align-items:center;gap:8px;}
+.guru-count{background:var(--khs-blue);color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;}
+.guru-group{margin-bottom:16px;}
+.guru-group-label{font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eee;}
+.guru-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;}
+.guru-card{background:#f8fafc;padding:10px 12px;border-radius:8px;display:flex;align-items:center;gap:10px;border-left:3px solid #ddd;transition:all 0.2s;}
+.guru-card:hover{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);transform:translateX(2px);}
+.guru-card.ketua{border-left-color:var(--khs-gold);background:linear-gradient(90deg,#fef9e7 0%,#fff 100%);}
+.guru-card.penolong{border-left-color:var(--secondary);background:linear-gradient(90deg,#ebf5fb 0%,#fff 100%);}
+.guru-card.ahli{border-left-color:#bdc3c7;}
+.guru-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--khs-blue),var(--primary));color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.guru-card.ketua .guru-avatar{background:linear-gradient(135deg,var(--khs-gold),#e67e22);}
+.guru-card.penolong .guru-avatar{background:linear-gradient(135deg,var(--secondary),var(--khs-blue));}
+.guru-info{flex:1;min-width:0;}
+.guru-name{font-size:12px;font-weight:700;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.guru-meta{font-size:10px;color:#7f8c8d;margin-top:2px;}
+.sesi-badge{background:#ebf5fb;color:var(--khs-blue);padding:1px 6px;border-radius:8px;font-size:9px;font-weight:600;}
+.sesi-badge.petang{background:#fef5d4;color:#b7950b;}
+.guru-toggle{background:none;border:1px dashed #bdc3c7;color:var(--khs-blue);cursor:pointer;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;margin-top:8px;width:100%;transition:all 0.2s;}
+.guru-toggle:hover{background:var(--khs-blue);color:#fff;border-style:solid;}
+.guru-empty{text-align:center;padding:30px 20px;color:#7f8c8d;}
+.guru-empty i{font-size:32px;opacity:0.3;display:block;margin-bottom:10px;}
+
+@keyframes slideDown {
+  from { transform: translate(-50%, -20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* ===== MODAL DOKUMEN ===== */
+.dok-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;}
+.dok-modal.open{display:flex;animation:fadeIn 0.2s ease;}
+.dok-modal-box{background:#fff;border-radius:16px;max-width:780px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.dok-modal-header{padding:20px 24px;border-bottom:2px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;border-radius:16px 16px 0 0;color:#fff;}
+.dok-modal-header h3{font-size:16px;font-weight:800;margin:0;}
+.dok-modal-header p{font-size:11px;opacity:0.9;margin-top:4px;}
+.dok-modal-close{background:rgba(255,255,255,0.2);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.dok-modal-close:hover{background:rgba(255,255,255,0.35);}
+.dok-modal-body{padding:20px 24px;overflow-y:auto;flex:1;}
+.dok-modal-stats{background:linear-gradient(135deg,#f8fafc,#fff);padding:14px 18px;border-radius:10px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--khs-blue);}
+.dok-modal-stat-num{font-size:24px;font-weight:800;color:var(--khs-blue);}
+.dok-modal-stat-lbl{font-size:11px;color:#7f8c8d;}
+
+/* Dokumen Item */
+.dok-item{background:#f8fafc;border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:14px;border-left:4px solid #ddd;transition:all 0.2s;}
+.dok-item:hover{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.dok-item.ada{border-left-color:var(--success);}
+.dok-item.tiada{border-left-color:#bdc3c7;opacity:0.85;}
+.dok-item.edms{border-left-color:var(--purple);}
+.dok-item.folder{border-left-color:var(--accent);}
+
+.dok-status-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+.dok-item.ada .dok-status-icon{background:var(--success);color:#fff;}
+.dok-item.tiada .dok-status-icon{background:#ecf0f1;color:#95a5a6;}
+.dok-item.folder .dok-status-icon{background:var(--accent);color:#fff;}
+.dok-item.edms .dok-status-icon{background:var(--purple);color:#fff;}
+
+.dok-info{flex:1;min-width:0;}
+.dok-no{font-size:10px;font-weight:800;color:var(--khs-blue);background:#ebf5fb;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:4px;}
+.dok-nama{font-size:13px;font-weight:700;color:var(--dark);line-height:1.3;}
+.dok-meta{font-size:11px;color:#7f8c8d;margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;}
+.dok-meta-tag{background:#fff;padding:2px 8px;border-radius:10px;border:1px solid #ddd;}
+.dok-meta-tag.warn{background:#fef9e7;border-color:var(--accent);color:#7d6608;}
+
+.dok-actions{display:flex;gap:6px;flex-shrink:0;align-items:center;}
+.dok-btn{padding:7px 14px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;transition:all 0.2s;}
+.dok-btn-drive{background:var(--success);color:#fff;}
+.dok-btn-drive:hover{background:#1e8449;}
+.dok-btn-edms{background:var(--purple);color:#fff;}
+.dok-btn-edms:hover{background:#6c3483;}
+.dok-btn-folder{background:var(--accent);color:#fff;}
+.dok-btn-folder:hover{background:#d35400;}
+.dok-btn-empty{background:#ecf0f1;color:#7f8c8d;cursor:not-allowed;}
+
+/* Cluster colors in modal header */
+.dok-modal-header.kluster-A{background:linear-gradient(135deg,#1abc9c,#16a085);}
+.dok-modal-header.kluster-B{background:linear-gradient(135deg,#3498db,#2980b9);}
+.dok-modal-header.kluster-C{background:linear-gradient(135deg,#9b59b6,#8e44ad);}
+.dok-modal-header.kluster-D{background:linear-gradient(135deg,#e67e22,#d35400);}
+.dok-modal-header.kluster-E{background:linear-gradient(135deg,#f39c12,#e67e22);}
+.dok-modal-header.kluster-F{background:linear-gradient(135deg,#16a085,#1abc9c);}
+.dok-modal-header.kluster-G{background:linear-gradient(135deg,#27ae60,#229954);}
+.dok-modal-header.kluster-H{background:linear-gradient(135deg,#e74c3c,#c0392b);}
+.dok-modal-header.kluster-I{background:linear-gradient(135deg,#8e44ad,#6c3483);}
+.dok-modal-header.kluster-J{background:linear-gradient(135deg,#34495e,#2c3e50);}
+
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* Loading state */
+.dok-loading{text-align:center;padding:40px;color:#7f8c8d;}
+.dok-loading i{font-size:32px;color:var(--khs-blue);margin-bottom:12px;animation:spin 1s linear infinite;}
+/* ===== MODUL SK@S 3.2 ===== */
+.skas-page{display:none;animation:fadeIn 0.3s ease;}
+.skas-page.active{display:block;}
+
+.skas-hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:16px;padding:30px;margin-bottom:24px;box-shadow:0 6px 24px rgba(118,75,162,0.3);}
+.skas-hero h1{font-size:24px;font-weight:800;margin-bottom:8px;}
+.skas-hero p{font-size:13px;opacity:0.9;}
+
+.skas-overall{background:rgba(255,255,255,0.15);border-radius:12px;padding:20px;margin-top:16px;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;border:1px solid rgba(255,255,255,0.25);}
+.skas-overall-skor{font-size:48px;font-weight:900;line-height:1;}
+.skas-overall-skor small{font-size:18px;font-weight:600;opacity:0.85;}
+.skas-overall-info{font-size:13px;}
+.skas-overall-info strong{display:block;font-size:18px;margin-bottom:6px;}
+.skas-overall-stats{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;}
+.skas-overall-stats span{background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:20px;}
+
+/* Aspek Cards */
+.skas-aspek-card{background:#fff;border-radius:14px;padding:22px;margin-bottom:20px;box-shadow:var(--card-shadow);border-top:4px solid var(--khs-blue);}
+.skas-aspek-321{border-top-color:#1abc9c;}
+.skas-aspek-322{border-top-color:#3498db;}
+.skas-aspek-325{border-top-color:#9b59b6;}
+.skas-aspek-326{border-top-color:#e67e22;}
+.skas-aspek-327{border-top-color:#e74c3c;}
+
+.skas-aspek-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.skas-aspek-title{display:flex;align-items:center;gap:12px;}
+.skas-aspek-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;}
+.skas-aspek-321 .skas-aspek-icon{background:#1abc9c;}
+.skas-aspek-322 .skas-aspek-icon{background:#3498db;}
+.skas-aspek-325 .skas-aspek-icon{background:#9b59b6;}
+.skas-aspek-326 .skas-aspek-icon{background:#e67e22;}
+.skas-aspek-327 .skas-aspek-icon{background:#e74c3c;}
+
+.skas-aspek-title h3{font-size:15px;font-weight:800;color:var(--dark);margin:0;}
+.skas-aspek-title p{font-size:11px;color:#7f8c8d;margin-top:2px;}
+
+.skas-skor-display{text-align:right;}
+.skas-skor-num{font-size:28px;font-weight:800;}
+.skas-skor-label{font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:1px;}
+.skas-skor-skpm{font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:#f0f0f0;display:inline-block;margin-top:4px;}
+.skas-skor-skpm.skor-4{background:#d5f5e3;color:#27ae60;}
+.skas-skor-skpm.skor-3{background:#fef9e7;color:#d4a017;}
+.skas-skor-skpm.skor-2{background:#fff3e0;color:#e67e22;}
+.skas-skor-skpm.skor-1{background:#ffebee;color:#e74c3c;}
+.skas-skor-skpm.skor-0{background:#e0e0e0;color:#7f8c8d;}
+
+.skas-aspek-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;background:#f8fafc;padding:12px;border-radius:10px;}
+.skas-stat-item{text-align:center;padding:6px;}
+.skas-stat-num{font-size:18px;font-weight:800;color:var(--dark);}
+.skas-stat-lbl{font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+/* Folder Grid */
+.skas-folder-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px;}
+.skas-folder-chip{background:#f8fafc;border:1px solid #e0e0e0;border-radius:10px;padding:10px 12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.skas-folder-chip:hover{transform:translateY(-2px);box-shadow:0 3px 10px rgba(0,0,0,0.1);border-color:var(--khs-blue);}
+.skas-folder-chip-no{font-size:11px;font-weight:800;color:var(--khs-blue);min-width:32px;}
+.skas-folder-chip-name{font-size:11px;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.skas-folder-chip-status{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.skas-folder-chip-status.green{background:#27ae60;}
+.skas-folder-chip-status.yellow{background:#f1c40f;}
+.skas-folder-chip-status.orange{background:#e67e22;}
+.skas-folder-chip-status.red{background:#e74c3c;}
+
+/* Linked Card */
+.skas-linked-card{background:linear-gradient(135deg,#3498db 10%,#2980b9 100%);color:#fff;padding:20px;border-radius:12px;text-align:center;}
+.skas-linked-card h4{font-size:16px;margin-bottom:10px;}
+.skas-linked-card p{font-size:12px;opacity:0.9;margin-bottom:14px;}
+.skas-linked-stats{display:flex;justify-content:center;gap:14px;font-size:11px;flex-wrap:wrap;margin-bottom:14px;}
+.skas-linked-stats span{background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:20px;}
+
+/* Reminder Section */
+.skas-reminder{background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-left:4px solid #f59e0b;border-radius:12px;padding:20px;margin-top:24px;}
+.skas-reminder-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.skas-reminder-header i{font-size:24px;color:#d97706;}
+.skas-reminder-header h3{color:#78350f;font-size:15px;margin:0;}
+.skas-reminder-list{max-height:280px;overflow-y:auto;}
+.skas-reminder-item{background:#fff;padding:12px 14px;margin-bottom:8px;border-radius:8px;display:flex;align-items:center;gap:12px;border-left:3px solid #e74c3c;}
+.skas-reminder-item.orange{border-left-color:#e67e22;}
+.skas-reminder-item-icon{width:36px;height:36px;background:#fee;color:#e74c3c;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.skas-reminder-item.orange .skas-reminder-item-icon{background:#fff3e0;color:#e67e22;}
+.skas-reminder-item-info{flex:1;min-width:0;}
+.skas-reminder-item-name{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:2px;}
+.skas-reminder-item-meta{font-size:10px;color:#7f8c8d;}
+.skas-reminder-item-actions{display:flex;gap:6px;}
+
+/* Aspek Buttons */
+.skas-aspek-actions{display:flex;gap:8px;justify-content:flex-end;}
+.skas-btn{padding:8px 16px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;text-decoration:none;}
+.skas-btn-primary{background:var(--khs-blue);color:#fff;}
+.skas-btn-primary:hover{background:#2980b9;}
+.skas-btn-outline{background:#fff;border:1px solid var(--khs-blue);color:var(--khs-blue);}
+.skas-btn-outline:hover{background:var(--khs-blue);color:#fff;}
+
+/* Header Action Buttons */
+.skas-header-actions{display:flex;gap:10px;justify-content:flex-end;margin-bottom:20px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR KANAN -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="admin-sidebar-header">
+    <div class="admin-sidebar-icon">🛡️</div>
+    <div class="admin-sidebar-title">Sistem Pentadbiran<span>Khas untuk Pentadbir</span></div>
+  </div>
+  <div class="admin-sidebar-body" id="adminSidebarBody">
+    <!-- Auto-generated dari adminSystemsData -->
+  </div>
+</aside>
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+  <i class="fas fa-chevron-left"></i><span>ADMIN</span>
+</button>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- DATA SOURCE BANNER (BAHARU V3) -->
+  <div class="data-banner">
+    <div class="data-banner-left">
+      <i class="fas fa-database"></i>
+      <div>
+        <div style="font-weight:800;color:var(--success);">Data Dikuasakan oleh Google Sheets</div>
+        <div style="color:#7f8c8d;margin-top:2px;">Senarai 46 kelab + 7 borang + 3 sistem dimuatkan dari pangkalan data luaran</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <span class="data-status"><span class="pulse"></span>Live · Sync 2 min lalu</span>
+      <button class="btn btn-success" onclick="reloadData()"><i class="fas fa-sync"></i> Muat Semula</button>
+      <button class="btn btn-outline" onclick="openSheetsGuide()"><i class="fas fa-table"></i> Buka Sheets</button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="khs-header">
+    <div class="khs-header-content">
+      <div class="khs-logo-area">
+        <div class="khs-logo">🏫</div>
+        <div class="khs-title">
+          <h1>MODUL PENGURUSAN 46 KELAB & PERSATUAN</h1>
+          <p>SMK Kuching High · SPKB v3 — Sistem Berasaskan Data (Data-Driven)</p>
+        </div>
+      </div>
+      <div class="khs-session">
+        <div class="label">Sesi Semasa</div>
+        <div class="value">2025/2026 · Sem 2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS (Auto-calculated) -->
+  <div class="stat-row" id="statsRow"></div>
+
+  <!-- PUSAT BORANG (Auto-rendered) -->
+  <div class="forms-zone">
+    <div class="forms-zone-header">
+      <div>
+        <div class="forms-zone-title">
+          <i class="fas fa-file-lines"></i> PUSAT BORANG GURU PENASIHAT
+          <span class="forms-count-badge" id="formsCountBadge">0 Borang</span>
+        </div>
+        <div class="zone-subtitle">Data dari <strong>SPKB_Form_Registry</strong> · Tambah borang = tambah baris Sheets</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="openAddFormModal()"><i class="fas fa-circle-question"></i> Panduan Tambah</button>
+        <button class="btn btn-accent"><i class="fas fa-qrcode"></i> Cetak Poster QR</button>
+      </div>
+    </div>
+    <div class="forms-grid" id="formsGrid"></div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <input class="search-input" id="searchInput" placeholder="🔍 Cari kelab (nama / kod / guru penasihat)..." oninput="filterClubs()">
+    <div class="filter-tab active" onclick="setFilter('all',this)">Semua (<span id="cntAll">0</span>)</div>
+    <div class="filter-tab" onclick="setFilter('green',this)">🟢 Cemerlang (<span id="cntGreen">0</span>)</div>
+    <div class="filter-tab" onclick="setFilter('yellow',this)">🟡 Baik (<span id="cntYellow">0</span>)</div>
+    <div class="filter-tab" onclick="setFilter('orange',this)">🟠 Perhatian (<span id="cntOrange">0</span>)</div>
+    <div class="filter-tab" onclick="setFilter('red',this)">🔴 Kritikal (<span id="cntRed">0</span>)</div>
+  </div>
+
+  <!-- KATEGORI (Auto-rendered) -->
+  <div id="categoriesContainer">
+    <div class="loading-state">
+      <i class="fas fa-spinner"></i>
+      <div>Memuatkan 46 kelab dari pangkalan data...</div>
+    </div>
+  </div>
+
+<!-- ============================================= -->
+<!-- HALAMAN INDIVIDU KELAB                        -->
+<!-- ============================================= -->
+<div class="page" id="page-clubDetail">
+  <a class="detail-back-btn" onclick="backToMain()">
+    <i class="fas fa-arrow-left"></i> Kembali ke 46 Kelab
+  </a>
+
+  <!-- HERO -->
+  <div class="detail-hero">
+    <div class="detail-stars">★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★</div>
+    <div class="detail-hero-body">
+      <div class="detail-emblem" id="detailEmblem">🎖️</div>
+      <div class="detail-info">
+        <h2 id="detailTitle">Memuatkan...</h2>
+        <p id="detailSubtitle">-</p>
+        <div class="detail-quick-stats" id="detailQuickStats"></div>
+      </div>
+      <button class="detail-video-btn" id="detailVideoBtn" onclick="openVideo()">
+        <i class="fab fa-youtube" style="font-size:22px;"></i> Video Pengenalan
+      </button>
+    </div>
+    <div class="detail-stars">★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★</div>
+  </div>
+
+<!-- ===== MODUL SK@S 3.2: PENGURUSAN FAIL INDUK ===== -->
+<div class="page skas-page" id="page-skas">
+  <!-- Header Hero -->
+  <div class="skas-hero">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+      <div>
+        <h1>📁 Pengurusan Fail Induk Kokurikulum</h1>
+        <p>Berasaskan SK@S KPM Standard 3.2 — Audit-Ready untuk PPD/JPN</p>
+      </div>
+      <button class="skas-btn skas-btn-primary" onclick="refreshSKASDashboard()" id="skasRefreshBtn">
+        <i class="fas fa-sync-alt"></i> Refresh Sekarang
+      </button>
+    </div>
+    
+    <!-- Overall Score -->
+    <div class="skas-overall" id="skasOverall">
+      <div class="skas-overall-skor">
+        <span id="skasPeratus">--</span><small>%</small>
+      </div>
+      <div class="skas-overall-info">
+        <strong id="skasLabel">Memuatkan...</strong>
+        <div class="skas-overall-stats">
+          <span>📁 <span id="skasTotalFolder">0</span> folder</span>
+          <span>📄 <span id="skasTotalFail">0</span> fail</span>
+          <span>✅ <span id="skasTotalUpdated">0</span> updated</span>
+          <span>⚠️ <span id="skasTotalStale">0</span> belum update</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aspek Cards Container -->
+  <div id="skasAspekContainer">
+    <div style="text-align:center;padding:60px;color:#7f8c8d;">
+      <i class="fas fa-spinner fa-spin" style="font-size:32px;"></i>
+      <p style="margin-top:14px;">Memuatkan data SK@S...</p>
+    </div>
+  </div>
+
+  <!-- Reminder Section -->
+  <div class="skas-reminder" id="skasReminder" style="display:none;">
+    <div class="skas-reminder-header">
+      <i class="fas fa-bell"></i>
+      <h3>⚠️ Pengingat: <span id="skasReminderCount">0</span> fail belum update untuk <span id="skasReminderYear">2026</span></h3>
+    </div>
+    <div class="skas-reminder-list" id="skasReminderList"></div>
+    <div style="text-align:right;margin-top:14px;">
+      <button class="skas-btn skas-btn-outline" onclick="lihatSemuaStale()">
+        <i class="fas fa-list"></i> Lihat Semua
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- SKPM 3.2 SCORE PANEL -->
+  <div class="skpm-panel">
+    <div class="skpm-header">
+      <div>
+        <div class="skpm-title"><i class="fas fa-chart-pie"></i> Status Pengurusan SKPM 3.2</div>
+        <div style="font-size:11px;color:#7f8c8d;margin-top:3px;">Berasaskan 3 kriteria objektif · Auto-kira mengikut minggu semasa</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="skpm-overall" id="skpmOverall">--</div>
+        <div style="font-size:11px;color:#7f8c8d;" id="skpmOverallLabel">Skor Keseluruhan</div>
+      </div>
+    </div>
+
+    <div class="skpm-criteria">
+      <div class="skpm-card" id="skpmA">
+        <div class="skpm-card-title">📋 (A) Laporan Perjumpaan</div>
+        <div class="skpm-card-value"><span id="skpmA_value">0</span> / <span id="skpmA_target">24</span></div>
+        <div class="skpm-card-target">Wajaran 40% · Sasaran proporsional ikut minggu</div>
+        <div class="skpm-card-bar"><div class="skpm-card-bar-fill" id="skpmA_bar" style="width:0%;background:var(--success);"></div></div>
+      </div>
+      <div class="skpm-card" id="skpmB" style="border-left-color:var(--accent);">
+        <div class="skpm-card-title">📁 (B) Kemaskini Fail</div>
+        <div class="skpm-card-value"><span id="skpmB_value">0</span> / 48</div>
+        <div class="skpm-card-target">Wajaran 35% · Sasaran tetap 48 dokumen</div>
+        <div class="skpm-card-bar"><div class="skpm-card-bar-fill" id="skpmB_bar" style="width:0%;background:var(--accent);"></div></div>
+      </div>
+      <div class="skpm-card" id="skpmC" style="border-left-color:var(--purple);">
+        <div class="skpm-card-title">📝 (C) Kertas Kerja Aktiviti</div>
+        <div class="skpm-card-value"><span id="skpmC_value">0</span> / <span id="skpmC_target">6</span></div>
+        <div class="skpm-card-target">Wajaran 25% · Sasaran 6 program/tahun</div>
+        <div class="skpm-card-bar"><div class="skpm-card-bar-fill" id="skpmC_bar" style="width:0%;background:var(--purple);"></div></div>
+      </div>
+    </div>
+
+    <div class="skpm-formula">
+      <strong>📐 Formula:</strong> Skor = (A × 40%) + (B × 35%) + (C × 25%) ·
+      <strong>Status:</strong> 🟢 ≥85 · 🟡 70-84 · 🟠 50-69 · 🔴 &lt;50
+    </div>
+  </div>
+
+  <!-- 6 BUTANG AKSI PANTAS -->
+  <div class="zone" style="background:#fff;border-radius:16px;padding:22px;margin-bottom:24px;box-shadow:var(--card-shadow);">
+    <div class="zone-header" style="margin-bottom:14px;">
+      <div>
+        <div class="zone-title" style="color:var(--khs-blue);"><i class="fas fa-bolt"></i> AKSI PANTAS — Borang & Aktiviti</div>
+        <div style="font-size:11px;color:#7f8c8d;">Khusus untuk kelab ini · Auto-isi maklumat kelab</div>
+      </div>
+    </div>
+    <div class="action-grid">
+      <a class="action-btn" onclick="openClubAction('laporan')"><i class="fas fa-clipboard-check"></i> Laporan Mingguan</a>
+      <a class="action-btn" onclick="openClubAction('kk')"><i class="fas fa-file-contract"></i> Kertas Kerja</a>
+      <a class="action-btn" onclick="openClubAction('pencapaian')"><i class="fas fa-trophy"></i> Pencapaian</a>
+      <a class="action-btn" onclick="openClubAction('surat')"><i class="fas fa-envelope-open-text"></i> Surat Kebenaran</a>
+      <a class="action-btn" onclick="openClubAction('keluar')"><i class="fas fa-door-open"></i> Keluar Kelas</a>
+      <a class="action-btn" onclick="openClubAction('mohon')"><i class="fas fa-box-archive"></i> Mohon Aktiviti</a>
+    </div>
+  </div>
+
+ <!-- ===== SENARAI GURU PENASIHAT ===== -->
+<div class="guru-section">
+  <div class="guru-header">
+    <div class="guru-title">
+      <i class="fas fa-chalkboard-user"></i> Guru Penasihat Kelab
+    </div>
+    <span class="guru-count" id="guruCount">0 orang</span>
+  </div>
+  <div id="guruContent">
+    <div class="guru-empty">
+      <i class="fas fa-spinner fa-spin"></i>
+      <div>Memuatkan senarai guru...</div>
+    </div>
+  </div>
+</div>
+
+ <!-- 10 KLUSTER DOKUMEN -->
+  <div class="zone" style="background:#fff;border-radius:16px;padding:22px;margin-bottom:24px;box-shadow:var(--card-shadow);">
+    <div class="zone-header" style="margin-bottom:14px;">
+      <div>
+        <div class="zone-title" style="color:var(--khs-blue);"><i class="fas fa-folder-tree"></i> 48 DOKUMEN STANDARD · 10 KLUSTER</div>
+        <div style="font-size:11px;color:#7f8c8d;">Klik kluster untuk lihat senarai dokumen</div>
+      </div>
+      <button class="btn btn-primary" onclick="openDriveFolder()"><i class="fas fa-folder-open"></i> Buka Drive</button>
+    </div>
+    <div class="cluster-grid" id="clusterGrid"></div>
+  </div>
+</div>
+
+  <div style="text-align:center;font-size:11px;color:#bdc3c7;padding:20px 0;border-top:1px solid #eee;margin-top:20px;">
+    SPKB v3 — Data-Driven Architecture | Tiada risiko "data hilang" · Mudah dikemas kini via Google Sheets
+  </div>
+</div>
+
+<!-- MODAL: PANDUAN TAMBAH -->
+<div class="modal-overlay" id="addFormModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-plus-circle"></i> Tambah Borang / Kelab Baharu (Tanpa Kod!)</h3>
+      <button class="modal-close" onclick="closeAddFormModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <h4 style="color:var(--success);font-size:14px;margin-bottom:10px;"><i class="fas fa-file-lines"></i> A. Tambah Borang Baharu</h4>
+      <ol style="font-size:12px;line-height:1.8;color:#555;padding-left:20px;">
+        <li>Buka Google Sheets <code>SPKB_Form_Registry</code></li>
+        <li>Tambah baris baharu dengan maklumat:</li>
+      </ol>
+      <div class="code-sample">
+<span class="cm">// Struktur kolum Sheets:</span>
+<span class="kw">id</span>      : F08
+<span class="kw">nama</span>    : <span class="str">"Borang Penilaian Aktiviti"</span>
+<span class="kw">icon</span>    : <span class="str">"fa-star"</span>
+<span class="kw">desc</span>    : <span class="str">"Nilai kualiti aktiviti kelab"</span>
+<span class="kw">url</span>     : <span class="str">"https://forms.gle/xxx"</span>
+<span class="kw">qr</span>      : <span class="str">"https://qr.io/xxx"</span>
+<span class="kw">special</span> : <span class="str">"false"</span>  <span class="cm">// true = badge ungu</span>
+<span class="kw">status</span>  : <span class="str">"active"</span>
+      </div>
+      <p style="font-size:12px;color:#7f8c8d;">3. Simpan → SPKB auto-papar borang baharu selepas <strong>"Muat Semula"</strong>.</p>
+
+      <h4 style="color:var(--khs-blue);font-size:14px;margin:20px 0 10px;"><i class="fas fa-people-group"></i> B. Tambah / Edit Kelab</h4>
+      <ol style="font-size:12px;line-height:1.8;color:#555;padding-left:20px;">
+        <li>Buka Google Sheets <code>SPKB_Clubs</code></li>
+        <li>Tambah baris atau edit data sedia ada:</li>
+      </ol>
+      <div class="code-sample">
+<span class="kw">kod</span>    : S19
+<span class="kw">nama</span>   : <span class="str">"Ping Pong Wanita"</span>
+<span class="kw">kat</span>    : S
+<span class="kw">ahli</span>   : 24
+<span class="kw">pajsk</span>  : 4.1
+<span class="kw">fail</span>   : 42
+<span class="kw">status</span> : <span class="str">"green"</span>  <span class="cm">// green/yellow/orange/red</span>
+<span class="kw">guru</span>   : <span class="str">"Pn. Tan"</span>
+      </div>
+
+      <div style="background:#eafaf1;border-left:4px solid var(--success);padding:12px 16px;border-radius:8px;margin-top:16px;font-size:12px;">
+        <strong style="color:var(--success);">💡 Tiada HTML Perlu Diedit!</strong> Semua perubahan dibuat di Sheets sahaja.
+        Sistem baca data automatik setiap kali halaman dibuka atau "Muat Semula" diklik.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   LAPISAN DATA — FALLBACK (guna jika API gagal)
+   ⚠️ Guna 'let' supaya boleh ditimpa oleh data Sheets
+   ============================================================ */
+
+let adminSystemsData = [
+  {id:'SURAT', nama:'Surat Pintar AI', icon:'✉️', desc:'Urus surat masuk/keluar dengan AI + OCR + arkib cloud', url:'#'},
+  {id:'MINIT', nama:'Minit Mesyuarat KPM', icon:'📋', desc:'Auto-jana minit dengan AI, edit, cetak & arkib', url:'#'},
+  {id:'OPR',   nama:'Smart OPR Aktiviti', icon:'📝', desc:'Jana One-Page Report selari dengan SK@S', url:'#'}
+];
+
+let formsData = [
+  {id:'F01', nama:'Laporan Perjumpaan Mingguan', icon:'fa-clipboard-check', desc:'Diisi selepas setiap perjumpaan', responses:42, lastResponse:'2 jam lalu', url:'#', qr:'#', special:false, status:'active'},
+  {id:'F02', nama:'Kertas Kerja Program', icon:'fa-file-contract', desc:'Auto-sync ke Smart OPR', responses:28, lastResponse:'Semalam', url:'#', qr:'#', special:false, status:'active'},
+  {id:'F03', nama:'Penyertaan & Pencapaian', icon:'fa-trophy', desc:'Update Hall of Fame automatik', responses:15, lastResponse:'3 hari lalu', url:'#', qr:'#', special:false, status:'active'},
+  {id:'F04', nama:'Surat Kebenaran Ibu Bapa', icon:'fa-envelope-open-text', desc:'Jana PDF + hantar email', responses:8, lastResponse:'5 hari lalu', url:'#', qr:'#', special:false, status:'active'},
+  {id:'F05', nama:'Murid Keluar Kelas', icon:'fa-door-open', desc:'Notifikasi ke guru tingkatan', responses:35, lastResponse:'1 jam lalu', url:'#', qr:'#', special:false, status:'active'},
+  {id:'F06', nama:'Permohonan Aktiviti & Kemudahan', icon:'fa-box-archive', desc:'Workflow kelulusan digital', responses:12, lastResponse:'Hari ini', url:'#', qr:'#', special:false, status:'active'},
+  {id:'F07', nama:'Penarafan Kendiri KBAT', icon:'fa-brain', desc:'Oleh Ketua Guru Penasihat sahaja', responses:18, lastResponse:'Minggu lepas', url:'#', qr:'#', special:true, status:'active'}
+];
+
+let categoriesData = [
+  {kod:'A', nama:'BADAN BERUNIFORM', penyelaras:'En. Azman Hamid', range:'A01 – A08'},
+  {kod:'B', nama:'KELAB',             penyelaras:'Pn. Siti Aminah', range:'B01 – B05'},
+  {kod:'C', nama:'PERSATUAN AKADEMIK', penyelaras:'En. Rahman Ibrahim', range:'C01 – C08'},
+  {kod:'D', nama:'PERSATUAN KEBUDAYAAN & AGAMA', penyelaras:'Pn. Lim Mei Ling', range:'D01 – D07'},
+  {kod:'S', nama:'SUKAN & PERMAINAN', penyelaras:'En. Raj Kumar', range:'S01 – S18'}
+];
+
+let clubsData = [
+  {kod:'A01', nama:'BSMM',                       kat:'A', ahli:45, pajsk:4.5, fail:48, status:'green',  guru:'Pn. Leong'},
+  {kod:'A02', nama:'St. John Ambulans',          kat:'A', ahli:38, pajsk:4.3, fail:46, status:'green',  guru:'En. Chen'},
+  {kod:'A03', nama:'Pengakap',                   kat:'A', ahli:52, pajsk:4.0, fail:42, status:'yellow', guru:'En. Azman'},
+  {kod:'A04', nama:'Pandu Puteri',               kat:'A', ahli:41, pajsk:4.4, fail:47, status:'green',  guru:'Pn. Noraini'},
+  {kod:'A05', nama:'Kadet Bomba & Penyelamat',   kat:'A', ahli:35, pajsk:4.2, fail:45, status:'green',  guru:'En. Hassan'},
+  {kod:'A06', nama:'Kadet Remaja Sekolah (KRS)', kat:'A', ahli:48, pajsk:3.9, fail:40, status:'yellow', guru:'En. Zulkifli'},
+  {kod:'A07', nama:'Girl Brigade',               kat:'A', ahli:32, pajsk:4.3, fail:46, status:'green',  guru:'Pn. Mary'},
+  {kod:'A08', nama:'Boy Brigade',                kat:'A', ahli:36, pajsk:4.2, fail:45, status:'green',  guru:'En. John'},
+  {kod:'B01', nama:'Interact Club',              kat:'B', ahli:42, pajsk:4.4, fail:47, status:'green',  guru:'Pn. Siti'},
+  {kod:'B02', nama:'Leo Club',                   kat:'B', ahli:38, pajsk:4.3, fail:46, status:'green',  guru:'En. Wong'},
+  {kod:'B03', nama:'Rukun Negara',               kat:'B', ahli:34, pajsk:3.9, fail:41, status:'yellow', guru:'Pn. Rohaya'},
+  {kod:'B04', nama:'Kelab Kerjaya',              kat:'B', ahli:40, pajsk:4.5, fail:48, status:'green',  guru:'En. David'},
+  {kod:'B05', nama:'Kelab Kewartawanan',         kat:'B', ahli:28, pajsk:3.5, fail:32, status:'orange', guru:'Pn. Lisa'},
+  {kod:'C01', nama:'Persatuan Bahasa Melayu',    kat:'C', ahli:44, pajsk:4.3, fail:46, status:'green',  guru:'Pn. Aminah'},
+  {kod:'C02', nama:'English Society',            kat:'C', ahli:48, pajsk:4.4, fail:47, status:'green',  guru:'Ms. Sarah'},
+  {kod:'C03', nama:'Persatuan Bahasa Cina',      kat:'C', ahli:52, pajsk:4.5, fail:48, status:'green',  guru:'En. Lim'},
+  {kod:'C04', nama:'Persatuan Sejarah & Geografi', kat:'C', ahli:36, pajsk:4.0, fail:43, status:'yellow', guru:'Pn. Kamariah'},
+  {kod:'C05', nama:'Persatuan Seni Visual',      kat:'C', ahli:30, pajsk:4.2, fail:45, status:'green',  guru:'En. Fauzi'},
+  {kod:'C06', nama:'Persatuan STEM',             kat:'C', ahli:56, pajsk:4.6, fail:48, status:'green',  guru:'Dr. Tan'},
+  {kod:'C07', nama:'Persatuan ASK',              kat:'C', ahli:38, pajsk:3.8, fail:41, status:'yellow', guru:'En. Rahman'},
+  {kod:'C08', nama:'Persatuan Agama Islam',      kat:'C', ahli:62, pajsk:4.4, fail:46, status:'green',  guru:'Ust. Ahmad'},
+  {kod:'D01', nama:'Persatuan Seni Budaya',      kat:'D', ahli:35, pajsk:4.3, fail:45, status:'green',  guru:'Pn. Lim'},
+  {kod:'D02', nama:'Persatuan Robotik',          kat:'D', ahli:28, pajsk:4.5, fail:47, status:'green',  guru:'En. Kumar'},
+  {kod:'D03', nama:'Hua Yue (Muzik Cina)',       kat:'D', ahli:30, pajsk:4.2, fail:44, status:'green',  guru:'Cikgu Wong'},
+  {kod:'D04', nama:'Yoyo & Tarian',              kat:'D', ahli:26, pajsk:3.9, fail:40, status:'yellow', guru:'Pn. Jessica'},
+  {kod:'D05', nama:'Persatuan Dharma',           kat:'D', ahli:24, pajsk:4.1, fail:44, status:'green',  guru:'En. Raj'},
+  {kod:'D06', nama:'Young Catholic Students',    kat:'D', ahli:22, pajsk:4.0, fail:43, status:'green',  guru:'Sr. Maria'},
+  {kod:'D07', nama:'ISCF',                       kat:'D', ahli:20, pajsk:3.8, fail:39, status:'yellow', guru:'Br. Peter'},
+  {kod:'S01', nama:'Badminton',                  kat:'S', ahli:32, pajsk:4.4, fail:46, status:'green',  guru:'En. Lee'},
+  {kod:'S02', nama:'Bola Keranjang',             kat:'S', ahli:40, pajsk:4.6, fail:48, status:'green',  guru:'En. Michael'},
+  {kod:'S03', nama:'Bola Tampar',                kat:'S', ahli:34, pajsk:4.2, fail:45, status:'green',  guru:'Pn. Wati'},
+  {kod:'S04', nama:'Bola Sepak',                 kat:'S', ahli:48, pajsk:4.5, fail:47, status:'green',  guru:'En. Raj Kumar'},
+  {kod:'S05', nama:'Bola Jaring',                kat:'S', ahli:30, pajsk:4.3, fail:46, status:'green',  guru:'Pn. Anne'},
+  {kod:'S06', nama:'Ping Pong',                  kat:'S', ahli:26, pajsk:3.9, fail:41, status:'yellow', guru:'En. Chen'},
+  {kod:'S07', nama:'Olahraga',                   kat:'S', ahli:55, pajsk:4.4, fail:46, status:'green',  guru:'En. Hakim'},
+  {kod:'S08', nama:'Catur',                      kat:'S', ahli:18, pajsk:3.6, fail:34, status:'orange', guru:'En. Lau'},
+  {kod:'S09', nama:'Hoki',                       kat:'S', ahli:36, pajsk:4.2, fail:45, status:'green',  guru:'En. Singh'},
+  {kod:'S10', nama:'Ragbi',                      kat:'S', ahli:28, pajsk:3.8, fail:40, status:'yellow', guru:'En. Kumar'},
+  {kod:'S11', nama:'Memanah',                    kat:'S', ahli:22, pajsk:4.3, fail:45, status:'green',  guru:'Pn. Aida'},
+  {kod:'S12', nama:'Silat',                      kat:'S', ahli:30, pajsk:4.1, fail:44, status:'green',  guru:'En. Ali'},
+  {kod:'S13', nama:'Taekwondo',                  kat:'S', ahli:26, pajsk:4.0, fail:43, status:'green',  guru:'Sabum Park'},
+  {kod:'S14', nama:'Wushu',                      kat:'S', ahli:20, pajsk:3.9, fail:41, status:'yellow', guru:'Sifu Wong'},
+  {kod:'S15', nama:'Karate',                     kat:'S', ahli:24, pajsk:4.2, fail:45, status:'green',  guru:'Sensei Yamamoto'},
+  {kod:'S16', nama:'Renang',                     kat:'S', ahli:18, pajsk:4.4, fail:46, status:'green',  guru:'Pn. Ling'},
+  {kod:'S17', nama:'Sepak Takraw',               kat:'S', ahli:22, pajsk:3.9, fail:40, status:'yellow', guru:'En. Zul'},
+  {kod:'S18', nama:'Tenis',                      kat:'S', ahli:20, pajsk:4.0, fail:43, status:'green',  guru:'Pn. Helena'}
+];
+
+/* ============================================================
+   KONFIGURASI API
+   ============================================================ */
+const SPKB_CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbxTXUFFwssqT7Nwg5sJ6tWsVUMD_-zV2h2S35lymOgTW88iVaT1mqag2yHfBoShTWA/exec',
+  API_SECRET: 'SPKB_KHS_2026_SECRET_KEY_CHANGE_THIS',
+  USER_EMAIL: 'pkkoku@moe-dl.edu.my',
+  USE_CACHE: true,
+  FALLBACK_TO_LOCAL: true
+};
+
+/* ============================================================
+   FUNGSI UTAMA: Muat data dari Sheets
+   ============================================================ */
+async function loadDataFromSheets(forceFresh = false) {
+  const banner = document.querySelector('.data-banner');
+  const statusEl = banner ? banner.querySelector('.data-status') : null;
+
+  try {
+    if (statusEl) {
+      statusEl.innerHTML = '<span class="pulse"></span>Menyambung...';
+    }
+
+    const timestamp = new Date().getTime();
+    const cacheParam = forceFresh ? 'false' : 'true';
+    const url = `${SPKB_CONFIG.API_URL}?action=all&cache=${cacheParam}&_t=${timestamp}`;
+
+    console.log('🔄 Fetching:', url);
+    const response = await fetch(url);
+
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error);
+
+    console.log('📥 Raw data:', result.data);
+
+    // ⭐ NORMALISASI DATA (tukar string → number/boolean)
+    clubsData = result.data.clubs
+  .filter(c => c.aktif !== false && c.aktif !== 'FALSE' && c.aktif !== 'false')
+  .map(c => ({
+    kod:    String(c.kod || '').trim(),
+    nama:   String(c.nama || '').trim(),
+    kat:    String(c.kat || '').toUpperCase().trim(),
+    ahli:   Number(c.ahli) || 0,
+    pajsk:  Number(c.pajsk) || 0,
+    fail:   Number(c.fail) || 0,
+    status: String(c.status || 'green').toLowerCase().trim(),
+    guru:   String(c.guru || '').trim(),
+    aktif:  c.aktif !== false && c.aktif !== 'FALSE',
+    youtube_url: String(c.youtube_url || '').trim(),
+    drive_folder_id: String(c.drive_folder_id || '').trim(),
+    
+    // ⭐ BAHARU: Field untuk modal kluster
+    laporan_24:     Number(c.laporan_24) || 0,
+    kk_aktiviti:    Number(c.kk_aktiviti) || 0,
+    penyertaan_17:  Number(c.penyertaan_17) || 0
+  }));
+
+    formsData = result.data.forms.map(f => ({
+      id:           String(f.id || '').trim(),
+      nama:         String(f.nama || '').trim(),
+      icon:         String(f.icon || 'fa-file').trim(),
+      desc:         String(f.desc || '').trim(),
+      url:          String(f.url || '#').trim(),
+      qr:           String(f.qr || '#').trim(),
+      responses:    Number(f.responses) || 0,
+      lastResponse: String(f.lastResponse || '-').trim(),
+      special:      f.special === true || f.special === 'true' || f.special === 'TRUE',
+      status:       String(f.status || 'active').toLowerCase().trim()
+    }));
+
+    adminSystemsData = result.data.systems.map(s => ({
+      id:   String(s.id || '').trim(),
+      nama: String(s.nama || '').trim(),
+      icon: String(s.icon || '').trim(),
+      desc: String(s.desc || '').trim(),
+      url:  String(s.url || '#').trim()
+    }));
+
+    console.log('✅ Selepas normalisasi:', {
+      kelab: clubsData.length,
+      borang: formsData.length,
+      sistem: adminSystemsData.length,
+      A01: clubsData.find(c => c.kod === 'A01')
+    });
+
+    // Render semula keseluruhan UI
+    renderAdminSystems();
+    renderStats();
+    renderForms();
+    renderCategories(currentFilter, document.getElementById('searchInput').value);
+
+    if (statusEl) {
+      const cacheTxt = result.cached ? ' (cache)' : ' (fresh)';
+      statusEl.innerHTML = `<span class="pulse"></span>Live${cacheTxt} · ${new Date().toLocaleTimeString('ms-MY')}`;
+      statusEl.style.color = 'var(--success)';
+      statusEl.style.background = '#fff';
+    }
+
+  } catch (error) {
+    console.error('❌ API Error:', error);
+    if (statusEl) {
+      statusEl.innerHTML = '<i class="fas fa-info-circle"></i> Mod Demo · Data Lokal';
+      statusEl.style.color = '#e67e22';
+      statusEl.style.background = '#fff5e7';
+    }
+    if (SPKB_CONFIG.FALLBACK_TO_LOCAL) {
+      renderAdminSystems();
+      renderStats();
+      renderForms();
+      renderCategories();
+    }
+  }
+}
+
+/* ============================================================
+   FUNGSI RENDER
+   ============================================================ */
+
+function renderAdminSystems(){
+  const container = document.getElementById('adminSidebarBody');
+  let html = '<div class="admin-sidebar-label">📌 Sistem Utama</div>';
+  adminSystemsData.forEach(sys => {
+    html += `
+      <a class="admin-sys-item" onclick="openSystem('${sys.id}')">
+        <div class="admin-sys-icon">${sys.icon}</div>
+        <div class="admin-sys-info">
+          <div class="admin-sys-name">${sys.nama}</div>
+          <div class="admin-sys-desc">${sys.desc}</div>
+        </div>
+      </a>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderForms(){
+  const container = document.getElementById('formsGrid');
+  const activeForms = formsData.filter(f => f.status === 'active');
+  document.getElementById('formsCountBadge').textContent = activeForms.length + ' Borang';
+
+  let html = '';
+  activeForms.forEach(f => {
+    html += `
+      <div class="form-card ${f.special ? 'special' : ''}">
+        <div class="form-card-top">
+          <div class="form-icon"><i class="fas ${f.icon}"></i></div>
+          <div class="form-info">
+            <div class="form-name">${f.nama}</div>
+            <div class="form-desc">${f.desc}</div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <a class="form-btn ${f.special ? 'special' : 'primary'}" 
+             onclick="openForm('${f.id}')" 
+             style="cursor:pointer;"><i class="fas fa-external-link-alt"></i> Buka Borang</a>
+          <a class="form-btn" 
+             onclick="copyFormLink('${f.id}')" 
+             title="Salin Link" 
+             style="cursor:pointer;"><i class="fas fa-link"></i></a>
+          <a class="form-btn" 
+             onclick="showQRCode('${f.id}')" 
+             title="QR Code" 
+             style="cursor:pointer;"><i class="fas fa-qrcode"></i></a>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+function renderCategories(filter='all', search=''){
+  const container = document.getElementById('categoriesContainer');
+  let html = '';
+
+  categoriesData.forEach(cat => {
+    let clubs = clubsData.filter(c => c.kat === cat.kod);
+    if(filter !== 'all') clubs = clubs.filter(c => c.status === filter);
+    if(search) clubs = clubs.filter(c =>
+      c.nama.toLowerCase().includes(search.toLowerCase()) ||
+      c.kod.toLowerCase().includes(search.toLowerCase()) ||
+      c.guru.toLowerCase().includes(search.toLowerCase())
+    );
+    if(clubs.length === 0) return;
+
+    html += `
+      <div class="cat-section">
+        <div class="cat-header">
+          <div class="cat-header-left">
+            <div class="cat-code-badge ${cat.kod}">${cat.kod}</div>
+            <div>
+              <div class="cat-name">${cat.nama}</div>
+              <div class="cat-subname">${clubs.length} unit · Penyelaras: ${cat.penyelaras}</div>
+            </div>
+          </div>
+          <span class="cat-count">${cat.range}</span>
+        </div>
+        <div class="club-grid">`;
+
+    clubs.forEach(c => {
+      html += `
+        <div class="club-card" onclick="openClub('${c.kod}','${c.nama}')">
+          <div class="club-thumb ${c.kat}">
+            <span class="club-code">${c.kod}</span>
+            <div class="club-play-btn"><i class="fas fa-play"></i></div>
+            <div class="club-health ${c.status}"></div>
+          </div>
+          <div class="club-body">
+            <div class="club-title">${c.nama}</div>
+            <div class="club-stats">
+              <span class="club-stat"><i class="fas fa-users"></i> ${c.ahli}</span>
+              <span class="club-stat"><i class="fas fa-star"></i> ${c.pajsk}</span>
+              <span class="club-stat"><i class="fas fa-file"></i> ${c.fail}/48</span>
+            </div>
+          </div>
+        </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  if(html === '') html = `<div class="loading-state"><i class="fas fa-search"></i><div>Tiada kelab dijumpai.</div></div>`;
+  container.innerHTML = html;
+}
+
+function renderStats(){
+  const totalAhli = clubsData.reduce((s,c) => s + c.ahli, 0);
+  const totalFail = clubsData.reduce((s,c) => s + c.fail, 0);
+  const avgFail = (totalFail / clubsData.length).toFixed(1);
+  const kritikal = clubsData.filter(c => c.status === 'orange' || c.status === 'red').length;
+  const activeForms = formsData.filter(f => f.status === 'active').length;
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-box"><div class="stat-box-icon"><i class="fas fa-layer-group"></i></div><div class="stat-box-info"><div class="num">${clubsData.length}</div><div class="lbl">Jumlah Unit</div></div></div>
+    <div class="stat-box green"><div class="stat-box-icon"><i class="fas fa-users"></i></div><div class="stat-box-info"><div class="num">${totalAhli.toLocaleString()}</div><div class="lbl">Ahli Aktif</div></div></div>
+    <div class="stat-box orange"><div class="stat-box-icon"><i class="fas fa-file-circle-check"></i></div><div class="stat-box-info"><div class="num">${avgFail}/48</div><div class="lbl">Purata Fail Lengkap</div></div></div>
+    <div class="stat-box purple"><div class="stat-box-icon"><i class="fas fa-file-lines"></i></div><div class="stat-box-info"><div class="num">${activeForms}</div><div class="lbl">Borang Aktif</div></div></div>
+    <div class="stat-box red"><div class="stat-box-icon"><i class="fas fa-triangle-exclamation"></i></div><div class="stat-box-info"><div class="num">${kritikal}</div><div class="lbl">Perlu Perhatian</div></div></div>`;
+
+  document.getElementById('cntAll').textContent = clubsData.length;
+  document.getElementById('cntGreen').textContent = clubsData.filter(c => c.status === 'green').length;
+  document.getElementById('cntYellow').textContent = clubsData.filter(c => c.status === 'yellow').length;
+  document.getElementById('cntOrange').textContent = clubsData.filter(c => c.status === 'orange').length;
+  document.getElementById('cntRed').textContent = clubsData.filter(c => c.status === 'red').length;
+}
+
+/* ============================================================
+   INTERAKSI
+   ============================================================ */
+let currentFilter = 'all';
+
+function setFilter(filter, el){
+  currentFilter = filter;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderCategories(filter, document.getElementById('searchInput').value);
+}
+
+function filterClubs(){
+  renderCategories(currentFilter, document.getElementById('searchInput').value);
+}
+
+function toggleSidebar(){
+  document.getElementById('adminSidebar').classList.toggle('open');
+  document.getElementById('sidebarToggle').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+function openSystem(id){
+  const sys = adminSystemsData.find(s => s.id === id);
+  if (!sys) {
+    alert('❌ Sistem tidak dijumpai');
+    return;
+  }
+  
+  // Semak jika URL sah
+  if (!sys.url || sys.url === '#' || !sys.url.toString().startsWith('http')) {
+    alert(`⚠️ ${sys.nama}\n\nURL sistem belum ditetapkan.\n\nSila kemas kini di Google Sheets:\nSPKB_Admin_Systems → kolum "url"`);
+    return;
+  }
+  
+  // Buka dalam tab baharu
+  window.open(sys.url, '_blank');
+}
+
+// ============================================================
+// PUSAT BORANG GURU — Fungsi Pautan
+// ============================================================
+
+function openForm(formId) {
+  const form = formsData.find(f => f.id === formId);
+  if (!form) {
+    alert('❌ Borang tidak dijumpai');
+    return;
+  }
+  
+  if (!form.url || form.url === '#' || !form.url.toString().startsWith('http')) {
+    alert(`⚠️ ${form.nama}\n\nURL Google Form belum ditetapkan.\n\nSila kemas kini di Google Sheets:\nSPKB_Form_Registry → kolum "url"`);
+    return;
+  }
+  
+  window.open(form.url, '_blank');
+}
+
+function copyFormLink(formId) {
+  const form = formsData.find(f => f.id === formId);
+  if (!form || !form.url || form.url === '#') {
+    alert('⚠️ URL borang belum ditetapkan');
+    return;
+  }
+  
+  navigator.clipboard.writeText(form.url).then(() => {
+    showToast(`✅ Link disalin: ${form.nama}`);
+  }).catch(() => {
+    alert(`📋 Link borang:\n\n${form.url}\n\nSila salin manual.`);
+  });
+}
+
+function showQRCode(formId) {
+  const form = formsData.find(f => f.id === formId);
+  if (!form) return;
+  
+  if (!form.url || form.url === '#') {
+    alert('⚠️ URL borang belum ditetapkan');
+    return;
+  }
+  
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(form.url)}`;
+  
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  `;
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:24px;text-align:center;max-width:380px;width:100%;">
+      <h3 style="color:var(--khs-blue);margin-bottom:8px;font-size:16px;">${form.nama}</h3>
+      <p style="font-size:11px;color:#7f8c8d;margin-bottom:16px;">Imbas QR untuk akses borang</p>
+      <img src="${qrUrl}" alt="QR Code" style="width:100%;max-width:300px;border:2px solid #eee;border-radius:8px;">
+      <div style="font-size:10px;color:#7f8c8d;margin-top:12px;word-break:break-all;background:#f8fafc;padding:8px;border-radius:6px;">${form.url}</div>
+      <button onclick="this.closest('div[style*=fixed]').remove()" 
+              style="margin-top:16px;padding:10px 24px;background:var(--khs-blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;">
+        Tutup
+      </button>
+    </div>
+  `;
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+// Helper: Toast notification
+function showToast(message, color = 'var(--success)') {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position:fixed;top:20px;left:50%;transform:translateX(-50%);
+    background:${color};color:#fff;padding:12px 24px;
+    border-radius:10px;font-size:13px;font-weight:700;
+    box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:10001;
+    animation:slideDown 0.3s ease;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+// ============================================================
+// HALAMAN INDIVIDU KELAB
+// ============================================================
+let currentClub = null;
+
+const CLUSTERS = [
+  {kod:'A', nama:'Penubuhan & Asas', range:'001-003', total:3, icon:'📋'},
+  {kod:'B', nama:'Struktur Organisasi', range:'004-010', total:8, icon:'🏛️'},
+  {kod:'C', nama:'Perancangan & Program', range:'011-015', total:5, icon:'🎯'},
+  {kod:'D', nama:'Laporan & Analisis', range:'016-020', total:5, icon:'📊'},
+  {kod:'E', nama:'Pengurusan Keahlian', range:'021-025', total:5, icon:'👥'},
+  {kod:'F', nama:'Borang Keahlian Gabungan', range:'027-032', total:6, icon:'📝'},
+  {kod:'G', nama:'Laporan Tahunan & Kewangan', range:'033-034', total:2, icon:'💰'},
+  {kod:'H', nama:'Pentaksiran PAJSK', range:'037-040', total:4, icon:'⭐'},
+  {kod:'I', nama:'Inventori & Pemantauan', range:'041-043', total:3, icon:'📦'},
+  {kod:'J', nama:'Dokumen Tambahan', range:'044-048', total:5, icon:'📎'}
+];
+
+async function openClub(kod, nama) {
+  // Sembunyikan halaman utama
+  document.querySelectorAll('.page, .data-banner, .khs-header, .stat-row, .forms-zone, .filter-bar, #categoriesContainer').forEach(el => {
+    if (el.id !== 'page-clubDetail' && el.id !== 'page-main') el.style.display = 'none';
+  });
+  
+  // Papar halaman detail
+  document.getElementById('page-clubDetail').classList.add('active');
+  document.getElementById('page-clubDetail').style.display = 'block';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+
+  // Cari data kelab
+  const club = clubsData.find(c => c.kod === kod);
+  if (!club) return;
+  currentClub = club;
+
+  // Render maklumat asas
+  document.getElementById('detailTitle').textContent = `${club.kod} ${club.nama.toUpperCase()}`;
+  document.getElementById('detailSubtitle').innerHTML = 
+    `<i class="fas fa-chalkboard-user"></i> ${club.guru} · 
+     <i class="fas fa-users"></i> ${club.ahli} ahli aktif · 
+     <i class="fas fa-calendar"></i> Kategori ${club.kat}`;
+
+  // Emblem ikut kategori
+  const emblems = {A:'🎖️', B:'🤝', C:'📚', D:'🎭', S:'⚽'};
+  document.getElementById('detailEmblem').textContent = emblems[club.kat] || '🏆';
+
+  // Quick stats
+  document.getElementById('detailQuickStats').innerHTML = `
+    <div class="dqs">PAJSK <strong>${club.pajsk} / 5.0</strong></div>
+    <div class="dqs">Pingat 2026 <strong>—</strong></div>
+    <div class="dqs">Status <strong style="text-transform:capitalize;">${club.status}</strong></div>
+  `;
+
+  // Cuba ambil detail SKPM dari API
+  await loadSkpmDetail(kod);
+
+    // Render kluster
+  renderClusters(club);
+  
+  // ⭐ BAHARU: Muat senarai guru penasihat
+  loadGuruByKelab(kod);
+}
+
+async function loadSkpmDetail(kod) {
+  try {
+    const url = `${SPKB_CONFIG.API_URL}?action=detail&kod=${kod}&_t=${Date.now()}`;
+    const res = await fetch(url);
+    const result = await res.json();
+    
+    if (result.success && result.data) {
+      const d = result.data;
+      
+      // Skor keseluruhan
+      const overallEl = document.getElementById('skpmOverall');
+      overallEl.textContent = d.skor + '%';
+      overallEl.className = 'skpm-overall ' + d.status;
+      
+      // Kriteria A
+      document.getElementById('skpmA_value').textContent = d.laporan_24 || 0;
+      document.getElementById('skpmA_target').textContent = Math.round(d.sasaranLaporan);
+      document.getElementById('skpmA_bar').style.width = Math.min(100, d.skorA) + '%';
+      
+      // Kriteria B
+      document.getElementById('skpmB_value').textContent = d.fail || 0;
+      document.getElementById('skpmB_bar').style.width = Math.min(100, d.skorB) + '%';
+      
+      // Kriteria C
+      document.getElementById('skpmC_value').textContent = d.kk_aktiviti || 0;
+      document.getElementById('skpmC_target').textContent = Math.round(d.sasaranKK);
+      document.getElementById('skpmC_bar').style.width = Math.min(100, d.skorC) + '%';
+    }
+  } catch (e) {
+    console.error('Gagal muat detail:', e);
+    // Fallback guna data tempatan
+    fallbackSkpmDetail();
+  }
+}
+
+function fallbackSkpmDetail() {
+  const c = currentClub;
+  const skorB = (c.fail / 48) * 100;
+  document.getElementById('skpmOverall').textContent = '--';
+  document.getElementById('skpmB_value').textContent = c.fail || 0;
+  document.getElementById('skpmB_bar').style.width = skorB + '%';
+}
+
+function renderClusters(club) {
+  const container = document.getElementById('clusterGrid');
+  let html = '';
+  CLUSTERS.forEach(cl => {
+    // Anggar berapa fail dalam kluster ini (proporsional)
+    const filInCluster = Math.round((club.fail / 48) * cl.total);
+    let statusClass = 'empty', statusText = 'Tiada';
+    if (filInCluster >= cl.total) { statusClass = 'complete'; statusText = `✅ Lengkap ${filInCluster}/${cl.total}`; }
+    else if (filInCluster > 0) { statusClass = 'partial'; statusText = `⏳ ${filInCluster}/${cl.total}`; }
+    else { statusText = `❌ 0/${cl.total}`; }
+    
+    html += `
+      <div class="cluster-card" onclick="openCluster('${cl.kod}')">
+        <div class="cluster-badge">${cl.kod}</div>
+        <div class="cluster-title">${cl.icon} ${cl.nama}</div>
+        <div class="cluster-meta">Dok. ${cl.range}</div>
+        <span class="cluster-status ${statusClass}">${statusText}</span>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ============================================================
+// MUAT SENARAI GURU PENASIHAT UNTUK KELAB
+// ============================================================
+async function loadGuruByKelab(kod) {
+  const container = document.getElementById('guruContent');
+  const counter = document.getElementById('guruCount');
+  
+  // Papar loading
+  container.innerHTML = `
+    <div class="guru-empty">
+      <i class="fas fa-spinner fa-spin"></i>
+      <div>Memuatkan senarai guru...</div>
+    </div>`;
+  
+  try {
+    const url = `${SPKB_CONFIG.API_URL}?action=guru&kod=${kod}&_t=${Date.now()}`;
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (!result.success || !result.data || result.data.length === 0) {
+      counter.textContent = '0 orang';
+      container.innerHTML = `
+        <div class="guru-empty">
+          <i class="fas fa-user-slash"></i>
+          <div style="font-size:13px;font-weight:600;">Tiada guru penasihat berdaftar</div>
+          <div style="font-size:11px;margin-top:4px;">
+            Tambah di Sheets <code>SPKB_Guru_Penasihat</code><br>
+            Pastikan kod kelab di Sheets bermula dengan "${kod} "
+          </div>
+        </div>`;
+      return;
+    }
+
+    const guruList = result.data;
+    counter.textContent = `${guruList.length} orang`;
+
+    // Logik eksklusif: penolong didahulukan supaya tidak overlap dengan ketua
+const penolong = guruList.filter(g => /penolong/i.test(g.peranan));
+const ketua = guruList.filter(g => /ketua/i.test(g.peranan) && !/penolong/i.test(g.peranan));
+const ahli = guruList.filter(g => !/ketua|penolong/i.test(g.peranan));
+
+    let html = '';
+
+    // Ketua Penasihat
+    if (ketua.length) {
+      html += `<div class="guru-group">
+        <div class="guru-group-label">
+          <i class="fas fa-star" style="color:var(--khs-gold);"></i> 
+          Ketua Guru Penasihat (${ketua.length})
+        </div>
+        <div class="guru-list">${ketua.map(g => guruCardHtml(g, 'ketua')).join('')}</div>
+      </div>`;
+    }
+
+    // Penolong Ketua
+    if (penolong.length) {
+      html += `<div class="guru-group">
+        <div class="guru-group-label">
+          <i class="fas fa-user-tie" style="color:var(--secondary);"></i> 
+          Penolong Ketua (${penolong.length})
+        </div>
+        <div class="guru-list">${penolong.map(g => guruCardHtml(g, 'penolong')).join('')}</div>
+      </div>`;
+    }
+
+    // Ahli (collapsed jika > 6)
+    if (ahli.length) {
+      const showAll = ahli.length <= 6;
+      const id = `ahli_${Date.now()}`;
+      html += `<div class="guru-group">
+        <div class="guru-group-label">
+          <i class="fas fa-users" style="color:#7f8c8d;"></i> 
+          Guru Penasihat (${ahli.length})
+        </div>
+        <div class="guru-list" id="${id}">
+          ${ahli.slice(0, showAll ? ahli.length : 6).map(g => guruCardHtml(g, 'ahli')).join('')}
+        </div>
+        ${!showAll ? `
+          <button class="guru-toggle" onclick='toggleAhliFull("${id}", ${JSON.stringify(ahli).replace(/'/g, "&#39;")})'>
+            <i class="fas fa-chevron-down"></i> Tunjuk Semua ${ahli.length} Guru
+          </button>` : ''}
+      </div>`;
+    }
+
+    container.innerHTML = html;
+
+  } catch (e) {
+    console.error('Gagal load guru:', e);
+    counter.textContent = 'Ralat';
+    container.innerHTML = `
+      <div class="guru-empty" style="color:var(--danger);">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div style="font-size:13px;font-weight:600;">Gagal memuatkan senarai guru</div>
+        <div style="font-size:11px;margin-top:4px;">${e.message}</div>
+      </div>`;
+  }
+}
+
+/**
+ * Bina kad guru
+ */
+function guruCardHtml(g, jenis) {
+  // Initials dari nama (max 2 huruf)
+  const words = (g.nama || '?').split(/\s+/).filter(w => w.length > 0);
+  const initials = words.slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+  
+  // Sesi badge
+  const sesiClass = String(g.sesi || '').toLowerCase().includes('petang') ? 'petang' : '';
+  const sesiBadge = g.sesi ? `<span class="sesi-badge ${sesiClass}">${g.sesi}</span>` : '';
+  
+  // Kategori sahaja jika peranan biasa
+  const meta = `${g.peranan}${g.kategori ? ' · ' + g.kategori : ''}`;
+  
+  return `
+    <div class="guru-card ${jenis}">
+      <div class="guru-avatar">${initials || '?'}</div>
+      <div class="guru-info">
+        <div class="guru-name">
+          <span title="${g.nama}">${g.nama}</span>
+          ${sesiBadge}
+        </div>
+        <div class="guru-meta">${meta}</div>
+      </div>
+    </div>`;
+}
+
+/**
+ * Tunjuk semua ahli (bila guna butang)
+ */
+function toggleAhliFull(containerId, allAhli) {
+  const list = document.getElementById(containerId);
+  if (!list) return;
+  
+  list.innerHTML = allAhli.map(g => guruCardHtml(g, 'ahli')).join('');
+  
+  // Sembunyikan butang
+  const btn = list.parentElement.querySelector('.guru-toggle');
+  if (btn) btn.style.display = 'none';
+}
+
+function backToMain() {
+  document.getElementById('page-clubDetail').classList.remove('active');
+  document.getElementById('page-clubDetail').style.display = 'none';
+  document.querySelectorAll('.data-banner, .khs-header, .stat-row, .forms-zone, .filter-bar, #categoriesContainer').forEach(el => {
+    el.style.display = '';
+  });
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  currentClub = null;
+}
+
+function openVideo() {
+  if (currentClub && currentClub.youtube_url) {
+    window.open(currentClub.youtube_url, '_blank');
+  } else {
+    alert('🎬 Video pengenalan belum ditambah.\n\nTambah URL di Sheets kolum "youtube_url".');
+  }
+}
+
+function openDriveFolder() {
+  if (currentClub && currentClub.drive_folder_id) {
+    window.open(`https://drive.google.com/drive/folders/${currentClub.drive_folder_id}`, '_blank');
+  } else {
+    alert('📁 Folder Drive belum disambungkan.\n\nTambah ID folder di Sheets kolum "drive_folder_id".');
+  }
+}
+
+// ============================================================
+// BUKA BORANG GURU UNTUK KELAB INI (6 Butang Aksi Pantas)
+// ============================================================
+function openClubAction(jenis) {
+  // Padankan jenis butang dengan ID borang dalam Form Registry
+  const formMapping = {
+    'laporan':    'F01',  // Laporan Perjumpaan Mingguan
+    'kk':         'F02',  // Kertas Kerja Program
+    'pencapaian': 'F03',  // Penyertaan & Pencapaian
+    'surat':      'F04',  // Surat Kebenaran Ibu Bapa
+    'keluar':     'F05',  // Murid Keluar Kelas
+    'mohon':      'F06'   // Permohonan Aktiviti
+  };
+
+  const formId = formMapping[jenis];
+  if (!formId) {
+    alert('❌ Jenis borang tidak dikenali');
+    return;
+  }
+
+  // Cari borang dari formsData (sudah di-load dari Sheets)
+  const form = formsData.find(f => f.id === formId);
+  if (!form) {
+    alert(`⚠️ Borang ${formId} tidak dijumpai dalam Form Registry.\n\nSila tambah di Sheets SPKB_Form_Registry.`);
+    return;
+  }
+
+  if (!form.url || form.url === '#' || !form.url.toString().startsWith('http')) {
+    alert(`⚠️ ${form.nama}\n\nURL Google Form belum ditetapkan.\n\nSila kemas kini di Google Sheets:\nSPKB_Form_Registry → kolum "url"`);
+    return;
+  }
+
+  // Buka borang dalam tab baharu
+  window.open(form.url, '_blank');
+  
+  // Bonus: Tunjuk notifikasi
+  if (typeof showToast === 'function') {
+    showToast(`📋 Membuka: ${form.nama} untuk ${currentClub.kod}`);
+  }
+}
+
+// ============================================================
+// MODAL DOKUMEN KLUSTER
+// ============================================================
+
+const KLUSTER_NAMA = {
+  'A': { nama: 'Penubuhan & Asas', icon: '📋', range: '001-003' },
+  'B': { nama: 'Struktur Organisasi', icon: '🏛️', range: '004-010' },
+  'C': { nama: 'Perancangan & Program', icon: '🎯', range: '011-015' },
+  'D': { nama: 'Laporan & Analisis', icon: '📊', range: '016-020' },
+  'E': { nama: 'Pengurusan Keahlian', icon: '👥', range: '021-026' },
+  'F': { nama: 'Borang Keahlian Gabungan', icon: '📝', range: '027-032' },
+  'G': { nama: 'Laporan Tahunan & Kewangan', icon: '💰', range: '033-034' },
+  'H': { nama: 'Pentaksiran PAJSK', icon: '⭐', range: '036-040' },
+  'I': { nama: 'Inventori & Pemantauan', icon: '📦', range: '041-043' },
+  'J': { nama: 'Dokumen Tambahan', icon: '📎', range: '044-048' }
+};
+
+let cachedDokumen = {};  // Cache: { 'A01': [array of 48 docs] }
+
+async function openCluster(klusterKod) {
+  if (!currentClub) {
+    alert('❌ Tiada kelab dipilih');
+    return;
+  }
+
+  // ⭐ BAHARU: Refresh currentClub dari clubsData terkini
+  const freshClub = clubsData.find(c => c.kod === currentClub.kod);
+  if (freshClub) {
+    currentClub = freshClub;
+  }
+
+  const klusterInfo = KLUSTER_NAMA[klusterKod];
+  if (!klusterInfo) return;
+
+  // Setup modal
+  const modal = document.getElementById('dokModal');
+  const header = document.getElementById('dokModalHeader');
+  const title = document.getElementById('dokModalTitle');
+  const subtitle = document.getElementById('dokModalSubtitle');
+  const body = document.getElementById('dokModalBody');
+
+  // Tukar warna header ikut kluster
+  header.className = `dok-modal-header kluster-${klusterKod}`;
+  title.textContent = `${klusterInfo.icon} Kluster ${klusterKod}: ${klusterInfo.nama}`;
+  subtitle.textContent = `${currentClub.kod} ${currentClub.nama} · Dok ${klusterInfo.range}`;
+
+  body.innerHTML = `
+    <div class="dok-loading">
+      <i class="fas fa-spinner"></i>
+      <div>Memuatkan dokumen...</div>
+    </div>`;
+
+  modal.classList.add('open');
+
+  // Tarik data dokumen
+  try {
+    let allDocs;
+    if (cachedDokumen[currentClub.kod]) {
+      allDocs = cachedDokumen[currentClub.kod];
+    } else {
+      const url = `${SPKB_CONFIG.API_URL}?action=dokumen&kod=${currentClub.kod}&_t=${Date.now()}`;
+      const res = await fetch(url);
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error);
+      allDocs = result.data;
+      cachedDokumen[currentClub.kod] = allDocs;
+    }
+
+    // Filter ikut kluster
+    const klusterDocs = allDocs.filter(d => d.kluster === klusterKod);
+    renderDokumenList(klusterDocs, klusterKod);
+
+  } catch (e) {
+    body.innerHTML = `
+      <div class="dok-loading" style="color:var(--danger);">
+        <i class="fas fa-exclamation-triangle" style="animation:none;"></i>
+        <div>Gagal memuatkan dokumen</div>
+        <div style="font-size:11px;margin-top:4px;">${e.message}</div>
+      </div>`;
+  }
+}
+
+function renderDokumenList(docs, klusterKod) {
+  const body = document.getElementById('dokModalBody');
+
+  if (!docs || docs.length === 0) {
+    body.innerHTML = `<div class="dok-loading"><i class="fas fa-folder-open" style="animation:none;"></i><div>Tiada dokumen dalam kluster ini</div></div>`;
+    return;
+  }
+
+  // Stats
+  const adaCount = docs.filter(d => d.ada || d.jenis === 'Folder' || d.jenis === 'Pautan').length;
+  const totalCount = docs.length;
+  const peratus = Math.round((adaCount / totalCount) * 100);
+  const statusColor = peratus >= 80 ? 'var(--success)' : peratus >= 50 ? 'var(--accent)' : 'var(--danger)';
+
+  let html = `
+    <div class="dok-modal-stats">
+      <div>
+        <div class="dok-modal-stat-num" style="color:${statusColor};">${adaCount} / ${totalCount}</div>
+        <div class="dok-modal-stat-lbl">Dokumen lengkap (${peratus}%)</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="dok-modal-stat-num" style="font-size:28px;color:${statusColor};">${peratus}%</div>
+        <div class="dok-modal-stat-lbl">Kelengkapan kluster</div>
+      </div>
+    </div>`;
+
+  docs.forEach(d => {
+    html += renderDokumenItem(d);
+  });
+
+  body.innerHTML = html;
+}
+
+function renderDokumenItem(d) {
+  const isFolder = d.jenis === 'Folder';
+  const isPautan = d.jenis === 'Pautan';
+  const isFail = d.jenis === 'Fail';
+  
+  let itemClass, statusIcon, actionsBtn;
+
+  if (isFolder) {
+    // Folder 014, 016, 017 — auto-detect dari Drive
+    itemClass = 'folder';
+    const fileCount = getFolderFileCount(d.no_dok);
+    statusIcon = `<div class="dok-status-icon"><i class="fas fa-folder"></i></div>`;
+    
+    if (fileCount > 0) {
+      actionsBtn = `<button class="dok-btn dok-btn-folder" onclick="openClubFolder('${d.no_dok}')">
+        <i class="fas fa-folder-open"></i> ${fileCount} fail
+      </button>`;
+    } else {
+      actionsBtn = `<button class="dok-btn dok-btn-empty" disabled>
+        <i class="fas fa-folder"></i> 0 fail
+      </button>`;
+    }
+  } else if (isPautan) {
+    // Pautan EDMS
+    itemClass = 'edms';
+    statusIcon = `<div class="dok-status-icon"><i class="fas fa-link"></i></div>`;
+    
+    if (d.edms_url) {
+      actionsBtn = `<a class="dok-btn dok-btn-edms" href="${d.edms_url}" target="_blank">
+        <i class="fas fa-external-link-alt"></i> EDMS
+      </a>`;
+    } else {
+      actionsBtn = `<button class="dok-btn dok-btn-empty" disabled>
+        <i class="fas fa-link"></i> URL belum ada
+      </button>`;
+    }
+  } else {
+    // Fail biasa
+    if (d.ada) {
+      itemClass = 'ada';
+      statusIcon = `<div class="dok-status-icon"><i class="fas fa-check"></i></div>`;
+      actionsBtn = d.drive_url 
+        ? `<a class="dok-btn dok-btn-drive" href="${d.drive_url}" target="_blank">
+             <i class="fas fa-external-link-alt"></i> Drive
+           </a>`
+        : `<button class="dok-btn dok-btn-empty" disabled>
+             <i class="fas fa-check"></i> Ada
+           </button>`;
+    } else {
+      itemClass = 'tiada';
+      statusIcon = `<div class="dok-status-icon">—</div>`;
+      actionsBtn = `<button class="dok-btn dok-btn-empty" disabled>
+        <i class="fas fa-times"></i> Belum ada
+      </button>`;
+    }
+  }
+
+  // Meta info
+  let metaHtml = '';
+  const metaItems = [];
+  
+ if (isFolder) {
+    metaItems.push('<span class="dok-meta-tag warn">📁 Folder Auto</span>');
+    
+    // ⭐ BAHARU: Tag berbeza untuk 017 (kumulatif) vs 014/016 (tahun semasa)
+    if (d.no_dok === '017') {
+      metaItems.push(`<span class="dok-meta-tag">Semua Tahun (Kumulatif)</span>`);
+    } else {
+      metaItems.push(`<span class="dok-meta-tag">Tahun ${new Date().getFullYear()}</span>`);
+    }
+  } else if (isPautan) {
+    metaItems.push('<span class="dok-meta-tag warn">🌐 EDMS SchoolNet</span>');
+  } else {
+    metaItems.push(`<span class="dok-meta-tag">${d.sumber || 'Drive'}</span>`);
+    if (d.format) metaItems.push(`<span class="dok-meta-tag">${d.format}</span>`);
+    if (d.tarikh_kemas) {
+      const tarikh = new Date(d.tarikh_kemas).toLocaleDateString('ms-MY');
+      metaItems.push(`<span class="dok-meta-tag">📅 ${tarikh}</span>`);
+    }
+    if (d.oleh) metaItems.push(`<span class="dok-meta-tag">👤 ${d.oleh}</span>`);
+  }
+  
+  if (metaItems.length > 0) {
+    metaHtml = `<div class="dok-meta">${metaItems.join('')}</div>`;
+  }
+
+  return `
+    <div class="dok-item ${itemClass}">
+      ${statusIcon}
+      <div class="dok-info">
+        <span class="dok-no">${d.no_dok}</span>
+        <div class="dok-nama">${d.nama_dok}</div>
+        ${metaHtml}
+      </div>
+      <div class="dok-actions">${actionsBtn}</div>
+    </div>`;
+}
+
+// Helper: dapatkan kiraan fail folder dari currentClub
+function getFolderFileCount(no_dok) {
+  if (!currentClub) return 0;
+  if (no_dok === '016') return Number(currentClub.laporan_24) || 0;
+  if (no_dok === '014') return Number(currentClub.kk_aktiviti) || 0;
+  if (no_dok === '017') return Number(currentClub.penyertaan_17) || 0;  // ⭐ FIX
+  return 0;
+}
+
+// Helper: buka folder Drive kelab
+function openClubFolder(no_dok) {
+  if (!currentClub || !currentClub.drive_folder_id) {
+    alert('⚠️ ID folder Drive belum ditetapkan untuk kelab ini.');
+    return;
+  }
+  
+  const folderUrl = `https://drive.google.com/drive/folders/${currentClub.drive_folder_id}`;
+  window.open(folderUrl, '_blank');
+}
+
+function closeDokModal() {
+  document.getElementById('dokModal').classList.remove('open');
+}
+
+// Tutup modal bila klik di luar
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('dokModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeDokModal();
+    });
+  }
+});
+
+// ESC untuk tutup
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDokModal();
+});function openAddFormModal(){ document.getElementById('addFormModal').classList.add('open'); }
+function closeAddFormModal(){ document.getElementById('addFormModal').classList.remove('open'); }
+
+function reloadData(){
+  document.getElementById('categoriesContainer').innerHTML =
+    '<div class="loading-state"><i class="fas fa-spinner"></i><div>Menyegarkan data...</div></div>';
+  loadDataFromSheets(true);
+}
+
+function openSheetsGuide(){
+  alert('📊 Buka Google Sheets SPKB_Master_Database untuk edit data 46 kelab.');
+}
+
+/* ============================================================
+   CRUD FUNCTIONS
+   ============================================================ */
+async function callAPI(action, sheetName, data) {
+  try {
+    const response = await fetch(SPKB_CONFIG.API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: action,
+        sheetName: sheetName,
+        data: data,
+        apiKey: SPKB_CONFIG.API_SECRET,
+        userEmail: SPKB_CONFIG.USER_EMAIL
+      })
+    });
+    const result = await response.json();
+    if (result.success) {
+      await loadDataFromSheets(true);
+      return { success: true, data: result.result };
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error('API call failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function createClub(data) { return await callAPI('create', 'SPKB_Clubs', data); }
+async function updateClub(data) { return await callAPI('update', 'SPKB_Clubs', data); }
+async function deleteClub(kod)  { return await callAPI('delete', 'SPKB_Clubs', { kod: kod }); }
+
+/* ============================================================
+   INISIALISASI
+   ============================================================ */
+setInterval(() => loadDataFromSheets(false), 5 * 60 * 1000);
+document.addEventListener('DOMContentLoaded', () => loadDataFromSheets(false));
+// ============================================================
+// MODUL SK@S 3.2 — DASHBOARD VISUAL
+// ============================================================
+
+const SKAS_ASPEK_INFO = {
+  '3.2.1': {
+    nama: 'KETETAPAN PELAKSANAAN KOKURIKULUM',
+    icon: 'fa-clipboard-list',
+    aspek: 'Aspek 1',
+    cssClass: 'skas-aspek-321'
+  },
+  '3.2.2-4': {
+    nama: 'PENGURUSAN KELAB / UNIFORM / SUKAN',
+    icon: 'fa-users',
+    aspek: 'Aspek 2-4',
+    cssClass: 'skas-aspek-322',
+    linked: true
+  },
+  '3.2.5': {
+    nama: 'PROGRAM KECEMERLANGAN KOKURIKULUM',
+    icon: 'fa-trophy',
+    aspek: 'Aspek 5',
+    cssClass: 'skas-aspek-325'
+  },
+  '3.2.6': {
+    nama: 'SUKAN UNTUK SEMUA',
+    icon: 'fa-running',
+    aspek: 'Aspek 6',
+    cssClass: 'skas-aspek-326'
+  },
+  '3.2.7': {
+    nama: 'PENTAKSIRAN KOKURIKULUM',
+    icon: 'fa-chart-line',
+    aspek: 'Aspek 7',
+    cssClass: 'skas-aspek-327'
+  }
+};
+
+let skasData = null;
+
+/**
+ * Buka modul SK@S
+ */
+async function bukaModulSKAS() {
+  // Sembunyikan halaman lain
+  document.querySelectorAll('.page').forEach(function(p) {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  
+  // Sembunyikan elemen utama dashboard (kekalkan banner & header)
+  document.querySelectorAll('.stat-row, .forms-zone, .filter-bar, #categoriesContainer').forEach(function(el) {
+    el.style.display = 'none';
+  });
+  
+  // Papar halaman SK@S
+  const skasPage = document.getElementById('page-skas');
+  skasPage.classList.add('active');
+  skasPage.style.display = 'block';
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // Load data
+  await loadSKASData();
+}
+
+/**
+ * Load data dari API
+ */
+async function loadSKASData() {
+  try {
+    const url = SPKB_CONFIG.API_URL + '?action=skas_dashboard&_t=' + Date.now();
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (!result.success) throw new Error(result.error);
+    
+    skasData = result.data;
+    renderSKASDashboard();
+    loadStaleFiles();
+    
+  } catch (e) {
+    console.error('Gagal load SK@S:', e);
+    document.getElementById('skasAspekContainer').innerHTML = 
+      '<div style="text-align:center;padding:40px;color:var(--danger);">' +
+      '<i class="fas fa-exclamation-triangle" style="font-size:32px;"></i>' +
+      '<p style="margin-top:14px;">Gagal memuatkan data: ' + e.message + '</p></div>';
+  }
+}
+
+/**
+ * Render dashboard
+ */
+function renderSKASDashboard() {
+  if (!skasData) return;
+  
+  // Update overall
+  const k = skasData.keseluruhan;
+  document.getElementById('skasPeratus').textContent = k.peratus;
+  document.getElementById('skasLabel').textContent = 
+    'Skor SKPMg2: ' + k.skorSkpm + '/4 (' + k.label + ')';
+  document.getElementById('skasTotalFolder').textContent = skasData.folders.length;
+  document.getElementById('skasTotalFail').textContent = k.totalFail;
+  document.getElementById('skasTotalUpdated').textContent = k.totalGreen;
+  document.getElementById('skasTotalStale').textContent = k.totalStale;
+  
+  // Render aspek cards
+  const container = document.getElementById('skasAspekContainer');
+  let html = '';
+  
+  // Group folders by standard
+  const foldersByStandard = {};
+  skasData.folders.forEach(function(f) {
+    const std = f.standard_id;
+    if (!foldersByStandard[std]) foldersByStandard[std] = [];
+    foldersByStandard[std].push(f);
+  });
+  
+  // Render setiap standard
+  ['3.2.1', '3.2.2-4', '3.2.5', '3.2.6', '3.2.7'].forEach(function(stdId) {
+    const folders = foldersByStandard[stdId] || [];
+    const stdInfo = SKAS_ASPEK_INFO[stdId];
+    const stdData = skasData.standards.find(function(s) { return s.standard_id === stdId; });
+    
+    if (!stdInfo) return;
+    
+    html += renderAspekCard(stdId, stdInfo, stdData, folders);
+  });
+  
+  container.innerHTML = html;
+}
+
+/**
+ * Render satu kad aspek
+ */
+function renderAspekCard(stdId, info, stdData, folders) {
+  const peratus = stdData ? parseInt(String(stdData.peratus || '0%').replace('%','')) : 0;
+  const skorSkpm = stdData ? Number(stdData.skor_skpm) || 0 : 0;
+  const labelSkpm = stdData ? (stdData.label_skpm || 'N/A') : 'N/A';
+  
+  // Special handling for linked aspek (3.2.2-4)
+  if (info.linked) {
+    return `
+      <div class="skas-aspek-card ${info.cssClass}">
+        <div class="skas-aspek-header">
+          <div class="skas-aspek-title">
+            <div class="skas-aspek-icon"><i class="fas ${info.icon}"></i></div>
+            <div>
+              <h3>STANDARD ${stdId} — ${info.nama}</h3>
+              <p>${info.aspek}</p>
+            </div>
+          </div>
+          <div class="skas-skor-display">
+            <div style="font-size:11px;color:#3498db;font-weight:700;">🔗 LINKED</div>
+            <div class="skas-skor-label">Modul Kelab</div>
+          </div>
+        </div>
+        
+        <div class="skas-linked-card">
+          <h4><i class="fas fa-link"></i> Sambung ke Modul Kelab Sedia Ada</h4>
+          <p>Data evidens 3.2.2/3/4 diuruskan secara automatik oleh Modul Pengurusan Kelab</p>
+          <div class="skas-linked-stats">
+            <span>📊 ${clubsData ? clubsData.length : 0} kelab terurus</span>
+            <span>👥 Auto-sync setiap pagi</span>
+          </div>
+          <button class="skas-btn" style="background:#fff;color:#3498db;font-weight:800;" onclick="kembaliKeKelab()">
+            <i class="fas fa-arrow-right"></i> Buka Modul Kelab Penuh
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Calculate stats for this aspek
+  let totalFail = 0, totalGreen = 0, totalStale = 0;
+  folders.forEach(function(f) {
+    if (f.stats) {
+      totalFail += f.stats.total || 0;
+      totalGreen += f.stats.green || 0;
+      totalStale += (f.stats.red || 0) + (f.stats.orange || 0);
+    }
+  });
+  
+  // Render folder chips
+  let folderChipsHtml = '';
+  folders.forEach(function(f) {
+    const statusColor = getStatusFromStats(f.stats);
+    const noPart = String(f.no);
+    folderChipsHtml += `
+      <div class="skas-folder-chip" onclick="bukaFolderDetail('${noPart}')">
+        <div class="skas-folder-chip-no">${noPart}</div>
+        <div class="skas-folder-chip-name">${f.nama_folder}</div>
+        <div class="skas-folder-chip-status ${statusColor}"></div>
+      </div>
+    `;
+  });
+  
+  return `
+    <div class="skas-aspek-card ${info.cssClass}">
+      <div class="skas-aspek-header">
+        <div class="skas-aspek-title">
+          <div class="skas-aspek-icon"><i class="fas ${info.icon}"></i></div>
+          <div>
+            <h3>STANDARD ${stdId} — ${info.nama}</h3>
+            <p>${info.aspek}</p>
+          </div>
+        </div>
+        <div class="skas-skor-display">
+          <div class="skas-skor-num">${peratus}%</div>
+          <div class="skas-skor-label">Skor</div>
+          <div class="skas-skor-skpm skor-${skorSkpm}">${skorSkpm}/4 ${labelSkpm}</div>
+        </div>
+      </div>
+      
+      <div class="skas-aspek-stats">
+        <div class="skas-stat-item">
+          <div class="skas-stat-num">${folders.length}</div>
+          <div class="skas-stat-lbl">Folder</div>
+        </div>
+        <div class="skas-stat-item">
+          <div class="skas-stat-num">${totalFail}</div>
+          <div class="skas-stat-lbl">Fail</div>
+        </div>
+        <div class="skas-stat-item" style="color:#27ae60;">
+          <div class="skas-stat-num">${totalGreen}</div>
+          <div class="skas-stat-lbl">Updated</div>
+        </div>
+        <div class="skas-stat-item" style="color:#e74c3c;">
+          <div class="skas-stat-num">${totalStale}</div>
+          <div class="skas-stat-lbl">Stale</div>
+        </div>
+      </div>
+      
+      <div class="skas-folder-grid">
+        ${folderChipsHtml}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Tentukan warna status berdasarkan stats
+ */
+function getStatusFromStats(stats) {
+  if (!stats || stats.total === 0) return 'red';
+  const greenPct = (stats.green / stats.total) * 100;
+  if (greenPct >= 75) return 'green';
+  if (greenPct >= 50) return 'yellow';
+  if (greenPct >= 25) return 'orange';
+  return 'red';
+}
+
+/**
+ * Load fail belum update
+ */
+async function loadStaleFiles() {
+  try {
+    const url = SPKB_CONFIG.API_URL + '?action=skas_stale_files&_t=' + Date.now();
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (!result.success) return;
+    
+    const stale = result.data || [];
+    if (stale.length === 0) {
+      document.getElementById('skasReminder').style.display = 'none';
+      return;
+    }
+    
+    document.getElementById('skasReminder').style.display = 'block';
+    document.getElementById('skasReminderCount').textContent = stale.length;
+    document.getElementById('skasReminderYear').textContent = new Date().getFullYear();
+    
+    // Show 5 first
+    const top5 = stale.slice(0, 5);
+    let html = '';
+    top5.forEach(function(item) {
+      const cls = item.status === 'orange' ? 'orange' : '';
+      html += `
+        <div class="skas-reminder-item ${cls}">
+          <div class="skas-reminder-item-icon">
+            <i class="fas fa-exclamation"></i>
+          </div>
+          <div class="skas-reminder-item-info">
+            <div class="skas-reminder-item-name">${item.nama_fail}</div>
+            <div class="skas-reminder-item-meta">📁 Folder ${item.folder_no} · ${item.label}</div>
+          </div>
+          <div class="skas-reminder-item-actions">
+            <button class="skas-btn skas-btn-primary" style="padding:5px 10px;font-size:11px;" onclick="window.open('${item.url}', '_blank')">
+              <i class="fas fa-edit"></i> Update
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    
+    if (stale.length > 5) {
+      html += '<p style="text-align:center;font-size:11px;color:#7f8c8d;margin-top:8px;">' +
+              '+ ' + (stale.length - 5) + ' fail lagi belum update</p>';
+    }
+    
+    document.getElementById('skasReminderList').innerHTML = html;
+    
+  } catch (e) {
+    console.error('Gagal load stale:', e);
+  }
+}
+
+/**
+ * Refresh dashboard (trigger Apps Script)
+ */
+async function refreshSKASDashboard() {
+  const btn = document.getElementById('skasRefreshBtn');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Refresh...';
+  btn.disabled = true;
+  
+  try {
+    const url = SPKB_CONFIG.API_URL + '?action=skas_refresh&_t=' + Date.now();
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (result.success) {
+      showToast('✅ Refresh berjaya. Memuatkan data...');
+      await loadSKASData();
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (e) {
+    showToast('❌ Gagal refresh: ' + e.message);
+  } finally {
+    btn.innerHTML = originalHTML;
+    btn.disabled = false;
+  }
+}
+
+/**
+ * Buka detail folder (placeholder untuk Sesi 4)
+ */
+function bukaFolderDetail(folderNo) {
+  alert('📁 Detail Folder ' + folderNo + '\n\nFitur ini akan dibina dalam Sesi 4 (Drill-Down Detail).');
+}
+
+/**
+ * Lihat semua stale files
+ */
+function lihatSemuaStale() {
+  alert('Lihat semua fail belum update — coming soon!');
+}
+
+/**
+ * Kembali ke modul Kelab
+ */
+function kembaliKeKelab() {
+  // Sembunyikan halaman SK@S
+  document.getElementById('page-skas').classList.remove('active');
+  document.getElementById('page-skas').style.display = 'none';
+  
+  // Papar semula elemen utama
+  document.querySelectorAll('.stat-row, .forms-zone, .filter-bar, #categoriesContainer').forEach(function(el) {
+    el.style.display = '';
+  });
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+<!-- ===== MODAL: DOKUMEN KLUSTER ===== -->
+<div class="dok-modal" id="dokModal">
+  <div class="dok-modal-box">
+    <div class="dok-modal-header" id="dokModalHeader">
+      <div>
+        <h3 id="dokModalTitle">Dokumen Kluster</h3>
+        <p id="dokModalSubtitle">Memuatkan...</p>
+      </div>
+      <button class="dok-modal-close" onclick="closeDokModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="dok-modal-body" id="dokModalBody">
+      <div class="dok-loading">
+        <i class="fas fa-spinner"></i>
+        <div>Memuatkan dokumen...</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
