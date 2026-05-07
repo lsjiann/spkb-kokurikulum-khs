@@ -812,14 +812,12 @@ document.querySelectorAll('.nav-item[data-page]').forEach(function(item) {
 /* ============================================================
    MODUL PENGURUSAN KELAB — Buka dari Drive
    ============================================================ */
+// URL GitHub Pages untuk Modul Kelab
+const KELAB_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-kelab-v3.html';
+
 function openKelabFullscreen() {
-  if (!KELAB_FILE_ID || KELAB_FILE_ID === 'FILE_ID_DARI_DRIVE_ANDA') {
-    alert('⚠️ FILE_ID Drive belum ditetapkan!');
-    return;
-  }
-  const kelabURL = 'https://drive.google.com/file/d/' + KELAB_FILE_ID + '/preview';
-  console.log('📂 Membuka modul kelab:', kelabURL);
-  window.open(kelabURL, '_blank', 'noopener,noreferrer');
+  console.log('📂 Membuka modul kelab dari GitHub:', KELAB_URL);
+  window.open(KELAB_URL, '_blank', 'noopener,noreferrer');
 }
 
 /* ============================================================
