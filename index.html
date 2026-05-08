@@ -866,26 +866,18 @@ document.getElementById('sidebarToggle').addEventListener('click', function() {
    PAGE INFO
    ============================================================ */
 const pageInfo = {
-  'dashboard':        { title: 'SPKB v3.1 — Papan Pemuka Kokurikulum', label: 'Papan Pemuka Utama' },
-  'fail':             { title: 'SPKB v3.1 — Pengurusan Fail Kokurikulum', label: 'Pengurusan Fail' },
-  'skas':             { title: 'SPKB v3.1 — Pengurusan SK@S 3.2', label: 'Pengurusan SK@S 3.2' },
-  'pengurusan-kelab': { title: 'SPKB v3.1 — Pengurusan Kelab/Persatuan', label: 'Pengurusan Kelab/Persatuan' },
-  'pajsk':            { title: 'SPKB v3.1 — Penilaian PAJSK', label: 'Penilaian PAJSK' },
-  'kelab':            { title: 'SPKB v3.1 — Kelab & Persatuan', label: 'Kelab & Persatuan' },
-  'uniform':          { title: 'SPKB v3.1 — Badan Beruniform', label: 'Badan Beruniform' },
-  'sukan':            { title: 'SPKB v3.1 — Sukan & Permainan', label: 'Sukan & Permainan' },
-  'pelajar':          { title: 'SPKB v3.1 — Data Pelajar', label: 'Data Pelajar' },
-  'guru':             { title: 'SPKB v3.1 — Guru Penasihat', label: 'Guru Penasihat' },
-  'jana':             { title: 'SPKB v3.1 — Jana Dokumen', label: 'Jana Dokumen' },
-  'perancangan':      { title: 'SPKB v3.1 — Perancangan Aktiviti', label: 'Perancangan Aktiviti' },
-  'kehadiran':        { title: 'SPKB v3.1 — Rekod Kehadiran', label: 'Rekod Kehadiran' },
-  'pencapaian':       { title: 'SPKB v3.1 — Pencapaian', label: 'Pencapaian' },
-  'analitik':         { title: 'SPKB v3.1 — Analitik & Laporan', label: 'Analitik & Laporan' },
-  'profil':           { title: 'SPKB v3.1 — Profil Pentadbir', label: 'Profil Pentadbir' },
-  'sekolah':          { title: 'SPKB v3.1 — Maklumat Sekolah', label: 'Maklumat Sekolah' },
-  'pengguna':         { title: 'SPKB v3.1 — Pengurusan Pengguna', label: 'Pengurusan Pengguna' },
-  'tetapan':          { title: 'SPKB v3.1 — Tetapan Sistem', label: 'Tetapan Sistem' },
-  'bantuan':          { title: 'SPKB v3.1 — Bantuan & Panduan', label: 'Bantuan & Panduan' }
+  'dashboard':        { title: 'SPKB v3.1 — Papan Pemuka Kokurikulum', label: 'Papan Pemuka Utama', phase: 'active', icon: '📊' },
+  'pengurusan-kelab': { title: 'SPKB v3.1 — Pengurusan Kelab/Persatuan', label: 'Pengurusan Kelab/Persatuan', phase: 'active', icon: '📂' },
+  'skas':             { title: 'SPKB v3.1 — Pengurusan SK@S 3.2', label: 'Pengurusan SK@S 3.2', phase: 'active', icon: '✅' },
+  'pajsk':            { title: 'SPKB v3.1 — Penilaian PAJSK', label: 'Penilaian PAJSK', phase: 'phase2', icon: '📋' },
+  'pencapaian':       { title: 'SPKB v3.1 — Pencapaian', label: 'Pencapaian (Hall of Fame)', phase: 'phase2', icon: '🏆' },
+  'fail':             { title: 'SPKB v3.1 — Pengurusan Fail', label: 'Pengurusan Fail', phase: 'phase3', icon: '📁' },
+  'jana':             { title: 'SPKB v3.1 — Jana Dokumen', label: 'Jana Dokumen', phase: 'phase3', icon: '📄' },
+  'pelajar':          { title: 'SPKB v3.1 — Data Pelajar', label: 'Data Pelajar', phase: 'phase3', icon: '🎓' },
+  'guru':             { title: 'SPKB v3.1 — Guru Penasihat', label: 'Guru Penasihat', phase: 'phase3', icon: '👨‍🏫' },
+  'sekolah':          { title: 'SPKB v3.1 — Maklumat Sekolah', label: 'Maklumat Sekolah', phase: 'phase3', icon: '🏫' },
+  'profil':           { title: 'SPKB v3.1 — Profil Pentadbir', label: 'Profil Pentadbir', phase: 'phase3', icon: '👤' },
+  'tetapan':          { title: 'SPKB v3.1 — Tetapan Sistem', label: 'Tetapan Sistem', phase: 'phase3', icon: '⚙️' }
 };
 
 /* ============================================================
@@ -910,13 +902,34 @@ function navigateTo(pageId) {
   if (targetPage) {
     targetPage.classList.add('active');
   } else {
+    // Show enhanced "Coming Soon" page
     const ph = document.getElementById('page-placeholder');
     if (ph) {
       ph.classList.add('active');
       if (pageInfo[pageId]) {
-        document.getElementById('placeholderTitle').innerHTML = '<i class="fas fa-hammer"></i> ' + pageInfo[pageId].label;
-        document.getElementById('placeholderBreadcrumb').textContent = pageInfo[pageId].label;
-        document.getElementById('placeholderDesc').textContent = 'Modul "' + pageInfo[pageId].label + '" sedang dibangunkan dan akan tersedia tidak lama lagi.';
+        const info = pageInfo[pageId];
+        const phaseLabel = info.phase === 'phase2' ? 'Phase 2 — Coming Soon (Next!)' : 'Phase 3 — Akan Datang';
+        const phaseColor = info.phase === 'phase2' ? '#7d6608' : '#1a5276';
+        const phaseBg = info.phase === 'phase2' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)';
+        const heroDesc = info.phase === 'phase2' 
+          ? 'Modul ini adalah keutamaan tinggi dan akan dilancarkan dalam fasa seterusnya. Tunggu kemas kini!'
+          : 'Modul ini sedang dirancang dan akan dilancarkan mengikut keperluan dan keutamaan.';
+        
+        document.getElementById('placeholderTitle').innerHTML = '<i class="fas fa-rocket"></i> ' + info.label;
+        document.getElementById('placeholderBreadcrumb').textContent = info.label;
+        document.getElementById('placeholderDesc').textContent = 'Modul ini akan dibangunkan mengikut keutamaan dan keperluan.';
+        
+        const iconEl = document.getElementById('placeholderIcon');
+        if (iconEl) iconEl.textContent = info.icon || '🚀';
+        
+        const heroTitleEl = document.getElementById('placeholderHeroTitle');
+        if (heroTitleEl) heroTitleEl.textContent = info.label;
+        
+        const heroDescEl = document.getElementById('placeholderHeroDesc');
+        if (heroDescEl) heroDescEl.textContent = heroDesc;
+        
+        const phaseTextEl = document.getElementById('placeholderPhaseText');
+        if (phaseTextEl) phaseTextEl.textContent = phaseLabel;
       }
     }
   }
@@ -927,7 +940,6 @@ function navigateTo(pageId) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 document.querySelectorAll('.nav-item[data-page]').forEach(function(item) {
   item.addEventListener('click', function(e) {
     e.preventDefault();
