@@ -690,6 +690,534 @@ body.demo-active .main{margin-top:98px;}
     </div>
   </div>
 
+
+<!-- ============================================= -->
+<!-- PAGE: PENILAIAN PAJSK (SESI 2C)              -->
+<!-- ============================================= -->
+<div class="page" id="page-pajsk">
+  <div class="breadcrumb">
+    <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+    <i class="fas fa-chevron-right" style="margin:0 8px;font-size:10px;"></i>
+    <span style="color:var(--dark);font-weight:700;">Penilaian PAJSK</span>
+  </div>
+
+  <!-- HERO HEADER -->
+  <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:16px;padding:30px;margin-bottom:24px;box-shadow:0 6px 24px rgba(102,126,234,0.3);">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 8px 0;">
+          <i class="fas fa-clipboard-list"></i> Penilaian PAJSK
+        </h1>
+        <p style="font-size:13px;opacity:0.9;margin:0;">
+          Dashboard analisis PAJSK lengkap dengan auto-analytics & sasaran
+        </p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-outline" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);" onclick="navigateTo('dashboard')">
+          <i class="fas fa-arrow-left"></i> Kembali
+        </button>
+        <button class="btn btn-accent" onclick="loadPAJSKData()">
+          <i class="fas fa-sync"></i> Refresh
+        </button>
+        <button class="btn" style="background:#27ae60;color:#fff;" onclick="togglePAJSKSharingMode()">
+          <i class="fas fa-eye"></i> Mode Pembentangan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB NAVIGATION -->
+  <div class="pajsk-tabs">
+    <button class="pajsk-tab active" data-pajsk-tab="dashboard" onclick="switchPAJSKTab('dashboard')">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </button>
+    <button class="pajsk-tab" data-pajsk-tab="input" onclick="switchPAJSKTab('input')">
+      <i class="fas fa-pen-to-square"></i> Input Data
+    </button>
+    <button class="pajsk-tab" data-pajsk-tab="data" onclick="switchPAJSKTab('data')">
+      <i class="fas fa-table"></i> Senarai Data
+    </button>
+    <button class="pajsk-tab" data-pajsk-tab="eksport" onclick="switchPAJSKTab('eksport')">
+      <i class="fas fa-file-export"></i> Eksport
+    </button>
+  </div>
+
+  <!-- ============================================= -->
+  <!-- TAB 1: DASHBOARD                              -->
+  <!-- ============================================= -->
+  <div class="pajsk-tab-content active" id="pajskTab-dashboard">
+    
+    <!-- Year Selector -->
+    <div class="pajsk-year-bar">
+      <i class="fas fa-calendar-alt" style="color:#667eea;"></i>
+      <label>Tahun Sesi:</label>
+      <select class="pajsk-year-select" id="pajskYearSelect" onchange="loadPAJSKData()">
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+      </select>
+      <span class="pajsk-status-badge" id="pajskStatusBadge">
+        <i class="fas fa-circle" style="font-size:8px;"></i> Memuatkan...
+      </span>
+    </div>
+
+    <!-- Loading State -->
+    <div id="pajskLoading" style="text-align:center;padding:60px;background:#fff;border-radius:14px;box-shadow:var(--card-shadow);">
+      <i class="fas fa-spinner fa-spin" style="font-size:48px;color:#667eea;"></i>
+      <div style="margin-top:16px;font-size:14px;color:#7f8c8d;">Memuatkan data PAJSK...</div>
+    </div>
+
+    <!-- Dashboard Content (hidden until loaded) -->
+    <div id="pajskDashboardContent" style="display:none;">
+      
+      <!-- HERO STATS -->
+      <div class="pajsk-hero-grid">
+        <div class="pajsk-hero-card" id="pajskHeroGPS">
+          <div class="ribbon">GPS Keseluruhan</div>
+          <div class="pajsk-hero-num" id="pajskHeroGPSNum">--</div>
+          <div class="pajsk-hero-label">Tahun <span id="pajskHeroYear">2025</span></div>
+          <div class="pajsk-hero-sub" id="pajskHeroRating">
+            <i class="fas fa-star"></i> <span>Memuatkan...</span>
+          </div>
+        </div>
+
+        <div class="pajsk-hero-card success">
+          <div class="ribbon">% GPS</div>
+          <div class="pajsk-hero-num" id="pajskHeroPeratus">--%</div>
+          <div class="pajsk-hero-label">Peratus Keseluruhan</div>
+          <div class="pajsk-hero-sub">
+            <i class="fas fa-percentage"></i> <span>Tahap pencapaian</span>
+          </div>
+        </div>
+
+        <div class="pajsk-hero-card" id="pajskHeroChange">
+          <div class="ribbon">vs Tahun Lepas</div>
+          <div class="pajsk-hero-num" id="pajskHeroChangeNum">--</div>
+          <div class="pajsk-hero-label">Perubahan YoY</div>
+          <div class="pajsk-hero-sub" id="pajskHeroChangeSub">
+            <i class="fas fa-chart-line"></i> <span>Memuatkan...</span>
+          </div>
+        </div>
+
+        <div class="pajsk-hero-card target">
+          <div class="ribbon">Sasaran 2026</div>
+          <div class="pajsk-hero-num" id="pajskHeroTarget">--</div>
+          <div class="pajsk-hero-label">Target GPS</div>
+          <div class="pajsk-hero-sub">
+            <i class="fas fa-bullseye"></i> <span>2% improvement</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TREND GRAF 10 TAHUN -->
+      <div class="pajsk-chart-card" style="margin-bottom:20px;">
+        <div class="pajsk-chart-title">
+          <i class="fas fa-chart-line"></i> 
+          Trend GPS PAJSK 10 Tahun (2017-2026)
+          <span class="pajsk-chart-title-sub">— GPS lebih rendah = lebih baik</span>
+        </div>
+        <div class="pajsk-chart-canvas-wrap tall">
+          <canvas id="pajskTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- UNIT CARDS -->
+      <div class="pajsk-unit-grid">
+        <div class="pajsk-unit-card sekolah">
+          <div class="pajsk-unit-icon">🏫</div>
+          <div class="pajsk-unit-name">Sekolah</div>
+          <div class="pajsk-unit-gps" id="pajskUnitGPS-SEKOLAH">--</div>
+          <div class="pajsk-unit-meta">
+            <span class="pajsk-unit-rating" id="pajskUnitRating-SEKOLAH">--</span>
+            <span class="pajsk-unit-trend" id="pajskUnitTrend-SEKOLAH">--</span>
+          </div>
+        </div>
+        <div class="pajsk-unit-card beruniform">
+          <div class="pajsk-unit-icon">🎖️</div>
+          <div class="pajsk-unit-name">Badan Beruniform</div>
+          <div class="pajsk-unit-gps" id="pajskUnitGPS-BADAN_BERUNIFORM">--</div>
+          <div class="pajsk-unit-meta">
+            <span class="pajsk-unit-rating" id="pajskUnitRating-BADAN_BERUNIFORM">--</span>
+            <span class="pajsk-unit-trend" id="pajskUnitTrend-BADAN_BERUNIFORM">--</span>
+          </div>
+        </div>
+        <div class="pajsk-unit-card kelab">
+          <div class="pajsk-unit-icon">📚</div>
+          <div class="pajsk-unit-name">Kelab & Persatuan</div>
+          <div class="pajsk-unit-gps" id="pajskUnitGPS-KELAB_PERSATUAN">--</div>
+          <div class="pajsk-unit-meta">
+            <span class="pajsk-unit-rating" id="pajskUnitRating-KELAB_PERSATUAN">--</span>
+            <span class="pajsk-unit-trend" id="pajskUnitTrend-KELAB_PERSATUAN">--</span>
+          </div>
+        </div>
+        <div class="pajsk-unit-card sukan">
+          <div class="pajsk-unit-icon">⚽</div>
+          <div class="pajsk-unit-name">Sukan & Permainan</div>
+          <div class="pajsk-unit-gps" id="pajskUnitGPS-SUKAN_PERMAINAN">--</div>
+          <div class="pajsk-unit-meta">
+            <span class="pajsk-unit-rating" id="pajskUnitRating-SUKAN_PERMAINAN">--</span>
+            <span class="pajsk-unit-trend" id="pajskUnitTrend-SUKAN_PERMAINAN">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 CHARTS UTAMA -->
+      <div class="pajsk-chart-grid-2">
+        <div class="pajsk-chart-card">
+          <div class="pajsk-chart-title">
+            <i class="fas fa-chart-bar"></i> %GPS Mengikut Unit
+          </div>
+          <div class="pajsk-chart-canvas-wrap">
+            <canvas id="pajskChartPeratusUnit"></canvas>
+          </div>
+        </div>
+        <div class="pajsk-chart-card">
+          <div class="pajsk-chart-title">
+            <i class="fas fa-chart-bar"></i> GPS Pencapaian Mengikut Unit
+          </div>
+          <div class="pajsk-chart-canvas-wrap">
+            <canvas id="pajskChartGPSUnit"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stacked Bar: Prestasi Murid Mengikut Unit -->
+      <div class="pajsk-chart-card" style="margin-bottom:20px;">
+        <div class="pajsk-chart-title">
+          <i class="fas fa-layer-group"></i> Prestasi Murid Mengikut Unit (Bilangan A/B/C/D/E)
+        </div>
+        <div class="pajsk-chart-canvas-wrap tall">
+          <canvas id="pajskChartPrestasiUnit"></canvas>
+        </div>
+      </div>
+
+      <div class="pajsk-chart-grid-2">
+        <div class="pajsk-chart-card">
+          <div class="pajsk-chart-title">
+            <i class="fas fa-chart-bar"></i> %GPS Mengikut Tingkatan
+          </div>
+          <div class="pajsk-chart-canvas-wrap">
+            <canvas id="pajskChartPeratusTingkatan"></canvas>
+          </div>
+        </div>
+        <div class="pajsk-chart-card">
+          <div class="pajsk-chart-title">
+            <i class="fas fa-chart-bar"></i> GPS Mengikut Tingkatan
+          </div>
+          <div class="pajsk-chart-canvas-wrap">
+            <canvas id="pajskChartGPSTingkatan"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stacked Bar: Prestasi Murid Mengikut Tingkatan -->
+      <div class="pajsk-chart-card" style="margin-bottom:20px;">
+        <div class="pajsk-chart-title">
+          <i class="fas fa-layer-group"></i> Prestasi Murid Mengikut Tingkatan (Bilangan A/B/C/D/E)
+        </div>
+        <div class="pajsk-chart-canvas-wrap tall">
+          <canvas id="pajskChartPrestasiTingkatan"></canvas>
+        </div>
+      </div>
+
+      <!-- Radar + Heat Map -->
+      <div class="pajsk-chart-grid-2">
+        <div class="pajsk-chart-card">
+          <div class="pajsk-chart-title">
+            <i class="fas fa-spider"></i> GPS Comparison (Radar)
+          </div>
+          <div class="pajsk-chart-canvas-wrap tall">
+            <canvas id="pajskChartRadar"></canvas>
+          </div>
+        </div>
+        <div class="pajsk-chart-card">
+          <div class="pajsk-chart-title">
+            <i class="fas fa-th"></i> Heat Map: Tingkatan × Unit
+            <span class="pajsk-chart-title-sub">— Hover untuk detail</span>
+          </div>
+          <div id="pajskHeatMapContainer" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <!-- Jumlah Murid Chart -->
+      <div class="pajsk-chart-card" style="margin-bottom:20px;">
+        <div class="pajsk-chart-title">
+          <i class="fas fa-users"></i> Jumlah Murid Mengikut Tingkatan
+        </div>
+        <div class="pajsk-chart-canvas-wrap">
+          <canvas id="pajskChartJumlahMurid"></canvas>
+        </div>
+      </div>
+
+      <!-- ============================================= -->
+      <!-- AUTO-ANALYSIS SWOT                            -->
+      <!-- ============================================= -->
+      <div style="background:linear-gradient(135deg,#1a3c6e 0%,#2e86c1 100%);color:#fff;border-radius:14px;padding:20px;margin-bottom:20px;">
+        <h2 style="font-size:18px;margin:0 0 8px 0;">
+          <i class="fas fa-brain"></i> Auto-Analisis SWOT & Tindak Susul
+        </h2>
+        <p style="font-size:12px;opacity:0.9;margin:0;">
+          Sistem auto-detect kekuatan, kelemahan dan cadangan tindakan untuk peningkatan
+        </p>
+      </div>
+
+      <div class="pajsk-swot-grid">
+        <!-- KEKUATAN -->
+        <div class="pajsk-swot-card kekuatan">
+          <div class="pajsk-swot-header kekuatan">
+            <i class="fas fa-thumbs-up"></i> Kekuatan
+            <span style="margin-left:auto;font-size:11px;background:#27ae60;color:#fff;padding:2px 10px;border-radius:10px;" id="pajskSWOTKekuatanCount">0</span>
+          </div>
+          <ul class="pajsk-swot-list" id="pajskSWOTKekuatan">
+            <li class="pajsk-swot-item kekuatan-bg">
+              <span class="icon">⏳</span>
+              <span>Memuatkan analisis...</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- KELEMAHAN -->
+        <div class="pajsk-swot-card kelemahan">
+          <div class="pajsk-swot-header kelemahan">
+            <i class="fas fa-exclamation-triangle"></i> Kelemahan
+            <span style="margin-left:auto;font-size:11px;background:#e74c3c;color:#fff;padding:2px 10px;border-radius:10px;" id="pajskSWOTKelemahanCount">0</span>
+          </div>
+          <ul class="pajsk-swot-list" id="pajskSWOTKelemahan">
+            <li class="pajsk-swot-item kelemahan-bg">
+              <span class="icon">⏳</span>
+              <span>Memuatkan analisis...</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- TINDAK SUSUL -->
+        <div class="pajsk-swot-card tindakan">
+          <div class="pajsk-swot-header tindakan">
+            <i class="fas fa-bullseye"></i> Tindak Susul
+            <span style="margin-left:auto;font-size:11px;background:#3498db;color:#fff;padding:2px 10px;border-radius:10px;" id="pajskSWOTTindakanCount">0</span>
+          </div>
+          <ul class="pajsk-swot-list" id="pajskSWOTTindakan">
+            <li class="pajsk-swot-item tindakan-bg">
+              <span class="icon">⏳</span>
+              <span>Memuatkan cadangan...</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="dashboard-footer">
+        <i class="fas fa-info-circle"></i> 
+        Data PAJSK dijana auto dari Google Sheets · 
+        Last sync: <span id="pajskLastSync">--</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================= -->
+  <!-- TAB 2: INPUT DATA                             -->
+  <!-- ============================================= -->
+  <div class="pajsk-tab-content" id="pajskTab-input">
+    <div class="pajsk-form-card">
+      <h2 style="font-size:18px;color:var(--primary);margin-bottom:8px;">
+        <i class="fas fa-pen-to-square"></i> Input Data PAJSK
+      </h2>
+      <p style="font-size:12px;color:#7f8c8d;margin-bottom:20px;">
+        Masukkan bilangan murid mengikut gred A/B/C/D/E. GPS akan dikira secara automatik.
+      </p>
+
+      <div class="pajsk-form-info">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Nota:</strong> Total A+B+C+D+E mesti sama dengan Bil. Murid. 
+        Sistem akan auto-update jika data sudah wujud.
+      </div>
+
+      <form id="pajskInputForm" onsubmit="submitPAJSKData(event)">
+        <div class="pajsk-form-row">
+          <div class="pajsk-form-group">
+            <label>Tahun</label>
+            <input type="number" class="pajsk-form-input" id="formTahun" value="2025" min="2017" max="2030" required>
+          </div>
+          <div class="pajsk-form-group">
+            <label>Unit</label>
+            <select class="pajsk-form-input" id="formUnit" required>
+              <option value="SEKOLAH">SEKOLAH (Keseluruhan)</option>
+              <option value="BADAN_BERUNIFORM">BADAN BERUNIFORM</option>
+              <option value="KELAB_PERSATUAN">KELAB & PERSATUAN</option>
+              <option value="SUKAN_PERMAINAN">SUKAN & PERMAINAN</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pajsk-form-row">
+          <div class="pajsk-form-group">
+            <label>Tingkatan</label>
+            <select class="pajsk-form-input" id="formTingkatan" required>
+              <option value="KESELURUHAN">KESELURUHAN</option>
+              <option value="TING 1">Tingkatan 1</option>
+              <option value="TING 2">Tingkatan 2</option>
+              <option value="TING 3">Tingkatan 3</option>
+              <option value="TING 4">Tingkatan 4</option>
+              <option value="TING 5">Tingkatan 5</option>
+            </select>
+          </div>
+          <div class="pajsk-form-group">
+            <label>Bil. Murid</label>
+            <input type="number" class="pajsk-form-input" id="formBilMurid" min="1" required>
+          </div>
+        </div>
+
+        <h3 style="font-size:13px;color:var(--primary);margin:20px 0 10px 0;font-weight:800;">
+          Bilangan Mengikut Gred:
+        </h3>
+
+        <div class="pajsk-form-grid-5">
+          <div class="pajsk-form-group">
+            <label style="color:#27ae60;">A (Cemerlang)</label>
+            <input type="number" class="pajsk-form-input gred" id="formA" min="0" value="0" required onchange="autoCalculatePAJSK()">
+          </div>
+          <div class="pajsk-form-group">
+            <label style="color:#3498db;">B (Baik)</label>
+            <input type="number" class="pajsk-form-input gred" id="formB" min="0" value="0" required onchange="autoCalculatePAJSK()">
+          </div>
+          <div class="pajsk-form-group">
+            <label style="color:#f39c12;">C (Memuaskan)</label>
+            <input type="number" class="pajsk-form-input gred" id="formC" min="0" value="0" required onchange="autoCalculatePAJSK()">
+          </div>
+          <div class="pajsk-form-group">
+            <label style="color:#e67e22;">D (Lemah)</label>
+            <input type="number" class="pajsk-form-input gred" id="formD" min="0" value="0" required onchange="autoCalculatePAJSK()">
+          </div>
+          <div class="pajsk-form-group">
+            <label style="color:#e74c3c;">E (Sangat Lemah)</label>
+            <input type="number" class="pajsk-form-input gred" id="formE" min="0" value="0" required onchange="autoCalculatePAJSK()">
+          </div>
+        </div>
+
+        <!-- Auto-Calculate Preview -->
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-top:14px;">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div>
+              <strong style="font-size:12px;color:#7f8c8d;">Total Gred:</strong>
+              <span id="formTotalGred" style="font-size:16px;font-weight:800;color:var(--primary);margin-left:8px;">0</span>
+            </div>
+            <div>
+              <strong style="font-size:12px;color:#7f8c8d;">GPS:</strong>
+              <span id="formGPS" style="font-size:16px;font-weight:800;color:#667eea;margin-left:8px;">0.00</span>
+            </div>
+            <div>
+              <strong style="font-size:12px;color:#7f8c8d;">%GPS:</strong>
+              <span id="formPeratusGPS" style="font-size:16px;font-weight:800;color:#27ae60;margin-left:8px;">0.00%</span>
+            </div>
+            <div>
+              <strong style="font-size:12px;color:#7f8c8d;">Status:</strong>
+              <span id="formStatus" style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:10px;background:#ecf0f1;color:#7f8c8d;margin-left:8px;">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pajsk-form-actions">
+          <button type="button" class="btn btn-outline" onclick="resetPAJSKForm()">
+            <i class="fas fa-redo"></i> Reset
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Simpan Data
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================= -->
+  <!-- TAB 3: SENARAI DATA                           -->
+  <!-- ============================================= -->
+  <div class="pajsk-tab-content" id="pajskTab-data">
+    <div class="pajsk-filter-bar">
+      <i class="fas fa-filter" style="color:#667eea;"></i>
+      <label>Tahun:</label>
+      <select id="pajskFilterTahun" onchange="loadPAJSKData()">
+        <option value="all">Semua</option>
+        <option value="2025" selected>2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+      </select>
+      <label>Unit:</label>
+      <select id="pajskFilterUnit" onchange="renderPAJSKDataTable()">
+        <option value="all">Semua</option>
+        <option value="SEKOLAH">Sekolah</option>
+        <option value="BADAN_BERUNIFORM">Beruniform</option>
+        <option value="KELAB_PERSATUAN">Kelab</option>
+        <option value="SUKAN_PERMAINAN">Sukan</option>
+      </select>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="pajsk-data-table">
+        <thead>
+          <tr>
+            <th>Tahun</th>
+            <th>Unit</th>
+            <th>Tingkatan</th>
+            <th>Bil. Murid</th>
+            <th style="background:#27ae60;">A</th>
+            <th style="background:#3498db;">B</th>
+            <th style="background:#f39c12;">C</th>
+            <th style="background:#e67e22;">D</th>
+            <th style="background:#e74c3c;">E</th>
+            <th>GPS</th>
+            <th>%GPS</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="pajskDataTableBody">
+          <tr>
+            <td colspan="12" style="text-align:center;padding:40px;color:#7f8c8d;">
+              <i class="fas fa-spinner fa-spin"></i> Memuatkan data...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================================= -->
+  <!-- TAB 4: EKSPORT                                -->
+  <!-- ============================================= -->
+  <div class="pajsk-tab-content" id="pajskTab-eksport">
+    <div style="background:#fff;border-radius:14px;padding:30px;box-shadow:var(--card-shadow);text-align:center;">
+      <i class="fas fa-file-export" style="font-size:64px;color:#667eea;margin-bottom:16px;"></i>
+      <h2 style="color:var(--primary);margin-bottom:10px;">Eksport Laporan PAJSK</h2>
+      <p style="color:#7f8c8d;font-size:13px;margin-bottom:24px;max-width:500px;margin-left:auto;margin-right:auto;">
+        Jana laporan PAJSK lengkap dalam format PDF atau Excel untuk audit PPD/JPN
+      </p>
+      
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="exportPAJSKPDF()">
+          <i class="fas fa-file-pdf"></i> Eksport PDF
+        </button>
+        <button class="btn btn-success" onclick="exportPAJSKExcel()">
+          <i class="fas fa-file-excel"></i> Eksport Excel
+        </button>
+        <button class="btn btn-accent" onclick="window.print()">
+          <i class="fas fa-print"></i> Cetak Sekarang
+        </button>
+      </div>
+
+      <div style="margin-top:30px;padding-top:24px;border-top:1px solid #f0f0f0;">
+        <h3 style="font-size:14px;color:var(--primary);margin-bottom:10px;">📋 Annual Report Generator</h3>
+        <p style="font-size:11px;color:#7f8c8d;margin-bottom:14px;">
+          Generate Laporan Tahunan PAJSK lengkap dengan SWOT analysis untuk hantar ke PPD
+        </p>
+        <button class="btn btn-primary" onclick="generateAnnualReport()" style="background:#9b59b6;">
+          <i class="fas fa-magic"></i> Jana Laporan Tahunan
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+  
 <!-- ===== PAGE: PLACEHOLDER (Coming Soon) ===== -->
 <div class="page" id="page-placeholder">
   <div class="breadcrumb">
