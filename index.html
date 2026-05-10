@@ -718,16 +718,50 @@ body.demo-active .main { margin-top: 98px; }
   </div>
 </div>
 
-<!-- Placeholder for Step 6 (Charts Unit) -->
+<!-- 2 CHARTS UNIT (Step 6) -->
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:20px;" id="pajskChartsUnitGrid">
+  
+  <!-- Chart 1: % GPS Mengikut Unit -->
+  <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);">
+    <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+      <i class="fas fa-chart-bar"></i> %GPS Mengikut Unit
+      <span style="font-size:10px;color:#7f8c8d;font-weight:400;margin-left:auto;">Higher = Better</span>
+    </h3>
+    <div style="position:relative;height:280px;">
+      <canvas id="pajskChartPeratusUnit"></canvas>
+    </div>
+  </div>
+  
+  <!-- Chart 2: GPS Mengikut Unit -->
+  <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);">
+    <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+      <i class="fas fa-chart-bar"></i> GPS Mengikut Unit
+      <span style="font-size:10px;color:#7f8c8d;font-weight:400;margin-left:auto;">Lower = Better</span>
+    </h3>
+    <div style="position:relative;height:280px;">
+      <canvas id="pajskChartGPSUnit"></canvas>
+    </div>
+  </div>
+  
+</div>
+
+<!-- Responsive single column on small screens -->
+<style>
+@media (max-width: 1100px) {
+  #pajskChartsUnitGrid { grid-template-columns: 1fr !important; }
+}
+</style>
+
+<!-- Placeholder for Step 7 (Charts Tingkatan) -->
 <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
   <div style="font-size:48px;margin-bottom:14px;">📊</div>
-  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Charts Unit Coming Soon</h2>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Charts Tingkatan Coming Soon</h2>
   <p style="color:#7f8c8d;font-size:12px;">
-    Step 5 of 12 — Unit Cards Done ✅<br>
-    Next: 2 Charts (%GPS & GPS Mengikut Unit)
+    Step 6 of 12 — Charts Unit Done ✅<br>
+    Next: 2 Charts (%GPS & GPS Mengikut Tingkatan)
   </p>
   <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-    🟡 Step 5/12
+    🟡 Step 6/12
   </div>
 </div>
 
@@ -2029,6 +2063,133 @@ function renderPAJSKUnitCards(data) {
   container.innerHTML = html;
 }
 // Update loadPAJSKDashboard untuk include trend chart + unit cards
+
+let pajskChartPeratusUnitInstance = null;
+let pajskChartGPSUnitInstance = null;
+
+function renderPAJSKChartsUnit(data) {
+  const perUnit = data.perUnit || {};
+  const units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
+  const labels = ['Sekolah', 'Beruniform', 'Kelab', 'Sukan'];
+  const colors = ['#3498db', '#1abc9c', '#9b59b6', '#f39c12'];
+  
+  // Extract data
+  const peratusData = units.map(function(u) {
+    const item = perUnit[u] || {};
+    return item.peratusGPS || 0;
+  });
+  
+  const gpsData = units.map(function(u) {
+    const item = perUnit[u] || {};
+    return item.gps || 0;
+  });
+  
+  // Chart 1: % GPS Mengikut Unit
+  const ctx1 = document.getElementById('pajskChartPeratusUnit');
+  if (ctx1) {
+    if (pajskChartPeratusUnitInstance) pajskChartPeratusUnitInstance.destroy();
+    
+    pajskChartPeratusUnitInstance = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '% GPS',
+          data: peratusData,
+          backgroundColor: colors,
+          borderColor: colors,
+          borderWidth: 0,
+          borderRadius: 8,
+          barThickness: 'flex',
+          maxBarThickness: 60
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return '% GPS: ' + context.parsed.y.toFixed(2) + '%';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            min: 0,
+            max: 100,
+            ticks: {
+              stepSize: 20,
+              font: { size: 11 },
+              callback: function(value) { return value + '%'; }
+            },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            ticks: { font: { size: 12, weight: 'bold' } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+  
+  // Chart 2: GPS Mengikut Unit
+  const ctx2 = document.getElementById('pajskChartGPSUnit');
+  if (ctx2) {
+    if (pajskChartGPSUnitInstance) pajskChartGPSUnitInstance.destroy();
+    
+    pajskChartGPSUnitInstance = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'GPS',
+          data: gpsData,
+          backgroundColor: colors,
+          borderColor: colors,
+          borderWidth: 0,
+          borderRadius: 8,
+          barThickness: 'flex',
+          maxBarThickness: 60
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'GPS: ' + context.parsed.y.toFixed(2);
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            reverse: true, // Lower is better
+            min: 1.0,
+            max: 3.5,
+            ticks: {
+              stepSize: 0.5,
+              font: { size: 11 }
+            },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            ticks: { font: { size: 12, weight: 'bold' } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+}
 const _origLoadPAJSKDashboard = loadPAJSKDashboard;
 loadPAJSKDashboard = async function() {
   // Save data dari _origLoadPAJSKDashboard untuk render unit cards
@@ -2045,8 +2206,9 @@ loadPAJSKDashboard = async function() {
     const result = await response.json();
     
     if (result.success && result.data) {
-      renderPAJSKUnitCards(result.data);
-    }
+  renderPAJSKUnitCards(result.data);
+  renderPAJSKChartsUnit(result.data);
+}
   } catch (e) {
     console.error('Gagal load unit cards:', e);
   }
