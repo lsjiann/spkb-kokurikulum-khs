@@ -911,16 +911,100 @@ body.demo-active .main { margin-top: 98px; }
 }
 </style>
 
-<!-- Placeholder for Step 10 (SWOT Analysis) -->
+<!-- AUTO-SWOT ANALYSIS (Step 10) -->
+<div style="background:linear-gradient(135deg,#1a3c6e 0%,#2e86c1 100%);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+    <div>
+      <h2 style="font-size:18px;margin:0 0 8px 0;display:flex;align-items:center;gap:10px;">
+        <i class="fas fa-brain"></i> Auto-Analisis SWOT & Tindak Susul
+      </h2>
+      <p style="font-size:12px;opacity:0.9;margin:0;">
+        Sistem auto-detect kekuatan, kelemahan dan cadangan tindakan untuk peningkatan
+      </p>
+    </div>
+    <div style="background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
+      <i class="fas fa-magic"></i> Powered by AI
+    </div>
+  </div>
+</div>
+
+<!-- 3 SWOT Cards Grid -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;" id="pajskSWOTGrid">
+  
+  <!-- KEKUATAN -->
+  <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);border-top:4px solid #27ae60;">
+    <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:#27ae60;">
+      <i class="fas fa-thumbs-up"></i> Kekuatan
+      <span style="margin-left:auto;font-size:11px;background:#27ae60;color:#fff;padding:2px 10px;border-radius:10px;" id="pajskSWOTKekuatanCount">0</span>
+    </div>
+    <ul style="list-style:none;padding:0;margin:0;" id="pajskSWOTKekuatanList">
+      <li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#eafaf1;color:#1e8449;border-left:3px solid #27ae60;">
+        <span style="flex-shrink:0;font-size:14px;">⏳</span>
+        <span>Memuatkan analisis...</span>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- KELEMAHAN -->
+  <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);border-top:4px solid #e74c3c;">
+    <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:#e74c3c;">
+      <i class="fas fa-exclamation-triangle"></i> Kelemahan
+      <span style="margin-left:auto;font-size:11px;background:#e74c3c;color:#fff;padding:2px 10px;border-radius:10px;" id="pajskSWOTKelemahanCount">0</span>
+    </div>
+    <ul style="list-style:none;padding:0;margin:0;" id="pajskSWOTKelemahanList">
+      <li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#fdedec;color:#c0392b;border-left:3px solid #e74c3c;">
+        <span style="flex-shrink:0;font-size:14px;">⏳</span>
+        <span>Memuatkan analisis...</span>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- TINDAK SUSUL -->
+  <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);border-top:4px solid #3498db;">
+    <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:#3498db;">
+      <i class="fas fa-bullseye"></i> Tindak Susul
+      <span style="margin-left:auto;font-size:11px;background:#3498db;color:#fff;padding:2px 10px;border-radius:10px;" id="pajskSWOTTindakanCount">0</span>
+    </div>
+    <ul style="list-style:none;padding:0;margin:0;" id="pajskSWOTTindakanList">
+      <li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#ebf5fb;color:#1a5276;border-left:3px solid #3498db;">
+        <span style="flex-shrink:0;font-size:14px;">⏳</span>
+        <span>Memuatkan cadangan...</span>
+      </li>
+    </ul>
+  </div>
+  
+</div>
+
+<!-- Responsive -->
+<style>
+@media (max-width: 1100px) {
+  #pajskSWOTGrid { grid-template-columns: 1fr !important; }
+}
+</style>
+
+<!-- Action Footer -->
+<div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-left:4px solid #f59e0b;border-radius:12px;padding:16px 20px;margin-bottom:20px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <i class="fas fa-lightbulb" style="font-size:20px;color:#d97706;"></i>
+    <div>
+      <strong style="color:#78350f;font-size:13px;">💡 Cadangan Penggunaan:</strong>
+      <p style="font-size:11px;color:#92400e;margin:4px 0 0 0;">
+        Gunakan analisis ini untuk briefing dengan pengetua, mesyuarat AJK Kokurikulum, dan persediaan audit PPD/JPN.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Placeholder for Step 11 (Form Input) -->
 <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
-  <div style="font-size:48px;margin-bottom:14px;">🧠</div>
-  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Auto-SWOT Analysis Coming Soon</h2>
+  <div style="font-size:48px;margin-bottom:14px;">📝</div>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Form Input Coming Soon</h2>
   <p style="color:#7f8c8d;font-size:12px;">
-    Step 9 of 12 — Radar + Heat Map Done ✅<br>
-    Next: Auto-Analisis SWOT (Kekuatan, Kelemahan, Tindak Susul)
+    Step 10 of 12 — SWOT Analysis Done ✅<br>
+    Next: Form Input untuk masukkan data PAJSK
   </p>
   <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-    🟡 Step 9/12
+    🟡 Step 10/12
   </div>
 </div>
 
@@ -2234,6 +2318,122 @@ let pajskStackedTingkatanInstance = null;
 
 let pajskRadarChartInstance = null;
 
+async function loadPAJSKSWOT() {
+  const yearSelect = document.getElementById('pajskYearSelect');
+  if (!yearSelect) return;
+  
+  const tahun = yearSelect.value;
+  
+  try {
+    const url = SKAS_API_URL + '?action=pajsk_swot&tahun=' + tahun + '&_t=' + Date.now();
+    console.log('🧠 Fetching PAJSK SWOT:', url);
+    
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (!result.success) throw new Error(result.error || 'Unknown error');
+    
+    const swotData = result.data;
+    console.log('📦 SWOT Data:', swotData);
+    
+    renderPAJSKSWOT(swotData);
+    
+  } catch (e) {
+    console.error('❌ Gagal load SWOT:', e);
+    
+    // Show error in cards
+    const errorHTML = '<li style="padding:14px;color:#e74c3c;font-size:12px;text-align:center;"><i class="fas fa-exclamation-triangle"></i><br>Gagal memuatkan: ' + e.message + '</li>';
+    
+    const lists = ['pajskSWOTKekuatanList', 'pajskSWOTKelemahanList', 'pajskSWOTTindakanList'];
+    lists.forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = errorHTML;
+    });
+  }
+}
+
+function renderPAJSKSWOT(swotData) {
+  const kekuatan = swotData.kekuatan || [];
+  const kelemahan = swotData.kelemahan || [];
+  const tindakSusul = swotData.tindakSusul || [];
+  const summary = swotData.summary || {};
+  
+  // Update counts
+  const kekuatanCount = document.getElementById('pajskSWOTKekuatanCount');
+  if (kekuatanCount) kekuatanCount.textContent = kekuatan.length;
+  
+  const kelemahanCount = document.getElementById('pajskSWOTKelemahanCount');
+  if (kelemahanCount) kelemahanCount.textContent = kelemahan.length;
+  
+  const tindakanCount = document.getElementById('pajskSWOTTindakanCount');
+  if (tindakanCount) tindakanCount.textContent = tindakSusul.length;
+  
+  // Render Kekuatan
+  const kekuatanList = document.getElementById('pajskSWOTKekuatanList');
+  if (kekuatanList) {
+    if (kekuatan.length === 0) {
+      kekuatanList.innerHTML = '<li style="padding:14px;color:#7f8c8d;font-size:12px;text-align:center;font-style:italic;">Tiada kekuatan dikenalpasti</li>';
+    } else {
+      let html = '';
+      kekuatan.forEach(function(item) {
+        html += '<li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#eafaf1;color:#1e8449;border-left:3px solid #27ae60;">' +
+          '<span style="flex-shrink:0;font-size:14px;">✅</span>' +
+          '<span><strong>' + (item.kategori || 'Kekuatan') + ':</strong> ' + (item.item || '') + '</span>' +
+        '</li>';
+      });
+      kekuatanList.innerHTML = html;
+    }
+  }
+  
+  // Render Kelemahan
+  const kelemahanList = document.getElementById('pajskSWOTKelemahanList');
+  if (kelemahanList) {
+    if (kelemahan.length === 0) {
+      kelemahanList.innerHTML = '<li style="padding:14px;color:#27ae60;font-size:12px;text-align:center;"><i class="fas fa-check-circle"></i> Tiada kelemahan kritikal!</li>';
+    } else {
+      let html = '';
+      kelemahan.forEach(function(item) {
+        html += '<li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#fdedec;color:#c0392b;border-left:3px solid #e74c3c;">' +
+          '<span style="flex-shrink:0;font-size:14px;">⚠️</span>' +
+          '<span><strong>' + (item.kategori || 'Kelemahan') + ':</strong> ' + (item.item || '') + '</span>' +
+        '</li>';
+      });
+      kelemahanList.innerHTML = html;
+    }
+  }
+  
+  // Render Tindak Susul
+  const tindakanList = document.getElementById('pajskSWOTTindakanList');
+  if (tindakanList) {
+    if (tindakSusul.length === 0) {
+      tindakanList.innerHTML = '<li style="padding:14px;color:#27ae60;font-size:12px;text-align:center;"><i class="fas fa-check-circle"></i> Tiada tindakan diperlukan!</li>';
+    } else {
+      let html = '';
+      tindakSusul.forEach(function(item) {
+        const prioriti = item.prioriti || 'SEDERHANA';
+        let prioritiBg = '#fef9e7';
+        let prioritiColor = '#7d6608';
+        let prioritiBorder = '#f39c12';
+        
+        if (prioriti === 'TINGGI') {
+          prioritiBg = '#fdedec';
+          prioritiColor = '#c0392b';
+          prioritiBorder = '#e74c3c';
+        }
+        
+        html += '<li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#ebf5fb;color:#1a5276;border-left:3px solid #3498db;">' +
+          '<span style="flex-shrink:0;font-size:14px;">🎯</span>' +
+          '<span>' +
+            '<span style="display:inline-block;background:' + prioritiBg + ';color:' + prioritiColor + ';border:1px solid ' + prioritiBorder + ';padding:1px 8px;border-radius:8px;font-size:9px;font-weight:800;margin-right:6px;">' + prioriti + '</span>' +
+            (item.cadangan || '') +
+          '</span>' +
+        '</li>';
+      });
+      tindakanList.innerHTML = html;
+    }
+  }
+}
+
 function renderPAJSKRadarChart(data) {
   const perUnit = data.perUnit || {};
   const units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
@@ -2881,6 +3081,9 @@ if (result.success && result.data) {
   renderPAJSKRadarChart(result.data);
   renderPAJSKHeatMap(result.data);
 }
+
+// Load SWOT analysis
+await loadPAJSKSWOT();
   } catch (e) {
     console.error('Gagal load unit cards:', e);
   }
