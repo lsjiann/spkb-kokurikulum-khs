@@ -752,16 +752,59 @@ body.demo-active .main { margin-top: 98px; }
 }
 </style>
 
-<!-- Placeholder for Step 7 (Charts Tingkatan) -->
+<!-- 2 CHARTS TINGKATAN (Step 7) -->
+<div style="background:linear-gradient(135deg,#9b59b6 0%,#8e44ad 100%);color:#fff;border-radius:14px;padding:18px 24px;margin-bottom:16px;">
+  <h3 style="font-size:15px;font-weight:800;margin:0;display:flex;align-items:center;gap:8px;">
+    <i class="fas fa-graduation-cap"></i> Analisis Mengikut Tingkatan
+  </h3>
+  <p style="font-size:11px;opacity:0.9;margin:4px 0 0 0;">
+    Perbandingan pencapaian PAJSK dari Tingkatan 1 hingga 5
+  </p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:20px;" id="pajskChartsTingkatanGrid">
+  
+  <!-- Chart 1: % GPS Mengikut Tingkatan -->
+  <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);">
+    <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+      <i class="fas fa-chart-bar"></i> %GPS Mengikut Tingkatan
+      <span style="font-size:10px;color:#7f8c8d;font-weight:400;margin-left:auto;">Higher = Better</span>
+    </h3>
+    <div style="position:relative;height:280px;">
+      <canvas id="pajskChartPeratusTingkatan"></canvas>
+    </div>
+  </div>
+  
+  <!-- Chart 2: GPS Mengikut Tingkatan -->
+  <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);">
+    <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+      <i class="fas fa-chart-bar"></i> GPS Mengikut Tingkatan
+      <span style="font-size:10px;color:#7f8c8d;font-weight:400;margin-left:auto;">Lower = Better</span>
+    </h3>
+    <div style="position:relative;height:280px;">
+      <canvas id="pajskChartGPSTingkatan"></canvas>
+    </div>
+  </div>
+  
+</div>
+
+<!-- Responsive single column on small screens -->
+<style>
+@media (max-width: 1100px) {
+  #pajskChartsTingkatanGrid { grid-template-columns: 1fr !important; }
+}
+</style>
+
+<!-- Placeholder for Step 8 (Stacked Charts) -->
 <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
   <div style="font-size:48px;margin-bottom:14px;">📊</div>
-  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Charts Tingkatan Coming Soon</h2>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Stacked Charts Coming Soon</h2>
   <p style="color:#7f8c8d;font-size:12px;">
-    Step 6 of 12 — Charts Unit Done ✅<br>
-    Next: 2 Charts (%GPS & GPS Mengikut Tingkatan)
+    Step 7 of 12 — Charts Tingkatan Done ✅<br>
+    Next: Prestasi Murid (Stacked Bar A/B/C/D/E)
   </p>
   <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-    🟡 Step 6/12
+    🟡 Step 7/12
   </div>
 </div>
 
@@ -2067,6 +2110,168 @@ function renderPAJSKUnitCards(data) {
 let pajskChartPeratusUnitInstance = null;
 let pajskChartGPSUnitInstance = null;
 
+let pajskChartPeratusTingkatanInstance = null;
+let pajskChartGPSTingkatanInstance = null;
+
+function renderPAJSKChartsTingkatan(data) {
+  const perTingkatan = data.perTingkatan || {};
+  const tingkatans = ['TING 1', 'TING 2', 'TING 3', 'TING 4', 'TING 5'];
+  const labels = ['Ting 1', 'Ting 2', 'Ting 3', 'Ting 4', 'Ting 5'];
+  
+  // Extract data tahun semasa
+  const peratusData = tingkatans.map(function(t) {
+    const item = perTingkatan[t] || {};
+    return item.peratusGPS || 0;
+  });
+  
+  const gpsData = tingkatans.map(function(t) {
+    const item = perTingkatan[t] || {};
+    return item.gps || 0;
+  });
+  
+  // Extract data tahun lepas
+  const gpsLepasData = tingkatans.map(function(t) {
+    const item = perTingkatan[t] || {};
+    return item.gpsLepas || 0;
+  });
+  
+  // Kira peratus lepas
+  const peratusLepasData = gpsLepasData.map(function(g) {
+    return g > 0 ? ((5 - g) / 4) * 100 : 0;
+  });
+  
+  const tahun = data.tahun || 2025;
+  const tahunLepas = data.tahunLepas || 2024;
+  
+  // Chart 1: % GPS Mengikut Tingkatan (Compare 2 years)
+  const ctx1 = document.getElementById('pajskChartPeratusTingkatan');
+  if (ctx1) {
+    if (pajskChartPeratusTingkatanInstance) pajskChartPeratusTingkatanInstance.destroy();
+    
+    pajskChartPeratusTingkatanInstance = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: tahunLepas + '',
+            data: peratusLepasData,
+            backgroundColor: 'rgba(149, 165, 166, 0.6)',
+            borderColor: '#7f8c8d',
+            borderWidth: 0,
+            borderRadius: 6
+          },
+          {
+            label: tahun + '',
+            data: peratusData,
+            backgroundColor: '#9b59b6',
+            borderColor: '#8e44ad',
+            borderWidth: 0,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { font: { size: 11 }, boxWidth: 14 }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            min: 0,
+            max: 100,
+            ticks: {
+              stepSize: 20,
+              font: { size: 11 },
+              callback: function(value) { return value + '%'; }
+            },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            ticks: { font: { size: 11, weight: 'bold' } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+  
+  // Chart 2: GPS Mengikut Tingkatan (Compare 2 years)
+  const ctx2 = document.getElementById('pajskChartGPSTingkatan');
+  if (ctx2) {
+    if (pajskChartGPSTingkatanInstance) pajskChartGPSTingkatanInstance.destroy();
+    
+    pajskChartGPSTingkatanInstance = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: tahunLepas + '',
+            data: gpsLepasData,
+            backgroundColor: 'rgba(149, 165, 166, 0.6)',
+            borderColor: '#7f8c8d',
+            borderWidth: 0,
+            borderRadius: 6
+          },
+          {
+            label: tahun + '',
+            data: gpsData,
+            backgroundColor: '#3498db',
+            borderColor: '#2980b9',
+            borderWidth: 0,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { font: { size: 11 }, boxWidth: 14 }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            reverse: true, // Lower is better
+            min: 1.0,
+            max: 3.5,
+            ticks: {
+              stepSize: 0.5,
+              font: { size: 11 }
+            },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            ticks: { font: { size: 11, weight: 'bold' } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+}  
+
 function renderPAJSKChartsUnit(data) {
   const perUnit = data.perUnit || {};
   const units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
@@ -2208,6 +2413,7 @@ loadPAJSKDashboard = async function() {
     if (result.success && result.data) {
   renderPAJSKUnitCards(result.data);
   renderPAJSKChartsUnit(result.data);
+  renderPAJSKChartsTingkatan(result.data);
 }
   } catch (e) {
     console.error('Gagal load unit cards:', e);
