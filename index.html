@@ -602,19 +602,84 @@ body.demo-active .main { margin-top: 98px; }
       </div>
     </div>
 
-    <!-- Placeholder Box -->
-    <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
-      <div style="font-size:48px;margin-bottom:14px;">📊</div>
-      <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Dashboard Coming Soon</h2>
-      <p style="color:#7f8c8d;font-size:12px;">
-        Step 2 of 12 — Hero Header Done ✅<br>
-        Next: Year Selector + Hero Stats
-      </p>
-      <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-        🟡 Step 2/12
+    <!-- YEAR SELECTOR (Step 3) -->
+<div style="background:#fff;border-radius:12px;padding:14px 18px;box-shadow:var(--card-shadow);margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+  <i class="fas fa-calendar-alt" style="color:#667eea;font-size:18px;"></i>
+  <label style="font-size:13px;color:#7f8c8d;font-weight:600;">Tahun Sesi:</label>
+  <select id="pajskYearSelect" onchange="loadPAJSKDashboard()" style="padding:8px 14px;border:1px solid #dfe6ec;border-radius:8px;font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;background:#fff;">
+    <option value="2025">2025</option>
+    <option value="2024">2024</option>
+    <option value="2023">2023</option>
+  </select>
+  <span id="pajskStatusBadge" style="margin-left:auto;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
+    <i class="fas fa-circle" style="font-size:8px;"></i> Memuatkan...
+  </span>
+</div>
+
+<!-- LOADING STATE -->
+<div id="pajskLoading" style="text-align:center;padding:60px;background:#fff;border-radius:14px;box-shadow:var(--card-shadow);">
+  <i class="fas fa-spinner fa-spin" style="font-size:48px;color:#667eea;"></i>
+  <div style="margin-top:16px;font-size:14px;color:#7f8c8d;">Memuatkan data PAJSK dari Google Sheets...</div>
+</div>
+
+<!-- HERO STATS (hidden until loaded) -->
+<div id="pajskHeroStatsContainer" style="display:none;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
+    
+    <!-- Card 1: GPS Keseluruhan -->
+    <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(102,126,234,0.25);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:0 0 0 12px;font-size:10px;font-weight:700;">GPS Keseluruhan</div>
+      <div id="pajskHeroGPSNum" style="font-size:42px;font-weight:900;line-height:1;margin-bottom:8px;">--</div>
+      <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Tahun <span id="pajskHeroYear">2025</span></div>
+      <div id="pajskHeroRating" style="font-size:12px;opacity:0.85;margin-top:8px;display:flex;align-items:center;gap:6px;">
+        <i class="fas fa-star"></i> <span>Memuatkan...</span>
+      </div>
+    </div>
+
+    <!-- Card 2: % GPS -->
+    <div style="background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(39,174,96,0.25);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:0 0 0 12px;font-size:10px;font-weight:700;">% GPS</div>
+      <div id="pajskHeroPeratus" style="font-size:42px;font-weight:900;line-height:1;margin-bottom:8px;">--%</div>
+      <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Peratus Keseluruhan</div>
+      <div style="font-size:12px;opacity:0.85;margin-top:8px;display:flex;align-items:center;gap:6px;">
+        <i class="fas fa-percentage"></i> <span>Tahap pencapaian</span>
+      </div>
+    </div>
+
+    <!-- Card 3: vs Tahun Lepas -->
+    <div id="pajskHeroChange" style="background:linear-gradient(135deg,#3498db 0%,#2980b9 100%);color:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(52,152,219,0.25);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:0 0 0 12px;font-size:10px;font-weight:700;">vs Tahun Lepas</div>
+      <div id="pajskHeroChangeNum" style="font-size:42px;font-weight:900;line-height:1;margin-bottom:8px;">--</div>
+      <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Perubahan YoY</div>
+      <div id="pajskHeroChangeSub" style="font-size:12px;opacity:0.85;margin-top:8px;display:flex;align-items:center;gap:6px;">
+        <i class="fas fa-chart-line"></i> <span>Memuatkan...</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Sasaran 2026 -->
+    <div style="background:linear-gradient(135deg,#f39c12 0%,#e67e22 100%);color:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(243,156,18,0.25);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:0 0 0 12px;font-size:10px;font-weight:700;">Sasaran 2026</div>
+      <div id="pajskHeroTarget" style="font-size:42px;font-weight:900;line-height:1;margin-bottom:8px;">--</div>
+      <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Target GPS</div>
+      <div style="font-size:12px;opacity:0.85;margin-top:8px;display:flex;align-items:center;gap:6px;">
+        <i class="fas fa-bullseye"></i> <span>2% improvement</span>
       </div>
     </div>
   </div>
+
+  <!-- Placeholder for Step 4 (Trend Chart) -->
+  <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
+    <div style="font-size:48px;margin-bottom:14px;">📈</div>
+    <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Trend Chart Coming Soon</h2>
+    <p style="color:#7f8c8d;font-size:12px;">
+      Step 3 of 12 — Hero Stats Done ✅<br>
+      Next: Trend GPS 10 Tahun (2017-2026)
+    </p>
+    <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
+      🟡 Step 3/12
+    </div>
+  </div>
+</div>
 
   <!-- ===== PAGE: PENGURUSAN SK@S 3.2 ===== -->
   <div class="page" id="page-skas">
@@ -1471,6 +1536,151 @@ function emailReminderInfo() {
   alert('📧 EMAIL REMINDER\n\nSet trigger di Apps Script: Weekly Mon 7am');
 }
 
+/* ============================================================
+   MODUL PAJSK 2.0 — Frontend (Step 3)
+   ============================================================ */
+
+async function loadPAJSKDashboard() {
+  const yearSelect = document.getElementById('pajskYearSelect');
+  if (!yearSelect) return;
+  
+  const tahun = yearSelect.value;
+  const loadingEl = document.getElementById('pajskLoading');
+  const containerEl = document.getElementById('pajskHeroStatsContainer');
+  const statusBadge = document.getElementById('pajskStatusBadge');
+
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (containerEl) containerEl.style.display = 'none';
+  if (statusBadge) {
+    statusBadge.style.background = '#fef9e7';
+    statusBadge.style.color = '#7d6608';
+    statusBadge.innerHTML = '<i class="fas fa-circle" style="font-size:8px;"></i> Memuatkan...';
+  }
+
+  try {
+    // Fetch dashboard data
+    const url = SKAS_API_URL + '?action=pajsk_dashboard&tahun=' + tahun + '&_t=' + Date.now();
+    console.log('📊 Fetching PAJSK dashboard:', url);
+    
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (!result.success) throw new Error(result.error || 'Unknown error');
+    
+    const data = result.data;
+    console.log('📦 PAJSK Data:', data);
+    
+    // Render Hero Stats
+    renderPAJSKHeroStats(data);
+    
+    // Fetch target sasaran
+    await loadPAJSKTarget();
+    
+    // Show container, hide loading
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (containerEl) containerEl.style.display = 'block';
+    
+    // Update status badge
+    if (statusBadge) {
+      statusBadge.style.background = '#eafaf1';
+      statusBadge.style.color = '#27ae60';
+      statusBadge.innerHTML = '<i class="fas fa-circle" style="font-size:8px;"></i> Live · Sync ' + new Date().toLocaleTimeString('ms-MY');
+    }
+    
+  } catch (e) {
+    console.error('❌ Gagal load PAJSK:', e);
+    
+    if (loadingEl) {
+      loadingEl.innerHTML = 
+        '<div style="color:#e74c3c;">' +
+        '<i class="fas fa-exclamation-triangle" style="font-size:48px;"></i>' +
+        '<div style="margin-top:16px;font-weight:600;">Gagal memuatkan data PAJSK</div>' +
+        '<div style="font-size:12px;margin-top:8px;color:#7f8c8d;">' + e.message + '</div>' +
+        '<button class="btn btn-primary" style="margin-top:16px;" onclick="loadPAJSKDashboard()">' +
+        '<i class="fas fa-redo"></i> Cuba Semula</button>' +
+        '</div>';
+    }
+    
+    if (statusBadge) {
+      statusBadge.style.background = '#fdedec';
+      statusBadge.style.color = '#e74c3c';
+      statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+    }
+  }
+}
+
+function renderPAJSKHeroStats(data) {
+  const k = data.keseluruhan || {};
+  const tahun = data.tahun || 2025;
+  
+  // Card 1: GPS
+  const gpsEl = document.getElementById('pajskHeroGPSNum');
+  if (gpsEl) gpsEl.textContent = k.gps || '--';
+  
+  const yearEl = document.getElementById('pajskHeroYear');
+  if (yearEl) yearEl.textContent = tahun;
+  
+  const ratingEl = document.getElementById('pajskHeroRating');
+  if (ratingEl && k.rating) {
+    ratingEl.innerHTML = '<i class="fas fa-star"></i> <span>' + k.rating.label + '</span>';
+  }
+  
+  // Card 2: % GPS
+  const peratusEl = document.getElementById('pajskHeroPeratus');
+  if (peratusEl) peratusEl.textContent = (k.peratusGPS || 0).toFixed(2) + '%';
+  
+  // Card 3: vs Tahun Lepas
+  const lepas = data.keseluruhanLepas || {};
+  const changeEl = document.getElementById('pajskHeroChangeNum');
+  const changeSub = document.getElementById('pajskHeroChangeSub');
+  
+  if (lepas.gps && k.gps) {
+    const change = (k.gps - lepas.gps).toFixed(2);
+    if (changeEl) changeEl.textContent = (change > 0 ? '+' : '') + change;
+    
+    if (changeSub) {
+      let icon, label;
+      if (change < 0) {
+        icon = 'fa-arrow-down';
+        label = '↓ Better (improvement)';
+      } else if (change > 0) {
+        icon = 'fa-arrow-up';
+        label = '↑ Worse (decline)';
+      } else {
+        icon = 'fa-minus';
+        label = 'Stable';
+      }
+      changeSub.innerHTML = '<i class="fas ' + icon + '"></i> <span>' + label + '</span>';
+    }
+  } else {
+    if (changeEl) changeEl.textContent = 'N/A';
+    if (changeSub) changeSub.innerHTML = '<i class="fas fa-info-circle"></i> <span>Tiada data tahun lepas</span>';
+  }
+}
+
+async function loadPAJSKTarget() {
+  try {
+    const url = SKAS_API_URL + '?action=pajsk_target&tahun=2026&_t=' + Date.now();
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      const targetEl = document.getElementById('pajskHeroTarget');
+      if (targetEl) targetEl.textContent = result.data.targetGPS || '--';
+    }
+  } catch (e) {
+    console.error('Gagal load target:', e);
+  }
+}
+
+// Auto-load when PAJSK page is opened
+const _origNavigateTo = navigateTo;
+navigateTo = function(pageId) {
+  _origNavigateTo(pageId);
+  if (pageId === 'pajsk') {
+    setTimeout(loadPAJSKDashboard, 100);
+  }
+};
 console.log('✅ SPKB v3.1 dimuatkan');
 console.log('📋 Modul aktif: Papan Pemuka, Pengurusan Kelab v3, SK@S 3.2, PAJSK (Step 2/12)');
 </script>
