@@ -712,17 +712,41 @@ body.demo-active .main{margin-top:98px;}
     </div>
   </div>
 
-  <!-- Placeholder untuk content (akan diisi step demi step) -->
-  <div style="background:#fff;border-radius:14px;padding:60px;text-align:center;box-shadow:var(--card-shadow);">
-    <div style="font-size:64px;margin-bottom:16px;">📋</div>
-    <h2 style="color:var(--primary);margin-bottom:10px;">Penilaian PAJSK Module</h2>
-    <p style="color:#7f8c8d;font-size:13px;">
-      Halaman ini sedang dibina secara incremental.<br>
-      Step 1 of 12 — Empty Page Structure
-    </p>
-    <div style="margin-top:20px;display:inline-block;background:#eafaf1;color:#27ae60;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-      ✅ Page Active
+  <!-- HERO HEADER -->
+<div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:16px;padding:30px;margin-bottom:24px;box-shadow:0 6px 24px rgba(118,75,162,0.3);">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+    <div>
+      <h1 style="font-size:24px;font-weight:800;margin:0 0 8px 0;">
+        <i class="fas fa-clipboard-list"></i> Penilaian PAJSK
+      </h1>
+      <p style="font-size:13px;opacity:0.9;margin:0;">
+        Dashboard analisis PAJSK lengkap dengan auto-analytics & sasaran tahunan
+      </p>
     </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-outline" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);" onclick="navigateTo('dashboard')">
+        <i class="fas fa-arrow-left"></i> Kembali
+      </button>
+      <button class="btn btn-accent" onclick="alert('Refresh akan dilaksana di step seterusnya')">
+        <i class="fas fa-sync"></i> Refresh
+      </button>
+      <button class="btn" style="background:#27ae60;color:#fff;" onclick="toggleDemoMode()">
+        <i class="fas fa-eye"></i> Demo Mode
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Placeholder Box -->
+<div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
+  <div style="font-size:48px;margin-bottom:14px;">📊</div>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Dashboard Coming Soon</h2>
+  <p style="color:#7f8c8d;font-size:12px;">
+    Step 2 of 12 — Hero Header Done ✅<br>
+    Next: Year Selector + Hero Stats
+  </p>
+  <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
+    🟡 Step 2/12
   </div>
 </div>
   
