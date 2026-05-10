@@ -667,17 +667,49 @@ body.demo-active .main { margin-top: 98px; }
     </div>
   </div>
 
-  <!-- Placeholder for Step 4 (Trend Chart) -->
-  <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
-    <div style="font-size:48px;margin-bottom:14px;">📈</div>
-    <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Trend Chart Coming Soon</h2>
-    <p style="color:#7f8c8d;font-size:12px;">
-      Step 3 of 12 — Hero Stats Done ✅<br>
-      Next: Trend GPS 10 Tahun (2017-2026)
-    </p>
-    <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-      🟡 Step 3/12
+  <!-- TREND GPS 10 TAHUN (Step 4) -->
+<div style="background:#fff;border-radius:14px;padding:24px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <h3 style="font-size:16px;font-weight:800;color:var(--primary);margin:0;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-chart-line"></i> Trend GPS PAJSK 10 Tahun (2017-2026)
+      </h3>
+      <p style="font-size:11px;color:#7f8c8d;margin:4px 0 0 0;">
+        💡 GPS lebih rendah = lebih baik · 2026 adalah sasaran
+      </p>
     </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="background:#eafaf1;color:#27ae60;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;">
+        <i class="fas fa-star"></i> Best: <span id="trendBestYear">--</span>
+      </span>
+      <span style="background:#fef9e7;color:#7d6608;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;">
+        <i class="fas fa-bullseye"></i> Sasaran: <span id="trendTargetYear">--</span>
+      </span>
+    </div>
+  </div>
+  <div style="position:relative;height:340px;">
+    <canvas id="pajskTrendChart"></canvas>
+  </div>
+  <div id="trendInsights" style="margin-top:16px;padding:14px;background:#f8fafc;border-radius:10px;border-left:4px solid #667eea;">
+    <div style="font-size:11px;color:#7f8c8d;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">
+      📊 Auto-Insights
+    </div>
+    <div id="trendInsightText" style="font-size:13px;color:#2c3e50;line-height:1.6;">
+      Memuatkan analisis...
+    </div>
+  </div>
+</div>
+
+<!-- Placeholder for Step 5 (Unit Cards) -->
+<div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
+  <div style="font-size:48px;margin-bottom:14px;">📊</div>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Unit Cards Coming Soon</h2>
+  <p style="color:#7f8c8d;font-size:12px;">
+    Step 4 of 12 — Trend Chart Done ✅<br>
+    Next: 4 Unit Cards (Sekolah, Beruniform, Kelab, Sukan)
+  </p>
+  <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
+    🟡 Step 4/12
   </div>
 </div>
 
@@ -1674,6 +1706,220 @@ async function loadPAJSKTarget() {
 }
 
 // Auto-load when PAJSK page is opened
+
+let pajskTrendChartInstance = null;
+
+async function loadPAJSKTrendChart() {
+  try {
+    const url = SKAS_API_URL + '?action=pajsk_history&_t=' + Date.now();
+    console.log('📈 Fetching PAJSK history:', url);
+    
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (!result.success) throw new Error(result.error || 'Unknown error');
+    
+    const history = result.data.history || [];
+    console.log('📦 History data:', history);
+    
+    if (history.length === 0) {
+      console.warn('⚠️ Tiada data history');
+      return;
+    }
+    
+    renderPAJSKTrendChart(history);
+    renderTrendInsights(history);
+    
+  } catch (e) {
+    console.error('❌ Gagal load trend:', e);
+  }
+}
+
+function renderPAJSKTrendChart(history) {
+  const canvas = document.getElementById('pajskTrendChart');
+  if (!canvas) return;
+  
+  // Destroy existing chart
+  if (pajskTrendChartInstance) {
+    pajskTrendChartInstance.destroy();
+  }
+  
+  // Pisahkan actual & target
+  const actualData = history.filter(h => !h.isTarget);
+  const targetData = history.filter(h => h.isTarget);
+  
+  const labels = history.map(h => h.tahun.toString());
+  
+  // Data utama (semua tahun)
+  const allData = history.map(h => h.gps);
+  
+  // Data sasaran (line dotted untuk tahun target sahaja)
+  const targetLineData = history.map(h => h.isTarget ? h.gps : null);
+  
+  // Connect last actual ke target
+  const lastActual = actualData[actualData.length - 1];
+  if (lastActual && targetData.length > 0) {
+    const lastActualIndex = labels.indexOf(lastActual.tahun.toString());
+    if (lastActualIndex >= 0) {
+      targetLineData[lastActualIndex] = lastActual.gps;
+    }
+  }
+  
+  // Best year (lowest GPS)
+  const bestYear = actualData.reduce((min, curr) => curr.gps < min.gps ? curr : min, actualData[0]);
+  
+  // Highlight points
+  const pointColors = history.map(h => {
+    if (h.isTarget) return '#f39c12';
+    if (h.tahun === bestYear.tahun) return '#27ae60';
+    return '#667eea';
+  });
+  
+  const pointSizes = history.map(h => {
+    if (h.isTarget || h.tahun === bestYear.tahun) return 8;
+    return 5;
+  });
+  
+  pajskTrendChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'GPS Actual',
+          data: allData.map((v, i) => history[i].isTarget ? null : v),
+          borderColor: '#667eea',
+          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          borderWidth: 3,
+          tension: 0.3,
+          fill: true,
+          pointRadius: pointSizes,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          spanGaps: false
+        },
+        {
+          label: 'Sasaran',
+          data: targetLineData,
+          borderColor: '#f39c12',
+          backgroundColor: 'rgba(243, 156, 18, 0.1)',
+          borderWidth: 2,
+          borderDash: [8, 4],
+          tension: 0,
+          fill: false,
+          pointRadius: 8,
+          pointBackgroundColor: '#f39c12',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font: { size: 12 }, boxWidth: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const point = history[context.dataIndex];
+              if (!point) return '';
+              let label = 'GPS: ' + point.gps;
+              if (point.catatan) label += ' (' + point.catatan + ')';
+              if (point.isTarget) label += ' [SASARAN]';
+              return label;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          reverse: true, // KERANA lebih rendah = lebih baik
+          min: 1.5,
+          max: 3.0,
+          ticks: {
+            stepSize: 0.25,
+            font: { size: 11 },
+            callback: function(value) { return value.toFixed(2); }
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          title: {
+            display: true,
+            text: 'GPS (Lower = Better)',
+            font: { size: 11, weight: 'bold' },
+            color: '#7f8c8d'
+          }
+        },
+        x: {
+          ticks: { font: { size: 11, weight: 'bold' } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+  
+  // Update badges
+  const bestYearEl = document.getElementById('trendBestYear');
+  if (bestYearEl) bestYearEl.textContent = bestYear.tahun + ' (' + bestYear.gps + ')';
+  
+  const targetYearEl = document.getElementById('trendTargetYear');
+  if (targetData.length > 0 && targetYearEl) {
+    targetYearEl.textContent = targetData[0].tahun + ' (' + targetData[0].gps + ')';
+  }
+}
+
+function renderTrendInsights(history) {
+  const insightEl = document.getElementById('trendInsightText');
+  if (!insightEl) return;
+  
+  const actualData = history.filter(h => !h.isTarget);
+  const targetData = history.filter(h => h.isTarget);
+  
+  if (actualData.length === 0) {
+    insightEl.textContent = 'Tiada data untuk dianalisis.';
+    return;
+  }
+  
+  // Analisis
+  const firstYear = actualData[0];
+  const lastYear = actualData[actualData.length - 1];
+  const bestYear = actualData.reduce((min, curr) => curr.gps < min.gps ? curr : min);
+  const worstYear = actualData.reduce((max, curr) => curr.gps > max.gps ? curr : max);
+  const overallChange = (lastYear.gps - firstYear.gps).toFixed(2);
+  const isImproving = overallChange < 0;
+  
+  let insights = [];
+  
+  // Insight 1: Overall trend
+  if (isImproving) {
+    insights.push('<strong style="color:#27ae60;">✅ Trend Positif:</strong> Pencapaian PAJSK menurun dari ' + firstYear.gps + ' (' + firstYear.tahun + ') ke ' + lastYear.gps + ' (' + lastYear.tahun + ') — improvement ' + Math.abs(overallChange) + ' dalam ' + (lastYear.tahun - firstYear.tahun) + ' tahun.');
+  } else {
+    insights.push('<strong style="color:#e74c3c;">⚠️ Perlu Perhatian:</strong> Pencapaian PAJSK meningkat dari ' + firstYear.gps + ' ke ' + lastYear.gps + ' — perlu strategi peningkatan.');
+  }
+  
+  // Insight 2: Best year
+  insights.push('<strong style="color:#27ae60;">🏆 Pencapaian Terbaik:</strong> Tahun ' + bestYear.tahun + ' dengan GPS ' + bestYear.gps + (bestYear.catatan ? ' (' + bestYear.catatan + ')' : '') + '.');
+  
+  // Insight 3: Target
+  if (targetData.length > 0) {
+    const target = targetData[0];
+    const gapToTarget = (lastYear.gps - target.gps).toFixed(2);
+    insights.push('<strong style="color:#f39c12;">🎯 Sasaran ' + target.tahun + ':</strong> GPS ' + target.gps + ' — perlu turunkan ' + gapToTarget + ' lagi dari pencapaian semasa.');
+  }
+  
+  insightEl.innerHTML = insights.join('<br><br>');
+}
+
+// Update loadPAJSKDashboard untuk include trend chart
+const _origLoadPAJSKDashboard = loadPAJSKDashboard;
+loadPAJSKDashboard = async function() {
+  await _origLoadPAJSKDashboard();
+  await loadPAJSKTrendChart();
+};
 const _origNavigateTo = navigateTo;
 navigateTo = function(pageId) {
   _origNavigateTo(pageId);
