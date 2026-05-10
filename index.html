@@ -820,7 +820,7 @@ body.demo-active .main { margin-top: 98px; }
    KONFIGURASI API
    ============================================================ */
 const SKAS_API_URL = 'https://script.google.com/macros/s/AKfycbxTXUFFwssqT7Nwg5sJ6tWsVUMD_-zV2h2S35lymOgTW88iVaT1mqag2yHfBoShTWA/exec';
-const KELAB_FILE_ID = '1N7lYrEd6OMtEkRe0IzWIwbGsdrqR6KN7a6dzbEkmws4';
+const KELAB_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-kelab-v3.html';
 
 /* ============================================================
    SIDEBAR TOGGLE
@@ -921,8 +921,7 @@ document.querySelectorAll('.nav-item[data-page]').forEach(function(item) {
    MODUL KELAB — Buka dari Drive
    ============================================================ */
 function openKelabFullscreen() {
-  const kelabURL = 'https://drive.google.com/file/d/' + KELAB_FILE_ID + '/preview';
-  window.open(kelabURL, '_blank', 'noopener,noreferrer');
+  window.open(KELAB_URL, '_blank', 'noopener,noreferrer');
 }
 
 /* ============================================================
