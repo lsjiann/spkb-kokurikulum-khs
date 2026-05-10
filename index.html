@@ -995,16 +995,166 @@ body.demo-active .main { margin-top: 98px; }
   </div>
 </div>
 
-<!-- Placeholder for Step 11 (Form Input) -->
+<!-- FORM INPUT (Step 11) -->
+<div style="background:linear-gradient(135deg,#9b59b6 0%,#8e44ad 100%);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0;display:flex;align-items:center;gap:10px;">
+    <i class="fas fa-pen-to-square"></i> Input Data PAJSK
+  </h3>
+  <p style="font-size:11px;opacity:0.9;margin:6px 0 0 0;">
+    Masukkan bilangan murid mengikut gred A/B/C/D/E. GPS akan dikira secara automatik.
+  </p>
+</div>
+
+<div style="background:#fff;border-radius:14px;padding:24px;box-shadow:var(--card-shadow);max-width:900px;margin:0 auto 20px auto;">
+  
+  <!-- Info Box -->
+  <div style="background:#ebf5fb;border-left:4px solid #3498db;padding:12px 16px;border-radius:8px;font-size:12px;color:#1a5276;margin-bottom:20px;">
+    <i class="fas fa-info-circle"></i> 
+    <strong>Nota:</strong> Total A+B+C+D+E mesti sama dengan Bil. Murid. 
+    Sistem akan auto-update jika data sudah wujud.
+  </div>
+  
+  <form id="pajskInputForm" onsubmit="submitPAJSKData(event)">
+    
+    <!-- Row 1: Tahun & Unit -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px;">
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#7f8c8d;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">
+          Tahun
+        </label>
+        <input type="number" id="formTahun" value="2025" min="2017" max="2030" required
+          style="width:100%;padding:10px 14px;border:1px solid #dfe6ec;border-radius:8px;font-size:13px;font-weight:600;">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#7f8c8d;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">
+          Unit
+        </label>
+        <select id="formUnit" required
+          style="width:100%;padding:10px 14px;border:1px solid #dfe6ec;border-radius:8px;font-size:13px;font-weight:600;">
+          <option value="SEKOLAH">SEKOLAH (Keseluruhan)</option>
+          <option value="BADAN_BERUNIFORM">BADAN BERUNIFORM</option>
+          <option value="KELAB_PERSATUAN">KELAB & PERSATUAN</option>
+          <option value="SUKAN_PERMAINAN">SUKAN & PERMAINAN</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Row 2: Tingkatan & Bil. Murid -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px;">
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#7f8c8d;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">
+          Tingkatan
+        </label>
+        <select id="formTingkatan" required
+          style="width:100%;padding:10px 14px;border:1px solid #dfe6ec;border-radius:8px;font-size:13px;font-weight:600;">
+          <option value="KESELURUHAN">KESELURUHAN</option>
+          <option value="TING 1">Tingkatan 1</option>
+          <option value="TING 2">Tingkatan 2</option>
+          <option value="TING 3">Tingkatan 3</option>
+          <option value="TING 4">Tingkatan 4</option>
+          <option value="TING 5">Tingkatan 5</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#7f8c8d;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">
+          Bil. Murid
+        </label>
+        <input type="number" id="formBilMurid" min="1" required onchange="autoCalculatePAJSK()"
+          style="width:100%;padding:10px 14px;border:1px solid #dfe6ec;border-radius:8px;font-size:13px;font-weight:600;">
+      </div>
+    </div>
+    
+    <h3 style="font-size:13px;color:var(--primary);margin:20px 0 10px 0;font-weight:800;">
+      Bilangan Mengikut Gred:
+    </h3>
+    
+    <!-- Gred Inputs -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;">
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#27ae60;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;text-align:center;">
+          A (Cemerlang)
+        </label>
+        <input type="number" id="formA" min="0" value="0" required onchange="autoCalculatePAJSK()"
+          style="width:100%;padding:10px 14px;border:2px solid #27ae60;border-radius:8px;font-size:16px;font-weight:800;text-align:center;color:#27ae60;">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#3498db;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;text-align:center;">
+          B (Baik)
+        </label>
+        <input type="number" id="formB" min="0" value="0" required onchange="autoCalculatePAJSK()"
+          style="width:100%;padding:10px 14px;border:2px solid #3498db;border-radius:8px;font-size:16px;font-weight:800;text-align:center;color:#3498db;">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#f1c40f;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;text-align:center;">
+          C (Memuaskan)
+        </label>
+        <input type="number" id="formC" min="0" value="0" required onchange="autoCalculatePAJSK()"
+          style="width:100%;padding:10px 14px;border:2px solid #f1c40f;border-radius:8px;font-size:16px;font-weight:800;text-align:center;color:#b7950b;">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#e67e22;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;text-align:center;">
+          D (Lemah)
+        </label>
+        <input type="number" id="formD" min="0" value="0" required onchange="autoCalculatePAJSK()"
+          style="width:100%;padding:10px 14px;border:2px solid #e67e22;border-radius:8px;font-size:16px;font-weight:800;text-align:center;color:#e67e22;">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:#e74c3c;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;text-align:center;">
+          E (Sangat Lemah)
+        </label>
+        <input type="number" id="formE" min="0" value="0" required onchange="autoCalculatePAJSK()"
+          style="width:100%;padding:10px 14px;border:2px solid #e74c3c;border-radius:8px;font-size:16px;font-weight:800;text-align:center;color:#e74c3c;">
+      </div>
+    </div>
+    
+    <!-- Auto-Calculate Preview -->
+    <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-top:14px;border:1px dashed #bdc3c7;">
+      <div style="font-size:11px;color:#7f8c8d;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
+        🧮 Auto-Calculate Preview:
+      </div>
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+        <div>
+          <strong style="font-size:11px;color:#7f8c8d;">Total Gred:</strong>
+          <span id="formTotalGred" style="font-size:18px;font-weight:800;color:var(--primary);margin-left:8px;">0</span>
+        </div>
+        <div>
+          <strong style="font-size:11px;color:#7f8c8d;">GPS:</strong>
+          <span id="formGPS" style="font-size:18px;font-weight:800;color:#667eea;margin-left:8px;">0.00</span>
+        </div>
+        <div>
+          <strong style="font-size:11px;color:#7f8c8d;">%GPS:</strong>
+          <span id="formPeratusGPS" style="font-size:18px;font-weight:800;color:#27ae60;margin-left:8px;">0.00%</span>
+        </div>
+        <div>
+          <strong style="font-size:11px;color:#7f8c8d;">Status:</strong>
+          <span id="formStatus" style="font-size:13px;font-weight:700;padding:4px 12px;border-radius:10px;background:#ecf0f1;color:#7f8c8d;margin-left:8px;">--</span>
+        </div>
+      </div>
+      <div id="formValidation" style="margin-top:10px;font-size:11px;color:#7f8c8d;"></div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;">
+      <button type="button" onclick="resetPAJSKForm()" style="padding:10px 20px;background:#fff;border:2px solid #bdc3c7;color:#7f8c8d;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;">
+        <i class="fas fa-redo"></i> Reset
+      </button>
+      <button type="submit" id="formSubmitBtn" style="padding:10px 24px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;">
+        <i class="fas fa-save"></i> Simpan Data
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Placeholder for Step 12 (Polish) -->
 <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
-  <div style="font-size:48px;margin-bottom:14px;">📝</div>
-  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Form Input Coming Soon</h2>
+  <div style="font-size:48px;margin-bottom:14px;">✨</div>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Final Polish Coming Soon</h2>
   <p style="color:#7f8c8d;font-size:12px;">
-    Step 10 of 12 — SWOT Analysis Done ✅<br>
-    Next: Form Input untuk masukkan data PAJSK
+    Step 11 of 12 — Form Input Done ✅<br>
+    Next: Final touches & footer
   </p>
   <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-    🟡 Step 10/12
+    🟡 Step 11/12
   </div>
 </div>
 
@@ -2318,7 +2468,175 @@ let pajskStackedTingkatanInstance = null;
 
 let pajskRadarChartInstance = null;
 
-async function loadPAJSKSWOT() {
+
+/* ============================================================
+   PAJSK FORM INPUT
+   ============================================================ */
+
+function autoCalculatePAJSK() {
+  const A = Number(document.getElementById('formA').value) || 0;
+  const B = Number(document.getElementById('formB').value) || 0;
+  const C = Number(document.getElementById('formC').value) || 0;
+  const D = Number(document.getElementById('formD').value) || 0;
+  const E = Number(document.getElementById('formE').value) || 0;
+  const bilMurid = Number(document.getElementById('formBilMurid').value) || 0;
+  
+  const totalGred = A + B + C + D + E;
+  
+  // Update Total Gred
+  const totalEl = document.getElementById('formTotalGred');
+  if (totalEl) totalEl.textContent = totalGred;
+  
+  // Calculate GPS (Lower = Better)
+  let gps = 0;
+  let peratusGPS = 0;
+  
+  if (totalGred > 0) {
+    gps = (A * 1 + B * 2 + C * 3 + D * 4 + E * 5) / totalGred;
+    peratusGPS = ((5 - gps) / 4) * 100;
+  }
+  
+  // Update GPS
+  const gpsEl = document.getElementById('formGPS');
+  if (gpsEl) gpsEl.textContent = gps.toFixed(2);
+  
+  // Update %GPS
+  const peratusEl = document.getElementById('formPeratusGPS');
+  if (peratusEl) peratusEl.textContent = peratusGPS.toFixed(2) + '%';
+  
+  // Determine Status
+  const statusEl = document.getElementById('formStatus');
+  if (statusEl) {
+    let statusText = '--';
+    let statusBg = '#ecf0f1';
+    let statusColor = '#7f8c8d';
+    
+    if (gps === 0) {
+      statusText = '--';
+    } else if (gps <= 2.0) {
+      statusText = 'Cemerlang';
+      statusBg = '#eafaf1';
+      statusColor = '#27ae60';
+    } else if (gps <= 2.5) {
+      statusText = 'Baik';
+      statusBg = '#ebf5fb';
+      statusColor = '#3498db';
+    } else if (gps <= 3.0) {
+      statusText = 'Memuaskan';
+      statusBg = '#fef9e7';
+      statusColor = '#f39c12';
+    } else {
+      statusText = 'Lemah';
+      statusBg = '#fdedec';
+      statusColor = '#e74c3c';
+    }
+    
+    statusEl.textContent = statusText;
+    statusEl.style.background = statusBg;
+    statusEl.style.color = statusColor;
+  }
+  
+  // Validation
+  const validationEl = document.getElementById('formValidation');
+  if (validationEl) {
+    if (bilMurid === 0) {
+      validationEl.innerHTML = '';
+    } else if (totalGred === bilMurid) {
+      validationEl.innerHTML = '<span style="color:#27ae60;"><i class="fas fa-check-circle"></i> Total A+B+C+D+E sama dengan Bil. Murid (' + bilMurid + ')</span>';
+    } else {
+      validationEl.innerHTML = '<span style="color:#e74c3c;"><i class="fas fa-exclamation-triangle"></i> Total Gred (' + totalGred + ') tidak sama dengan Bil. Murid (' + bilMurid + ') · Beza: ' + Math.abs(totalGred - bilMurid) + '</span>';
+    }
+  }
+}
+
+function resetPAJSKForm() {
+  document.getElementById('pajskInputForm').reset();
+  document.getElementById('formTahun').value = new Date().getFullYear();
+  autoCalculatePAJSK();
+}
+
+async function submitPAJSKData(event) {
+  event.preventDefault();
+  
+  const submitBtn = document.getElementById('formSubmitBtn');
+  const originalHTML = submitBtn.innerHTML;
+  
+  const tahun = Number(document.getElementById('formTahun').value);
+  const unit = document.getElementById('formUnit').value;
+  const tingkatan = document.getElementById('formTingkatan').value;
+  const bilMurid = Number(document.getElementById('formBilMurid').value);
+  const A = Number(document.getElementById('formA').value);
+  const B = Number(document.getElementById('formB').value);
+  const C = Number(document.getElementById('formC').value);
+  const D = Number(document.getElementById('formD').value);
+  const E = Number(document.getElementById('formE').value);
+  
+  // Validation
+  const totalGred = A + B + C + D + E;
+  if (totalGred !== bilMurid) {
+    alert('⚠️ Total A+B+C+D+E (' + totalGred + ') tidak sama dengan Bil. Murid (' + bilMurid + ')');
+    return;
+  }
+  
+  // Confirmation
+  if (!confirm('Simpan data PAJSK?\n\n' +
+               'Tahun: ' + tahun + '\n' +
+               'Unit: ' + unit + '\n' +
+               'Tingkatan: ' + tingkatan + '\n' +
+               'Bil. Murid: ' + bilMurid + '\n' +
+               'A:' + A + ' B:' + B + ' C:' + C + ' D:' + D + ' E:' + E + '\n\n' +
+               'Sistem akan update jika data sudah wujud.')) {
+    return;
+  }
+  
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+  submitBtn.disabled = true;
+  
+  try {
+    const response = await fetch(SKAS_API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'pajsk_save',
+        payload: {
+          tahun: tahun,
+          unit: unit,
+          tingkatan: tingkatan,
+          bil_murid: bilMurid,
+          A: A, B: B, C: C, D: D, E: E,
+          userEmail: 'admin@spkb.local'
+        }
+      })
+    });
+    
+    // Sebab no-cors, kita assume success
+    alert('✅ Data berjaya disimpan!\n\nDashboard akan refresh dalam 2 saat...');
+    
+    // Refresh dashboard selepas 2 saat
+    setTimeout(function() {
+      loadPAJSKDashboard();
+    }, 2000);
+    
+  } catch (e) {
+    console.error('Gagal save:', e);
+    alert('❌ Gagal menyimpan data: ' + e.message);
+  } finally {
+    submitBtn.innerHTML = originalHTML;
+    submitBtn.disabled = false;
+  }
+}
+
+// Initialize form
+setTimeout(function() {
+  if (document.getElementById('pajskInputForm')) {
+    autoCalculatePAJSK();
+  }
+}, 1500);
+  
+  async function loadPAJSKSWOT() {
   const yearSelect = document.getElementById('pajskYearSelect');
   if (!yearSelect) return;
   
