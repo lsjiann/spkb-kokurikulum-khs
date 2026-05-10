@@ -1389,6 +1389,132 @@ body.demo-active .main { margin-top: 98px; }
     </div>
   </div>
 
+<!-- ============================================================
+     PAGE: PLACEHOLDER (untuk modul Phase 2 & Phase 3)
+     Digunakan oleh navigateTo() untuk modul yang belum dibina
+     ============================================================ -->
+<section id="page-placeholder" class="page">
+
+  <!-- Breadcrumb -->
+  <div style="font-size:12px;color:#7f8c8d;margin-bottom:14px;">
+    <i class="fas fa-home"></i>
+    <a href="#" onclick="navigateTo('dashboard');return false;" style="color:#7f8c8d;text-decoration:none;">Papan Pemuka</a>
+    <i class="fas fa-chevron-right" style="font-size:9px;margin:0 6px;"></i>
+    <span id="placeholderBreadcrumb">Modul</span>
+  </div>
+
+  <!-- Page Header -->
+  <div style="background:#fff;border-radius:14px;padding:22px 26px;margin-bottom:20px;box-shadow:var(--card-shadow);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+    <div>
+      <h2 id="placeholderTitle" style="font-size:18px;font-weight:800;color:var(--primary);margin:0 0 4px 0;">
+        <i class="fas fa-rocket"></i> Modul
+      </h2>
+      <p id="placeholderDesc" style="font-size:12px;color:#7f8c8d;margin:0;">
+        Modul ini akan dibangunkan mengikut keutamaan dan keperluan.
+      </p>
+    </div>
+    <button onclick="navigateTo('dashboard')" style="padding:9px 18px;background:#fff;color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;">
+      <i class="fas fa-arrow-left"></i> Kembali ke Papan Pemuka
+    </button>
+  </div>
+
+  <!-- Hero "Coming Soon" Card -->
+  <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:16px;padding:48px 30px;text-align:center;margin-bottom:24px;box-shadow:0 8px 30px rgba(102,126,234,0.25);">
+    <div id="placeholderIcon" style="font-size:64px;margin-bottom:18px;">🚀</div>
+    <h2 id="placeholderHeroTitle" style="font-size:24px;font-weight:800;margin:0 0 10px 0;">Coming Soon</h2>
+    <p id="placeholderHeroDesc" style="font-size:13px;opacity:0.92;max-width:560px;margin:0 auto 18px;line-height:1.6;">
+      Modul ini sedang dirancang dan akan dilancarkan dalam fasa pembangunan seterusnya.
+    </p>
+    <div id="placeholderPhaseText" style="display:inline-block;background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.35);padding:8px 20px;border-radius:24px;font-size:12px;font-weight:700;letter-spacing:0.5px;">
+      Phase — Coming Soon
+    </div>
+  </div>
+
+  <!-- Roadmap Section -->
+  <div style="background:#fff;border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:var(--card-shadow);">
+    <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:0 0 16px 0;padding-bottom:12px;border-bottom:2px solid #f0f0f0;">
+      <i class="fas fa-road"></i> Roadmap Pembangunan SPKB
+    </h3>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;">
+
+      <!-- Phase 1 -->
+      <div style="border:2px solid #27ae60;border-radius:12px;padding:16px;background:#eafaf1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#27ae60;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;">
+            <i class="fas fa-check"></i>
+          </div>
+          <strong style="color:#1e8449;font-size:13px;">Phase 1 — Foundation</strong>
+        </div>
+        <ul style="margin:0;padding-left:20px;font-size:11px;color:#1e8449;line-height:1.8;">
+          <li>Papan Pemuka Dashboard ✓</li>
+          <li>Pengurusan Kelab v3 ✓</li>
+          <li>SK@S 3.2 Module ✓</li>
+          <li>Penilaian PAJSK ✓</li>
+        </ul>
+      </div>
+
+      <!-- Phase 2 -->
+      <div style="border:2px solid #f39c12;border-radius:12px;padding:16px;background:#fef9e7;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#f39c12;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;">
+            <i class="fas fa-hammer"></i>
+          </div>
+          <strong style="color:#7d6608;font-size:13px;">Phase 2 — Daily Tools</strong>
+        </div>
+        <ul style="margin:0;padding-left:20px;font-size:11px;color:#7d6608;line-height:1.8;">
+          <li>Pencapaian (Hall of Fame)</li>
+        </ul>
+      </div>
+
+      <!-- Phase 3 -->
+      <div style="border:2px solid #bdc3c7;border-radius:12px;padding:16px;background:#f8fafc;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#7f8c8d;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;">
+            <i class="fas fa-clock"></i>
+          </div>
+          <strong style="color:#5d6d7e;font-size:13px;">Phase 3 — Extended</strong>
+        </div>
+        <ul style="margin:0;padding-left:20px;font-size:11px;color:#5d6d7e;line-height:1.8;">
+          <li>Data Pelajar & Guru Penasihat</li>
+          <li>Pengurusan Fail & Jana Dokumen</li>
+          <li>Maklumat Sekolah & Tetapan</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Quick Access -->
+  <div style="background:#fff;border-radius:14px;padding:24px;box-shadow:var(--card-shadow);">
+    <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+      <i class="fas fa-bolt"></i> Buat Masa Ini, Anda Boleh Akses:
+    </h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+      <a href="#" onclick="navigateTo('dashboard');return false;" style="padding:14px;background:#ebf5fb;border-radius:10px;text-decoration:none;color:#1a5276;font-size:12px;font-weight:700;text-align:center;border:1.5px solid #aed6f1;">
+        <i class="fas fa-gauge-high" style="font-size:20px;display:block;margin-bottom:6px;"></i>
+        Papan Pemuka
+      </a>
+      <a href="#" onclick="navigateTo('pengurusan-kelab');return false;" style="padding:14px;background:#f4ecf7;border-radius:10px;text-decoration:none;color:#6c3483;font-size:12px;font-weight:700;text-align:center;border:1.5px solid #d7bde2;">
+        <i class="fas fa-users" style="font-size:20px;display:block;margin-bottom:6px;"></i>
+        Pengurusan Kelab v3
+      </a>
+      <a href="#" onclick="navigateTo('pajsk');return false;" style="padding:14px;background:#e8f8f5;border-radius:10px;text-decoration:none;color:#0e6655;font-size:12px;font-weight:700;text-align:center;border:1.5px solid #a3e4d7;">
+        <i class="fas fa-chart-line" style="font-size:20px;display:block;margin-bottom:6px;"></i>
+        Penilaian PAJSK
+      </a>
+      <a href="#" onclick="navigateTo('skas');return false;" style="padding:14px;background:#fef9e7;border-radius:10px;text-decoration:none;color:#7d6608;font-size:12px;font-weight:700;text-align:center;border:1.5px solid #f9e79f;">
+        <i class="fas fa-clipboard-check" style="font-size:20px;display:block;margin-bottom:6px;"></i>
+        SK@S 3.2
+      </a>
+    </div>
+  </div>
+
+</section>
+<!-- ============================================================
+     END: PAGE PLACEHOLDER
+     ============================================================ -->
+  
 </main>
 
 <!-- ===== MODAL: DRILL-DOWN ===== -->
