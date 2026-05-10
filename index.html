@@ -700,16 +700,34 @@ body.demo-active .main { margin-top: 98px; }
   </div>
 </div>
 
-<!-- Placeholder for Step 5 (Unit Cards) -->
+<!-- 4 UNIT CARDS (Step 5) -->
+<div style="background:linear-gradient(135deg,#1a3c6e 0%,#2e86c1 100%);color:#fff;border-radius:14px;padding:18px 24px;margin-bottom:16px;">
+  <h3 style="font-size:15px;font-weight:800;margin:0;display:flex;align-items:center;gap:8px;">
+    <i class="fas fa-th-large"></i> Analisis 4 Unit Kokurikulum
+  </h3>
+  <p style="font-size:11px;opacity:0.9;margin:4px 0 0 0;">
+    GPS dan rating mengikut unit · Klik untuk detail breakdown
+  </p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:24px;" id="pajskUnitCardsContainer">
+  <!-- Auto-populated by JavaScript -->
+  <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);grid-column:1/-1;">
+    <i class="fas fa-spinner fa-spin" style="font-size:32px;color:#667eea;"></i>
+    <div style="margin-top:12px;font-size:13px;color:#7f8c8d;">Memuatkan data unit...</div>
+  </div>
+</div>
+
+<!-- Placeholder for Step 6 (Charts Unit) -->
 <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
   <div style="font-size:48px;margin-bottom:14px;">📊</div>
-  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Unit Cards Coming Soon</h2>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Charts Unit Coming Soon</h2>
   <p style="color:#7f8c8d;font-size:12px;">
-    Step 4 of 12 — Trend Chart Done ✅<br>
-    Next: 4 Unit Cards (Sekolah, Beruniform, Kelab, Sukan)
+    Step 5 of 12 — Unit Cards Done ✅<br>
+    Next: 2 Charts (%GPS & GPS Mengikut Unit)
   </p>
   <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-    🟡 Step 4/12
+    🟡 Step 5/12
   </div>
 </div>
 
@@ -1915,10 +1933,123 @@ function renderTrendInsights(history) {
 }
 
 // Update loadPAJSKDashboard untuk include trend chart
+
+const PAJSK_UNIT_INFO = {
+  'SEKOLAH': {
+    icon: '🏫',
+    nama: 'Sekolah',
+    nama_full: 'SEKOLAH (Keseluruhan)',
+    color: '#3498db',
+    gradient: 'linear-gradient(135deg,#ebf5fb 0%,#fff 100%)'
+  },
+  'BADAN_BERUNIFORM': {
+    icon: '🎖️',
+    nama: 'Beruniform',
+    nama_full: 'BADAN BERUNIFORM',
+    color: '#1abc9c',
+    gradient: 'linear-gradient(135deg,#e8f8f5 0%,#fff 100%)'
+  },
+  'KELAB_PERSATUAN': {
+    icon: '📚',
+    nama: 'Kelab',
+    nama_full: 'KELAB & PERSATUAN',
+    color: '#9b59b6',
+    gradient: 'linear-gradient(135deg,#f4ecf7 0%,#fff 100%)'
+  },
+  'SUKAN_PERMAINAN': {
+    icon: '⚽',
+    nama: 'Sukan',
+    nama_full: 'SUKAN & PERMAINAN',
+    color: '#f39c12',
+    gradient: 'linear-gradient(135deg,#fef9e7 0%,#fff 100%)'
+  }
+};
+
+function renderPAJSKUnitCards(data) {
+  const container = document.getElementById('pajskUnitCardsContainer');
+  if (!container) return;
+  
+  const perUnit = data.perUnit || {};
+  const units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
+  
+  let html = '';
+  
+  units.forEach(function(unitKey) {
+    const unitData = perUnit[unitKey] || {};
+    const info = PAJSK_UNIT_INFO[unitKey];
+    if (!info) return;
+    
+    const gps = unitData.gps || 0;
+    const gpsLepas = unitData.gpsLepas || 0;
+    const change = unitData.changeGPS || 0;
+    const rating = unitData.rating || { label: 'N/A', color: '#bdc3c7' };
+    
+    // Trend icon & color
+    let trendIcon = 'fa-minus';
+    let trendColor = '#7f8c8d';
+    let trendLabel = 'Stable';
+    
+    if (change < 0) {
+      trendIcon = 'fa-arrow-down';
+      trendColor = '#27ae60';
+      trendLabel = '↓ Better';
+    } else if (change > 0) {
+      trendIcon = 'fa-arrow-up';
+      trendColor = '#e74c3c';
+      trendLabel = '↑ Worse';
+    }
+    
+    html += '<div style="background:' + info.gradient + ';border-radius:14px;padding:18px;box-shadow:var(--card-shadow);position:relative;overflow:hidden;border-top:4px solid ' + info.color + ';transition:transform 0.2s;cursor:default;" ' +
+      'onmouseover="this.style.transform=\'translateY(-3px)\'" ' +
+      'onmouseout="this.style.transform=\'translateY(0)\'">' +
+      
+      '<div style="font-size:32px;margin-bottom:8px;">' + info.icon + '</div>' +
+      
+      '<div style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">' + info.nama_full + '</div>' +
+      
+      '<div style="font-size:36px;font-weight:900;color:' + info.color + ';line-height:1;margin-bottom:6px;">' + gps + '</div>' +
+      
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;">' +
+        '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;color:#fff;background:' + rating.color + ';">' + rating.label + '</span>' +
+        '<span style="font-size:11px;font-weight:700;color:' + trendColor + ';display:flex;align-items:center;gap:4px;">' +
+          '<i class="fas ' + trendIcon + '"></i> ' + 
+          (change !== 0 ? Math.abs(change).toFixed(2) : 'Same') +
+        '</span>' +
+      '</div>' +
+      
+      (gpsLepas > 0 ? 
+        '<div style="font-size:10px;color:#7f8c8d;margin-top:8px;text-align:center;">' +
+          'vs ' + gpsLepas + ' (tahun lepas)' +
+        '</div>' : ''
+      ) +
+      
+    '</div>';
+  });
+  
+  container.innerHTML = html;
+}
+// Update loadPAJSKDashboard untuk include trend chart + unit cards
 const _origLoadPAJSKDashboard = loadPAJSKDashboard;
 loadPAJSKDashboard = async function() {
+  // Save data dari _origLoadPAJSKDashboard untuk render unit cards
+  const yearSelect = document.getElementById('pajskYearSelect');
+  const tahun = yearSelect ? yearSelect.value : 2025;
+  
   await _origLoadPAJSKDashboard();
   await loadPAJSKTrendChart();
+  
+  // Fetch data lagi untuk unit cards
+  try {
+    const url = SKAS_API_URL + '?action=pajsk_dashboard&tahun=' + tahun + '&_t=' + Date.now();
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      renderPAJSKUnitCards(result.data);
+    }
+  } catch (e) {
+    console.error('Gagal load unit cards:', e);
+  }
 };
 const _origNavigateTo = navigateTo;
 navigateTo = function(pageId) {
