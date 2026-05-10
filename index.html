@@ -795,16 +795,67 @@ body.demo-active .main { margin-top: 98px; }
 }
 </style>
 
-<!-- Placeholder for Step 8 (Stacked Charts) -->
+<!-- 2 STACKED BAR CHARTS (Step 8) -->
+<div style="background:linear-gradient(135deg,#e67e22 0%,#d35400 100%);color:#fff;border-radius:14px;padding:18px 24px;margin-bottom:16px;">
+  <h3 style="font-size:15px;font-weight:800;margin:0;display:flex;align-items:center;gap:8px;">
+    <i class="fas fa-layer-group"></i> Prestasi Murid (Bilangan A/B/C/D/E)
+  </h3>
+  <p style="font-size:11px;opacity:0.9;margin:4px 0 0 0;">
+    Breakdown bilangan murid mengikut gred · Visualisasi distribusi pencapaian
+  </p>
+</div>
+
+<!-- Color Legend -->
+<div style="background:#fff;border-radius:10px;padding:12px 18px;box-shadow:var(--card-shadow);margin-bottom:16px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+  <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#2c3e50;">
+    <span style="width:14px;height:14px;background:#27ae60;border-radius:3px;"></span> A (Cemerlang)
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#2c3e50;">
+    <span style="width:14px;height:14px;background:#3498db;border-radius:3px;"></span> B (Baik)
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#2c3e50;">
+    <span style="width:14px;height:14px;background:#f1c40f;border-radius:3px;"></span> C (Memuaskan)
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#2c3e50;">
+    <span style="width:14px;height:14px;background:#e67e22;border-radius:3px;"></span> D (Lemah)
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#2c3e50;">
+    <span style="width:14px;height:14px;background:#e74c3c;border-radius:3px;"></span> E (Sangat Lemah)
+  </div>
+</div>
+
+<!-- Stacked Bar Chart 1: Mengikut Unit -->
+<div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+  <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+    <i class="fas fa-chart-bar"></i> Prestasi Murid Mengikut Unit
+    <span style="font-size:10px;color:#7f8c8d;font-weight:400;margin-left:auto;">Total: <span id="totalMuridUnit">--</span> murid</span>
+  </h3>
+  <div style="position:relative;height:340px;">
+    <canvas id="pajskStackedUnit"></canvas>
+  </div>
+</div>
+
+<!-- Stacked Bar Chart 2: Mengikut Tingkatan -->
+<div style="background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+  <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+    <i class="fas fa-chart-bar"></i> Prestasi Murid Mengikut Tingkatan (Sekolah Keseluruhan)
+    <span style="font-size:10px;color:#7f8c8d;font-weight:400;margin-left:auto;">Tingkatan 1-5</span>
+  </h3>
+  <div style="position:relative;height:340px;">
+    <canvas id="pajskStackedTingkatan"></canvas>
+  </div>
+</div>
+
+<!-- Placeholder for Step 9 (Radar + Heat Map) -->
 <div style="background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:var(--card-shadow);">
-  <div style="font-size:48px;margin-bottom:14px;">📊</div>
-  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Stacked Charts Coming Soon</h2>
+  <div style="font-size:48px;margin-bottom:14px;">🕸️</div>
+  <h2 style="color:var(--primary);margin-bottom:8px;font-size:18px;">Radar + Heat Map Coming Soon</h2>
   <p style="color:#7f8c8d;font-size:12px;">
-    Step 7 of 12 — Charts Tingkatan Done ✅<br>
-    Next: Prestasi Murid (Stacked Bar A/B/C/D/E)
+    Step 8 of 12 — Stacked Charts Done ✅<br>
+    Next: Radar Chart + Heat Map (Tingkatan × Unit)
   </p>
   <div style="margin-top:16px;display:inline-block;background:#fef9e7;color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;">
-    🟡 Step 7/12
+    🟡 Step 8/12
   </div>
 </div>
 
@@ -2113,6 +2164,198 @@ let pajskChartGPSUnitInstance = null;
 let pajskChartPeratusTingkatanInstance = null;
 let pajskChartGPSTingkatanInstance = null;
 
+let pajskStackedUnitInstance = null;
+let pajskStackedTingkatanInstance = null;
+
+const PAJSK_GRED_COLORS = {
+  A: '#27ae60',  // Hijau
+  B: '#3498db',  // Biru
+  C: '#f1c40f',  // Kuning
+  D: '#e67e22',  // Oren
+  E: '#e74c3c'   // Merah
+};
+
+function renderPAJSKStackedUnit(data) {
+  const rawData = data.rawData || [];
+  const units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
+  const labels = ['Sekolah', 'Beruniform', 'Kelab', 'Sukan'];
+  
+  // Filter row KESELURUHAN sahaja untuk setiap unit
+  const dataA = [], dataB = [], dataC = [], dataD = [], dataE = [];
+  let totalMurid = 0;
+  
+  units.forEach(function(unit) {
+    const item = rawData.find(function(r) {
+      return r.unit === unit && r.tingkatan === 'KESELURUHAN';
+    });
+    
+    if (item) {
+      dataA.push(item.A || 0);
+      dataB.push(item.B || 0);
+      dataC.push(item.C || 0);
+      dataD.push(item.D || 0);
+      dataE.push(item.E || 0);
+      if (totalMurid === 0) totalMurid = item.bil_murid || 0;
+    } else {
+      dataA.push(0); dataB.push(0); dataC.push(0); dataD.push(0); dataE.push(0);
+    }
+  });
+  
+  // Update total murid
+  const totalEl = document.getElementById('totalMuridUnit');
+  if (totalEl) totalEl.textContent = totalMurid.toLocaleString();
+  
+  // Render chart
+  const ctx = document.getElementById('pajskStackedUnit');
+  if (!ctx) return;
+  
+  if (pajskStackedUnitInstance) pajskStackedUnitInstance.destroy();
+  
+  pajskStackedUnitInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'A', data: dataA, backgroundColor: PAJSK_GRED_COLORS.A, borderRadius: 4 },
+        { label: 'B', data: dataB, backgroundColor: PAJSK_GRED_COLORS.B, borderRadius: 4 },
+        { label: 'C', data: dataC, backgroundColor: PAJSK_GRED_COLORS.C, borderRadius: 4 },
+        { label: 'D', data: dataD, backgroundColor: PAJSK_GRED_COLORS.D, borderRadius: 4 },
+        { label: 'E', data: dataE, backgroundColor: PAJSK_GRED_COLORS.E, borderRadius: 4 }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font: { size: 11 }, boxWidth: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'Gred ' + context.dataset.label + ': ' + context.parsed.x + ' murid';
+            },
+            afterLabel: function(context) {
+              const total = context.chart.data.datasets.reduce(function(sum, ds) {
+                return sum + (ds.data[context.dataIndex] || 0);
+              }, 0);
+              const peratus = total > 0 ? ((context.parsed.x / total) * 100).toFixed(1) : 0;
+              return '(' + peratus + '%)';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: { font: { size: 11 } },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          title: {
+            display: true,
+            text: 'Bilangan Murid',
+            font: { size: 11, weight: 'bold' },
+            color: '#7f8c8d'
+          }
+        },
+        y: {
+          stacked: true,
+          ticks: { font: { size: 12, weight: 'bold' } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+function renderPAJSKStackedTingkatan(data) {
+  const rawData = data.rawData || [];
+  const tingkatans = ['TING 1', 'TING 2', 'TING 3', 'TING 4', 'TING 5'];
+  const labels = ['Ting 1', 'Ting 2', 'Ting 3', 'Ting 4', 'Ting 5'];
+  
+  // Filter row SEKOLAH untuk setiap tingkatan
+  const dataA = [], dataB = [], dataC = [], dataD = [], dataE = [];
+  
+  tingkatans.forEach(function(ting) {
+    const item = rawData.find(function(r) {
+      return r.unit === 'SEKOLAH' && r.tingkatan === ting;
+    });
+    
+    if (item) {
+      dataA.push(item.A || 0);
+      dataB.push(item.B || 0);
+      dataC.push(item.C || 0);
+      dataD.push(item.D || 0);
+      dataE.push(item.E || 0);
+    } else {
+      dataA.push(0); dataB.push(0); dataC.push(0); dataD.push(0); dataE.push(0);
+    }
+  });
+  
+  // Render chart
+  const ctx = document.getElementById('pajskStackedTingkatan');
+  if (!ctx) return;
+  
+  if (pajskStackedTingkatanInstance) pajskStackedTingkatanInstance.destroy();
+  
+  pajskStackedTingkatanInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'A', data: dataA, backgroundColor: PAJSK_GRED_COLORS.A, borderRadius: 4 },
+        { label: 'B', data: dataB, backgroundColor: PAJSK_GRED_COLORS.B, borderRadius: 4 },
+        { label: 'C', data: dataC, backgroundColor: PAJSK_GRED_COLORS.C, borderRadius: 4 },
+        { label: 'D', data: dataD, backgroundColor: PAJSK_GRED_COLORS.D, borderRadius: 4 },
+        { label: 'E', data: dataE, backgroundColor: PAJSK_GRED_COLORS.E, borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font: { size: 11 }, boxWidth: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'Gred ' + context.dataset.label + ': ' + context.parsed.y + ' murid';
+            },
+            afterLabel: function(context) {
+              const total = context.chart.data.datasets.reduce(function(sum, ds) {
+                return sum + (ds.data[context.dataIndex] || 0);
+              }, 0);
+              const peratus = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
+              return '(' + peratus + '%)';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: { font: { size: 12, weight: 'bold' } },
+          grid: { display: false }
+        },
+        y: {
+          stacked: true,
+          ticks: { font: { size: 11 } },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          title: {
+            display: true,
+            text: 'Bilangan Murid',
+            font: { size: 11, weight: 'bold' },
+            color: '#7f8c8d'
+          }
+        }
+      }
+    }
+  });
+}
+
 function renderPAJSKChartsTingkatan(data) {
   const perTingkatan = data.perTingkatan || {};
   const tingkatans = ['TING 1', 'TING 2', 'TING 3', 'TING 4', 'TING 5'];
@@ -2410,10 +2653,12 @@ loadPAJSKDashboard = async function() {
     const response = await fetch(url);
     const result = await response.json();
     
-    if (result.success && result.data) {
+ if (result.success && result.data) {
   renderPAJSKUnitCards(result.data);
   renderPAJSKChartsUnit(result.data);
   renderPAJSKChartsTingkatan(result.data);
+  renderPAJSKStackedUnit(result.data);
+  renderPAJSKStackedTingkatan(result.data);
 }
   } catch (e) {
     console.error('Gagal load unit cards:', e);
