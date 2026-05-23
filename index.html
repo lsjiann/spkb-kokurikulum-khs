@@ -3206,6 +3206,420 @@ body.demo-active .main { margin-top: 98px; }
        END PAGE 4: SK@S
        ============================================================ -->
 
+<!-- ============================================================
+     PAGE: PENCAPAIAN (HALL OF FAME) — V1.0
+     ============================================================ -->
+<section class="page" id="page-pencapaian">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+    <i class="fas fa-chevron-right"></i>
+    <span>Pencapaian (Hall of Fame)</span>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 style="color:#f39c12;">
+        <i class="fas fa-trophy"></i> Pencapaian — Hall of Fame
+      </h2>
+      <p>Showcase pencapaian gemilang pelajar SMK Tinggi Kuching · Audit-Ready untuk PPD/JPN</p>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-outline" onclick="navigateTo('dashboard')">
+        <i class="fas fa-arrow-left"></i> Kembali
+      </button>
+      <button class="btn btn-primary" onclick="loadPencapaianDashboard()" style="background:linear-gradient(135deg,#f39c12,#e67e22);">
+        <i class="fas fa-sync"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 2: HERO HEADER — Trophy Theme
+       ============================================================ -->
+  <div style="background:linear-gradient(135deg,#f39c12 0%,#d68910 50%,#9a6c0c 100%);color:#fff;border-radius:16px;padding:32px 28px;margin-bottom:20px;box-shadow:0 10px 40px rgba(243,156,18,0.3);position:relative;overflow:hidden;">
+
+    <!-- Decorative trophy icons (background) -->
+    <div style="position:absolute;top:-20px;right:20px;font-size:120px;opacity:0.12;">🏆</div>
+    <div style="position:absolute;bottom:-30px;left:30px;font-size:90px;opacity:0.10;">🥇</div>
+
+    <!-- Hero Content -->
+    <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;">
+      <div>
+        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:8px;">
+          🏆 HALL OF FAME
+        </div>
+        <h1 style="font-size:32px;font-weight:900;margin:0 0 8px 0;line-height:1.2;">
+          PENCAPAIAN GEMILANG
+        </h1>
+        <p style="font-size:14px;opacity:0.95;margin:0;max-width:600px;line-height:1.5;">
+          Menampilkan kemenjadian murid dan kecemerlangan sekolah · Pencapaian peringkat Sekolah hingga Antarabangsa
+        </p>
+      </div>
+
+      <!-- Year Selector + Status Badge -->
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;">
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);">
+          <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">
+            <i class="fas fa-calendar"></i> Tahun:
+          </label>
+          <select id="pencapaianYearSelect" onchange="loadPencapaianDashboard()" style="padding:6px 12px;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;color:#1a3c6e;background:#fff;">
+            <option value="2026">2026 (Semasa)</option>
+            <option value="2025" selected>2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+          </select>
+        </div>
+        <div id="pencapaianStatusBadge" style="background:rgba(255,255,255,0.95);color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
+          <i class="fas fa-circle" style="font-size:8px;"></i> Memuatkan...
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- END HERO HEADER -->
+
+  <!-- ============================================================
+       STEP 3: TAB NAVIGATION
+       ============================================================ -->
+  <div style="background:#fff;border-radius:12px;padding:8px;margin-bottom:20px;box-shadow:var(--card-shadow);display:flex;gap:4px;flex-wrap:wrap;overflow-x:auto;">
+
+    <button class="pencapaian-tab active" data-tab="ringkasan" onclick="switchPencapaianTab('ringkasan', this)" style="padding:12px 22px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;flex:1;justify-content:center;min-width:160px;">
+      <i class="fas fa-chart-pie"></i> Ringkasan
+    </button>
+
+    <button class="pencapaian-tab" data-tab="pencapaian" onclick="switchPencapaianTab('pencapaian', this)" style="padding:12px 22px;background:transparent;color:#7f8c8d;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;flex:1;justify-content:center;min-width:160px;">
+      <i class="fas fa-trophy"></i> Pencapaian
+    </button>
+
+    <button class="pencapaian-tab" data-tab="penyertaan" onclick="switchPencapaianTab('penyertaan', this)" style="padding:12px 22px;background:transparent;color:#7f8c8d;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;flex:1;justify-content:center;min-width:160px;">
+      <i class="fas fa-users"></i> Penyertaan
+    </button>
+
+    <button class="pencapaian-tab" data-tab="unit" onclick="switchPencapaianTab('unit', this)" style="padding:12px 22px;background:transparent;color:#7f8c8d;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;flex:1;justify-content:center;min-width:160px;">
+      <i class="fas fa-chart-bar"></i> Prestasi Unit
+    </button>
+
+  </div>
+
+  <!-- ============================================================
+       TAB CONTENT CONTAINERS
+       ============================================================ -->
+
+  <!-- TAB 1: RINGKASAN -->
+  <div class="pencapaian-tab-content active" id="tab-ringkasan">
+    <div id="pencapaianRingkasanContent">
+
+  <!-- LOADING STATE -->
+  <div id="pencapaianRingkasanLoading" style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+    <i class="fas fa-spinner fa-spin" style="font-size:36px;color:#f39c12;"></i>
+    <div style="margin-top:14px;font-size:13px;color:#7f8c8d;">
+      Memuatkan data Ringkasan...
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MAIN CONTENT (Hidden until data loaded)
+       ============================================================ -->
+  <div id="pencapaianRingkasanMain" style="display:none;">
+
+    <!-- ============================================================
+         SUMMARY BAR (Total Pelajar, Aktiviti, Pencapaian, etc.)
+         ============================================================ -->
+    <div style="background:linear-gradient(135deg,#1a3c6e 0%,#16a085 100%);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">
+
+        <div style="text-align:center;">
+          <div style="font-size:28px;font-weight:900;line-height:1;" id="ringkasanTotalPelajar">--</div>
+          <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
+            <i class="fas fa-user-graduate"></i> Total Pelajar
+          </div>
+        </div>
+
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.18);">
+          <div style="font-size:28px;font-weight:900;line-height:1;" id="ringkasanTotalAktiviti">--</div>
+          <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
+            <i class="fas fa-calendar-check"></i> Aktiviti
+          </div>
+        </div>
+
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.18);">
+          <div style="font-size:28px;font-weight:900;line-height:1;color:#f39c12;" id="ringkasanTotalPencapaian">--</div>
+          <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
+            <i class="fas fa-trophy"></i> Total Pencapaian
+          </div>
+        </div>
+
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.18);">
+          <div style="font-size:28px;font-weight:900;line-height:1;" id="ringkasanTotalPenyertaan">--</div>
+          <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
+            <i class="fas fa-users"></i> Penyertaan
+          </div>
+        </div>
+
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.18);">
+          <div style="font-size:28px;font-weight:900;line-height:1;color:#27ae60;" id="ringkasanPeratusPenyertaan">--</div>
+          <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
+            <i class="fas fa-percentage"></i> % Penyertaan
+          </div>
+        </div>
+
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.18);">
+          <div style="font-size:28px;font-weight:900;line-height:1;" id="ringkasanTotalUnit">--</div>
+          <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
+            <i class="fas fa-layer-group"></i> Unit Aktif
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION TITLE: Pencapaian by Level
+         ============================================================ -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h3 style="font-size:16px;font-weight:800;color:var(--primary);margin:0;">
+          <i class="fas fa-medal" style="color:#f39c12;"></i> Pencapaian Mengikut Peringkat
+        </h3>
+        <p style="font-size:11px;color:#7f8c8d;margin-top:4px;">
+          Breakdown pencapaian gemilang pelajar dari peringkat sekolah hingga antarabangsa
+        </p>
+      </div>
+      <div style="display:flex;gap:6px;font-size:10px;color:#7f8c8d;">
+        <span style="background:#fef9e7;padding:3px 10px;border-radius:10px;">
+          <i class="fas fa-info-circle"></i> Hover untuk detail
+        </span>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         HERO STATS — 5 LEVEL CARDS
+         Layout: 3 cards top row + 2 cards bottom row (pyramid)
+         ============================================================ -->
+
+    <!-- Top Row: International, National, State -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px;">
+
+      <!-- International -->
+      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(231,76,60,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(231,76,60,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(231,76,60,0.25)';">
+        <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🌍</div>
+        <div style="position:relative;z-index:2;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="font-size:20px;">🌍</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.95;">
+              International
+            </div>
+          </div>
+          <div style="font-size:56px;font-weight:900;line-height:1;margin-bottom:6px;" id="levelIntl">0</div>
+          <div style="font-size:12px;opacity:0.92;font-weight:600;">
+            🏆 Pencapaian Antarabangsa
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25);font-size:11px;opacity:0.9;">
+            <i class="fas fa-globe"></i> Highest tier · Top achievers
+          </div>
+        </div>
+      </div>
+
+      <!-- National -->
+      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#f39c12 0%,#d68910 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(243,156,18,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(243,156,18,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(243,156,18,0.25)';">
+        <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🇲🇾</div>
+        <div style="position:relative;z-index:2;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="font-size:20px;">🇲🇾</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.95;">
+              Kebangsaan
+            </div>
+          </div>
+          <div style="font-size:56px;font-weight:900;line-height:1;margin-bottom:6px;" id="levelNational">0</div>
+          <div style="font-size:12px;opacity:0.92;font-weight:600;">
+            🥇 Pencapaian Kebangsaan
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25);font-size:11px;opacity:0.9;">
+            <i class="fas fa-flag"></i> National presence
+          </div>
+        </div>
+      </div>
+
+      <!-- State -->
+      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#3498db 0%,#2874a6 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(52,152,219,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(52,152,219,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(52,152,219,0.25)';">
+        <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🏛️</div>
+        <div style="position:relative;z-index:2;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="font-size:20px;">🏛️</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.95;">
+              Negeri
+            </div>
+          </div>
+          <div style="font-size:56px;font-weight:900;line-height:1;margin-bottom:6px;" id="levelState">0</div>
+          <div style="font-size:12px;opacity:0.92;font-weight:600;">
+            🥈 Pencapaian Peringkat Negeri
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25);font-size:11px;opacity:0.9;">
+            <i class="fas fa-map"></i> Sarawak level
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Row: District, School -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px;">
+
+      <!-- District -->
+      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#9b59b6 0%,#7d3c98 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(155,89,182,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(155,89,182,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(155,89,182,0.25)';">
+        <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">📍</div>
+        <div style="position:relative;z-index:2;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="font-size:20px;">📍</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.95;">
+              Daerah
+            </div>
+          </div>
+          <div style="font-size:48px;font-weight:900;line-height:1;margin-bottom:6px;" id="levelDistrict">0</div>
+          <div style="font-size:12px;opacity:0.92;font-weight:600;">
+            🥉 Pencapaian Peringkat Daerah
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25);font-size:11px;opacity:0.9;">
+            <i class="fas fa-map-marker-alt"></i> Kuching district
+          </div>
+        </div>
+      </div>
+
+      <!-- School -->
+      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(39,174,96,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(39,174,96,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(39,174,96,0.25)';">
+        <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🏫</div>
+        <div style="position:relative;z-index:2;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="font-size:20px;">🏫</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.95;">
+              Sekolah
+            </div>
+          </div>
+          <div style="font-size:48px;font-weight:900;line-height:1;margin-bottom:6px;" id="levelSchool">0</div>
+          <div style="font-size:12px;opacity:0.92;font-weight:600;">
+            🎖️ Pencapaian Peringkat Sekolah
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25);font-size:11px;opacity:0.9;">
+            <i class="fas fa-school"></i> Internal recognition
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+<!-- ============================================================
+     STEP 5: HALL OF FAME — Top 10 Permata Sekolah
+     ============================================================ -->
+<div style="margin-top:24px;margin-bottom:20px;">
+
+  <!-- Section Header -->
+  <div style="background:linear-gradient(135deg,#1a3c6e 0%,#2e86c1 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">🌟</div>
+    <div style="position:absolute;bottom:-30px;left:-10px;font-size:90px;opacity:0.10;">🏆</div>
+    <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
+          ⭐ HALL OF FAME
+        </div>
+        <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">
+          Permata SMK Tinggi Kuching
+        </h2>
+        <p style="font-size:12px;opacity:0.95;margin:0;">
+          Top 10 pencapaian gemilang · Algoritma Mix Smart (International + Champion priority)
+        </p>
+      </div>
+      <div style="background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);text-align:center;">
+        <div style="font-size:24px;font-weight:900;" id="hofTotalRecords">--</div>
+        <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">
+          Total Records
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hall of Fame Cards Container -->
+  <div id="hofLoading" style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+    <i class="fas fa-spinner fa-spin" style="font-size:36px;color:#f39c12;"></i>
+    <div style="margin-top:14px;font-size:13px;color:#7f8c8d;">
+      Memuatkan Hall of Fame...
+    </div>
+  </div>
+
+  <div id="hofCardsContainer" style="display:none;"></div>
+
+  <!-- Empty State -->
+  <div id="hofEmpty" style="display:none;background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+    <i class="fas fa-trophy" style="font-size:48px;color:#bdc3c7;"></i>
+    <h3 style="margin-top:14px;font-size:16px;color:var(--primary);">Tiada Data Pencapaian</h3>
+    <p style="font-size:12px;color:#7f8c8d;margin-top:8px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;">
+      Sila tambah data pencapaian dalam Sheet <code>SPKB_Pencapaian_Individu</code>
+      untuk tahun yang dipilih.
+    </p>
+  </div>
+
+</div>
+<!-- END STEP 5: HALL OF FAME -->
+
+    <!-- ============================================================
+         STATUS FOOTER (Last Update)
+         ============================================================ -->
+    <div style="background:#f8fafc;border:1px dashed #dfe6ec;border-radius:10px;padding:12px 18px;text-align:center;font-size:11px;color:#7f8c8d;">
+      <i class="fas fa-database"></i> Data dari <strong>SPKB_Ringkasan_Tahunan</strong> · 
+      Last sync: <span id="pencapaianLastSync">--</span> ·
+      <a onclick="loadPencapaianDashboard()" style="color:#f39c12;cursor:pointer;font-weight:700;">
+        <i class="fas fa-sync"></i> Refresh
+      </a>
+    </div>
+
+  </div>
+  <!-- END MAIN CONTENT -->
+
+</div>
+
+  <!-- TAB 2: PENCAPAIAN -->
+  <div class="pencapaian-tab-content" id="tab-pencapaian" style="display:none;">
+    <div style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+      <i class="fas fa-trophy" style="font-size:48px;color:#f39c12;opacity:0.5;"></i>
+      <h3 style="margin-top:14px;font-size:16px;color:var(--primary);">Tab Pencapaian</h3>
+      <p style="font-size:12px;color:#7f8c8d;margin-top:8px;">
+        Hall of Fame & Detailed Achievement Table<br>
+        <em>Akan dilengkapkan dalam STEP 7-8</em>
+      </p>
+    </div>
+  </div>
+
+  <!-- TAB 3: PENYERTAAN -->
+  <div class="pencapaian-tab-content" id="tab-penyertaan" style="display:none;">
+    <div style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+      <i class="fas fa-users" style="font-size:48px;color:#3498db;opacity:0.5;"></i>
+      <h3 style="margin-top:14px;font-size:16px;color:var(--primary);">Tab Penyertaan</h3>
+      <p style="font-size:12px;color:#7f8c8d;margin-top:8px;">
+        Demographic & Participation Charts<br>
+        <em>Akan dilengkapkan dalam STEP 9-10</em>
+      </p>
+    </div>
+  </div>
+
+  <!-- TAB 4: PRESTASI UNIT -->
+  <div class="pencapaian-tab-content" id="tab-unit" style="display:none;">
+    <div style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+      <i class="fas fa-chart-bar" style="font-size:48px;color:#27ae60;opacity:0.5;"></i>
+      <h3 style="margin-top:14px;font-size:16px;color:var(--primary);">Tab Prestasi Unit</h3>
+      <p style="font-size:12px;color:#7f8c8d;margin-top:8px;">
+        Unit Performance Dashboard<br>
+        <em>Akan dilengkapkan dalam STEP 11</em>
+      </p>
+    </div>
+  </div>
+
+</section>
+<!-- ============================================================
+     END PAGE: PENCAPAIAN
+     ============================================================ -->
+
 
   <!-- ============================================================
        PAGE 5: PLACEHOLDER (untuk Phase 2 & Phase 3)
@@ -3393,6 +3807,7 @@ body.demo-active .main { margin-top: 98px; }
    ============================================================ */
 const SKAS_API_URL = 'https://script.google.com/macros/s/AKfycbxTXUFFwssqT7Nwg5sJ6tWsVUMD_-zV2h2S35lymOgTW88iVaT1mqag2yHfBoShTWA/exec';
 const KELAB_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-kelab-v3.html';
+const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
 /* ============================================================
    SIDEBAR TOGGLE
@@ -5011,6 +5426,446 @@ console.log('  • Auto-SWOT Analysis');
 console.log('  • Form Input + Auto-Save');
 console.log('  • Print-Ready');
 console.log('  • Live Google Sheets Sync');
+
+
+/* ============================================================
+   PENCAPAIAN MODULE — V1.0 (STEP 1-3 Foundation)
+   ============================================================ */
+
+let pencapaianCurrentTab = 'ringkasan';
+let pencapaianData = null;
+
+/* ============================================================
+   TAB NAVIGATION
+   ============================================================ */
+function switchPencapaianTab(tabName, btn) {
+  // Reset semua tabs
+  document.querySelectorAll('.pencapaian-tab').forEach(function(b) {
+    b.classList.remove('active');
+    b.style.background = 'transparent';
+    b.style.color = '#7f8c8d';
+  });
+
+  // Set active tab style
+  if (btn) {
+    btn.classList.add('active');
+    btn.style.background = 'linear-gradient(135deg,#f39c12,#e67e22)';
+    btn.style.color = '#fff';
+  }
+
+  // Hide semua tab content
+  document.querySelectorAll('.pencapaian-tab-content').forEach(function(c) {
+    c.style.display = 'none';
+    c.classList.remove('active');
+  });
+
+  // Show active tab content
+  const activeContent = document.getElementById('tab-' + tabName);
+  if (activeContent) {
+    activeContent.style.display = 'block';
+    activeContent.classList.add('active');
+  }
+
+  pencapaianCurrentTab = tabName;
+  console.log('🏆 Switched to Pencapaian tab:', tabName);
+}
+
+/* ============================================================
+   PENCAPAIAN DASHBOARD — STEP 4 (LIVE DATA)
+   ============================================================ */
+async function loadPencapaianDashboard() {
+  const yearSelect = document.getElementById('pencapaianYearSelect');
+  if (!yearSelect) return;
+
+  const tahun = yearSelect.value;
+  const statusBadge = document.getElementById('pencapaianStatusBadge');
+  const loadingEl = document.getElementById('pencapaianRingkasanLoading');
+  const mainEl = document.getElementById('pencapaianRingkasanMain');
+
+  // Update status badge to "Loading"
+  if (statusBadge) {
+    statusBadge.style.background = '#fef9e7';
+    statusBadge.style.color = '#7d6608';
+    statusBadge.innerHTML = '<i class="fas fa-circle" style="font-size:8px;"></i> Memuatkan...';
+  }
+
+  // Show loading
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (mainEl) mainEl.style.display = 'none';
+
+  try {
+    const url = PENCAPAIAN_API_URL + '?action=pencapaian_ringkasan&tahun=' + tahun + '&_t=' + Date.now();
+    console.log('🏆 Fetching Pencapaian Ringkasan:', url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.error || 'Unknown error');
+
+    console.log('🏆 Pencapaian Data:', result.data);
+    pencapaianData = result.data;
+
+    // Render data
+    renderPencapaianRingkasan(result.data);
+
+    // Load Hall of Fame
+    loadHallOfFame(tahun);	
+
+    // Hide loading, show main
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (mainEl) mainEl.style.display = 'block';
+
+    // Update status badge
+    if (statusBadge) {
+      statusBadge.style.background = '#eafaf1';
+      statusBadge.style.color = '#27ae60';
+      statusBadge.innerHTML = '<i class="fas fa-circle" style="font-size:8px;"></i> Live · ' + new Date().toLocaleTimeString('ms-MY');
+    }
+
+    // Update last sync
+    const lastSyncEl = document.getElementById('pencapaianLastSync');
+    if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleString('ms-MY');
+
+  } catch (e) {
+    console.error('🏆 Gagal load Pencapaian:', e);
+
+    if (loadingEl) {
+      loadingEl.innerHTML =
+        '<div style="color:#e74c3c;">' +
+        '<i class="fas fa-exclamation-triangle" style="font-size:48px;"></i>' +
+        '<div style="margin-top:16px;font-weight:600;">Gagal memuatkan data Pencapaian</div>' +
+        '<div style="font-size:12px;margin-top:8px;color:#7f8c8d;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6;">' + e.message + '</div>' +
+        '<button class="btn btn-primary" style="margin-top:16px;background:#f39c12;" onclick="loadPencapaianDashboard()">' +
+        '<i class="fas fa-redo"></i> Cuba Semula</button>' +
+        '<div style="margin-top:14px;font-size:11px;color:#7f8c8d;">' +
+        '💡 Tips: Pastikan API URL betul & Sheet 6 ada data untuk tahun ' + tahun +
+        '</div>' +
+        '</div>';
+    }
+
+    if (statusBadge) {
+      statusBadge.style.background = '#fdedec';
+      statusBadge.style.color = '#e74c3c';
+      statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+    }
+  }
+}
+
+/* ============================================================
+   RENDER PENCAPAIAN RINGKASAN — Animated Count-Up
+   ============================================================ */
+function renderPencapaianRingkasan(data) {
+  if (!data) return;
+
+  const summary = data.summary || {};
+  const levels = data.pencapaianByLevel || {};
+
+  // Animated count-up function
+  function animateValue(el, end, duration, isPercent, isDecimal) {
+    if (!el) return;
+    const start = 0;
+    const startTime = performance.now();
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Easing: cubic ease-out
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      const current = start + (end - start) * easeProgress;
+
+      let display;
+      if (isDecimal) {
+        display = current.toFixed(2);
+      } else if (isPercent) {
+        display = current.toFixed(1) + '%';
+      } else {
+        display = Math.round(current).toLocaleString();
+      }
+
+      el.textContent = display;
+
+      if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  // Animate Summary Bar
+  animateValue(document.getElementById('ringkasanTotalPelajar'),      summary.totalPelajar || 0,    1200);
+  animateValue(document.getElementById('ringkasanTotalAktiviti'),     summary.totalAktiviti || 0,   1200);
+  animateValue(document.getElementById('ringkasanTotalPencapaian'),   summary.totalPencapaian || 0, 1500);
+  animateValue(document.getElementById('ringkasanTotalPenyertaan'),   summary.totalPenyertaan || 0, 1500);
+  animateValue(document.getElementById('ringkasanPeratusPenyertaan'), summary.peratusPenyertaan || 0, 1200, true);
+  animateValue(document.getElementById('ringkasanTotalUnit'),         summary.totalUnitAktif || 0,  1000);
+
+  // Animate Level Cards
+  animateValue(document.getElementById('levelIntl'),     levels.international || 0, 1500);
+  animateValue(document.getElementById('levelNational'), levels.national || 0,      1700);
+  animateValue(document.getElementById('levelState'),    levels.state || 0,         1500);
+  animateValue(document.getElementById('levelDistrict'), levels.district || 0,      1500);
+  animateValue(document.getElementById('levelSchool'),   levels.school || 0,        1500);
+
+  console.log('✅ Pencapaian Ringkasan rendered with animated count-up');
+}
+
+console.log('✅ Pencapaian STEP 4 loaded (Hero Stats + Live Data)');
+
+
+/* ============================================================
+   PENCAPAIAN STEP 5 — HALL OF FAME LOADER
+   ============================================================ */
+async function loadHallOfFame(tahun) {
+  const loadingEl = document.getElementById('hofLoading');
+  const containerEl = document.getElementById('hofCardsContainer');
+  const emptyEl = document.getElementById('hofEmpty');
+
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (containerEl) containerEl.style.display = 'none';
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  try {
+    const url = PENCAPAIAN_API_URL + '?action=pencapaian_hof&tahun=' + tahun + '&limit=10&_t=' + Date.now();
+    console.log('⭐ Fetching Hall of Fame:', url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.error || 'Unknown error');
+
+    const data = result.data;
+    console.log('⭐ Hall of Fame Data:', data);
+
+    // Update total records
+    const totalEl = document.getElementById('hofTotalRecords');
+    if (totalEl) totalEl.textContent = data.total_records || 0;
+
+    if (!data.hall_of_fame || data.hall_of_fame.length === 0) {
+      // Show empty state
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+
+    // Render cards
+    renderHallOfFameCards(data.hall_of_fame);
+
+    // Hide loading, show container
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (containerEl) containerEl.style.display = 'block';
+
+  } catch (e) {
+    console.error('⭐ Gagal load Hall of Fame:', e);
+    if (loadingEl) {
+      loadingEl.innerHTML =
+        '<div style="color:#e74c3c;">' +
+        '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
+        '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan Hall of Fame</div>' +
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div>' +
+        '</div>';
+    }
+  }
+}
+
+/* ============================================================
+   RENDER HALL OF FAME CARDS
+   ============================================================ */
+function renderHallOfFameCards(records) {
+  const container = document.getElementById('hofCardsContainer');
+  if (!container) return;
+
+  // Build grid layout
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">';
+
+  records.forEach((rec, idx) => {
+    html += renderHofCard(rec, idx + 1);
+  });
+
+  html += '</div>';
+
+  // Footer link
+  html += '<div style="margin-top:18px;text-align:center;">' +
+    '<button onclick="switchPencapaianTab(\'pencapaian\', document.querySelector(\'[data-tab=pencapaian]\'))" style="background:transparent;color:#f39c12;border:1.5px solid #f39c12;padding:10px 24px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">' +
+    '<i class="fas fa-list"></i> Lihat Semua Pencapaian →' +
+    '</button>' +
+    '</div>';
+
+  container.innerHTML = html;
+}
+
+/* ============================================================
+   RENDER SINGLE HOF CARD
+   ============================================================ */
+function renderHofCard(rec, position) {
+  // Level styling
+  const levelStyle = getLevelStyle(rec.level);
+  const rankStyle = getRankStyle(rec.rank);
+
+  // Generate avatar
+  const initials = getInitials(rec.nama_pelajar);
+  const hasPhoto = rec.url_gambar && String(rec.url_gambar).trim() !== '';
+
+  // Featured badge for #1
+  const featured = position === 1;
+
+  // Position badge
+  const positionBadge = position <= 3 ?
+    '<div style="position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;background:' + (position === 1 ? '#f1c40f' : position === 2 ? '#bdc3c7' : '#cd7f32') + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:3;">' + position + '</div>'
+    : '<div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-radius:50%;background:#7f8c8d;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;z-index:3;">' + position + '</div>';
+
+  // Avatar component
+  const avatar = hasPhoto
+    ? '<img src="' + escapeHtml(rec.url_gambar) + '" alt="' + escapeHtml(rec.nama_pelajar) + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid ' + levelStyle.color + ';box-shadow:0 4px 14px rgba(0,0,0,0.15);" onerror="this.outerHTML=getInitialsAvatarHTML(\'' + escapeHtml(initials) + '\', \'' + levelStyle.color + '\');">'
+    : getInitialsAvatarHTML(initials, levelStyle.color);
+
+  // Date format
+  let dateDisplay = '';
+  if (rec.date) {
+    const d = new Date(rec.date);
+    if (!isNaN(d.getTime())) {
+      dateDisplay = d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
+    } else {
+      dateDisplay = String(rec.date);
+    }
+  }
+
+  return '<div style="background:#fff;border-radius:14px;padding:20px 16px 18px 16px;box-shadow:0 4px 16px rgba(0,0,0,0.08);position:relative;transition:all 0.25s;cursor:pointer;border-top:4px solid ' + levelStyle.color + ';' + (featured ? 'border:2px solid #f39c12;background:linear-gradient(135deg,#fff 0%,#fffbf0 100%);' : '') + '" onmouseover="this.style.transform=\'translateY(-5px)\';this.style.boxShadow=\'0 12px 28px rgba(0,0,0,0.15)\';" onmouseout="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\';">' +
+    positionBadge +
+    (featured ? '<div style="position:absolute;top:10px;right:10px;background:#f39c12;color:#fff;padding:4px 10px;border-radius:10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;z-index:3;">⭐ Top 1</div>' : '') +
+    '<div style="text-align:center;margin-top:8px;">' +
+      avatar +
+    '</div>' +
+    '<h4 style="font-size:13px;font-weight:800;color:#2c3e50;margin:14px 0 4px 0;text-align:center;line-height:1.3;min-height:34px;">' + escapeHtml(rec.nama_pelajar) + '</h4>' +
+    '<div style="text-align:center;font-size:10px;color:#7f8c8d;margin-bottom:10px;">' +
+      '<i class="fas fa-graduation-cap"></i> Tingkatan ' + escapeHtml(rec.tingkatan) +
+      (rec.bangsa ? ' · ' + escapeHtml(rec.bangsa) : '') +
+    '</div>' +
+    '<div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">' +
+      '<span style="background:' + rankStyle.bg + ';color:' + rankStyle.color + ';padding:3px 9px;border-radius:10px;font-size:9px;font-weight:800;border:1px solid ' + rankStyle.border + ';">' +
+        rankStyle.icon + ' ' + escapeHtml(rec.rank) +
+      '</span>' +
+      '<span style="background:' + levelStyle.color + ';color:#fff;padding:3px 9px;border-radius:10px;font-size:9px;font-weight:800;">' +
+        levelStyle.emoji + ' ' + escapeHtml(rec.level) +
+      '</span>' +
+    '</div>' +
+    '<div style="background:#f8fafc;border-radius:8px;padding:8px 10px;margin-top:8px;">' +
+      '<div style="font-size:10px;color:#34495e;font-weight:600;line-height:1.4;text-align:center;margin-bottom:3px;">' +
+        '<i class="fas fa-trophy" style="color:#f39c12;"></i> ' + escapeHtml(truncate(rec.competition, 50)) +
+      '</div>' +
+      (dateDisplay ? '<div style="font-size:9px;color:#95a5a6;text-align:center;"><i class="fas fa-calendar"></i> ' + dateDisplay + '</div>' : '') +
+    '</div>' +
+  '</div>';
+}
+
+/* ============================================================
+   HELPER: Get Level Styling
+   ============================================================ */
+function getLevelStyle(level) {
+  const lvl = String(level || '').toLowerCase().trim();
+  const styles = {
+    'international': { color: '#e74c3c', emoji: '🌍' },
+    'antarabangsa':  { color: '#e74c3c', emoji: '🌍' },
+    'national':      { color: '#f39c12', emoji: '🇲🇾' },
+    'kebangsaan':    { color: '#f39c12', emoji: '🇲🇾' },
+    'state':         { color: '#3498db', emoji: '🏛️' },
+    'negeri':        { color: '#3498db', emoji: '🏛️' },
+    'district':      { color: '#9b59b6', emoji: '📍' },
+    'daerah':        { color: '#9b59b6', emoji: '📍' },
+    'school':        { color: '#27ae60', emoji: '🏫' },
+    'sekolah':       { color: '#27ae60', emoji: '🏫' }
+  };
+  return styles[lvl] || { color: '#7f8c8d', emoji: '🏆' };
+}
+
+/* ============================================================
+   HELPER: Get Rank Styling
+   ============================================================ */
+function getRankStyle(rank) {
+  const rnk = String(rank || '').toLowerCase().trim();
+  if (rnk === 'champion' || rnk === 'johan' || rnk === '1st') {
+    return { bg: '#fef9e7', color: '#7d6608', border: '#f1c40f', icon: '🥇' };
+  } else if (rnk === 'runner-up' || rnk === 'runnerup' || rnk === 'naib johan' || rnk === '2nd') {
+    return { bg: '#f4f6f7', color: '#566573', border: '#bdc3c7', icon: '🥈' };
+  } else if (rnk.includes('2nd runner') || rnk === '3rd') {
+    return { bg: '#fdf2e9', color: '#a04000', border: '#cd7f32', icon: '🥉' };
+  } else {
+    return { bg: '#ebf5fb', color: '#1a5276', border: '#aed6f1', icon: '🎖️' };
+  }
+}
+
+/* ============================================================
+   HELPER: Get Initials from Name
+   ============================================================ */
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = String(name).trim().split(/\s+/);
+  // Filter out titles (Tn., Pn., Dr., dll)
+  const filtered = parts.filter(p => p.length > 1 && !['Tn.','Pn.','Hj.','Hjh.','En.','Dr.','Dato','Datin'].includes(p));
+  if (filtered.length === 0) return name[0].toUpperCase();
+  if (filtered.length === 1) return filtered[0].substring(0, 2).toUpperCase();
+  return (filtered[0][0] + filtered[filtered.length - 1][0]).toUpperCase();
+}
+
+/* ============================================================
+   HELPER: Get Initials Avatar HTML
+   ============================================================ */
+function getInitialsAvatarHTML(initials, color) {
+  return '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,' + color + ',' + adjustColor(color, -20) + ');color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;margin:0 auto;border:3px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);">' + initials + '</div>';
+}
+
+/* ============================================================
+   HELPER: Adjust Color Brightness
+   ============================================================ */
+function adjustColor(hex, percent) {
+  // Simple darken/lighten
+  hex = hex.replace('#', '');
+  const num = parseInt(hex, 16);
+  let r = (num >> 16) + percent;
+  let g = ((num >> 8) & 0x00FF) + percent;
+  let b = (num & 0x0000FF) + percent;
+  r = Math.max(0, Math.min(255, r));
+  g = Math.max(0, Math.min(255, g));
+  b = Math.max(0, Math.min(255, b));
+  return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+}
+
+/* ============================================================
+   HELPER: Truncate Text
+   ============================================================ */
+function truncate(text, maxLength) {
+  if (!text) return '';
+  text = String(text);
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+}
+
+/* ============================================================
+   HELPER: Escape HTML (security)
+   ============================================================ */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+console.log('✅ Pencapaian STEP 5 loaded (Hall of Fame + Mix Smart)');
+
+/* ============================================================
+   AUTO-LOAD when navigating to Pencapaian
+   ============================================================ */
+const _origNavigateToPencapaian = navigateTo;
+navigateTo = function(pageId) {
+  _origNavigateToPencapaian(pageId);
+  if (pageId === 'pencapaian') {
+    setTimeout(loadPencapaianDashboard, 100);
+  }
+};
+
+console.log('✅ Pencapaian module foundation loaded (STEP 1-3)');
+
 
 /* ============================================================
    ADMIN PANEL — Configuration & Logic
