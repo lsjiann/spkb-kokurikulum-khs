@@ -3355,14 +3355,14 @@ body.demo-active .main { margin-top: 98px; }
         <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.18);">
           <div style="font-size:28px;font-weight:900;line-height:1;" id="ringkasanTotalPenyertaan">--</div>
           <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
-            <i class="fas fa-users"></i> Penyertaan
+            <i class="fas fa-users"></i> Pelajar Aktif
           </div>
         </div>
 
         <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.18);">
           <div style="font-size:28px;font-weight:900;line-height:1;color:#27ae60;" id="ringkasanPeratusPenyertaan">--</div>
           <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">
-            <i class="fas fa-percentage"></i> % Penyertaan
+            <i class="fas fa-percentage"></i> Kadar Penyertaan
           </div>
         </div>
 
@@ -3385,8 +3385,8 @@ body.demo-active .main { margin-top: 98px; }
           <i class="fas fa-medal" style="color:#f39c12;"></i> Pencapaian Mengikut Peringkat
         </h3>
         <p style="font-size:11px;color:#7f8c8d;margin-top:4px;">
-          Breakdown pencapaian gemilang pelajar dari peringkat sekolah hingga antarabangsa
-        </p>
+  Bilangan <strong>pencapaian (anugerah)</strong> mengikut peringkat · Bukan bilangan aktiviti atau pelajar
+</p>
       </div>
       <div style="display:flex;gap:6px;font-size:10px;color:#7f8c8d;">
         <span style="background:#fef9e7;padding:3px 10px;border-radius:10px;">
@@ -3404,7 +3404,7 @@ body.demo-active .main { margin-top: 98px; }
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px;">
 
       <!-- International -->
-      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(231,76,60,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(231,76,60,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(231,76,60,0.25)';">
+      <div class="pencapaian-level-card" onclick="openLevelDrill('international')" style="background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(231,76,60,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(231,76,60,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(231,76,60,0.25)';">
         <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🌍</div>
         <div style="position:relative;z-index:2;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
@@ -3424,7 +3424,7 @@ body.demo-active .main { margin-top: 98px; }
       </div>
 
       <!-- National -->
-      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#f39c12 0%,#d68910 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(243,156,18,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(243,156,18,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(243,156,18,0.25)';">
+      <div class="pencapaian-level-card" onclick="openLevelDrill('national')" style="background:linear-gradient(135deg,#f39c12 0%,#d68910 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(243,156,18,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(243,156,18,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(243,156,18,0.25)';">
         <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🇲🇾</div>
         <div style="position:relative;z-index:2;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
@@ -3444,7 +3444,7 @@ body.demo-active .main { margin-top: 98px; }
       </div>
 
       <!-- State -->
-      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#3498db 0%,#2874a6 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(52,152,219,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(52,152,219,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(52,152,219,0.25)';">
+      <div class="pencapaian-level-card" onclick="openLevelDrill('state')" style="background:linear-gradient(135deg,#3498db 0%,#2874a6 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(52,152,219,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(52,152,219,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(52,152,219,0.25)';">
         <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🏛️</div>
         <div style="position:relative;z-index:2;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
@@ -3469,7 +3469,7 @@ body.demo-active .main { margin-top: 98px; }
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px;">
 
       <!-- District -->
-      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#9b59b6 0%,#7d3c98 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(155,89,182,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(155,89,182,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(155,89,182,0.25)';">
+      <div class="pencapaian-level-card" onclick="openLevelDrill('district')" style="background:linear-gradient(135deg,#9b59b6 0%,#7d3c98 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(155,89,182,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(155,89,182,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(155,89,182,0.25)';">
         <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">📍</div>
         <div style="position:relative;z-index:2;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
@@ -3489,7 +3489,7 @@ body.demo-active .main { margin-top: 98px; }
       </div>
 
       <!-- School -->
-      <div class="pencapaian-level-card" style="background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(39,174,96,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(39,174,96,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(39,174,96,0.25)';">
+      <div class="pencapaian-level-card" onclick="openLevelDrill('school')" style="background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:transform 0.25s;cursor:pointer;box-shadow:0 6px 20px rgba(39,174,96,0.25);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px rgba(39,174,96,0.4)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(39,174,96,0.25)';">
         <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:0.15;">🏫</div>
         <div style="position:relative;z-index:2;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
@@ -3565,6 +3565,75 @@ body.demo-active .main { margin-top: 98px; }
 
 
 <!-- ============================================================
+     LEVEL DRILL-DOWN MODAL
+     ============================================================ -->
+<div id="levelDrillModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this) closeLevelDrillModal();">
+  <div style="background:#fff;border-radius:16px;max-width:900px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <!-- Modal Header -->
+    <div id="levelDrillHeader" style="background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;padding:24px 28px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+      <div style="flex:1;">
+        <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;" id="levelDrillSubtitle">Senarai Pencapaian</div>
+        <h2 style="font-size:22px;font-weight:900;margin:0;" id="levelDrillTitle">🌍 International (14)</h2>
+        <p style="font-size:12px;opacity:0.95;margin:6px 0 0 0;" id="levelDrillDesc">Semua pencapaian peringkat antarabangsa</p>
+      </div>
+      <button onclick="closeLevelDrillModal()" style="background:rgba(255,255,255,0.25);color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div style="padding:16px 28px;background:#f8fafc;border-bottom:1px solid #e0e0e0;">
+      <input type="text" id="levelDrillSearch" placeholder="🔍 Cari nama pelajar / pertandingan..." oninput="filterLevelDrillList()" style="width:100%;padding:10px 14px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:13px;">
+    </div>
+
+    <!-- Stats Bar -->
+    <div style="padding:14px 28px;background:#f8fafc;border-bottom:1px solid #e0e0e0;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;">
+      <div style="background:#fff;padding:8px 12px;border-radius:8px;text-align:center;border:1px solid #eee;">
+        <div style="font-size:18px;font-weight:900;color:#2c3e50;" id="levelDrillTotal">0</div>
+        <div style="font-size:9px;color:#7f8c8d;text-transform:uppercase;">Total</div>
+      </div>
+      <div style="background:#fef9e7;padding:8px 12px;border-radius:8px;text-align:center;border:1px solid #f9e79f;">
+        <div style="font-size:18px;font-weight:900;color:#7d6608;" id="levelDrillChampion">0</div>
+        <div style="font-size:9px;color:#7f8c8d;text-transform:uppercase;">🥇 Champion</div>
+      </div>
+      <div style="background:#f4f6f7;padding:8px 12px;border-radius:8px;text-align:center;border:1px solid #d5dbdb;">
+        <div style="font-size:18px;font-weight:900;color:#566573;" id="levelDrillRunnerUp">0</div>
+        <div style="font-size:9px;color:#7f8c8d;text-transform:uppercase;">🥈 Runner-Up</div>
+      </div>
+      <div style="background:#fdf2e9;padding:8px 12px;border-radius:8px;text-align:center;border:1px solid #f5cba7;">
+        <div style="font-size:18px;font-weight:900;color:#a04000;" id="levelDrillThird">0</div>
+        <div style="font-size:9px;color:#7f8c8d;text-transform:uppercase;">🥉 3rd</div>
+      </div>
+      <div style="background:#ebf5fb;padding:8px 12px;border-radius:8px;text-align:center;border:1px solid #aed6f1;">
+        <div style="font-size:18px;font-weight:900;color:#1a5276;" id="levelDrillOthers">0</div>
+        <div style="font-size:9px;color:#7f8c8d;text-transform:uppercase;">🎖️ Lain</div>
+      </div>
+    </div>
+
+    <!-- List Body -->
+    <div id="levelDrillBody" style="padding:20px 28px;overflow-y:auto;flex:1;background:#fafbfc;">
+      <div style="text-align:center;padding:40px;color:#7f8c8d;">
+        <i class="fas fa-spinner fa-spin" style="font-size:36px;"></i>
+        <div style="margin-top:14px;">Memuatkan...</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:14px 28px;background:#f8fafc;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div style="font-size:11px;color:#7f8c8d;">
+        <i class="fas fa-info-circle"></i> ESC untuk tutup · Klik luar untuk tutup
+      </div>
+      <button onclick="exportLevelDrillCSV()" style="padding:8px 16px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">
+        <i class="fas fa-file-csv"></i> Export Senarai CSV
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================================================
      STEP 6: FEATURED COMPETITIONS — Top 5 Pertandingan Pilihan
      ============================================================ -->
 <div style="margin-top:24px;margin-bottom:20px;">
@@ -3616,6 +3685,163 @@ body.demo-active .main { margin-top: 98px; }
   </div>
 </div>
 <!-- END STEP 6: FEATURED COMPETITIONS -->
+
+
+<!-- ============================================================
+     ENHANCEMENT: SENARAI LENGKAP PERTANDINGAN
+     ============================================================ -->
+<div style="margin-top:24px;margin-bottom:20px;">
+
+  <!-- Section Header -->
+  <div style="background:linear-gradient(135deg,#16a085 0%,#1abc9c 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">📋</div>
+    <div style="position:absolute;bottom:-30px;left:30px;font-size:90px;opacity:0.10;">🏆</div>
+    <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
+          📋 SENARAI LENGKAP PERTANDINGAN
+        </div>
+        <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">
+          Semua Pertandingan Disertai
+        </h2>
+        <p style="font-size:12px;opacity:0.95;margin:0;">
+          Klik nama pertandingan untuk lihat senarai pelajar yang menyertai
+        </p>
+      </div>
+      <div style="background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);text-align:center;">
+        <div style="font-size:24px;font-weight:900;" id="allCompTotal">--</div>
+        <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">
+          Total Pertandingan
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search + Filter Bar -->
+  <div style="background:#fff;border-radius:14px;padding:16px 22px;box-shadow:var(--card-shadow);margin-bottom:14px;">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;align-items:center;">
+      <input type="text" id="allCompSearch" placeholder="🔍 Cari nama pertandingan..." oninput="filterAllCompetitions()" style="padding:10px 14px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:13px;">
+
+      <select id="allCompFilterLevel" onchange="filterAllCompetitions()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
+        <option value="">📊 Semua Level</option>
+        <option value="international">🌍 International</option>
+        <option value="national">🇲🇾 Kebangsaan</option>
+        <option value="state">🏛️ Negeri</option>
+        <option value="district">📍 Daerah</option>
+        <option value="school">🏫 Sekolah</option>
+      </select>
+
+      <select id="allCompFilterCategory" onchange="filterAllCompetitions()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
+        <option value="">🎯 Semua Category</option>
+      </select>
+
+      <select id="allCompSort" onchange="filterAllCompetitions()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
+        <option value="date">📅 Terkini Dulu</option>
+        <option value="name">🔤 Nama A-Z</option>
+        <option value="winners">🏆 Banyak Pemenang</option>
+        <option value="success">⭐ Success Rate</option>
+        <option value="students">👥 Banyak Pelajar</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+      <button onclick="expandAllLevels()" style="padding:6px 14px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">
+        ⬇️ Expand Semua
+      </button>
+      <button onclick="collapseAllLevels()" style="padding:6px 14px;background:#7f8c8d;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">
+        ⬆️ Collapse Semua
+      </button>
+      <button onclick="exportAllCompetitionsCSV()" style="padding:6px 14px;background:#3498db;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-left:auto;">
+        <i class="fas fa-file-csv"></i> Export CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="allCompLoading" style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+    <i class="fas fa-spinner fa-spin" style="font-size:36px;color:#16a085;"></i>
+    <div style="margin-top:14px;font-size:13px;color:#7f8c8d;">
+      Memuatkan senarai pertandingan...
+    </div>
+  </div>
+
+  <!-- Competitions Container -->
+  <div id="allCompContainer" style="display:none;"></div>
+
+  <!-- Empty State -->
+  <div id="allCompEmpty" style="display:none;background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+    <i class="fas fa-search" style="font-size:48px;color:#bdc3c7;"></i>
+    <div style="margin-top:14px;font-weight:600;color:#7f8c8d;">Tiada pertandingan dijumpai</div>
+  </div>
+
+</div>
+
+
+<!-- ============================================================
+     COMPETITION STUDENT DRILL-DOWN MODAL
+     ============================================================ -->
+<div id="competitionDrillModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this) closeCompetitionDrill();">
+  <div style="background:#fff;border-radius:16px;max-width:900px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <!-- Modal Header -->
+    <div id="compDrillHeader" style="background:linear-gradient(135deg,#16a085,#1abc9c);color:#fff;padding:24px 28px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;" id="compDrillLevelBadge">🌍 INTERNATIONAL · KATEGORI</div>
+        <h2 style="font-size:22px;font-weight:900;margin:0;line-height:1.3;" id="compDrillTitle">Memuatkan...</h2>
+        <p style="font-size:12px;opacity:0.95;margin:8px 0 0 0;" id="compDrillMeta">--</p>
+      </div>
+      <button onclick="closeCompetitionDrill()" style="background:rgba(255,255,255,0.25);color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Stats Bar -->
+    <div style="padding:14px 28px;background:#f8fafc;border-bottom:1px solid #e0e0e0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+      <div style="background:#fff;padding:10px;border-radius:8px;text-align:center;border:1px solid #eee;">
+        <div style="font-size:20px;font-weight:900;color:#2c3e50;" id="compDrillTotalStudents">0</div>
+        <div style="font-size:9px;color:#7f8c8d;text-transform:uppercase;">👥 Pelajar</div>
+      </div>
+      <div style="background:#fef9e7;padding:10px;border-radius:8px;text-align:center;">
+        <div style="font-size:20px;font-weight:900;color:#7d6608;" id="compDrillChampion">0</div>
+        <div style="font-size:9px;color:#7f8c8d;">🥇 Champion</div>
+      </div>
+      <div style="background:#f4f6f7;padding:10px;border-radius:8px;text-align:center;">
+        <div style="font-size:20px;font-weight:900;color:#566573;" id="compDrillRunnerUp">0</div>
+        <div style="font-size:9px;color:#7f8c8d;">🥈 Runner-Up</div>
+      </div>
+      <div style="background:#fdf2e9;padding:10px;border-radius:8px;text-align:center;">
+        <div style="font-size:20px;font-weight:900;color:#a04000;" id="compDrillThird">0</div>
+        <div style="font-size:9px;color:#7f8c8d;">🥉 3rd Place</div>
+      </div>
+      <div style="background:#ebf5fb;padding:10px;border-radius:8px;text-align:center;">
+        <div style="font-size:20px;font-weight:900;color:#1a5276;" id="compDrillOthers">0</div>
+        <div style="font-size:9px;color:#7f8c8d;">🎖️ Lain-lain</div>
+      </div>
+      <div style="background:#eafaf1;padding:10px;border-radius:8px;text-align:center;">
+        <div style="font-size:20px;font-weight:900;color:#1e8449;" id="compDrillSuccessRate">0%</div>
+        <div style="font-size:9px;color:#7f8c8d;">⭐ Success</div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div style="padding:14px 28px;background:#f8fafc;border-bottom:1px solid #e0e0e0;">
+      <input type="text" id="compDrillSearch" placeholder="🔍 Cari nama pelajar..." oninput="filterCompetitionStudents()" style="width:100%;padding:10px 14px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:13px;">
+    </div>
+
+    <!-- Student List Body -->
+    <div id="compDrillBody" style="padding:20px 28px;overflow-y:auto;flex:1;background:#fafbfc;"></div>
+
+    <!-- Footer -->
+    <div style="padding:14px 28px;background:#f8fafc;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#7f8c8d;">
+      <span><i class="fas fa-info-circle"></i> ESC untuk tutup</span>
+      <button onclick="exportCompetitionStudentsCSV()" style="padding:8px 14px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">
+        <i class="fas fa-file-csv"></i> Export Senarai Pelajar
+      </button>
+    </div>
+
+  </div>
+</div>
+
 </div>
 <!-- END TAB 1: RINGKASAN -->
 
@@ -3721,122 +3947,181 @@ body.demo-active .main { margin-top: 98px; }
   <div class="pencapaian-tab-content" id="tab-pencapaian" style="display:none;">
 
   <!-- ============================================================
-       STEP 7: ACHIEVEMENT BY LEVEL CHART
+       SECTION 1: STUDENT INVOLVEMENT BY LEVEL (NEW!)
        ============================================================ -->
-  <div style="margin-bottom:20px;">
-
-    <!-- Section Header -->
-    <div style="background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">📊</div>
-      <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
-            📊 ACHIEVEMENT ANALYSIS
-          </div>
-          <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">
-            Pencapaian Mengikut Peringkat
-          </h2>
-          <p style="font-size:12px;opacity:0.95;margin:0;">
-            Visualisasi pencapaian dari Sekolah hingga Antarabangsa · Bar chart interaktif
-          </p>
+  <div style="background:linear-gradient(135deg,#16a085 0%,#1abc9c 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">👥</div>
+    <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
+          👥 STUDENT INVOLVEMENT
         </div>
-        <div style="background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);text-align:center;">
-          <div style="font-size:24px;font-weight:900;" id="tab2TotalAch">--</div>
-          <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">
-            Total Records
-          </div>
+        <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">
+          Bilangan Murid Mengikut Peringkat
+        </h2>
+        <p style="font-size:12px;opacity:0.95;margin:0;">
+          Murid unik yang terlibat · Pencapaian (Anugerah) vs Penyertaan (Hadir)
+        </p>
+      </div>
+      <div style="background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);text-align:center;">
+        <div style="font-size:24px;font-weight:900;" id="involvementTotalStudents">--</div>
+        <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">
+          Total Murid Aktif
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Loading State -->
-    <div id="tab2ChartLoading" style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
-      <i class="fas fa-spinner fa-spin" style="font-size:36px;color:#e74c3c;"></i>
-      <div style="margin-top:14px;font-size:13px;color:#7f8c8d;">
-        Memuatkan Achievement Chart...
+  <!-- Involvement Chart + Stats Side-by-Side -->
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px;">
+
+    <!-- Bar Chart -->
+    <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
+      <div style="margin-bottom:14px;">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 4px 0;">
+          <i class="fas fa-chart-bar" style="color:#16a085;"></i> Bilangan Murid Unik per Peringkat
+        </h3>
+        <p style="font-size:10px;color:#7f8c8d;margin:0;">
+          🏆 Pencapaian (anugerah) · 👋 Penyertaan (hadir tanpa menang)
+        </p>
+      </div>
+      <div style="height:300px;position:relative;">
+        <canvas id="involvementChart"></canvas>
       </div>
     </div>
 
-    <!-- Chart Container -->
-    <div id="tab2ChartMain" style="display:none;">
-
-      <!-- Bar Chart + Insights Side-by-Side -->
-      <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px;">
-
-        <!-- Bar Chart -->
-        <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
-          <div style="margin-bottom:14px;">
-            <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 4px 0;">
-              <i class="fas fa-chart-bar" style="color:#e74c3c;"></i> Pencapaian by Level
-            </h3>
-            <p style="font-size:10px;color:#7f8c8d;margin:0;">Klik bar untuk filter table di bawah</p>
-          </div>
-          <div style="height:340px;position:relative;">
-            <canvas id="achievementLevelChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Quick Stats Card -->
-        <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
-          <h3 style="font-size:13px;font-weight:800;color:var(--primary);margin:0 0 14px 0;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
-            <i class="fas fa-info-circle"></i> Quick Stats
-          </h3>
-
-          <!-- Top Category -->
-          <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
-            <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">
-              <i class="fas fa-trophy"></i> Top Category
-            </div>
-            <div style="font-size:14px;font-weight:800;color:#2c3e50;" id="tab2TopCategory">--</div>
-            <div style="font-size:10px;color:#7f8c8d;margin-top:2px;" id="tab2TopCategoryCount">-- pencapaian</div>
-          </div>
-
-          <!-- Top Tingkatan -->
-          <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
-            <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">
-              <i class="fas fa-graduation-cap"></i> Top Tingkatan
-            </div>
-            <div style="font-size:14px;font-weight:800;color:#2c3e50;" id="tab2TopTingkatan">--</div>
-            <div style="font-size:10px;color:#7f8c8d;margin-top:2px;" id="tab2TopTingkatanCount">-- pencapaian</div>
-          </div>
-
-          <!-- Achievement Rate -->
-          <div style="background:linear-gradient(135deg,#fef9e7,#fff8e1);border-radius:10px;padding:12px;border-left:3px solid #f39c12;">
-            <div style="font-size:10px;color:#7d6608;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">
-              <i class="fas fa-percentage"></i> Highest Level Impact
-            </div>
-            <div style="font-size:18px;font-weight:900;color:#7d6608;" id="tab2HighestLevel">--</div>
-            <div style="font-size:10px;color:#a07e0c;margin-top:2px;" id="tab2HighestLevelLabel">--</div>
-          </div>
-
-        </div>
-      </div>
-
+    <!-- Stats Breakdown Cards -->
+    <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
+      <h3 style="font-size:13px;font-weight:800;color:var(--primary);margin:0 0 14px 0;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+        <i class="fas fa-list"></i> Breakdown
+      </h3>
+      <div id="involvementStatsList" style="display:grid;gap:10px;"></div>
     </div>
 
   </div>
-  <!-- END STEP 7 -->
 
   <!-- ============================================================
-       STEP 8: SEARCHABLE ACHIEVEMENT TABLE
+       SECTION 2: STUDENT HALL OF FAME (NEW!)
        ============================================================ -->
-  <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+  <div style="background:linear-gradient(135deg,#9b59b6 0%,#8e44ad 100%);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:18px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-20px;right:30px;font-size:90px;opacity:0.10;">🏆</div>
+    <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
+          🌟 STUDENT HALL OF FAME
+        </div>
+        <h2 style="font-size:20px;font-weight:900;margin:0 0 4px 0;">
+          Senarai Murid Aktif
+        </h2>
+        <p style="font-size:11px;opacity:0.95;margin:0;">
+          Klik nama untuk lihat senarai lengkap pencapaian & penyertaan
+        </p>
+      </div>
+      <div style="background:rgba(255,255,255,0.18);padding:8px 14px;border-radius:10px;font-size:11px;font-weight:700;">
+        💡 Disusun mengikut Impact Score
+      </div>
+    </div>
+  </div>
 
-    <!-- Table Header -->
+  <!-- Student Search + Filter -->
+  <div style="background:#fff;border-radius:14px;padding:18px 22px;box-shadow:var(--card-shadow);margin-bottom:14px;">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;">
+      <input type="text" id="studentSearch" placeholder="🔍 Cari nama murid / tingkatan..." oninput="filterStudentList()" style="padding:10px 14px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:13px;">
+
+      <select id="studentFilterTingkatan" onchange="filterStudentList()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
+        <option value="">📚 Semua Tingkatan</option>
+      </select>
+
+      <select id="studentSortMode" onchange="filterStudentList()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
+        <option value="impact">⭐ Impact Score</option>
+        <option value="pencapaian">🏆 Total Pencapaian</option>
+        <option value="penyertaan">👋 Total Penyertaan</option>
+        <option value="intl">🌍 International</option>
+        <option value="name">👤 Nama (A-Z)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Student List Container -->
+  <div id="studentListContainer" style="margin-bottom:20px;"></div>
+
+  <!-- ============================================================
+       SECTION 3: COMPLETE ACHIEVEMENTS TABLE (EXISTING ENHANCED)
+       ============================================================ -->
+  <div style="background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:14px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-15px;right:30px;font-size:90px;opacity:0.10;">📋</div>
+    <div style="position:relative;z-index:2;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
+        📋 COMPLETE RECORDS
+      </div>
+      <h2 style="font-size:20px;font-weight:900;margin:0;">
+        Senarai Pencapaian & Penyertaan
+      </h2>
+    </div>
+  </div>
+
+  <!-- Achievement Chart (kekal) -->
+  <div id="tab2ChartMain" style="display:block;margin-bottom:20px;">
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;">
+      <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
+        <div style="margin-bottom:14px;">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 4px 0;">
+            <i class="fas fa-chart-bar" style="color:#e74c3c;"></i> Records Distribution by Level
+          </h3>
+          <p style="font-size:10px;color:#7f8c8d;margin:0;">Bilangan rekod (termasuk participation) · Klik bar untuk filter table</p>
+        </div>
+        <div style="height:280px;position:relative;">
+          <canvas id="achievementLevelChart"></canvas>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
+        <h3 style="font-size:13px;font-weight:800;color:var(--primary);margin:0 0 14px 0;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+          <i class="fas fa-info-circle"></i> Quick Stats
+        </h3>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;"><i class="fas fa-trophy"></i> Top Category</div>
+          <div style="font-size:14px;font-weight:800;color:#2c3e50;" id="tab2TopCategory">--</div>
+          <div style="font-size:10px;color:#7f8c8d;margin-top:2px;" id="tab2TopCategoryCount">--</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;"><i class="fas fa-graduation-cap"></i> Top Tingkatan</div>
+          <div style="font-size:14px;font-weight:800;color:#2c3e50;" id="tab2TopTingkatan">--</div>
+          <div style="font-size:10px;color:#7f8c8d;margin-top:2px;" id="tab2TopTingkatanCount">--</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#fef9e7,#fff8e1);border-radius:10px;padding:12px;border-left:3px solid #f39c12;">
+          <div style="font-size:10px;color:#7d6608;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;"><i class="fas fa-percentage"></i> Highest Level</div>
+          <div style="font-size:16px;font-weight:900;color:#7d6608;" id="tab2HighestLevel">--</div>
+          <div style="font-size:10px;color:#a07e0c;margin-top:2px;" id="tab2HighestLevelLabel">--</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievement Table with View Mode Toggle -->
+  <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
+
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;">
       <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0;">
-        <i class="fas fa-table" style="color:#e74c3c;"></i> Senarai Pencapaian Lengkap
+        <i class="fas fa-table" style="color:#e74c3c;"></i> Senarai Lengkap
         <span id="tab2TableCount" style="background:#fdedec;color:#c0392b;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-left:8px;">--</span>
       </h3>
-      <button onclick="exportPencapaianCSV()" style="padding:8px 16px;background:#27ae60;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">
-        <i class="fas fa-file-csv"></i> Export CSV
-      </button>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <!-- View Mode Toggle -->
+        <div style="display:flex;gap:4px;background:#f8fafc;padding:4px;border-radius:8px;">
+          <button id="viewModeAll" onclick="setTab2ViewMode('all', this)" style="padding:6px 12px;border:none;background:#e74c3c;color:#fff;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📊 Semua</button>
+          <button id="viewModeAchievement" onclick="setTab2ViewMode('achievement', this)" style="padding:6px 12px;border:none;background:transparent;color:#7f8c8d;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🏆 Pencapaian</button>
+          <button id="viewModeParticipation" onclick="setTab2ViewMode('participation', this)" style="padding:6px 12px;border:none;background:transparent;color:#7f8c8d;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">👋 Penyertaan</button>
+        </div>
+        <button onclick="exportPencapaianCSV()" style="padding:8px 14px;background:#27ae60;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">
+          <i class="fas fa-file-csv"></i> Export CSV
+        </button>
+      </div>
     </div>
 
     <!-- Search + Filters -->
     <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
-      <input type="text" id="tab2Search" placeholder="🔍 Cari nama pelajar / pertandingan..." oninput="filterAchievementTable()" style="padding:10px 14px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:13px;">
-
+      <input type="text" id="tab2Search" placeholder="🔍 Cari nama / pertandingan..." oninput="filterAchievementTable()" style="padding:10px 14px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:13px;">
       <select id="tab2FilterLevel" onchange="filterAchievementTable()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
         <option value="">📊 Semua Level</option>
         <option value="international">🌍 International</option>
@@ -3845,17 +4130,14 @@ body.demo-active .main { margin-top: 98px; }
         <option value="district">📍 Daerah</option>
         <option value="school">🏫 Sekolah</option>
       </select>
-
       <select id="tab2FilterCategory" onchange="filterAchievementTable()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
         <option value="">🎯 Semua Category</option>
       </select>
-
       <select id="tab2FilterTingkatan" onchange="filterAchievementTable()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">
         <option value="">📚 Semua Tingkatan</option>
       </select>
     </div>
 
-    <!-- Table Container -->
     <div id="tab2TableLoading" style="text-align:center;padding:40px;color:#7f8c8d;">
       <i class="fas fa-spinner fa-spin"></i> Memuatkan...
     </div>
@@ -3864,20 +4146,19 @@ body.demo-active .main { margin-top: 98px; }
       <table style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead>
           <tr style="background:#f8fafc;border-bottom:2px solid #e0e0e0;">
-            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">#</th>
-            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Pelajar</th>
-            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Tingkatan</th>
-            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Pertandingan</th>
-            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Rank</th>
-            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Level</th>
-            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Kategori</th>
-            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Tarikh</th>
+            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">#</th>
+            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">Pelajar</th>
+            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">Tingkatan</th>
+            <th style="padding:12px 10px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">Pertandingan</th>
+            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">Rank</th>
+            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">Level</th>
+            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">Kategori</th>
+            <th style="padding:12px 10px;text-align:center;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;">Tarikh</th>
           </tr>
         </thead>
         <tbody id="tab2TableBody"></tbody>
       </table>
 
-      <!-- Pagination -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0;flex-wrap:wrap;gap:10px;">
         <div style="font-size:11px;color:#7f8c8d;" id="tab2PaginationInfo">--</div>
         <div style="display:flex;gap:6px;">
@@ -3892,62 +4173,123 @@ body.demo-active .main { margin-top: 98px; }
       </div>
     </div>
 
-    <!-- Empty State -->
     <div id="tab2TableEmpty" style="display:none;text-align:center;padding:40px;color:#7f8c8d;">
       <i class="fas fa-search" style="font-size:36px;color:#bdc3c7;"></i>
       <div style="margin-top:14px;font-weight:600;">Tiada data dijumpai</div>
-      <div style="font-size:11px;margin-top:6px;">Cuba ubah filter atau search term</div>
     </div>
   </div>
 
 </div>
 
+
+<!-- ============================================================
+     STUDENT PROFILE MODAL
+     ============================================================ -->
+<div id="studentProfileModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this) closeStudentProfile();">
+  <div style="background:#fff;border-radius:16px;max-width:900px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <!-- Modal Header -->
+    <div style="background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;padding:24px 28px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+      <div style="display:flex;gap:14px;flex:1;">
+        <div id="studentProfileAvatar" style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#f39c12,#e67e22);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;border:3px solid #fff;flex-shrink:0;">--</div>
+        <div>
+          <div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Profil Pelajar</div>
+          <h2 style="font-size:22px;font-weight:900;margin:0 0 4px 0;" id="studentProfileName">--</h2>
+          <p style="font-size:12px;opacity:0.95;margin:0;" id="studentProfileMeta">--</p>
+        </div>
+      </div>
+      <button onclick="closeStudentProfile()" style="background:rgba(255,255,255,0.25);color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Stats Grid -->
+    <div style="padding:18px 28px;background:#f8fafc;border-bottom:1px solid #e0e0e0;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+        <div style="background:#fff;padding:12px;border-radius:10px;text-align:center;border:1px solid #eee;">
+          <div style="font-size:24px;font-weight:900;color:#f39c12;" id="profileTotalPencapaian">0</div>
+          <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;">🏆 Pencapaian</div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:10px;text-align:center;border:1px solid #eee;">
+          <div style="font-size:24px;font-weight:900;color:#3498db;" id="profileTotalPenyertaan">0</div>
+          <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;">👋 Penyertaan</div>
+        </div>
+        <div style="background:#fdedec;padding:12px;border-radius:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:900;color:#c0392b;" id="profileIntl">0</div>
+          <div style="font-size:9px;color:#7f8c8d;">🌍 INTL</div>
+        </div>
+        <div style="background:#fef9e7;padding:12px;border-radius:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:900;color:#7d6608;" id="profileNat">0</div>
+          <div style="font-size:9px;color:#7f8c8d;">🇲🇾 NAT</div>
+        </div>
+        <div style="background:#ebf5fb;padding:12px;border-radius:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:900;color:#1a5276;" id="profileState">0</div>
+          <div style="font-size:9px;color:#7f8c8d;">🏛️ STATE</div>
+        </div>
+        <div style="background:#f4ecf7;padding:12px;border-radius:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:900;color:#6c3483;" id="profileDistrict">0</div>
+          <div style="font-size:9px;color:#7f8c8d;">📍 DAERAH</div>
+        </div>
+        <div style="background:#eafaf1;padding:12px;border-radius:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:900;color:#1e8449;" id="profileSchool">0</div>
+          <div style="font-size:9px;color:#7f8c8d;">🏫 SCHOOL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Records Body -->
+    <div id="studentProfileBody" style="padding:20px 28px;overflow-y:auto;flex:1;background:#fafbfc;"></div>
+
+    <!-- Footer -->
+    <div style="padding:14px 28px;background:#f8fafc;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#7f8c8d;">
+      <span><i class="fas fa-info-circle"></i> ESC untuk tutup</span>
+      <button onclick="exportStudentProfileCSV()" style="padding:8px 14px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">
+        <i class="fas fa-file-csv"></i> Export Profil
+      </button>
+    </div>
+  </div>
+</div>
+  <!-- END STEP 7 -->
+
+  <!-- ============================================================
+       STEP 8: SEARCHABLE ACHIEVEMENT TABLE
+       ============================================================ -->
+
   <!-- TAB 3: PENYERTAAN -->
   <div class="pencapaian-tab-content" id="tab-penyertaan" style="display:none;">
 
   <!-- ============================================================
-       STEP 9: PENYERTAAN HEADER
+       SECTION 1: PENYERTAAN HEADER
        ============================================================ -->
   <div style="background:linear-gradient(135deg,#3498db 0%,#2874a6 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
     <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">👥</div>
     <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
       <div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
-          👥 PARTICIPATION ANALYSIS
-        </div>
-        <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">
-          Penyertaan & Demographics
-        </h2>
-        <p style="font-size:12px;opacity:0.95;margin:0;">
-          KPM Diversity Compliance · SK@S 3.2.6 Sukan Untuk Semua
-        </p>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">👥 PARTICIPATION ANALYSIS</div>
+        <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">Penyertaan & Demographics</h2>
+        <p style="font-size:12px;opacity:0.95;margin:0;">KPM Diversity Compliance · SK@S 3.2.6 Sukan Untuk Semua</p>
       </div>
       <div style="background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);text-align:center;">
         <div style="font-size:24px;font-weight:900;" id="tab3GrandTotal">--</div>
-        <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">
-          Total Penyertaan
-        </div>
+        <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">Total Penyertaan</div>
       </div>
     </div>
   </div>
 
-  <!-- Loading State -->
+  <!-- LOADING STATE -->
   <div id="tab3Loading" style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
     <i class="fas fa-spinner fa-spin" style="font-size:36px;color:#3498db;"></i>
-    <div style="margin-top:14px;font-size:13px;color:#7f8c8d;">
-      Memuatkan Demographics & Top Units...
-    </div>
+    <div style="margin-top:14px;font-size:13px;color:#7f8c8d;">Memuatkan Demographics & Top Units...</div>
   </div>
 
-  <!-- Main Content -->
+  <!-- ============================================================
+       MAIN CONTENT — BLOCK LAYOUT (TIDAK GRID)
+       ============================================================ -->
   <div id="tab3Main" style="display:none;">
 
-    <!-- ============================================================
-         STEP 9: DEMOGRAPHIC CHARTS
-         ============================================================ -->
+    <!-- ROW 1: Race + Gender Charts (2 columns) -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
 
-      <!-- Pie Chart by Race -->
       <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
         <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;">
           <i class="fas fa-chart-pie" style="color:#3498db;"></i> Penyertaan by Race
@@ -3957,7 +4299,6 @@ body.demo-active .main { margin-top: 98px; }
         </div>
       </div>
 
-      <!-- Bar Chart by Gender -->
       <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
         <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;">
           <i class="fas fa-venus-mars" style="color:#e91e63;"></i> Penyertaan by Gender
@@ -3966,12 +4307,12 @@ body.demo-active .main { margin-top: 98px; }
           <canvas id="genderChart"></canvas>
         </div>
       </div>
+
     </div>
 
-    <!-- Unit Category + Diversity -->
+    <!-- ROW 2: Category Chart + Diversity Card (2:1) -->
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px;">
 
-      <!-- Bar Chart by Unit Category -->
       <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
         <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;">
           <i class="fas fa-layer-group" style="color:#27ae60;"></i> Penyertaan by Unit Category
@@ -3981,7 +4322,6 @@ body.demo-active .main { margin-top: 98px; }
         </div>
       </div>
 
-      <!-- KPM Diversity Card -->
       <div style="background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);position:relative;overflow:hidden;">
         <div style="position:absolute;top:-20px;right:-10px;font-size:90px;opacity:0.15;">🎯</div>
         <div style="position:relative;z-index:2;">
@@ -3999,35 +4339,71 @@ body.demo-active .main { margin-top: 98px; }
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- ============================================================
-         STEP 10: TOP ACTIVE UNITS
-         ============================================================ -->
-    <div style="background:linear-gradient(135deg,#f39c12 0%,#e67e22 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">🏆</div>
+    <!-- ROW 3: MURID UNIK HEADER (FULL WIDTH) -->
+    <div style="background:linear-gradient(135deg,#9b59b6 0%,#8e44ad 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">👥</div>
       <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
         <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
-            🏆 TOP ACTIVE UNITS
-          </div>
-          <h2 style="font-size:20px;font-weight:900;margin:0 0 4px 0;">
-            Unit Paling Aktif
-          </h2>
-          <p style="font-size:11px;opacity:0.95;margin:0;">
-            Top 10 mengikut Activity Score (Penglibatan + Pencapaian × 2)
-          </p>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">👥 MURID UNIK BY KAUM</div>
+          <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">Bilangan Pelajar Unik Setiap Kaum</h2>
+          <p style="font-size:12px;opacity:0.95;margin:0;">Audit-ready metric · Pelajar berlainan (bukan total aktiviti)</p>
         </div>
         <div style="background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);text-align:center;">
-          <div style="font-size:24px;font-weight:900;" id="tab3TotalUnits">--</div>
-          <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">
-            Active Units
-          </div>
+          <div style="font-size:24px;font-weight:900;" id="muridUnikTotal">--</div>
+          <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">Total Pelajar Unik</div>
         </div>
       </div>
     </div>
 
-    <!-- Top Units Cards -->
+    <!-- ROW 4: MURID UNIK BREAKDOWN CARDS (FULL WIDTH) -->
+    <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+      <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0;">
+          <i class="fas fa-users" style="color:#9b59b6;"></i> Breakdown Penyertaan vs Murid Unik
+        </h3>
+        <p style="font-size:11px;color:#7f8c8d;margin-top:4px;">
+          Bandingan: Murid unik (orang berlainan) vs Total aktiviti
+        </p>
+      </div>
+      <div id="muridUnikContainer" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+        <div style="text-align:center;padding:40px;color:#7f8c8d;grid-column:1/-1;">
+          <i class="fas fa-spinner fa-spin"></i> Memuatkan...
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 5: COMPLIANCE BREAKDOWN (FULL WIDTH) -->
+    <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+        <i class="fas fa-shield-alt" style="color:#27ae60;"></i> Kepelbagaian Etnik — Status Lengkap
+      </h3>
+      <div id="diversityBreakdownContainer">
+        <div style="text-align:center;padding:40px;color:#7f8c8d;">
+          <i class="fas fa-spinner fa-spin"></i> Memuatkan analisis...
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 6: TOP ACTIVE UNITS HEADER (FULL WIDTH) -->
+    <div style="background:linear-gradient(135deg,#f39c12 0%,#e67e22 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:30px;font-size:110px;opacity:0.10;">🏆</div>
+      <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">🏆 TOP ACTIVE UNITS</div>
+          <h2 style="font-size:20px;font-weight:900;margin:0 0 4px 0;">Unit Paling Aktif</h2>
+          <p style="font-size:11px;opacity:0.95;margin:0;">Top 10 mengikut Activity Score (Penglibatan + Pencapaian × 2)</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.18);padding:10px 16px;border-radius:12px;backdrop-filter:blur(10px);text-align:center;">
+          <div style="font-size:24px;font-weight:900;" id="tab3TotalUnits">--</div>
+          <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;">Active Units</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 7: TOP UNITS CARDS (FULL WIDTH) -->
     <div id="tab3UnitsContainer"></div>
 
   </div>
@@ -4152,6 +4528,34 @@ body.demo-active .main { margin-top: 98px; }
       </div>
       <div id="tab4HeatmapContainer" style="overflow-x:auto;"></div>
     </div>
+
+
+<!-- ============================================================
+     SECTION 3 (NEW): PENGLIBATAN BREAKDOWN
+     ============================================================ -->
+<div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;">
+    <div>
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 4px 0;">
+        <i class="fas fa-tasks" style="color:#9b59b6;"></i> Penglibatan Breakdown (P1/P2/P3)
+      </h3>
+      <p style="font-size:11px;color:#7f8c8d;margin:0;">
+        P1 = Peserta · P2 = AJK · P3 = Persembahan · Klik unit untuk lihat detail
+      </p>
+    </div>
+    <div style="display:flex;gap:6px;font-size:10px;flex-wrap:wrap;">
+      <span style="background:#ebf5fb;color:#1a5276;padding:3px 8px;border-radius:6px;font-weight:700;">P1 = Peserta</span>
+      <span style="background:#fef9e7;color:#7d6608;padding:3px 8px;border-radius:6px;font-weight:700;">P2 = AJK</span>
+      <span style="background:#fdedec;color:#c0392b;padding:3px 8px;border-radius:6px;font-weight:700;">P3 = Persembahan</span>
+    </div>
+  </div>
+
+  <div id="penglibatanBreakdownContainer">
+    <div style="text-align:center;padding:40px;color:#7f8c8d;">
+      <i class="fas fa-spinner fa-spin"></i> Memuatkan...
+    </div>
+  </div>
+</div>
 
     <!-- ============================================================
          SECTION 3: DETAILED UNIT TABLE
@@ -6581,11 +6985,18 @@ function renderFeatCard(comp, position) {
     }
   }
 
+// FIX: Normalize success rate — convert 0-1 decimal to 0-100 percent
+let displayRate = comp.success_rate || 0;
+if (displayRate > 0 && displayRate <= 1) {
+  displayRate = displayRate * 100;
+}
+displayRate = Math.round(displayRate * 100) / 100; // Round to 2 decimal
+
   // Progress bar color
   let barColor = '#27ae60';
-  if (comp.success_rate < 50) barColor = '#f39c12';
-  if (comp.success_rate < 25) barColor = '#e74c3c';
-  if (comp.success_rate === 0) barColor = '#bdc3c7';
+  if (displayRate < 50) barColor = '#f39c12';
+  if (displayRate < 25) barColor = '#e74c3c';
+  if (displayRate === 0) barColor = '#bdc3c7';
 
   return '<div style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,0.08);position:relative;overflow:hidden;border-top:4px solid ' + levelStyle.color + ';transition:all 0.25s;" onmouseover="this.style.transform=\'translateY(-3px)\';this.style.boxShadow=\'0 10px 28px rgba(0,0,0,0.12)\';" onmouseout="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 4px 16px rgba(0,0,0,0.08)\';">' +
 
@@ -6624,10 +7035,10 @@ function renderFeatCard(comp, position) {
     '<div style="margin-top:14px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
         '<span style="font-size:10px;font-weight:700;color:#7f8c8d;text-transform:uppercase;">Success Rate</span>' +
-        '<span style="font-size:13px;font-weight:900;color:' + barColor + ';">' + (comp.success_rate || 0) + '%</span>' +
+        '<span style="font-size:13px;font-weight:900;color:' + barColor + ';">' + (displayRate || 0) + '%</span>' +
       '</div>' +
       '<div style="background:#ecf0f1;height:8px;border-radius:6px;overflow:hidden;">' +
-        '<div style="background:linear-gradient(90deg,' + barColor + ',' + adjustColor(barColor, -15) + ');height:100%;width:' + (comp.success_rate || 0) + '%;border-radius:6px;transition:width 1s ease-out;"></div>' +
+        '<div style="background:linear-gradient(90deg,' + barColor + ',' + adjustColor(barColor, -15) + ');height:100%;width:' + (displayRate || 0) + '%;border-radius:6px;transition:width 1s ease-out;"></div>' +
       '</div>' +
       '<div style="margin-top:6px;font-size:10px;color:#95a5a6;text-align:center;">' + stars + '</div>' +
     '</div>' +
@@ -7642,6 +8053,1200 @@ console.log('✅ Pencapaian STEP 11 loaded (Prestasi Unit Dashboard)');
 
 
 /* ============================================================
+   TAB PENCAPAIAN V2 — Student Involvement + Hall of Fame
+   ============================================================ */
+let involvementChartInstance = null;
+let allStudents = [];
+let filteredStudents = [];
+let tab2ViewMode = 'all'; // 'all', 'achievement', 'participation'
+
+async function loadStudentInvolvement(tahun) {
+  try {
+    const url = PENCAPAIAN_API_URL + '?action=student_involvement&tahun=' + tahun + '&_t=' + Date.now();
+    console.log('👥 Fetching Student Involvement:', url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.error);
+
+    console.log('👥 Student Involvement Data:', result.data);
+    const data = result.data;
+
+    // Update total
+    const totalEl = document.getElementById('involvementTotalStudents');
+    if (totalEl) totalEl.textContent = data.total_students || 0;
+
+    // Render chart
+    renderInvolvementChart(data.byLevel);
+
+    // Render stats list
+    renderInvolvementStats(data.byLevel);
+
+    // Store students globally
+    allStudents = data.students || [];
+    filteredStudents = allStudents.slice(0);
+
+    // Populate tingkatan filter
+    populateStudentTingkatanFilter(allStudents);
+
+    // Render student list
+    renderStudentList();
+
+  } catch (e) {
+    console.error('Gagal load student involvement:', e);
+  }
+}
+
+function renderInvolvementChart(byLevel) {
+  const ctx = document.getElementById('involvementChart');
+  if (!ctx) return;
+  if (involvementChartInstance) involvementChartInstance.destroy();
+
+  const labels = ['🌍 International', '🇲🇾 National', '🏛️ State', '📍 District', '🏫 School'];
+  const levels = ['international', 'national', 'state', 'district', 'school'];
+
+  const pencapaianData = levels.map(function(l) { return byLevel[l] ? byLevel[l].pencapaian_count : 0; });
+  const penyertaanData = levels.map(function(l) { return byLevel[l] ? byLevel[l].penyertaan_count : 0; });
+
+  involvementChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '🏆 Pencapaian (Anugerah)',
+          data: pencapaianData,
+          backgroundColor: '#f39c12',
+          borderRadius: 6
+        },
+        {
+          label: '👋 Penyertaan (Hadir)',
+          data: penyertaanData,
+          backgroundColor: '#3498db',
+          borderRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 11 }, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            label: function(c) { return c.dataset.label + ': ' + c.parsed.y + ' murid unik'; }
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { size: 11 } } },
+        x: { ticks: { font: { size: 11, weight: 'bold' } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderInvolvementStats(byLevel) {
+  const container = document.getElementById('involvementStatsList');
+  if (!container) return;
+
+  const levels = [
+    { key: 'international', label: '🌍 International', color: '#e74c3c' },
+    { key: 'national', label: '🇲🇾 Kebangsaan', color: '#f39c12' },
+    { key: 'state', label: '🏛️ Negeri', color: '#3498db' },
+    { key: 'district', label: '📍 Daerah', color: '#9b59b6' },
+    { key: 'school', label: '🏫 Sekolah', color: '#27ae60' }
+  ];
+
+  let html = '';
+  levels.forEach(function(lvl) {
+    const d = byLevel[lvl.key] || { pencapaian_count: 0, penyertaan_count: 0, total_unique: 0 };
+    html += '<div style="background:#f8fafc;border-left:3px solid ' + lvl.color + ';border-radius:8px;padding:10px 12px;">' +
+      '<div style="font-size:11px;font-weight:800;color:' + lvl.color + ';margin-bottom:4px;">' + lvl.label + '</div>' +
+      '<div style="display:flex;justify-content:space-between;gap:8px;font-size:11px;">' +
+        '<span><strong style="color:#f39c12;">' + d.pencapaian_count + '</strong> 🏆</span>' +
+        '<span><strong style="color:#3498db;">' + d.penyertaan_count + '</strong> 👋</span>' +
+        '<span style="color:#7f8c8d;"><strong>' + d.total_unique + '</strong> 👥</span>' +
+      '</div>' +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function populateStudentTingkatanFilter(students) {
+  const filter = document.getElementById('studentFilterTingkatan');
+  if (!filter) return;
+
+  const tings = [...new Set(students.map(function(s) { return s.tingkatan; }))].filter(Boolean).sort();
+  filter.innerHTML = '<option value="">📚 Semua Tingkatan</option>';
+  tings.forEach(function(t) {
+    const opt = document.createElement('option');
+    opt.value = t.toLowerCase();
+    opt.textContent = 'Tingkatan ' + t;
+    filter.appendChild(opt);
+  });
+}
+
+function filterStudentList() {
+  const search = (document.getElementById('studentSearch') || {}).value || '';
+  const tingkatan = (document.getElementById('studentFilterTingkatan') || {}).value || '';
+  const sortMode = (document.getElementById('studentSortMode') || {}).value || 'impact';
+
+  const searchLower = search.toLowerCase().trim();
+
+  filteredStudents = allStudents.filter(function(s) {
+    if (searchLower) {
+      const searchable = (s.nama_pelajar + ' ' + s.tingkatan + ' ' + (s.bangsa || '')).toLowerCase();
+      if (searchable.indexOf(searchLower) === -1) return false;
+    }
+    if (tingkatan && String(s.tingkatan || '').toLowerCase() !== tingkatan) return false;
+    return true;
+  });
+
+  // Apply sort
+  if (sortMode === 'impact') filteredStudents.sort(function(a, b) { return b.impact_score - a.impact_score; });
+  else if (sortMode === 'pencapaian') filteredStudents.sort(function(a, b) { return b.total_pencapaian - a.total_pencapaian; });
+  else if (sortMode === 'penyertaan') filteredStudents.sort(function(a, b) { return b.total_penyertaan - a.total_penyertaan; });
+  else if (sortMode === 'intl') filteredStudents.sort(function(a, b) { return (b.intl_pencapaian + b.intl_penyertaan) - (a.intl_pencapaian + a.intl_penyertaan); });
+  else if (sortMode === 'name') filteredStudents.sort(function(a, b) { return String(a.nama_pelajar).localeCompare(b.nama_pelajar); });
+
+  renderStudentList();
+}
+
+function renderStudentList() {
+  const container = document.getElementById('studentListContainer');
+  if (!container) return;
+
+  if (filteredStudents.length === 0) {
+    container.innerHTML = '<div style="background:#fff;border-radius:14px;padding:40px;text-align:center;color:#7f8c8d;box-shadow:var(--card-shadow);">' +
+      '<i class="fas fa-users" style="font-size:36px;color:#bdc3c7;"></i>' +
+      '<div style="margin-top:14px;font-weight:600;">Tiada pelajar dijumpai</div></div>';
+    return;
+  }
+
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;">';
+
+  filteredStudents.slice(0, 30).forEach(function(s, idx) {
+    const initials = getInitials(s.nama_pelajar);
+    const totalActivities = s.total_pencapaian + s.total_penyertaan;
+
+    // Determine "tier" based on impact
+    let tierBadge = '';
+    if (idx === 0) tierBadge = '<div style="position:absolute;top:10px;right:10px;background:#f1c40f;color:#fff;padding:3px 10px;border-radius:10px;font-size:10px;font-weight:800;">🥇 TOP 1</div>';
+    else if (idx < 3) tierBadge = '<div style="position:absolute;top:10px;right:10px;background:#bdc3c7;color:#fff;padding:3px 10px;border-radius:10px;font-size:10px;font-weight:800;">🏅 TOP ' + (idx + 1) + '</div>';
+    else if (idx < 10) tierBadge = '<div style="position:absolute;top:10px;right:10px;background:#3498db;color:#fff;padding:3px 10px;border-radius:10px;font-size:10px;font-weight:800;">TOP ' + (idx + 1) + '</div>';
+
+    html += '<div onclick="openStudentProfile(\'' + escapeForOnclick(s.nama_pelajar) + '\')" style="background:#fff;border-radius:14px;padding:16px;box-shadow:var(--card-shadow);position:relative;cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform=\'translateY(-3px)\'" onmouseout="this.style.transform=\'translateY(0)\'">' +
+      tierBadge +
+      '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">' +
+        '<div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;">' + initials + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13px;font-weight:800;color:#2c3e50;line-height:1.3;">' + escapeHtml(s.nama_pelajar) + '</div>' +
+          '<div style="font-size:10px;color:#7f8c8d;margin-top:2px;">' +
+            '<i class="fas fa-graduation-cap"></i> Ting ' + escapeHtml(s.tingkatan) +
+            (s.bangsa ? ' · ' + escapeHtml(s.bangsa) : '') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">' +
+        '<div style="background:#fef9e7;padding:8px;border-radius:8px;text-align:center;">' +
+          '<div style="font-size:18px;font-weight:900;color:#f39c12;">' + s.total_pencapaian + '</div>' +
+          '<div style="font-size:9px;color:#7f8c8d;">🏆 Pencapaian</div>' +
+        '</div>' +
+        '<div style="background:#ebf5fb;padding:8px;border-radius:8px;text-align:center;">' +
+          '<div style="font-size:18px;font-weight:900;color:#3498db;">' + s.total_penyertaan + '</div>' +
+          '<div style="font-size:9px;color:#7f8c8d;">👋 Penyertaan</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="display:flex;gap:3px;flex-wrap:wrap;font-size:9px;">' +
+        (s.intl_pencapaian + s.intl_penyertaan > 0 ? '<span style="background:#fdedec;color:#c0392b;padding:2px 6px;border-radius:6px;">🌍 ' + (s.intl_pencapaian + s.intl_penyertaan) + '</span>' : '') +
+        (s.nat_pencapaian + s.nat_penyertaan > 0 ? '<span style="background:#fef9e7;color:#7d6608;padding:2px 6px;border-radius:6px;">🇲🇾 ' + (s.nat_pencapaian + s.nat_penyertaan) + '</span>' : '') +
+        (s.state_pencapaian + s.state_penyertaan > 0 ? '<span style="background:#ebf5fb;color:#1a5276;padding:2px 6px;border-radius:6px;">🏛️ ' + (s.state_pencapaian + s.state_penyertaan) + '</span>' : '') +
+        (s.dist_pencapaian + s.dist_penyertaan > 0 ? '<span style="background:#f4ecf7;color:#6c3483;padding:2px 6px;border-radius:6px;">📍 ' + (s.dist_pencapaian + s.dist_penyertaan) + '</span>' : '') +
+        (s.school_pencapaian + s.school_penyertaan > 0 ? '<span style="background:#eafaf1;color:#1e8449;padding:2px 6px;border-radius:6px;">🏫 ' + (s.school_pencapaian + s.school_penyertaan) + '</span>' : '') +
+      '</div>' +
+
+      '<div style="margin-top:10px;padding-top:8px;border-top:1px solid #f0f0f0;font-size:10px;color:#7f8c8d;text-align:center;">' +
+        '<i class="fas fa-mouse-pointer"></i> Klik untuk lihat ' + totalActivities + ' rekod' +
+      '</div>' +
+    '</div>';
+  });
+
+  if (filteredStudents.length > 30) {
+    html += '<div style="background:#f8fafc;border:2px dashed #dfe6ec;border-radius:14px;padding:20px;text-align:center;color:#7f8c8d;display:flex;align-items:center;justify-content:center;font-size:13px;">' +
+      '+ ' + (filteredStudents.length - 30) + ' pelajar lain<br><small>Gunakan search untuk cari pelajar spesifik</small></div>';
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function escapeForOnclick(str) {
+  return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+/* ============================================================
+   STUDENT PROFILE MODAL
+   ============================================================ */
+let _currentProfileStudent = null;
+
+function openStudentProfile(name) {
+  const student = allStudents.find(function(s) { return s.nama_pelajar === name; });
+  if (!student) return;
+
+  _currentProfileStudent = student;
+
+  // Update header
+  const initials = getInitials(student.nama_pelajar);
+  document.getElementById('studentProfileAvatar').textContent = initials;
+  document.getElementById('studentProfileName').textContent = student.nama_pelajar;
+  document.getElementById('studentProfileMeta').textContent =
+    'Tingkatan ' + student.tingkatan +
+    (student.bangsa ? ' · ' + student.bangsa : '') +
+    (student.jantina ? ' · ' + student.jantina : '');
+
+  // Update stats
+  document.getElementById('profileTotalPencapaian').textContent = student.total_pencapaian;
+  document.getElementById('profileTotalPenyertaan').textContent = student.total_penyertaan;
+  document.getElementById('profileIntl').textContent = student.intl_pencapaian + student.intl_penyertaan;
+  document.getElementById('profileNat').textContent = student.nat_pencapaian + student.nat_penyertaan;
+  document.getElementById('profileState').textContent = student.state_pencapaian + student.state_penyertaan;
+  document.getElementById('profileDistrict').textContent = student.dist_pencapaian + student.dist_penyertaan;
+  document.getElementById('profileSchool').textContent = student.school_pencapaian + student.school_penyertaan;
+
+  // Render records
+  renderStudentProfileRecords(student);
+
+  document.getElementById('studentProfileModal').style.display = 'flex';
+}
+
+function renderStudentProfileRecords(student) {
+  const body = document.getElementById('studentProfileBody');
+  if (!body) return;
+
+  const records = student.records || [];
+  if (records.length === 0) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:#7f8c8d;">Tiada rekod</div>';
+    return;
+  }
+
+  // Group records by type
+  const achievements = records.filter(function(r) { return r.type === 'pencapaian'; });
+  const participations = records.filter(function(r) { return r.type === 'penyertaan'; });
+
+  let html = '';
+
+  // Pencapaian section
+  if (achievements.length > 0) {
+    html += '<div style="margin-bottom:20px;">' +
+      '<h3 style="font-size:13px;font-weight:800;color:#f39c12;margin:0 0 10px 0;padding-bottom:6px;border-bottom:2px solid #fef9e7;">' +
+        '🏆 PENCAPAIAN (' + achievements.length + ')' +
+      '</h3>' +
+      '<div style="display:grid;gap:8px;">';
+
+    achievements.forEach(function(r) {
+      html += renderRecordItem(r);
+    });
+
+    html += '</div></div>';
+  }
+
+  // Penyertaan section
+  if (participations.length > 0) {
+    html += '<div>' +
+      '<h3 style="font-size:13px;font-weight:800;color:#3498db;margin:0 0 10px 0;padding-bottom:6px;border-bottom:2px solid #ebf5fb;">' +
+        '👋 PENYERTAAN (' + participations.length + ')' +
+      '</h3>' +
+      '<div style="display:grid;gap:8px;">';
+
+    participations.forEach(function(r) {
+      html += renderRecordItem(r);
+    });
+
+    html += '</div></div>';
+  }
+
+  body.innerHTML = html;
+}
+
+function renderRecordItem(r) {
+  const lvlStyle = getLevelStyle(r.level);
+  const rnkStyle = getRankStyle(r.rank);
+
+  let dateDisplay = '';
+  if (r.date) {
+    const d = new Date(r.date);
+    dateDisplay = !isNaN(d.getTime())
+      ? d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' })
+      : String(r.date).substring(0, 10);
+  }
+
+  return '<div style="background:#fff;padding:12px;border-radius:10px;border-left:4px solid ' + rnkStyle.border + ';">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:6px;">' +
+      '<div style="flex:1;min-width:200px;">' +
+        '<div style="font-size:13px;font-weight:800;color:#2c3e50;">' + escapeHtml(r.competition) + '</div>' +
+        (r.description ? '<div style="font-size:10px;color:#7f8c8d;margin-top:2px;">' + escapeHtml(r.description) + '</div>' : '') +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">' +
+        '<span style="background:' + rnkStyle.bg + ';color:' + rnkStyle.color + ';padding:3px 8px;border-radius:8px;font-size:10px;font-weight:700;border:1px solid ' + rnkStyle.border + ';">' +
+          rnkStyle.icon + ' ' + escapeHtml(r.rank) +
+        '</span>' +
+        '<span style="background:' + lvlStyle.color + ';color:#fff;padding:3px 8px;border-radius:8px;font-size:9px;font-weight:700;">' +
+          lvlStyle.emoji + ' ' + escapeHtml(r.level) +
+        '</span>' +
+      '</div>' +
+    '</div>' +
+    (dateDisplay || r.category ? '<div style="font-size:10px;color:#95a5a6;display:flex;gap:10px;margin-top:6px;padding-top:6px;border-top:1px solid #f0f0f0;">' +
+      (dateDisplay ? '<span><i class="fas fa-calendar"></i> ' + dateDisplay + '</span>' : '') +
+      (r.category ? '<span><i class="fas fa-tag"></i> ' + escapeHtml(r.category) + '</span>' : '') +
+    '</div>' : '') +
+  '</div>';
+}
+
+function closeStudentProfile() {
+  document.getElementById('studentProfileModal').style.display = 'none';
+}
+
+function exportStudentProfileCSV() {
+  if (!_currentProfileStudent) return;
+  const s = _currentProfileStudent;
+  const records = s.records || [];
+
+  const headers = ['No', 'Type', 'Competition', 'Description', 'Rank', 'Level', 'Category', 'Date'];
+  let csv = '"PROFIL PELAJAR: ' + s.nama_pelajar + '"\n';
+  csv += '"Tingkatan: ' + s.tingkatan + '","Bangsa: ' + (s.bangsa || '-') + '"\n';
+  csv += '"Total Pencapaian: ' + s.total_pencapaian + '","Total Penyertaan: ' + s.total_penyertaan + '"\n\n';
+  csv += headers.join(',') + '\n';
+
+  records.forEach(function(r, i) {
+    const row = [i + 1, r.type, r.competition, r.description || '', r.rank, r.level, r.category || '', r.date || ''];
+    csv += row.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+  });
+
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Profil_' + s.nama_pelajar.replace(/\s+/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+// ESC key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('studentProfileModal');
+    if (modal && modal.style.display === 'flex') closeStudentProfile();
+  }
+});
+
+/* ============================================================
+   TAB 2 VIEW MODE — Toggle Achievement/Participation
+   ============================================================ */
+function setTab2ViewMode(mode, btn) {
+  tab2ViewMode = mode;
+
+  // Update buttons
+  ['viewModeAll', 'viewModeAchievement', 'viewModeParticipation'].forEach(function(id) {
+    const b = document.getElementById(id);
+    if (b) {
+      b.style.background = 'transparent';
+      b.style.color = '#7f8c8d';
+    }
+  });
+  if (btn) {
+    btn.style.background = '#e74c3c';
+    btn.style.color = '#fff';
+  }
+
+  filterAchievementTable();
+}
+
+// Override filterAchievementTable untuk include view mode
+const _origFilterAchievementTable = typeof filterAchievementTable === 'function' ? filterAchievementTable : null;
+filterAchievementTable = function() {
+  const search = (document.getElementById('tab2Search') || {}).value || '';
+  const level = (document.getElementById('tab2FilterLevel') || {}).value || '';
+  const category = (document.getElementById('tab2FilterCategory') || {}).value || '';
+  const tingkatan = (document.getElementById('tab2FilterTingkatan') || {}).value || '';
+
+  const searchLower = search.toLowerCase().trim();
+
+  filteredAchievements = allAchievements.filter(function(a) {
+    if (searchLower) {
+      const searchable = (a.nama_pelajar + ' ' + a.competition + ' ' + a.description).toLowerCase();
+      if (searchable.indexOf(searchLower) === -1) return false;
+    }
+    if (level && String(a.level || '').toLowerCase() !== level) return false;
+    if (category && String(a.category || '').toLowerCase() !== category) return false;
+    if (tingkatan && String(a.tingkatan || '').toLowerCase() !== tingkatan) return false;
+
+    // View mode filter
+    const rank = String(a.rank || '').toLowerCase().trim();
+    const isPenyertaan = (rank === 'participation' || rank === 'penyertaan');
+
+    if (tab2ViewMode === 'achievement' && isPenyertaan) return false;
+    if (tab2ViewMode === 'participation' && !isPenyertaan) return false;
+
+    return true;
+  });
+
+  currentPage = 1;
+  renderAchievementTable();
+};
+
+/* ============================================================
+   AUTO-LOAD STUDENT INVOLVEMENT when Tab 2 loaded
+   ============================================================ */
+const _origLoadAchievementsTab = loadAchievementsTab;
+loadAchievementsTab = async function(tahun) {
+  await _origLoadAchievementsTab(tahun);
+  // Also load student involvement
+  loadStudentInvolvement(tahun);
+};
+
+console.log('✅ Tab Pencapaian V2 loaded (Student Involvement + Hall of Fame + View Mode)');
+
+
+/* ============================================================
+   SENARAI LENGKAP PERTANDINGAN — Logic
+   ============================================================ */
+let allCompetitionsData = null;
+let filteredCompetitions = [];
+let _collapsedLevels = new Set();
+let _currentCompDrill = null;
+let _compDrillFilteredStudents = [];
+
+async function loadAllCompetitions(tahun) {
+  const loading = document.getElementById('allCompLoading');
+  const container = document.getElementById('allCompContainer');
+  const empty = document.getElementById('allCompEmpty');
+
+  if (loading) loading.style.display = 'block';
+  if (container) container.style.display = 'none';
+  if (empty) empty.style.display = 'none';
+
+  try {
+    const url = PENCAPAIAN_API_URL + '?action=all_competitions&tahun=' + tahun + '&_t=' + Date.now();
+    console.log('📋 Fetching All Competitions:', url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.error);
+
+    console.log('📋 All Competitions Data:', result.data);
+    allCompetitionsData = result.data;
+
+    // Update total
+    const totalEl = document.getElementById('allCompTotal');
+    if (totalEl) totalEl.textContent = result.data.total || 0;
+
+    // Populate category filter
+    populateAllCompCategoryFilter(result.data.competitions);
+
+    // Initialize filtered data
+    filteredCompetitions = result.data.competitions.slice(0);
+
+    // Render
+    renderAllCompetitions();
+
+    if (loading) loading.style.display = 'none';
+    if (container) container.style.display = 'block';
+
+  } catch (e) {
+    console.error('📋 Gagal load competitions:', e);
+    if (loading) {
+      loading.innerHTML = '<div style="color:#e74c3c;">' +
+        '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
+        '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan</div>' +
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div></div>';
+    }
+  }
+}
+
+function populateAllCompCategoryFilter(competitions) {
+  const filter = document.getElementById('allCompFilterCategory');
+  if (!filter) return;
+
+  const cats = [...new Set(competitions.map(function(c) { return c.category; }))].filter(Boolean).sort();
+  filter.innerHTML = '<option value="">🎯 Semua Category</option>';
+  cats.forEach(function(c) {
+    const opt = document.createElement('option');
+    opt.value = c.toLowerCase();
+    opt.textContent = c;
+    filter.appendChild(opt);
+  });
+}
+
+function filterAllCompetitions() {
+  if (!allCompetitionsData) return;
+
+  const search = (document.getElementById('allCompSearch') || {}).value || '';
+  const level = (document.getElementById('allCompFilterLevel') || {}).value || '';
+  const category = (document.getElementById('allCompFilterCategory') || {}).value || '';
+  const sortMode = (document.getElementById('allCompSort') || {}).value || 'date';
+
+  const searchLower = search.toLowerCase().trim();
+
+  filteredCompetitions = (allCompetitionsData.competitions || []).filter(function(c) {
+    if (searchLower && c.competition.toLowerCase().indexOf(searchLower) === -1) return false;
+    if (level && c.level_normalized !== level) return false;
+    if (category && String(c.category || '').toLowerCase() !== category) return false;
+    return true;
+  });
+
+  // Apply sort
+  if (sortMode === 'date') {
+    filteredCompetitions.sort(function(a, b) { return new Date(b.date || 0) - new Date(a.date || 0); });
+  } else if (sortMode === 'name') {
+    filteredCompetitions.sort(function(a, b) { return a.competition.localeCompare(b.competition); });
+  } else if (sortMode === 'winners') {
+    filteredCompetitions.sort(function(a, b) { return b.total_winners - a.total_winners; });
+  } else if (sortMode === 'success') {
+    filteredCompetitions.sort(function(a, b) { return b.success_rate - a.success_rate; });
+  } else if (sortMode === 'students') {
+    filteredCompetitions.sort(function(a, b) { return b.total_students - a.total_students; });
+  }
+
+  renderAllCompetitions();
+}
+
+function renderAllCompetitions() {
+  const container = document.getElementById('allCompContainer');
+  const empty = document.getElementById('allCompEmpty');
+  if (!container) return;
+
+  if (filteredCompetitions.length === 0) {
+    container.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+
+  if (empty) empty.style.display = 'none';
+  container.style.display = 'block';
+
+  // Group filtered by level
+  const levelConfig = {
+    international: { emoji: '🌍', name: 'INTERNATIONAL', color: '#e74c3c', gradient: 'linear-gradient(135deg,#e74c3c,#c0392b)' },
+    national:      { emoji: '🇲🇾', name: 'KEBANGSAAN',    color: '#f39c12', gradient: 'linear-gradient(135deg,#f39c12,#d68910)' },
+    state:         { emoji: '🏛️', name: 'NEGERI',         color: '#3498db', gradient: 'linear-gradient(135deg,#3498db,#2874a6)' },
+    district:      { emoji: '📍', name: 'DAERAH',         color: '#9b59b6', gradient: 'linear-gradient(135deg,#9b59b6,#7d3c98)' },
+    school:        { emoji: '🏫', name: 'SEKOLAH',        color: '#27ae60', gradient: 'linear-gradient(135deg,#27ae60,#1e8449)' },
+    other:         { emoji: '❓', name: 'LAIN-LAIN',      color: '#7f8c8d', gradient: 'linear-gradient(135deg,#7f8c8d,#566573)' }
+  };
+
+  const grouped = {};
+  filteredCompetitions.forEach(function(c) {
+    const lvl = c.level_normalized || 'other';
+    if (!grouped[lvl]) grouped[lvl] = [];
+    grouped[lvl].push(c);
+  });
+
+  let html = '<div style="display:flex;flex-direction:column;gap:14px;">';
+
+  const levelOrder = ['international', 'national', 'state', 'district', 'school', 'other'];
+  levelOrder.forEach(function(lvl) {
+    const comps = grouped[lvl] || [];
+    if (comps.length === 0) return;
+
+    const cfg = levelConfig[lvl] || levelConfig.other;
+    const isCollapsed = _collapsedLevels.has(lvl);
+
+    html += '<div style="background:#fff;border-radius:14px;box-shadow:var(--card-shadow);overflow:hidden;">' +
+
+      // Level Header (clickable to collapse)
+      '<div onclick="toggleLevelCollapse(\'' + lvl + '\')" style="background:' + cfg.gradient + ';color:#fff;padding:14px 22px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<i class="fas fa-chevron-' + (isCollapsed ? 'right' : 'down') + '" style="transition:transform 0.2s;"></i>' +
+          '<h3 style="font-size:14px;font-weight:900;margin:0;">' + cfg.emoji + ' ' + cfg.name + '</h3>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;align-items:center;font-size:11px;">' +
+          '<span style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:10px;font-weight:700;">' + comps.length + ' Pertandingan</span>' +
+        '</div>' +
+      '</div>';
+
+    // Collapsible content
+    if (!isCollapsed) {
+      html += '<div style="padding:14px 22px;display:grid;gap:10px;">';
+
+      comps.forEach(function(c, idx) {
+        let dateDisplay = '';
+        if (c.date) {
+          const d = new Date(c.date);
+          dateDisplay = !isNaN(d.getTime())
+            ? d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' })
+            : String(c.date).substring(0, 10);
+        }
+
+        const catIcon = c.category && c.category.toLowerCase().includes('sukan') ? '⚽' :
+                        c.category && c.category.toLowerCase().includes('akademik') ? '🧠' :
+                        c.category && c.category.toLowerCase().includes('kokurikulum') ? '🎯' : '🏆';
+
+        let barColor = '#27ae60';
+        if (c.success_rate < 50) barColor = '#f39c12';
+        if (c.success_rate < 25) barColor = '#e74c3c';
+        if (c.success_rate === 0) barColor = '#bdc3c7';
+
+        const idEsc = escapeForOnclick(c.competition);
+        const hasStudents = c.students && c.students.length > 0;
+
+        html += '<div onclick="' + (hasStudents ? 'openCompetitionDrill(\'' + idEsc + '\')' : '') + '" style="background:#f8fafc;border-left:4px solid ' + cfg.color + ';border-radius:10px;padding:14px;cursor:' + (hasStudents ? 'pointer' : 'default') + ';transition:all 0.2s;" ' + (hasStudents ? 'onmouseover="this.style.background=\'#ebf5fb\';this.style.transform=\'translateX(4px)\'" onmouseout="this.style.background=\'#f8fafc\';this.style.transform=\'translateX(0)\'"' : '') + '>' +
+
+          '<div style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;">' +
+
+            // Left: Competition Info
+            '<div>' +
+              '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">' +
+                '<span style="background:' + cfg.color + ';color:#fff;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:800;">' +
+                  cfg.emoji + ' ' + escapeHtml(c.level) +
+                '</span>' +
+                (c.category ? '<span style="background:#fff;color:#7f8c8d;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;border:1px solid #dfe6ec;">' + catIcon + ' ' + escapeHtml(c.category) + '</span>' : '') +
+              '</div>' +
+              '<h4 style="font-size:13px;font-weight:800;color:#2c3e50;margin:0 0 6px 0;line-height:1.4;">' + escapeHtml(c.competition) + '</h4>' +
+              '<div style="display:flex;gap:14px;font-size:10px;color:#7f8c8d;flex-wrap:wrap;">' +
+                (dateDisplay ? '<span><i class="fas fa-calendar"></i> ' + dateDisplay + '</span>' : '') +
+                '<span><i class="fas fa-users"></i> ' + (c.total_students || 0) + ' pelajar</span>' +
+                '<span><i class="fas fa-trophy" style="color:#f39c12;"></i> ' + (c.total_winners || 0) + ' pemenang</span>' +
+              '</div>' +
+            '</div>' +
+
+            // Right: Success Rate
+            '<div style="text-align:right;min-width:90px;">' +
+              '<div style="font-size:24px;font-weight:900;color:' + barColor + ';line-height:1;">' + (c.success_rate || 0) + '%</div>' +
+              '<div style="font-size:9px;color:#7f8c8d;margin-top:2px;">Success Rate</div>' +
+              (hasStudents ? '<div style="font-size:9px;color:#3498db;margin-top:6px;font-weight:700;"><i class="fas fa-mouse-pointer"></i> Klik</div>' : '') +
+            '</div>' +
+
+          '</div>' +
+
+          // Rank breakdown
+          (c.total_winners > 0 ? '<div style="display:flex;gap:4px;margin-top:10px;flex-wrap:wrap;">' +
+            (c.rank_1 > 0 ? '<span style="background:#fef9e7;color:#7d6608;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;">🥇 ' + c.rank_1 + '</span>' : '') +
+            (c.rank_2 > 0 ? '<span style="background:#f4f6f7;color:#566573;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;">🥈 ' + c.rank_2 + '</span>' : '') +
+            (c.rank_3 > 0 ? '<span style="background:#fdf2e9;color:#a04000;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;">🥉 ' + c.rank_3 + '</span>' : '') +
+            (c.rank_4 > 0 ? '<span style="background:#f0f4f8;color:#7f8c8d;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;">4️⃣ ' + c.rank_4 + '</span>' : '') +
+            (c.rank_5 > 0 ? '<span style="background:#f0f4f8;color:#7f8c8d;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;">5️⃣ ' + c.rank_5 + '</span>' : '') +
+            (c.participation > 0 ? '<span style="background:#ebf5fb;color:#1a5276;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;">📌 ' + c.participation + ' Penyertaan</span>' : '') +
+          '</div>' : '') +
+
+        '</div>';
+      });
+
+      html += '</div>';
+    } else {
+      // Collapsed preview
+      html += '<div style="padding:10px 22px;background:#f8fafc;font-size:11px;color:#7f8c8d;text-align:center;">' +
+        '<i class="fas fa-info-circle"></i> ' + comps.length + ' pertandingan tersembunyi · Klik header untuk expand' +
+      '</div>';
+    }
+
+    html += '</div>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function toggleLevelCollapse(level) {
+  if (_collapsedLevels.has(level)) {
+    _collapsedLevels.delete(level);
+  } else {
+    _collapsedLevels.add(level);
+  }
+  renderAllCompetitions();
+}
+
+function expandAllLevels() {
+  _collapsedLevels.clear();
+  renderAllCompetitions();
+}
+
+function collapseAllLevels() {
+  ['international', 'national', 'state', 'district', 'school', 'other'].forEach(function(l) {
+    _collapsedLevels.add(l);
+  });
+  renderAllCompetitions();
+}
+
+/* ============================================================
+   COMPETITION STUDENT DRILL-DOWN
+   ============================================================ */
+function openCompetitionDrill(competitionName) {
+  if (!allCompetitionsData) return;
+
+  const comp = allCompetitionsData.competitions.find(function(c) { return c.competition === competitionName; });
+  if (!comp) return;
+
+  _currentCompDrill = comp;
+  _compDrillFilteredStudents = comp.students || [];
+
+  // Update header
+  const levelConfig = {
+    international: { gradient: 'linear-gradient(135deg,#e74c3c,#c0392b)', emoji: '🌍' },
+    national: { gradient: 'linear-gradient(135deg,#f39c12,#d68910)', emoji: '🇲🇾' },
+    state: { gradient: 'linear-gradient(135deg,#3498db,#2874a6)', emoji: '🏛️' },
+    district: { gradient: 'linear-gradient(135deg,#9b59b6,#7d3c98)', emoji: '📍' },
+    school: { gradient: 'linear-gradient(135deg,#27ae60,#1e8449)', emoji: '🏫' }
+  };
+
+  const cfg = levelConfig[comp.level_normalized] || levelConfig.school;
+  const header = document.getElementById('compDrillHeader');
+  if (header) header.style.background = cfg.gradient;
+
+  document.getElementById('compDrillLevelBadge').textContent = cfg.emoji + ' ' + comp.level + (comp.category ? ' · ' + comp.category : '');
+  document.getElementById('compDrillTitle').textContent = comp.competition;
+
+  let dateStr = '';
+  if (comp.date) {
+    const d = new Date(comp.date);
+    if (!isNaN(d.getTime())) dateStr = d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  document.getElementById('compDrillMeta').textContent = (dateStr ? '📅 ' + dateStr + ' · ' : '') + '👥 ' + comp.total_students + ' pelajar · 🏆 ' + comp.total_winners + ' pemenang';
+
+  // Update stats
+  document.getElementById('compDrillTotalStudents').textContent = comp.total_students || 0;
+  document.getElementById('compDrillChampion').textContent = comp.rank_1 || 0;
+  document.getElementById('compDrillRunnerUp').textContent = comp.rank_2 || 0;
+  document.getElementById('compDrillThird').textContent = comp.rank_3 || 0;
+  document.getElementById('compDrillOthers').textContent = (comp.rank_4 || 0) + (comp.rank_5 || 0) + (comp.rank_6 || 0) + (comp.participation || 0);
+  document.getElementById('compDrillSuccessRate').textContent = (comp.success_rate || 0) + '%';
+
+  // Reset search
+  const search = document.getElementById('compDrillSearch');
+  if (search) search.value = '';
+
+  // Render students
+  renderCompetitionStudents();
+
+  // Show modal
+  document.getElementById('competitionDrillModal').style.display = 'flex';
+}
+
+function renderCompetitionStudents() {
+  const body = document.getElementById('compDrillBody');
+  if (!body || !_currentCompDrill) return;
+
+  const students = _compDrillFilteredStudents || [];
+
+  if (students.length === 0) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:#7f8c8d;">' +
+      '<i class="fas fa-users-slash" style="font-size:36px;color:#bdc3c7;"></i>' +
+      '<div style="margin-top:14px;font-weight:600;">Tiada senarai pelajar dijumpai</div>' +
+      '<div style="font-size:11px;margin-top:6px;">Data pelajar mungkin tidak lengkap dalam Sheet 1</div></div>';
+    return;
+  }
+
+  // Sort by rank priority
+  const rankPriority = { 'champion': 1, 'johan': 1, '1st': 1, 'runner-up': 2, 'runnerup': 2, 'naib johan': 2, '2nd': 2, '2nd runner-up': 3, '3rd': 3 };
+  students.sort(function(a, b) {
+    const pa = rankPriority[String(a.rank || '').toLowerCase()] || 99;
+    const pb = rankPriority[String(b.rank || '').toLowerCase()] || 99;
+    return pa - pb;
+  });
+
+  let html = '<div style="display:grid;gap:8px;">';
+  students.forEach(function(s, idx) {
+    const rnkStyle = getRankStyle(s.rank);
+
+    html += '<div style="background:#fff;padding:12px;border-radius:10px;border-left:4px solid ' + rnkStyle.border + ';display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,0.04);">' +
+      '<div style="font-size:20px;text-align:center;">' + rnkStyle.icon + '</div>' +
+      '<div>' +
+        '<div style="font-size:13px;font-weight:800;color:#2c3e50;">' + escapeHtml(s.nama) + '</div>' +
+        '<div style="font-size:10px;color:#7f8c8d;margin-top:2px;">' +
+          '<i class="fas fa-graduation-cap"></i> Tingkatan ' + escapeHtml(s.tingkatan) +
+          (s.bangsa ? ' · ' + escapeHtml(s.bangsa) : '') +
+          (s.jantina ? ' · ' + escapeHtml(s.jantina) : '') +
+        '</div>' +
+        (s.description ? '<div style="font-size:10px;color:#95a5a6;margin-top:2px;"><i class="fas fa-info"></i> ' + escapeHtml(s.description) + '</div>' : '') +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<span style="background:' + rnkStyle.bg + ';color:' + rnkStyle.color + ';padding:3px 10px;border-radius:8px;font-size:10px;font-weight:800;border:1px solid ' + rnkStyle.border + ';">' +
+          escapeHtml(s.rank) +
+        '</span>' +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+
+  body.innerHTML = html;
+}
+
+function filterCompetitionStudents() {
+  if (!_currentCompDrill) return;
+  const search = document.getElementById('compDrillSearch').value.trim().toLowerCase();
+  const allStudents = _currentCompDrill.students || [];
+
+  if (!search) {
+    _compDrillFilteredStudents = allStudents;
+  } else {
+    _compDrillFilteredStudents = allStudents.filter(function(s) {
+      const searchable = (s.nama + ' ' + s.tingkatan + ' ' + (s.bangsa || '')).toLowerCase();
+      return searchable.indexOf(search) !== -1;
+    });
+  }
+
+  renderCompetitionStudents();
+}
+
+function closeCompetitionDrill() {
+  document.getElementById('competitionDrillModal').style.display = 'none';
+}
+
+function exportCompetitionStudentsCSV() {
+  if (!_currentCompDrill) return;
+  const c = _currentCompDrill;
+  const students = c.students || [];
+
+  if (students.length === 0) {
+    alert('⚠️ Tiada data pelajar untuk export!');
+    return;
+  }
+
+  const headers = ['No', 'Nama Pelajar', 'Tingkatan', 'Jantina', 'Bangsa', 'Rank', 'Description'];
+  let csv = '"PERTANDINGAN: ' + c.competition + '"\n';
+  csv += '"Level: ' + c.level + '","Category: ' + (c.category || '-') + '"\n';
+  csv += '"Total Pelajar: ' + c.total_students + '","Total Pemenang: ' + c.total_winners + '","Success Rate: ' + c.success_rate + '%"\n\n';
+  csv += headers.join(',') + '\n';
+
+  students.forEach(function(s, i) {
+    const row = [i + 1, s.nama, s.tingkatan, s.jantina || '', s.bangsa || '', s.rank, s.description || ''];
+    csv += row.map(function(cell) { return '"' + String(cell).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+  });
+
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Pertandingan_' + c.competition.replace(/[^a-z0-9]/gi, '_').substring(0, 50) + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportAllCompetitionsCSV() {
+  if (!allCompetitionsData || filteredCompetitions.length === 0) {
+    alert('⚠️ Tiada data untuk export!');
+    return;
+  }
+
+  const headers = ['No', 'Pertandingan', 'Level', 'Category', 'Tarikh', 'Total Pelajar', 'Pemenang', 'Champion', 'Runner-Up', '3rd', '4th', '5th', 'Penyertaan', 'Success Rate'];
+  let csv = headers.join(',') + '\n';
+
+  filteredCompetitions.forEach(function(c, i) {
+    const row = [i + 1, c.competition, c.level, c.category || '', c.date || '', c.total_students, c.total_winners, c.rank_1, c.rank_2, c.rank_3, c.rank_4, c.rank_5, c.participation, c.success_rate + '%'];
+    csv += row.map(function(cell) { return '"' + String(cell).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+  });
+
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Senarai_Pertandingan_' + new Date().toISOString().slice(0, 10) + '.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+// ESC to close modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('competitionDrillModal');
+    if (modal && modal.style.display === 'flex') closeCompetitionDrill();
+  }
+});
+
+/* ============================================================
+   AUTO-LOAD when Tab 1 loaded
+   ============================================================ */
+const _origLoadPencapaianForAllComp = typeof loadPencapaianDashboard === 'function' ? loadPencapaianDashboard : null;
+if (_origLoadPencapaianForAllComp) {
+  loadPencapaianDashboard = async function() {
+    await _origLoadPencapaianForAllComp();
+    const yearSelect = document.getElementById('pencapaianYearSelect');
+    if (yearSelect) loadAllCompetitions(yearSelect.value);
+  };
+}
+
+console.log('✅ Senarai Lengkap Pertandingan loaded (Group + Drill-down + Export)');
+
+
+/* ============================================================
+   MURID UNIK BY KAUM — Loader & Renderer
+   ============================================================ */
+async function loadMuridUnikByKaum(tahun) {
+  try {
+    const url = PENCAPAIAN_API_URL + '?action=murid_unik_kaum&tahun=' + tahun + '&_t=' + Date.now();
+    console.log('👥 Fetching Murid Unik by Kaum:', url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.error);
+
+    console.log('👥 Murid Unik Data:', result.data);
+
+    const data = result.data;
+
+    // Update total
+    const totalEl = document.getElementById('muridUnikTotal');
+    if (totalEl) totalEl.textContent = (data.total_murid_unik || 0).toLocaleString();
+
+    // Render kaum cards
+    renderMuridUnikCards(data);
+
+    // Render diversity breakdown
+    renderDiversityBreakdown(data);
+
+  } catch (e) {
+    console.error('Gagal load Murid Unik:', e);
+  }
+}
+
+function renderMuridUnikCards(data) {
+  const container = document.getElementById('muridUnikContainer');
+  if (!container) return;
+
+  const kaumConfig = {
+    Malay:   { emoji: '🟢', color: '#27ae60', gradient: 'linear-gradient(135deg,#27ae60,#1e8449)', bg: '#eafaf1' },
+    Chinese: { emoji: '🟠', color: '#f39c12', gradient: 'linear-gradient(135deg,#f39c12,#d68910)', bg: '#fef9e7' },
+    India:   { emoji: '🔴', color: '#e74c3c', gradient: 'linear-gradient(135deg,#e74c3c,#c0392b)', bg: '#fdedec' },
+    Others:  { emoji: '🔵', color: '#3498db', gradient: 'linear-gradient(135deg,#3498db,#2874a6)', bg: '#ebf5fb' }
+  };
+
+  let html = '';
+  (data.breakdown || []).forEach(function(item) {
+    const cfg = kaumConfig[item.kaum] || kaumConfig.Others;
+    const isActive = item.murid_unik > 0;
+
+    html += '<div style="background:' + (isActive ? '#fff' : '#f8fafc') + ';border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:4px solid ' + cfg.color + ';opacity:' + (isActive ? '1' : '0.6') + ';">' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">' +
+        '<div style="font-size:30px;">' + cfg.emoji + '</div>' +
+        '<div>' +
+          '<div style="font-size:14px;font-weight:800;color:#2c3e50;">' + item.kaum + '</div>' +
+          '<div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;">' +
+            (isActive ? '✅ Aktif' : '⚠️ Tiada Penyertaan') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="background:' + cfg.bg + ';padding:14px;border-radius:10px;margin-bottom:10px;text-align:center;">' +
+        '<div style="font-size:32px;font-weight:900;color:' + cfg.color + ';line-height:1;">' + item.murid_unik + '</div>' +
+        '<div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">👥 Murid Unik</div>' +
+      '</div>' +
+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+        '<div style="background:#f8fafc;padding:10px;border-radius:8px;text-align:center;">' +
+          '<div style="font-size:14px;font-weight:800;color:#34495e;">' + item.total_aktiviti + '</div>' +
+          '<div style="font-size:9px;color:#7f8c8d;">📊 Aktiviti</div>' +
+        '</div>' +
+        '<div style="background:#f8fafc;padding:10px;border-radius:8px;text-align:center;">' +
+          '<div style="font-size:14px;font-weight:800;color:#34495e;">' + item.avg_per_murid + '</div>' +
+          '<div style="font-size:9px;color:#7f8c8d;">📈 Avg/Murid</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function renderDiversityBreakdown(data) {
+  const container = document.getElementById('diversityBreakdownContainer');
+  if (!container) return;
+
+  const d = data.diversity || {};
+
+  let html = '<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;align-items:start;">' +
+
+    // Left: Big Status Display
+    '<div style="background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);color:#fff;padding:24px;border-radius:14px;text-align:center;">' +
+      '<div style="font-size:48px;margin-bottom:8px;">' + d.icon + '</div>' +
+      '<div style="font-size:32px;font-weight:900;line-height:1;margin-bottom:6px;">' + d.rating + '</div>' +
+      '<div style="font-size:18px;margin-bottom:14px;">' + d.stars + '</div>' +
+      '<div style="background:rgba(255,255,255,0.2);padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;">' +
+        d.active_races + ' / 4 Kaum Aktif' +
+      '</div>' +
+    '</div>' +
+
+    // Right: Breakdown Details
+    '<div>' +
+      '<h4 style="font-size:13px;font-weight:800;color:#2c3e50;margin:0 0 14px 0;">Senarai Status Penyertaan Setiap Kaum:</h4>';
+
+  (data.breakdown || []).forEach(function(item) {
+    const isActive = item.murid_unik > 0;
+    const statusBg = isActive ? '#eafaf1' : '#fef9e7';
+    const statusColor = isActive ? '#27ae60' : '#7d6608';
+    const statusText = isActive ? '✅ Aktif' : '⚠️ Tiada penyertaan';
+
+    html += '<div style="background:' + statusBg + ';padding:12px;border-radius:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid ' + statusColor + ';">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:20px;">' + (item.kaum === 'Malay' ? '🟢' : item.kaum === 'Chinese' ? '🟠' : item.kaum === 'India' ? '🔴' : '🔵') + '</span>' +
+        '<div>' +
+          '<div style="font-size:13px;font-weight:800;color:#2c3e50;">' + item.kaum + '</div>' +
+          '<div style="font-size:10px;color:' + statusColor + ';font-weight:700;">' + statusText + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:right;font-size:11px;">' +
+        '<div style="font-weight:800;color:#2c3e50;">' + item.murid_unik + ' murid</div>' +
+        '<div style="color:#7f8c8d;">' + item.total_aktiviti + ' aktiviti</div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  // Recommendation
+  if (d.active_races < 4) {
+    const missingKaum = (data.breakdown || []).filter(function(i) { return i.murid_unik === 0; }).map(function(i) { return i.kaum; });
+    html += '<div style="background:#fef9e7;border-left:4px solid #f39c12;padding:12px 14px;border-radius:10px;margin-top:12px;">' +
+      '<strong style="font-size:12px;color:#7d6608;"><i class="fas fa-lightbulb"></i> Cadangan untuk CEMERLANG (5⭐):</strong>' +
+      '<div style="font-size:11px;color:#7d6608;margin-top:6px;line-height:1.5;">' +
+        'Galakkan penyertaan dari kaum: <strong>' + missingKaum.join(', ') + '</strong>' +
+      '</div>' +
+    '</div>';
+  } else {
+    html += '<div style="background:#eafaf1;border-left:4px solid #27ae60;padding:12px 14px;border-radius:10px;margin-top:12px;">' +
+      '<strong style="font-size:12px;color:#1e8449;"><i class="fas fa-trophy"></i> CEMERLANG! Semua 4 kaum aktif menyertai!</strong>' +
+    '</div>';
+  }
+
+  html += '</div></div>';
+
+  container.innerHTML = html;
+}
+
+/* ============================================================
+   PENGLIBATAN BREAKDOWN (P1/P2/P3) — Tab 4 Enhancement
+   ============================================================ */
+function renderPenglibatanBreakdown(units) {
+  const container = document.getElementById('penglibatanBreakdownContainer');
+  if (!container) return;
+
+  if (!units || units.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#7f8c8d;">Tiada data</div>';
+    return;
+  }
+
+  // Filter units yang ada penglibatan
+  const activeUnits = units.filter(function(u) {
+    const b = u.breakdown_penglibatan || {};
+    const total = (b.P1_intl || 0) + (b.P1_nat || 0) + (b.P1_state || 0) + (b.P1_bahagian || 0) + (b.P1_district || 0) + (b.P1_school || 0) +
+                  (b.P2_intl || 0) + (b.P2_nat || 0) + (b.P2_state || 0) + (b.P2_bahagian || 0) + (b.P2_district || 0) + (b.P2_school || 0) +
+                  (b.P3_intl || 0) + (b.P3_nat || 0) + (b.P3_state || 0) + (b.P3_bahagian || 0) + (b.P3_district || 0) + (b.P3_school || 0);
+    return total > 0;
+  });
+
+  // Sort by total penglibatan
+  activeUnits.forEach(function(u) {
+    const b = u.breakdown_penglibatan || {};
+    u._total_penglibatan = (b.P1_intl || 0) + (b.P1_nat || 0) + (b.P1_state || 0) + (b.P1_bahagian || 0) + (b.P1_district || 0) + (b.P1_school || 0) +
+                          (b.P2_intl || 0) + (b.P2_nat || 0) + (b.P2_state || 0) + (b.P2_bahagian || 0) + (b.P2_district || 0) + (b.P2_school || 0) +
+                          (b.P3_intl || 0) + (b.P3_nat || 0) + (b.P3_state || 0) + (b.P3_bahagian || 0) + (b.P3_district || 0) + (b.P3_school || 0);
+  });
+  activeUnits.sort(function(a, b) { return b._total_penglibatan - a._total_penglibatan; });
+
+  let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:11px;">';
+
+  // Header
+  html += '<thead><tr>' +
+    '<th style="background:#f8fafc;padding:10px 8px;text-align:left;font-weight:700;color:#2c3e50;font-size:11px;text-transform:uppercase;border-radius:6px;min-width:160px;">Unit</th>' +
+    '<th style="background:#ebf5fb;padding:10px 6px;text-align:center;font-weight:700;color:#1a5276;font-size:10px;border-radius:6px;" colspan="6">P1 — PESERTA</th>' +
+    '<th style="background:#fef9e7;padding:10px 6px;text-align:center;font-weight:700;color:#7d6608;font-size:10px;border-radius:6px;" colspan="6">P2 — AJK</th>' +
+    '<th style="background:#fdedec;padding:10px 6px;text-align:center;font-weight:700;color:#c0392b;font-size:10px;border-radius:6px;" colspan="6">P3 — PERSEMBAHAN</th>' +
+    '<th style="background:#eafaf1;padding:10px 6px;text-align:center;font-weight:700;color:#1e8449;font-size:10px;border-radius:6px;">TOTAL</th>' +
+  '</tr>';
+
+  // Sub-header
+  const subLevels = ['Int', 'Keb', 'Neg', 'Bah', 'Dae', 'Sek'];
+  html += '<tr><th style="padding:6px;background:#f8fafc;"></th>';
+  for (var p = 0; p < 3; p++) {
+    subLevels.forEach(function(l) {
+      const bgColor = p === 0 ? '#d6eaf8' : p === 1 ? '#fcf3cf' : '#fadbd8';
+      html += '<th style="background:' + bgColor + ';padding:4px;text-align:center;font-size:9px;font-weight:700;color:#34495e;">' + l + '</th>';
+    });
+  }
+  html += '<th style="background:#eafaf1;"></th></tr></thead><tbody>';
+
+  // Body
+  activeUnits.forEach(function(u) {
+    const b = u.breakdown_penglibatan || {};
+    const catIcon = u.kategori_unit === 'Beruniform' ? '🎖️' : u.kategori_unit === 'Kelab' ? '📚' : '⚽';
+    const catColor = u.kategori_unit === 'Beruniform' ? '#1abc9c' : u.kategori_unit === 'Kelab' ? '#9b59b6' : '#f39c12';
+
+    html += '<tr style="border-bottom:1px solid #f0f0f0;">' +
+      '<td style="padding:8px;background:#f8fafc;font-weight:700;color:#2c3e50;border-left:3px solid ' + catColor + ';">' +
+        '<div style="font-size:11px;">' + catIcon + ' ' + escapeHtml(u.nama_unit) + '</div>' +
+        '<div style="font-size:9px;color:#7f8c8d;">' + u.kod_unit + '</div>' +
+      '</td>';
+
+    // P1 cells
+    ['P1_intl','P1_nat','P1_state','P1_bahagian','P1_district','P1_school'].forEach(function(key) {
+      const val = b[key] || 0;
+      html += '<td style="padding:8px;text-align:center;background:' + (val > 0 ? '#ebf5fb' : '#fafbfc') + ';color:' + (val > 0 ? '#1a5276' : '#bdc3c7') + ';font-weight:' + (val > 0 ? '700' : '400') + ';">' + val + '</td>';
+    });
+
+    // P2 cells
+    ['P2_intl','P2_nat','P2_state','P2_bahagian','P2_district','P2_school'].forEach(function(key) {
+      const val = b[key] || 0;
+      html += '<td style="padding:8px;text-align:center;background:' + (val > 0 ? '#fef9e7' : '#fafbfc') + ';color:' + (val > 0 ? '#7d6608' : '#bdc3c7') + ';font-weight:' + (val > 0 ? '700' : '400') + ';">' + val + '</td>';
+    });
+
+    // P3 cells
+    ['P3_intl','P3_nat','P3_state','P3_bahagian','P3_district','P3_school'].forEach(function(key) {
+      const val = b[key] || 0;
+      html += '<td style="padding:8px;text-align:center;background:' + (val > 0 ? '#fdedec' : '#fafbfc') + ';color:' + (val > 0 ? '#c0392b' : '#bdc3c7') + ';font-weight:' + (val > 0 ? '700' : '400') + ';">' + val + '</td>';
+    });
+
+    // Total
+    html += '<td style="padding:8px;text-align:center;background:#eafaf1;color:#1e8449;font-weight:800;font-size:13px;">' + u._total_penglibatan + '</td>';
+
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+
+  // Legend
+  html += '<div style="margin-top:14px;background:#f8fafc;padding:12px;border-radius:8px;font-size:11px;color:#7f8c8d;">' +
+    '<strong>Legend:</strong> ' +
+    '<span style="margin-left:8px;">Int = Antarabangsa</span> · ' +
+    '<span>Keb = Kebangsaan</span> · ' +
+    '<span>Neg = Negeri</span> · ' +
+    '<span>Bah = Bahagian</span> · ' +
+    '<span>Dae = Daerah</span> · ' +
+    '<span>Sek = Sekolah</span>' +
+  '</div>';
+
+  container.innerHTML = html;
+}
+
+/* ============================================================
+   AUTO-LOAD when Tab 3 or Tab 4 active
+   ============================================================ */
+const _origLoadPenyertaanTab = typeof loadPenyertaanTab === 'function' ? loadPenyertaanTab : null;
+if (_origLoadPenyertaanTab) {
+  loadPenyertaanTab = async function(tahun) {
+    await _origLoadPenyertaanTab(tahun);
+    loadMuridUnikByKaum(tahun);
+  };
+}
+
+// Hook into Tab 4 loader to render penglibatan
+const _origLoadPrestasiUnitTab = typeof loadPrestasiUnitTab === 'function' ? loadPrestasiUnitTab : null;
+if (_origLoadPrestasiUnitTab) {
+  loadPrestasiUnitTab = async function(tahun) {
+    await _origLoadPrestasiUnitTab(tahun);
+    // Render penglibatan breakdown from existing data
+    if (tab4AllUnits && tab4AllUnits.length > 0) {
+      renderPenglibatanBreakdown(tab4AllUnits);
+    }
+  };
+}
+
+console.log('✅ Enhancement loaded (Murid Unik + Penglibatan Breakdown)');
+
+
+/* ============================================================
    PENCAPAIAN STEP 12 — FINAL POLISH FUNCTIONS
    ============================================================ */
 
@@ -7793,6 +9398,352 @@ if (_origLoadPencapaianDash) {
     updatePencapaianLastSync();
   };
 }
+
+
+
+/* ============================================================
+   LEVEL DRILL-DOWN MODAL — V2 (with Filter + Sort)
+   ============================================================ */
+let _levelDrillCache = {};
+let _levelDrillCurrentLevel = '';
+let _levelDrillViewMode = 'achievements'; // 'achievements' or 'all'
+let _levelDrillSortMode = 'rank'; // 'rank', 'name', 'date', 'competition'
+let _levelDrillFullData = [];
+
+async function openLevelDrill(level) {
+  const modal = document.getElementById('levelDrillModal');
+  const yearSelect = document.getElementById('pencapaianYearSelect');
+  if (!modal || !yearSelect) return;
+
+  const tahun = yearSelect.value;
+  _levelDrillCurrentLevel = level;
+  _levelDrillViewMode = 'achievements'; // Reset to default
+  _levelDrillSortMode = 'rank';
+
+  const levelConfig = {
+    international: { emoji: '🌍', name: 'International', color: '#e74c3c', gradient: 'linear-gradient(135deg,#e74c3c,#c0392b)', desc: 'Pencapaian peringkat antarabangsa' },
+    national:      { emoji: '🇲🇾', name: 'Kebangsaan',    color: '#f39c12', gradient: 'linear-gradient(135deg,#f39c12,#d68910)', desc: 'Pencapaian peringkat kebangsaan' },
+    state:         { emoji: '🏛️', name: 'Negeri',         color: '#3498db', gradient: 'linear-gradient(135deg,#3498db,#2874a6)', desc: 'Pencapaian peringkat negeri (Sarawak)' },
+    district:      { emoji: '📍', name: 'Daerah',         color: '#9b59b6', gradient: 'linear-gradient(135deg,#9b59b6,#7d3c98)', desc: 'Pencapaian peringkat daerah (Kuching)' },
+    school:        { emoji: '🏫', name: 'Sekolah',        color: '#27ae60', gradient: 'linear-gradient(135deg,#27ae60,#1e8449)', desc: 'Pencapaian peringkat sekolah' }
+  };
+
+  const config = levelConfig[level] || levelConfig.international;
+
+  // Update header
+  const header = document.getElementById('levelDrillHeader');
+  if (header) header.style.background = config.gradient;
+
+  document.getElementById('levelDrillSubtitle').textContent = 'Senarai Pencapaian';
+  document.getElementById('levelDrillTitle').textContent = config.emoji + ' ' + config.name;
+  document.getElementById('levelDrillDesc').textContent = config.desc;
+
+  const search = document.getElementById('levelDrillSearch');
+  if (search) search.value = '';
+
+  modal.style.display = 'flex';
+
+  document.getElementById('levelDrillBody').innerHTML =
+    '<div style="text-align:center;padding:40px;color:#7f8c8d;">' +
+    '<i class="fas fa-spinner fa-spin" style="font-size:36px;"></i>' +
+    '<div style="margin-top:14px;">Memuatkan...</div></div>';
+
+  try {
+    let achievements;
+    if (_levelDrillCache[tahun]) {
+      achievements = _levelDrillCache[tahun];
+    } else {
+      const url = PENCAPAIAN_API_URL + '?action=pencapaian_achievements&tahun=' + tahun + '&_t=' + Date.now();
+      const response = await fetch(url);
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error);
+      achievements = result.data.achievements || [];
+      _levelDrillCache[tahun] = achievements;
+    }
+
+    // Filter by level
+    const filtered = achievements.filter(function(a) {
+      const lvl = String(a.level || '').toLowerCase();
+      if (level === 'international') return lvl === 'international' || lvl === 'antarabangsa';
+      if (level === 'national') return lvl === 'national' || lvl === 'kebangsaan';
+      if (level === 'state') return lvl === 'state' || lvl === 'negeri';
+      if (level === 'district') return lvl === 'daerah' || lvl === 'district';
+      if (level === 'school') return lvl === 'school' || lvl === 'sekolah';
+      return false;
+    });
+
+    _levelDrillFullData = filtered;
+
+    // Render with current view mode
+    renderLevelDrillWithControls();
+
+  } catch (e) {
+    document.getElementById('levelDrillBody').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#e74c3c;">' +
+      '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
+      '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan</div>' +
+      '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div></div>';
+  }
+}
+
+/* ============================================================
+   RENDER WITH VIEW MODE + SORT CONTROLS
+   ============================================================ */
+function renderLevelDrillWithControls() {
+  if (_levelDrillFullData.length === 0) {
+    document.getElementById('levelDrillBody').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#7f8c8d;">' +
+      '<i class="fas fa-folder-open" style="font-size:36px;color:#bdc3c7;"></i>' +
+      '<div style="margin-top:14px;font-weight:600;">Tiada data dijumpai</div></div>';
+    return;
+  }
+
+  // Filter by view mode
+  let data;
+  if (_levelDrillViewMode === 'achievements') {
+    // Exclude "Participation" / "Penyertaan"
+    data = _levelDrillFullData.filter(function(a) {
+      const rank = String(a.rank || '').toLowerCase().trim();
+      return rank !== 'participation' && rank !== 'penyertaan' && rank !== '';
+    });
+  } else {
+    data = _levelDrillFullData.slice(0);
+  }
+
+  // Apply search filter
+  const search = document.getElementById('levelDrillSearch');
+  const searchTerm = search ? search.value.trim().toLowerCase() : '';
+  if (searchTerm) {
+    data = data.filter(function(a) {
+      const searchable = (a.nama_pelajar + ' ' + a.competition + ' ' + (a.description || '') + ' ' + (a.tingkatan || '')).toLowerCase();
+      return searchable.indexOf(searchTerm) !== -1;
+    });
+  }
+
+  // Apply sort
+  applySortToLevelDrill(data);
+
+  // Store globally for export
+  window._currentLevelDrillData = data;
+
+  // Update title with count
+  const levelConfig = {
+    international: '🌍 International',
+    national: '🇲🇾 Kebangsaan',
+    state: '🏛️ Negeri',
+    district: '📍 Daerah',
+    school: '🏫 Sekolah'
+  };
+  document.getElementById('levelDrillTitle').textContent = levelConfig[_levelDrillCurrentLevel] + ' (' + data.length + ')';
+
+  // Render
+  renderLevelDrillList(data);
+}
+
+function applySortToLevelDrill(data) {
+  const rankPriority = {
+    'champion': 1, 'johan': 1, '1st': 1,
+    'runner-up': 2, 'runnerup': 2, 'naib johan': 2, '2nd': 2,
+    '2nd runner-up': 3, '2nd runnerup': 3, '3rd': 3,
+    '3rd runner-up': 4, '4th': 4, '5th': 4,
+    'saguhati': 5, 'consolation': 5,
+    'participation': 6, 'penyertaan': 6
+  };
+
+  if (_levelDrillSortMode === 'rank') {
+    data.sort(function(a, b) {
+      const pa = rankPriority[String(a.rank || '').toLowerCase()] || 99;
+      const pb = rankPriority[String(b.rank || '').toLowerCase()] || 99;
+      return pa - pb;
+    });
+  } else if (_levelDrillSortMode === 'name') {
+    data.sort(function(a, b) {
+      return String(a.nama_pelajar || '').localeCompare(String(b.nama_pelajar || ''));
+    });
+  } else if (_levelDrillSortMode === 'competition') {
+    data.sort(function(a, b) {
+      return String(a.competition || '').localeCompare(String(b.competition || ''));
+    });
+  } else if (_levelDrillSortMode === 'date') {
+    data.sort(function(a, b) {
+      const da = new Date(a.date || 0).getTime();
+      const db = new Date(b.date || 0).getTime();
+      return db - da; // Latest first
+    });
+  } else if (_levelDrillSortMode === 'tingkatan') {
+    data.sort(function(a, b) {
+      return String(a.tingkatan || '').localeCompare(String(b.tingkatan || ''));
+    });
+  }
+}
+
+/* ============================================================
+   RENDER LIST WITH CONTROLS BAR
+   ============================================================ */
+function renderLevelDrillList(achievements) {
+  const body = document.getElementById('levelDrillBody');
+  if (!body) return;
+
+  // Calculate stats
+  let champion = 0, runnerUp = 0, third = 0, others = 0, participation = 0;
+  achievements.forEach(function(a) {
+    const rank = String(a.rank || '').toLowerCase();
+    if (rank === 'champion' || rank === 'johan' || rank === '1st') champion++;
+    else if (rank === 'runner-up' || rank === 'runnerup' || rank === 'naib johan' || rank === '2nd') runnerUp++;
+    else if (rank.includes('2nd runner') || rank === '3rd') third++;
+    else if (rank === 'participation' || rank === 'penyertaan') participation++;
+    else others++;
+  });
+
+  // Update stats
+  document.getElementById('levelDrillTotal').textContent = achievements.length;
+  document.getElementById('levelDrillChampion').textContent = champion;
+  document.getElementById('levelDrillRunnerUp').textContent = runnerUp;
+  document.getElementById('levelDrillThird').textContent = third;
+  document.getElementById('levelDrillOthers').textContent = others + participation;
+
+  // Build controls bar HTML
+  let controlsHtml = '<div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px;background:#fff;border-radius:10px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);align-items:center;">' +
+
+    // View Mode Toggle
+    '<div style="display:flex;align-items:center;gap:8px;">' +
+      '<span style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;">View:</span>' +
+      '<button onclick="setLevelDrillViewMode(\'achievements\')" style="padding:6px 12px;border:1.5px solid ' + (_levelDrillViewMode === 'achievements' ? '#27ae60' : '#dfe6ec') + ';background:' + (_levelDrillViewMode === 'achievements' ? '#27ae60' : '#fff') + ';color:' + (_levelDrillViewMode === 'achievements' ? '#fff' : '#7f8c8d') + ';border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🏆 Pencapaian</button>' +
+      '<button onclick="setLevelDrillViewMode(\'all\')" style="padding:6px 12px;border:1.5px solid ' + (_levelDrillViewMode === 'all' ? '#3498db' : '#dfe6ec') + ';background:' + (_levelDrillViewMode === 'all' ? '#3498db' : '#fff') + ';color:' + (_levelDrillViewMode === 'all' ? '#fff' : '#7f8c8d') + ';border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">👥 Semua</button>' +
+    '</div>' +
+
+    '<div style="width:1px;height:30px;background:#e0e0e0;"></div>' +
+
+    // Sort By
+    '<div style="display:flex;align-items:center;gap:8px;">' +
+      '<span style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;">Sort:</span>' +
+      '<select onchange="setLevelDrillSort(this.value)" style="padding:6px 10px;border:1.5px solid #dfe6ec;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:#2c3e50;background:#fff;">' +
+        '<option value="rank"' + (_levelDrillSortMode === 'rank' ? ' selected' : '') + '>🏆 Mengikut Rank</option>' +
+        '<option value="competition"' + (_levelDrillSortMode === 'competition' ? ' selected' : '') + '>🎯 Mengikut Pertandingan</option>' +
+        '<option value="name"' + (_levelDrillSortMode === 'name' ? ' selected' : '') + '>👤 Mengikut Nama</option>' +
+        '<option value="date"' + (_levelDrillSortMode === 'date' ? ' selected' : '') + '>📅 Mengikut Tarikh (Terkini)</option>' +
+        '<option value="tingkatan"' + (_levelDrillSortMode === 'tingkatan' ? ' selected' : '') + '>📚 Mengikut Tingkatan</option>' +
+      '</select>' +
+    '</div>' +
+
+    '<div style="flex:1;text-align:right;font-size:11px;color:#7f8c8d;">' +
+      '<i class="fas fa-info-circle"></i> Mode: <strong>' + (_levelDrillViewMode === 'achievements' ? 'Anugerah sahaja' : 'Termasuk penyertaan') + '</strong>' +
+    '</div>' +
+
+  '</div>';
+
+  if (achievements.length === 0) {
+    body.innerHTML = controlsHtml + '<div style="text-align:center;padding:40px;color:#7f8c8d;">' +
+      '<i class="fas fa-folder-open" style="font-size:36px;color:#bdc3c7;"></i>' +
+      '<div style="margin-top:14px;font-weight:600;">Tiada data dijumpai</div></div>';
+    return;
+  }
+
+  // Group by competition if sort by competition
+  let html = controlsHtml + '<div style="display:grid;gap:10px;">';
+
+  // If sort by competition, add visual grouping
+  let lastCompetition = '';
+  achievements.forEach(function(a, idx) {
+    const rnkStyle = getRankStyle(a.rank);
+
+    let dateDisplay = '';
+    if (a.date) {
+      const d = new Date(a.date);
+      dateDisplay = !isNaN(d.getTime())
+        ? d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' })
+        : String(a.date).substring(0, 10);
+    }
+
+    // Competition group header
+    if (_levelDrillSortMode === 'competition' && a.competition !== lastCompetition) {
+      html += '<div style="background:linear-gradient(135deg,#1a3c6e,#2874a6);color:#fff;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:800;margin-top:' + (idx === 0 ? '0' : '8px') + ';">' +
+        '🏆 ' + escapeHtml(a.competition) +
+      '</div>';
+      lastCompetition = a.competition;
+    }
+
+    html += '<div style="background:#fff;padding:14px;border-radius:10px;border-left:4px solid ' + rnkStyle.border + ';display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.04);">' +
+      '<div style="font-size:20px;text-align:center;">' + rnkStyle.icon + '</div>' +
+      '<div>' +
+        '<div style="font-size:13px;font-weight:800;color:#2c3e50;margin-bottom:3px;">' + escapeHtml(a.nama_pelajar) + '</div>' +
+        '<div style="font-size:11px;color:#7f8c8d;margin-bottom:6px;">' +
+          '<i class="fas fa-graduation-cap"></i> Tingkatan ' + escapeHtml(a.tingkatan) +
+          (a.bangsa ? ' · ' + escapeHtml(a.bangsa) : '') +
+        '</div>' +
+        (_levelDrillSortMode !== 'competition' ? 
+          '<div style="font-size:11px;color:#34495e;line-height:1.4;">' +
+            '<i class="fas fa-trophy" style="color:#f39c12;"></i> ' + escapeHtml(a.competition) +
+          '</div>' : ''
+        ) +
+        (a.description ? '<div style="font-size:10px;color:#95a5a6;margin-top:2px;"><i class="fas fa-info"></i> ' + escapeHtml(a.description) + '</div>' : '') +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<span style="background:' + rnkStyle.bg + ';color:' + rnkStyle.color + ';padding:4px 10px;border-radius:8px;font-size:10px;font-weight:800;border:1px solid ' + rnkStyle.border + ';display:inline-block;margin-bottom:6px;">' +
+          escapeHtml(a.rank) +
+        '</span>' +
+        (dateDisplay ? '<div style="font-size:10px;color:#95a5a6;"><i class="fas fa-calendar"></i> ' + dateDisplay + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  });
+
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+/* ============================================================
+   CONTROL HANDLERS
+   ============================================================ */
+function setLevelDrillViewMode(mode) {
+  _levelDrillViewMode = mode;
+  renderLevelDrillWithControls();
+}
+
+function setLevelDrillSort(mode) {
+  _levelDrillSortMode = mode;
+  renderLevelDrillWithControls();
+}
+
+/* ============================================================
+   SEARCH FILTER (updated)
+   ============================================================ */
+function filterLevelDrillList() {
+  renderLevelDrillWithControls();
+}
+
+/* ============================================================
+   CLOSE & EXPORT (kekal)
+   ============================================================ */
+function closeLevelDrillModal() {
+  const modal = document.getElementById('levelDrillModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function exportLevelDrillCSV() {
+  const data = window._currentLevelDrillData || [];
+  if (data.length === 0) {
+    alert('⚠️ Tiada data untuk export!');
+    return;
+  }
+
+  const headers = ['No', 'Nama Pelajar', 'Tingkatan', 'Bangsa', 'Pertandingan', 'Description', 'Rank', 'Level', 'Tarikh'];
+  let csv = headers.join(',') + '\n';
+
+  data.forEach(function(a, i) {
+    const row = [i + 1, a.nama_pelajar, a.tingkatan, a.bangsa || '', a.competition, a.description || '', a.rank, a.level, a.date || ''];
+    csv += row.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+  });
+
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Pencapaian_' + _levelDrillCurrentLevel + '_' + _levelDrillViewMode + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+console.log('✅ Level Drill-Down V2 loaded (Filter + Sort + View Mode)');
 
 console.log('🎉 Pencapaian STEP 12 loaded — FINAL POLISH COMPLETE!');
 console.log('═══════════════════════════════════════════════════');
