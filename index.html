@@ -3266,10 +3266,12 @@ body.demo-active .main { margin-top: 98px; }
             <i class="fas fa-calendar"></i> Tahun:
           </label>
           <select id="pencapaianYearSelect" onchange="loadPencapaianDashboard()" style="padding:6px 12px;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;color:#1a3c6e;background:#fff;">
-            <option value="2026">2026 (Semasa)</option>
-            <option value="2025" selected>2025</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
+  <option value="2026_LIVE" selected>📡 2026 (Semasa - Live)</option>
+  <option value="2026">📊 2026 (Data SPKB)</option>
+  <option value="2025">2025</option>
+  <option value="2024">2024</option>
+  <option value="2023">2023</option>
+</select>
           </select>
         </div>
         <div id="pencapaianStatusBadge" style="background:rgba(255,255,255,0.95);color:#7d6608;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
@@ -3945,6 +3947,155 @@ body.demo-active .main { margin-top: 98px; }
 
   <!-- TAB 2: PENCAPAIAN -->
   <div class="pencapaian-tab-content" id="tab-pencapaian" style="display:none;">
+
+<!-- ============================================================
+     PENCAPAIAN SEMASA 2026 (LIVE)
+     Hanya muncul bila tahun yang dipilih = 2026
+     ============================================================ -->
+<div id="laporanSemasa2026" style="display:none;margin-bottom:24px;">
+
+  <!-- HEADER dengan LIVE indicator -->
+  <div style="background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;">
+
+    <div style="position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.2);padding:6px 12px;border-radius:20px;">
+      <span style="display:inline-block;width:8px;height:8px;background:#fff;border-radius:50%;animation:pulse 1.5s infinite;"></span>
+      <span style="font-size:10px;font-weight:800;letter-spacing:1px;">LIVE</span>
+    </div>
+
+    <div style="position:absolute;top:-20px;left:30px;font-size:110px;opacity:0.10;">📡</div>
+
+    <div style="position:relative;z-index:2;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:0.9;margin-bottom:6px;">
+        📡 LAPORAN PENCAPAIAN SEMASA
+      </div>
+      <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;">
+        Pencapaian Tahun Semasa 2026
+      </h2>
+      <p style="font-size:12px;opacity:0.95;margin:0 0 14px 0;">
+        ⚠️ Data ongoing dari laporan guru · Akan dikemaskini penuh akhir Disember
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span style="background:rgba(255,255,255,0.2);padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;">
+          <i class="fas fa-clock"></i> Sync: <span id="laporan2026Sync">--</span>
+        </span>
+        <button onclick="refreshLaporan2026()" style="background:#fff;color:#c0392b;border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">
+          <i class="fas fa-sync"></i> Refresh
+        </button>
+        <button onclick="openLaporan2026FullSheet()" style="background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.4);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">
+          <i class="fas fa-external-link-alt"></i> Buka Sheet Penuh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="laporan2026Loading" style="background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:var(--card-shadow);">
+    <i class="fas fa-spinner fa-spin" style="font-size:36px;color:#e74c3c;"></i>
+    <div style="margin-top:14px;font-size:13px;color:#7f8c8d;">Memuatkan data semasa...</div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="laporan2026Main" style="display:none;">
+
+    <!-- ROW 1: 3 Quick Stats Cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px;">
+
+      <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);border-top:4px solid #e74c3c;position:relative;">
+        <span style="position:absolute;top:14px;right:14px;background:#fdedec;color:#c0392b;padding:3px 10px;border-radius:8px;font-size:9px;font-weight:800;">LIVE</span>
+        <div style="font-size:11px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:10px;">
+          📊 Jumlah Program
+        </div>
+        <div style="font-size:42px;font-weight:900;color:#e74c3c;line-height:1;" id="lap2026TotalProgram">--</div>
+        <div style="font-size:10px;color:#7f8c8d;margin-top:8px;">Aktiviti dilaporkan setakat ini</div>
+      </div>
+
+      <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);border-top:4px solid #3498db;position:relative;">
+        <span style="position:absolute;top:14px;right:14px;background:#ebf5fb;color:#1a5276;padding:3px 10px;border-radius:8px;font-size:9px;font-weight:800;">LIVE</span>
+        <div style="font-size:11px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:10px;">
+          👥 Jumlah Peserta
+        </div>
+        <div style="font-size:42px;font-weight:900;color:#3498db;line-height:1;" id="lap2026TotalPeserta">--</div>
+        <div style="font-size:10px;color:#7f8c8d;margin-top:8px;">Pelajar terlibat dilaporkan</div>
+      </div>
+
+      <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);border-top:4px solid #27ae60;position:relative;">
+        <span style="position:absolute;top:14px;right:14px;background:#eafaf1;color:#1e8449;padding:3px 10px;border-radius:8px;font-size:9px;font-weight:800;">LIVE</span>
+        <div style="font-size:11px;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:10px;">
+          📈 Purata
+        </div>
+        <div style="font-size:42px;font-weight:900;color:#27ae60;line-height:1;" id="lap2026Purata">--</div>
+        <div style="font-size:10px;color:#7f8c8d;margin-top:8px;">Peserta per program</div>
+      </div>
+
+    </div>
+
+    <!-- ROW 2: Breakdown Side-by-Side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+
+      <!-- Breakdown by Peringkat -->
+      <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+          <i class="fas fa-layer-group" style="color:#3498db;"></i> Mengikut Peringkat
+        </h3>
+        <div id="lap2026Peringkat" style="display:grid;gap:8px;">
+          <div style="text-align:center;padding:20px;color:#7f8c8d;">
+            <i class="fas fa-spinner fa-spin"></i> Memuatkan...
+          </div>
+        </div>
+      </div>
+
+      <!-- Breakdown by Pencapaian -->
+      <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0 0 14px 0;padding-bottom:10px;border-bottom:2px solid #f0f0f0;">
+          <i class="fas fa-trophy" style="color:#f39c12;"></i> Mengikut Pencapaian
+        </h3>
+        <div id="lap2026Pencapaian" style="display:grid;gap:8px;">
+          <div style="text-align:center;padding:20px;color:#7f8c8d;">
+            <i class="fas fa-spinner fa-spin"></i> Memuatkan...
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 3: Recent Programs List -->
+    <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:var(--card-shadow);margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;flex-wrap:wrap;gap:10px;">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:0;">
+          <i class="fas fa-history" style="color:#e74c3c;"></i> Program Terkini Dilaporkan
+        </h3>
+        <span style="font-size:11px;color:#7f8c8d;">Semua program · Sorted by tarikh janaan · Auto-grow bila ada data baharu</span>
+      </div>
+      <div id="lap2026Recent">
+        <div style="text-align:center;padding:30px;color:#7f8c8d;">
+          <i class="fas fa-spinner fa-spin"></i> Memuatkan senarai...
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIT NOTICE -->
+    <div style="background:#fef9e7;border-left:4px solid #f39c12;padding:14px 18px;border-radius:10px;">
+      <strong style="font-size:12px;color:#7d6608;">
+        <i class="fas fa-info-circle"></i> Nota untuk Audit:
+      </strong>
+      <div style="font-size:11px;color:#7d6608;margin-top:6px;line-height:1.5;">
+        Data ini adalah <strong>laporan ringkas semasa</strong> dari guru. Data finalized akan dikeyin ke
+        <strong>SPKB_Pencapaian_Database</strong> akhir Disember 2026. Untuk audit lengkap, rujuk data
+        <strong>2025 (finalized)</strong>.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Animation CSS -->
+<style>
+@keyframes pulse {
+  0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+</style>
 
   <!-- ============================================================
        SECTION 1: STUDENT INVOLVEMENT BY LEVEL (NEW!)
@@ -9745,6 +9896,565 @@ function exportLevelDrillCSV() {
 
 console.log('✅ Level Drill-Down V2 loaded (Filter + Sort + View Mode)');
 
+
+/* ============================================================
+   LAPORAN PENCAPAIAN SEMASA 2026 — Live Data Integration
+   ============================================================ */
+
+// ⚠️ CONFIG — Update dengan URL Apps Script anda!
+const LAPORAN_2026_API_URL = 'https://script.google.com/macros/s/AKfycbzXfgwH6gvspGHAMElyyDg-Rpe4xx9BLLLhgvN4oqpYiWcDsjt6r9be5WCy6FjK3k-Y/exec';
+
+// Untuk "Buka Sheet Penuh" button — paste Sheet URL anda
+const LAPORAN_2026_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1GoSKpGz6GOuvyPlCOHxmRlqcVb8cpc90CopfU1XysLc/edit';
+
+const LAPORAN_2026_CURRENT_YEAR = 2026;
+
+/**
+ * Main loader
+ */
+async function loadLaporan2026() {
+  const loading = document.getElementById('laporan2026Loading');
+  const main = document.getElementById('laporan2026Main');
+
+  if (loading) loading.style.display = 'block';
+  if (main) main.style.display = 'none';
+
+  try {
+    // Fetch summary data
+    const url = LAPORAN_2026_API_URL + '?action=summary&_t=' + Date.now();
+    console.log('📡 Fetching Laporan 2026:', url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.error);
+
+    console.log('📡 Laporan 2026 Data:', result.data);
+
+    // Render summary stats
+    renderLaporan2026Summary(result.data);
+
+    // Render breakdowns
+    renderLaporan2026Peringkat(result.data.byPeringkat);
+    renderLaporan2026Pencapaian(result.data.byPencapaian);
+
+    // Update sync time
+    updateLaporan2026Sync();
+
+    // Load recent programs (separate call)
+    loadLaporan2026Recent();
+
+    if (loading) loading.style.display = 'none';
+    if (main) main.style.display = 'block';
+
+  } catch (e) {
+    console.error('📡 Gagal load Laporan 2026:', e);
+    if (loading) {
+      loading.innerHTML = '<div style="color:#e74c3c;">' +
+        '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
+        '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan data semasa</div>' +
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div>' +
+        '<div style="font-size:11px;margin-top:8px;color:#7f8c8d;">💡 Pastikan LAPORAN_2026_API_URL betul</div>' +
+        '</div>';
+    }
+  }
+}
+
+function renderLaporan2026Summary(data) {
+  const totalProgEl = document.getElementById('lap2026TotalProgram');
+  if (totalProgEl) totalProgEl.textContent = (data.totalProgram || 0).toLocaleString();
+
+  const totalPesEl = document.getElementById('lap2026TotalPeserta');
+  if (totalPesEl) totalPesEl.textContent = (data.totalPeserta || 0).toLocaleString();
+
+  const purataEl = document.getElementById('lap2026Purata');
+  if (purataEl) purataEl.textContent = data.purataPesertaPerProgram || '0';
+}
+
+function renderLaporan2026Peringkat(byPeringkat) {
+  const container = document.getElementById('lap2026Peringkat');
+  if (!container) return;
+
+  const peringkatColors = {
+    'Antarabangsa': { bg: '#fdedec', color: '#c0392b', icon: '🌍' },
+    'Kebangsaan': { bg: '#fef9e7', color: '#7d6608', icon: '🇲🇾' },
+    'Negeri': { bg: '#ebf5fb', color: '#1a5276', icon: '🏛️' },
+    'Bahagian': { bg: '#fdf2e9', color: '#a04000', icon: '📍' },
+    'Daerah': { bg: '#f4ecf7', color: '#6c3483', icon: '📌' }
+  };
+
+  // Sort by priority
+  const order = ['Antarabangsa', 'Kebangsaan', 'Negeri', 'Bahagian', 'Daerah'];
+  const sortedKeys = Object.keys(byPeringkat || {}).sort(function(a, b) {
+    const ia = order.indexOf(a);
+    const ib = order.indexOf(b);
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  if (sortedKeys.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#7f8c8d;">Tiada data</div>';
+    return;
+  }
+
+  let html = '';
+  sortedKeys.forEach(function(key) {
+    const item = byPeringkat[key];
+    const cfg = peringkatColors[key] || { bg: '#f0f4f8', color: '#7f8c8d', icon: '📊' };
+
+    html += '<div style="background:' + cfg.bg + ';padding:12px 14px;border-radius:10px;border-left:4px solid ' + cfg.color + ';display:flex;justify-content:space-between;align-items:center;">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:18px;">' + cfg.icon + '</span>' +
+        '<div>' +
+          '<div style="font-size:12px;font-weight:800;color:' + cfg.color + ';">' + key + '</div>' +
+          '<div style="font-size:10px;color:#7f8c8d;">' + item.program + ' program</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<div style="font-size:18px;font-weight:900;color:' + cfg.color + ';">' + item.peserta + '</div>' +
+        '<div style="font-size:9px;color:#7f8c8d;">peserta</div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function renderLaporan2026Pencapaian(byPencapaian) {
+  const container = document.getElementById('lap2026Pencapaian');
+  if (!container) return;
+
+  const pencapaianColors = {
+    'Johan': { bg: '#fef9e7', color: '#7d6608', icon: '🥇' },
+    'Naib Johan': { bg: '#f4f6f7', color: '#566573', icon: '🥈' },
+    'Ketiga': { bg: '#fdf2e9', color: '#a04000', icon: '🥉' },
+    'Penyertaan': { bg: '#ebf5fb', color: '#1a5276', icon: '🎖️' }
+  };
+
+  // Sort by priority
+  const order = ['Johan', 'Naib Johan', 'Ketiga', 'Penyertaan'];
+  const sortedKeys = Object.keys(byPencapaian || {}).sort(function(a, b) {
+    const ia = order.indexOf(a);
+    const ib = order.indexOf(b);
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  if (sortedKeys.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#7f8c8d;">Tiada data</div>';
+    return;
+  }
+
+  let html = '';
+  sortedKeys.forEach(function(key) {
+    const item = byPencapaian[key];
+    const cfg = pencapaianColors[key] || { bg: '#f0f4f8', color: '#7f8c8d', icon: '🏆' };
+
+    html += '<div style="background:' + cfg.bg + ';padding:12px 14px;border-radius:10px;border-left:4px solid ' + cfg.color + ';display:flex;justify-content:space-between;align-items:center;">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:18px;">' + cfg.icon + '</span>' +
+        '<div>' +
+          '<div style="font-size:12px;font-weight:800;color:' + cfg.color + ';">' + key + '</div>' +
+          '<div style="font-size:10px;color:#7f8c8d;">' + item.program + ' program</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<div style="font-size:18px;font-weight:900;color:' + cfg.color + ';">' + item.peserta + '</div>' +
+        '<div style="font-size:9px;color:#7f8c8d;">peserta</div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+async function loadLaporan2026Recent() {
+  try {
+    // Get SEMUA programs (limit tinggi)
+    const url = LAPORAN_2026_API_URL + '?action=recent&limit=10000&_t=' + Date.now();
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.error);
+
+    renderLaporan2026Recent(result.data.programs || [], result.data.total || 0);
+  } catch (e) {
+    console.error('Gagal load recent:', e);
+    const container = document.getElementById('lap2026Recent');
+    if (container) container.innerHTML = '<div style="color:#e74c3c;padding:20px;text-align:center;">Gagal load: ' + e.message + '</div>';
+  }
+}
+
+let _laporan2026AllPrograms = [];
+let _laporan2026FilteredPrograms = [];
+
+function renderLaporan2026Recent(programs, total) {
+  const container = document.getElementById('lap2026Recent');
+  if (!container) return;
+
+  _laporan2026AllPrograms = programs;
+  _laporan2026FilteredPrograms = programs.slice(0);
+
+  if (programs.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:#7f8c8d;">Tiada program dilaporkan</div>';
+    return;
+  }
+
+  // Build search + filter UI + list container
+  let html = 
+    '<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:14px;">' +
+      '<input type="text" id="lap2026SearchInput" placeholder="🔍 Cari nama program / tempat..." oninput="filterLaporan2026Programs()" style="padding:10px 14px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:13px;">' +
+      '<select id="lap2026FilterPeringkat" onchange="filterLaporan2026Programs()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">' +
+        '<option value="">📊 Semua Peringkat</option>' +
+        '<option value="Antarabangsa">🌍 Antarabangsa</option>' +
+        '<option value="Kebangsaan">🇲🇾 Kebangsaan</option>' +
+        '<option value="Negeri">🏛️ Negeri</option>' +
+        '<option value="Bahagian">📍 Bahagian</option>' +
+        '<option value="Daerah">📌 Daerah</option>' +
+      '</select>' +
+      '<select id="lap2026FilterPencapaian" onchange="filterLaporan2026Programs()" style="padding:10px 12px;border:1.5px solid #dfe6ec;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;">' +
+        '<option value="">🏆 Semua Pencapaian</option>' +
+        '<option value="Johan">🥇 Johan</option>' +
+        '<option value="Naib Johan">🥈 Naib Johan</option>' +
+        '<option value="Ketiga">🥉 Ketiga</option>' +
+        '<option value="Penyertaan">🎖️ Penyertaan</option>' +
+      '</select>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:11px;color:#7f8c8d;">' +
+      '<span>Total: <strong id="lap2026FilterCount">' + programs.length + '</strong> program</span>' +
+      '<button onclick="exportLaporan2026CSV()" style="padding:6px 14px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;"><i class="fas fa-file-csv"></i> Export Semua CSV</button>' +
+    '</div>' +
+    '<div id="lap2026ProgramsList" style="max-height:600px;overflow-y:auto;">' + 
+      renderLaporan2026ProgramItems(programs) +
+    '</div>';
+
+  container.innerHTML = html;
+}
+
+function renderLaporan2026ProgramItems(programs) {
+  const peringkatColors = {
+    'Antarabangsa': '#e74c3c', 'Kebangsaan': '#f39c12',
+    'Negeri': '#3498db', 'Bahagian': '#9b59b6', 'Daerah': '#27ae60'
+  };
+  const pencapaianIcons = {
+    'Johan': '🥇', 'Naib Johan': '🥈', 'Ketiga': '🥉', 'Penyertaan': '🎖️'
+  };
+
+  if (programs.length === 0) {
+    return '<div style="text-align:center;padding:30px;color:#7f8c8d;">Tiada program dijumpai</div>';
+  }
+
+  let html = '<div style="display:grid;gap:10px;">';
+  programs.forEach(function(p, idx) {
+    const lvlColor = peringkatColors[p.peringkat] || '#7f8c8d';
+    const pIcon = pencapaianIcons[p.pencapaian] || '🏆';
+
+    let dateDisplay = '';
+    if (p.tarikhJanaan) {
+      const d = new Date(p.tarikhJanaan);
+      if (!isNaN(d.getTime())) dateDisplay = d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short' });
+    }
+
+    html += '<div style="background:#f8fafc;padding:14px;border-radius:10px;border-left:4px solid ' + lvlColor + ';">' +
+      '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;">' +
+        '<div style="background:' + lvlColor + ';color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;">' + (idx + 1) + '</div>' +
+        '<div>' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
+            (p.peringkat ? '<span style="background:' + lvlColor + ';color:#fff;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:800;">' + p.peringkat + '</span>' : '') +
+            (p.pencapaian ? '<span style="background:#fff;color:#7f8c8d;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;border:1px solid #dfe6ec;">' + pIcon + ' ' + p.pencapaian + '</span>' : '') +
+            (dateDisplay ? '<span style="color:#95a5a6;font-size:10px;"><i class="fas fa-calendar"></i> ' + dateDisplay + '</span>' : '') +
+          '</div>' +
+          '<div style="font-size:12px;font-weight:800;color:#2c3e50;line-height:1.4;">' + escapeHtml(p.namaProgram) + '</div>' +
+          (p.tempat ? '<div style="font-size:10px;color:#7f8c8d;margin-top:2px;"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(p.tempat) + '</div>' : '') +
+          (p.maklumat ? '<div style="font-size:10px;color:#95a5a6;margin-top:4px;line-height:1.4;"><i class="fas fa-info"></i> ' + escapeHtml(p.maklumat.substring(0, 150)) + (p.maklumat.length > 150 ? '...' : '') + '</div>' : '') +
+        '</div>' +
+        (p.pdfLink ? '<a href="' + escapeHtml(p.pdfLink) + '" target="_blank" style="background:#3498db;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:700;white-space:nowrap;">' +
+          '<i class="fas fa-file-pdf"></i> PDF' +
+        '</a>' : '') +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function filterLaporan2026Programs() {
+  const search = (document.getElementById('lap2026SearchInput') || {}).value || '';
+  const peringkat = (document.getElementById('lap2026FilterPeringkat') || {}).value || '';
+  const pencapaian = (document.getElementById('lap2026FilterPencapaian') || {}).value || '';
+  
+  const searchLower = search.toLowerCase().trim();
+  
+  _laporan2026FilteredPrograms = _laporan2026AllPrograms.filter(function(p) {
+    if (searchLower) {
+      const searchable = (p.namaProgram + ' ' + p.tempat + ' ' + (p.maklumat || '')).toLowerCase();
+      if (searchable.indexOf(searchLower) === -1) return false;
+    }
+    if (peringkat && p.peringkat !== peringkat) return false;
+    if (pencapaian && p.pencapaian !== pencapaian) return false;
+    return true;
+  });
+  
+  const listEl = document.getElementById('lap2026ProgramsList');
+  if (listEl) listEl.innerHTML = renderLaporan2026ProgramItems(_laporan2026FilteredPrograms);
+  
+  const countEl = document.getElementById('lap2026FilterCount');
+  if (countEl) countEl.textContent = _laporan2026FilteredPrograms.length;
+}
+
+function exportLaporan2026CSV() {
+  const programs = _laporan2026FilteredPrograms;
+  if (programs.length === 0) {
+    alert('⚠️ Tiada data untuk export!');
+    return;
+  }
+  
+  const headers = ['No', 'Tarikh Janaan', 'Nama Program', 'Tempat', 'Peringkat', 'Pencapaian', 'Maklumat', 'PDF Link'];
+  let csv = headers.join(',') + '\n';
+  
+  programs.forEach(function(p, i) {
+    const row = [i + 1, p.tarikhJanaan || '', p.namaProgram, p.tempat || '', p.peringkat || '', p.pencapaian || '', p.maklumat || '', p.pdfLink || ''];
+    csv += row.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+  });
+  
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Laporan_2026_Semasa_' + new Date().toISOString().slice(0, 10) + '.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+function updateLaporan2026Sync() {
+  const el = document.getElementById('laporan2026Sync');
+  if (el) el.textContent = new Date().toLocaleString('ms-MY');
+}
+
+function refreshLaporan2026() {
+  console.log('🔄 Manual refresh...');
+  loadLaporan2026();
+}
+
+function openLaporan2026FullSheet() {
+  if (LAPORAN_2026_SHEET_URL && LAPORAN_2026_SHEET_URL.indexOf('PASTE_YOUR') === -1) {
+    window.open(LAPORAN_2026_SHEET_URL, '_blank');
+  } else {
+    alert('⚠️ Sila konfigurasi LAPORAN_2026_SHEET_URL dalam JavaScript');
+  }
+}
+
+/* ============================================================
+   YEAR MODE MANAGEMENT — Live vs SPKB Data
+   ============================================================ */
+const YEAR_MODE = {
+  LIVE: '2026_LIVE',
+  SPKB_2026: '2026',
+  SPKB_2025: '2025',
+  SPKB_2024: '2024',
+  SPKB_2023: '2023'
+};
+
+function getCurrentYearMode() {
+  const yearSelect = document.getElementById('pencapaianYearSelect');
+  if (!yearSelect) return 'SPKB';
+  
+  const val = yearSelect.value;
+  return val === YEAR_MODE.LIVE ? 'LIVE' : 'SPKB';
+}
+
+function getCurrentYearForAPI() {
+  const yearSelect = document.getElementById('pencapaianYearSelect');
+  if (!yearSelect) return 2025;
+  
+  const val = yearSelect.value;
+  if (val === YEAR_MODE.LIVE) return 2026; // For Live data
+  return parseInt(val);
+}
+
+/**
+ * MAIN CONTROLLER: Show/Hide sections based on year mode
+ */
+function manageSectionVisibility() {
+  const mode = getCurrentYearMode();
+  const tahun = getCurrentYearForAPI();
+
+  console.log('🎯 Year Mode:', mode, '| Year:', tahun);
+
+  // === ELEMENTS ===
+  const laporanSemasa = document.getElementById('laporanSemasa2026');
+  const tab1 = document.getElementById('tab-ringkasan');
+  const tab2 = document.getElementById('tab-pencapaian');
+  const tab3 = document.getElementById('tab-penyertaan');
+  const tab4 = document.getElementById('tab-unit');
+
+  if (mode === 'LIVE') {
+    // ==========================================
+    // LIVE MODE (2026 Semasa)
+    // ==========================================
+
+    // 🎯 TAB 1 RINGKASAN: Show error message
+    if (tab1) {
+      const tab1Sections = tab1.querySelectorAll(':scope > div');
+      tab1Sections.forEach(function(section, idx) {
+        // Hide everything except first error/info message
+        section.style.display = 'none';
+      });
+
+      // Create or show LIVE mode message
+      let liveMsg = document.getElementById('tab1LiveMessage');
+      if (!liveMsg) {
+        liveMsg = document.createElement('div');
+        liveMsg.id = 'tab1LiveMessage';
+        liveMsg.style.cssText = 'background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);margin-bottom:20px;';
+        liveMsg.innerHTML =
+          '<div style="font-size:48px;margin-bottom:14px;">📡</div>' +
+          '<h2 style="font-size:18px;color:#1a3c6e;margin-bottom:8px;">Mode LIVE Aktif</h2>' +
+          '<p style="font-size:13px;color:#7f8c8d;max-width:500px;margin:0 auto;line-height:1.6;">' +
+            'Untuk data Ringkasan, sila pilih <strong>Tab Pencapaian</strong> untuk lihat ' +
+            '<strong>Laporan Pencapaian Semasa 2026</strong> yang dilaporkan oleh guru.' +
+          '</p>' +
+          '<div style="margin-top:18px;display:inline-block;background:#eafaf1;color:#1e8449;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;">' +
+            '<i class="fas fa-arrow-right"></i> Klik Tab Pencapaian' +
+          '</div>';
+        tab1.insertBefore(liveMsg, tab1.firstChild);
+      } else {
+        liveMsg.style.display = 'block';
+      }
+    }
+
+    // 🎯 TAB 2 PENCAPAIAN: Show Laporan 2026 + Hide SPKB sections
+    if (tab2) {
+      const tab2Children = tab2.querySelectorAll(':scope > div');
+      tab2Children.forEach(function(child) {
+        if (child.id === 'laporanSemasa2026') {
+          child.style.display = 'block';
+        } else {
+          child.style.display = 'none';
+        }
+      });
+    }
+    if (laporanSemasa) laporanSemasa.style.display = 'block';
+    loadLaporan2026();
+
+    // 🎯 TAB 3 PENYERTAAN: Show empty/info message
+    if (tab3) {
+      const tab3Sections = tab3.querySelectorAll(':scope > div');
+      tab3Sections.forEach(function(section) {
+        section.style.display = 'none';
+      });
+
+      let liveMsgT3 = document.getElementById('tab3LiveMessage');
+      if (!liveMsgT3) {
+        liveMsgT3 = document.createElement('div');
+        liveMsgT3.id = 'tab3LiveMessage';
+        liveMsgT3.style.cssText = 'background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);margin-bottom:20px;';
+        liveMsgT3.innerHTML =
+          '<div style="font-size:48px;margin-bottom:14px;">📡</div>' +
+          '<h2 style="font-size:18px;color:#1a3c6e;margin-bottom:8px;">Penyertaan 2026 - Mode LIVE</h2>' +
+          '<p style="font-size:13px;color:#7f8c8d;max-width:500px;margin:0 auto;line-height:1.6;">' +
+            'Data Penyertaan finalized akan tersedia selepas data 2026 dikemaskini penuh dalam SPKB (akhir Disember).' +
+            '<br><br>' +
+            'Untuk data semasa, rujuk <strong>Tab Pencapaian → Laporan Semasa 2026</strong>.' +
+          '</p>' +
+          '<div style="margin-top:18px;display:inline-block;background:#fef9e7;color:#7d6608;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;">' +
+            '<i class="fas fa-info-circle"></i> Data belum dikeyin sepenuhnya' +
+          '</div>';
+        tab3.insertBefore(liveMsgT3, tab3.firstChild);
+      } else {
+        liveMsgT3.style.display = 'block';
+      }
+    }
+
+    // 🎯 TAB 4 PRESTASI UNIT: Show empty/info message
+    if (tab4) {
+      const tab4Sections = tab4.querySelectorAll(':scope > div');
+      tab4Sections.forEach(function(section) {
+        section.style.display = 'none';
+      });
+
+      let liveMsgT4 = document.getElementById('tab4LiveMessage');
+      if (!liveMsgT4) {
+        liveMsgT4 = document.createElement('div');
+        liveMsgT4.id = 'tab4LiveMessage';
+        liveMsgT4.style.cssText = 'background:#fff;border-radius:14px;padding:60px 20px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);margin-bottom:20px;';
+        liveMsgT4.innerHTML =
+          '<div style="font-size:48px;margin-bottom:14px;">📡</div>' +
+          '<h2 style="font-size:18px;color:#1a3c6e;margin-bottom:8px;">Prestasi Unit 2026 - Mode LIVE</h2>' +
+          '<p style="font-size:13px;color:#7f8c8d;max-width:500px;margin:0 auto;line-height:1.6;">' +
+            'Data Prestasi Unit finalized akan tersedia selepas data 2026 dikemaskini penuh dalam SPKB (akhir Disember).' +
+            '<br><br>' +
+            'Untuk data semasa, rujuk <strong>Tab Pencapaian → Laporan Semasa 2026</strong>.' +
+          '</p>' +
+          '<div style="margin-top:18px;display:inline-block;background:#fef9e7;color:#7d6608;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;">' +
+            '<i class="fas fa-info-circle"></i> Data belum dikeyin sepenuhnya' +
+          '</div>';
+        tab4.insertBefore(liveMsgT4, tab4.firstChild);
+      } else {
+        liveMsgT4.style.display = 'block';
+      }
+    }
+
+  } else {
+    // ==========================================
+    // SPKB MODE (2025, 2024, 2023, 2026 finalized)
+    // ==========================================
+
+    // 🎯 TAB 1 RINGKASAN: Restore original sections
+    if (tab1) {
+      const tab1Sections = tab1.querySelectorAll(':scope > div');
+      tab1Sections.forEach(function(section) {
+        section.style.display = '';
+      });
+
+      const liveMsg = document.getElementById('tab1LiveMessage');
+      if (liveMsg) liveMsg.style.display = 'none';
+    }
+
+    // 🎯 TAB 2 PENCAPAIAN: Hide Laporan 2026, show SPKB sections
+    if (tab2) {
+      const tab2Children = tab2.querySelectorAll(':scope > div');
+      tab2Children.forEach(function(child) {
+        if (child.id === 'laporanSemasa2026') {
+          child.style.display = 'none';
+        } else {
+          child.style.display = '';
+        }
+      });
+    }
+
+    // 🎯 TAB 3 PENYERTAAN: Restore original sections
+    if (tab3) {
+      const tab3Sections = tab3.querySelectorAll(':scope > div');
+      tab3Sections.forEach(function(section) {
+        section.style.display = '';
+      });
+
+      const liveMsgT3 = document.getElementById('tab3LiveMessage');
+      if (liveMsgT3) liveMsgT3.style.display = 'none';
+    }
+
+    // 🎯 TAB 4 PRESTASI UNIT: Restore original sections
+    if (tab4) {
+      const tab4Sections = tab4.querySelectorAll(':scope > div');
+      tab4Sections.forEach(function(section) {
+        section.style.display = '';
+      });
+
+      const liveMsgT4 = document.getElementById('tab4LiveMessage');
+      if (liveMsgT4) liveMsgT4.style.display = 'none';
+    }
+
+    // Load SPKB data for selected year (Tab 2)
+    if (typeof loadAchievementsTab === 'function') {
+      loadAchievementsTab(tahun);
+    }
+  }
+}
+
+console.log('✅ Year Mode Management loaded');
+
 console.log('🎉 Pencapaian STEP 12 loaded — FINAL POLISH COMPLETE!');
 console.log('═══════════════════════════════════════════════════');
 console.log('🏆 PENCAPAIAN MODULE 100% COMPLETE!');
@@ -9921,6 +10631,130 @@ updateNotifBadge = function() {
   _origUpdateNotifBadge();
   syncAdminNotifBadge();
 };
+
+
+/* ============================================================
+   PATCH: Skip SPKB API calls for LIVE mode (2026_LIVE)
+   ============================================================ */
+
+// Save original functions
+const _origLoadPencapaianDashboardSPKB = loadPencapaianDashboard;
+const _origLoadAchievementsTabSPKB = typeof loadAchievementsTab === 'function' ? loadAchievementsTab : null;
+const _origLoadPenyertaanTabSPKB = typeof loadPenyertaanTab === 'function' ? loadPenyertaanTab : null;
+const _origLoadPrestasiUnitTabSPKB = typeof loadPrestasiUnitTab === 'function' ? loadPrestasiUnitTab : null;
+const _origLoadAllCompetitionsSPKB = typeof loadAllCompetitions === 'function' ? loadAllCompetitions : null;
+
+/**
+ * Helper: Check if current mode is LIVE
+ */
+function isLiveMode() {
+  const yearSelect = document.getElementById('pencapaianYearSelect');
+  if (!yearSelect) return false;
+  return yearSelect.value === '2026_LIVE';
+}
+
+/**
+ * OVERRIDE: loadPencapaianDashboard — skip SPKB calls in LIVE mode
+ */
+loadPencapaianDashboard = async function() {
+  if (isLiveMode()) {
+    console.log('🎯 LIVE Mode: Skipping SPKB dashboard load');
+
+    // Hide status badge to avoid "Error"
+    const statusBadge = document.getElementById('pencapaianStatusBadge');
+    if (statusBadge) statusBadge.style.display = 'none';
+
+    // Just manage section visibility
+    manageSectionVisibility();
+    return;
+  }
+
+  // Show status badge
+  const statusBadge = document.getElementById('pencapaianStatusBadge');
+  if (statusBadge) statusBadge.style.display = 'flex';
+
+  // Normal SPKB mode
+  if (_origLoadPencapaianDashboardSPKB) {
+    await _origLoadPencapaianDashboardSPKB();
+  }
+
+  manageSectionVisibility();
+};
+
+/**
+ * OVERRIDE: loadAchievementsTab
+ */
+if (_origLoadAchievementsTabSPKB) {
+  loadAchievementsTab = async function(tahun) {
+    if (isLiveMode()) {
+      console.log('🎯 LIVE Mode: Skipping SPKB achievements load');
+      return;
+    }
+    // Convert to number if string
+    const yearNum = Number(tahun);
+    if (isNaN(yearNum)) {
+      console.warn('⚠️ Invalid year:', tahun);
+      return;
+    }
+    return await _origLoadAchievementsTabSPKB(yearNum);
+  };
+}
+
+/**
+ * OVERRIDE: loadPenyertaanTab
+ */
+if (_origLoadPenyertaanTabSPKB) {
+  loadPenyertaanTab = async function(tahun) {
+    if (isLiveMode()) {
+      console.log('🎯 LIVE Mode: Skipping SPKB penyertaan load');
+      return;
+    }
+    const yearNum = Number(tahun);
+    if (isNaN(yearNum)) {
+      console.warn('⚠️ Invalid year:', tahun);
+      return;
+    }
+    return await _origLoadPenyertaanTabSPKB(yearNum);
+  };
+}
+
+/**
+ * OVERRIDE: loadPrestasiUnitTab
+ */
+if (_origLoadPrestasiUnitTabSPKB) {
+  loadPrestasiUnitTab = async function(tahun) {
+    if (isLiveMode()) {
+      console.log('🎯 LIVE Mode: Skipping SPKB prestasi unit load');
+      return;
+    }
+    const yearNum = Number(tahun);
+    if (isNaN(yearNum)) {
+      console.warn('⚠️ Invalid year:', tahun);
+      return;
+    }
+    return await _origLoadPrestasiUnitTabSPKB(yearNum);
+  };
+}
+
+/**
+ * OVERRIDE: loadAllCompetitions
+ */
+if (_origLoadAllCompetitionsSPKB) {
+  loadAllCompetitions = async function(tahun) {
+    if (isLiveMode()) {
+      console.log('🎯 LIVE Mode: Skipping SPKB all competitions load');
+      return;
+    }
+    const yearNum = Number(tahun);
+    if (isNaN(yearNum)) {
+      console.warn('⚠️ Invalid year:', tahun);
+      return;
+    }
+    return await _origLoadAllCompetitionsSPKB(yearNum);
+  };
+}
+
+console.log('✅ LIVE Mode Patch loaded — SPKB calls skipped for 2026_LIVE');
 
 </script>
 
