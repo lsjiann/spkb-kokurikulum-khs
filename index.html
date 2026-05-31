@@ -1816,6 +1816,12 @@ body.demo-active .main { margin-top: 98px; }
   .session-banner { flex-direction: column; }
   .session-stats { width: 100%; justify-content: space-around; }
 }
+/* Animation: pulse (dipindah dari <body> ke <head>) */
+@keyframes pulse {
+  0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
 </style>
 
 </head>
@@ -4497,14 +4503,6 @@ body.demo-active .main { margin-top: 98px; }
   </div>
 </div>
 
-<!-- Animation CSS -->
-<style>
-@keyframes pulse {
-  0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
-  50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(255,255,255,0); }
-  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-}
-</style>
 
   <!-- ============================================================
        SECTION 1: STUDENT INVOLVEMENT BY LEVEL (NEW!)
@@ -5460,6 +5458,12 @@ function navigateTo(pageId) {
   }
   if (pageId === 'pajsk') {
     setTimeout(loadPAJSKDashboard, 100);
+  }
+  if (pageId === 'pencapaian') {
+    setTimeout(loadPencapaianDashboard, 100);
+  }
+  if (pageId === 'jana') {
+    setTimeout(loadJanaDokumen, 100);
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -11523,18 +11527,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-/* ============================================================
-   Hook into navigateTo
-   ============================================================ */
-const _origNavigateForJana = typeof navigateTo === 'function' ? navigateTo : null;
-if (_origNavigateForJana) {
-  navigateTo = function(pageId) {
-    _origNavigateForJana(pageId);
-    if (pageId === 'jana') {
-      setTimeout(loadJanaDokumen, 100);
-    }
-  };
-}
+/* Auto-load 'jana' dikendali dalam navigateTo (dikonsolidasi) */
 
 /* Add CSS animations */
 const _janaStyle = document.createElement('style');
@@ -11545,33 +11538,9 @@ document.head.appendChild(_janaStyle);
 
 console.log('✅ Modul Jana Dokumen loaded');
 
-console.log('🎉 Pencapaian STEP 12 loaded — FINAL POLISH COMPLETE!');
-console.log('═══════════════════════════════════════════════════');
-console.log('🏆 PENCAPAIAN MODULE 100% COMPLETE!');
-console.log('═══════════════════════════════════════════════════');
-console.log('Total Features Built:');
-console.log('  ✅ Tab 1: Ringkasan (Hero Stats, Hall of Fame, Featured)');
-console.log('  ✅ Tab 2: Pencapaian (Chart + Searchable Table)');
-console.log('  ✅ Tab 3: Penyertaan (Demographics + Top Units)');
-console.log('  ✅ Tab 4: Prestasi Unit (Heatmap + Detail Table)');
-console.log('  ✅ Smart Features Banner');
-console.log('  ✅ Quick Actions Panel');
-console.log('  ✅ Success Banner');
-console.log('  ✅ Print-Ready Styles');
-console.log('  ✅ Master CSV Export');
-console.log('  ✅ Live Google Sheets Sync');
-console.log('═══════════════════════════════════════════════════');
+console.log('✅ Pencapaian module loaded');
 
-/* ============================================================
-   AUTO-LOAD when navigating to Pencapaian
-   ============================================================ */
-const _origNavigateToPencapaian = navigateTo;
-navigateTo = function(pageId) {
-  _origNavigateToPencapaian(pageId);
-  if (pageId === 'pencapaian') {
-    setTimeout(loadPencapaianDashboard, 100);
-  }
-};
+/* Auto-load 'pencapaian' dikendali dalam navigateTo (dikonsolidasi) */
 
 console.log('✅ Pencapaian module foundation loaded (STEP 1-3)');
 
@@ -11849,18 +11818,13 @@ console.log('✅ LIVE Mode Patch loaded — SPKB calls skipped for 2026_LIVE');
 </script>
 
 <!-- ============================================================
-     DATA PELAJAR MODULE v3.2 — CLEAN SLATE (modul lama & Ultimate Fix dibuang)
-     ============================================================ -->
-<!-- ============================================================
      DATA PELAJAR MODULE v3.2 — CLEAN VERSION
-     Paste BEFORE </body>
      ============================================================ -->
 <script>
 console.log('🚀 [DataPelajar] Loading module...');
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+<!-- Chart.js dimuatkan sekali di <head> -->
 <script>
 (function() {
   'use strict';
@@ -11998,6 +11962,40 @@ console.log('🚀 [DataPelajar] Loading module...');
       #dpModal .m-koko { display: flex; align-items: flex-start; gap: 16px; padding: 18px; background: white; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; }
       #dpModal .m-koko-i { width: 48px; height: 48px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; flex-shrink: 0; }
       #dpModal .m-f { padding: 16px 28px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+      /* PENCAPAIAN TAB STYLES */
+      #dpModal .ach-loading { text-align: center; padding: 40px 20px; color: #64748b; }
+      #dpModal .ach-empty { text-align: center; padding: 40px 20px; }
+      #dpModal .ach-empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+      #dpModal .ach-empty-title { font-size: 16px; font-weight: 700; color: #334155; margin-bottom: 8px; }
+      #dpModal .ach-empty-msg { font-size: 14px; color: #64748b; line-height: 1.6; max-width: 400px; margin: 0 auto 16px; }
+      #dpModal .ach-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 24px; }
+      #dpModal .ach-stat { background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 16px; border-radius: 8px; text-align: center; border: 1px solid #fbbf24; }
+      #dpModal .ach-stat-v { font-size: 28px; font-weight: 800; color: #92400e; line-height: 1; margin-bottom: 4px; }
+      #dpModal .ach-stat-l { font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.05em; }
+      #dpModal .ach-section-title { font-size: 14px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 12px; }
+      #dpModal .ach-card { background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 12px; transition: all 0.2s; }
+      #dpModal .ach-card:hover { border-color: #fbbf24; transform: translateX(4px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+      #dpModal .ach-card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+      #dpModal .ach-rank-badge { width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; color: white; font-weight: 800; }
+      #dpModal .ach-rank-champion { background: linear-gradient(135deg, #f59e0b, #d97706); }
+      #dpModal .ach-rank-runner { background: linear-gradient(135deg, #6b7280, #4b5563); }
+      #dpModal .ach-rank-runner2 { background: linear-gradient(135deg, #a16207, #854d0e); }
+      #dpModal .ach-rank-runner3 { background: linear-gradient(135deg, #84cc16, #65a30d); }
+      #dpModal .ach-rank-other { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+      #dpModal .ach-rank-part { background: linear-gradient(135deg, #94a3b8, #64748b); }
+      #dpModal .ach-card-info { flex: 1; min-width: 0; }
+      #dpModal .ach-competition { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; word-break: break-word; }
+      #dpModal .ach-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; }
+      #dpModal .ach-meta-i { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 100px; font-weight: 600; }
+      #dpModal .ach-meta-rank { background: #fef3c7; color: #92400e; }
+      #dpModal .ach-meta-level { background: #dbeafe; color: #1e40af; }
+      #dpModal .ach-meta-category { background: #ede9fe; color: #6b21a8; }
+      #dpModal .ach-meta-year { background: #d1fae5; color: #065f46; }
+      #dpModal .ach-meta-date { background: #f1f5f9; color: #475569; }
+      #dpModal .ach-info-banner { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 1px solid #3b82f6; border-radius: 8px; padding: 16px; margin-bottom: 16px; color: #1e40af; }
+      #dpModal .ach-info-banner-title { font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+      #dpModal .ach-cross-link { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; font-family: inherit; font-size: 14px; transition: all 0.2s; }
+      #dpModal .ach-cross-link:hover { transform: translateY(-2px); box-shadow: 0 8px 12px rgba(37, 99, 235, 0.3); }
       @media (max-width: 900px) { #page-pelajar .dp-filters { grid-template-columns: 1fr 1fr; } #page-pelajar .dp-sb { grid-column: 1 / -1; } }
       @media (max-width: 600px) { #page-pelajar .dp-filters { grid-template-columns: 1fr; } }
     `;
@@ -12087,11 +12085,13 @@ console.log('🚀 [DataPelajar] Loading module...');
           <button class="m-tab active" data-tab="p" onclick="DataPelajar.switchTab('p')">📋 Maklumat Peribadi</button>
           <button class="m-tab" data-tab="k" onclick="DataPelajar.switchTab('k')">🏃 Kokurikulum</button>
           <button class="m-tab" data-tab="a" onclick="DataPelajar.switchTab('a')">📚 Akademik</button>
+          <button class="m-tab" data-tab="ach" onclick="DataPelajar.switchTab('ach')">🏆 Pencapaian</button>
         </div>
         <div class="m-body">
           <div class="m-tc active" id="dp-t-p"><div class="m-ig" id="dp-i-p"></div></div>
           <div class="m-tc" id="dp-t-k"><div id="dp-i-k"></div></div>
           <div class="m-tc" id="dp-t-a"><div class="m-ig" id="dp-i-a"></div></div>
+          <div class="m-tc" id="dp-t-ach"><div id="dp-i-ach"></div></div>
         </div>
         <div class="m-f">
           <button class="dp-clr" onclick="DataPelajar.closeProfile()">Tutup</button>
@@ -12107,8 +12107,23 @@ console.log('🚀 [DataPelajar] Loading module...');
   // MAIN LOGIC
   // ============================================================
   
-  async function api(action) {
+    async function api(action) {
     const res = await fetch(API_URL + '?action=' + action);
+    return res.json();
+  }
+  
+  // ⭐ ADD THIS NEW FUNCTION
+  async function apiWithParams(action, params) {
+    const url = new URL(API_URL);
+    url.searchParams.append('action', action);
+    if (params) {
+      Object.keys(params).forEach(function(key) {
+        if (params[key] !== undefined && params[key] !== null) {
+          url.searchParams.append(key, params[key]);
+        }
+      });
+    }
+    const res = await fetch(url.toString());
     return res.json();
   }
   
@@ -12229,6 +12244,174 @@ console.log('🚀 [DataPelajar] Loading module...');
     state.currentPage = 1;
     renderTable();
   }
+
+  // ⭐ ADD THIS NEW FUNCTION
+  async function loadStudentAchievements(student) {
+    const container = document.getElementById('dp-i-ach');
+    if (!container) return;
+    
+    // Show loading
+    container.innerHTML = `
+      <div class="ach-loading">
+        <div style="font-size: 32px; margin-bottom: 12px;">⏳</div>
+        <div>Memuatkan rekod pencapaian...</div>
+      </div>
+    `;
+    
+    try {
+      const result = await apiWithParams('student_achievements', {
+        nama: student.nama,
+        tingkatan: student.tingkatan
+      });
+      
+      if (!result.success) {
+        container.innerHTML = `
+          <div class="ach-empty">
+            <div class="ach-empty-icon">⚠️</div>
+            <div class="ach-empty-title">Ralat Memuatkan Data</div>
+            <div class="ach-empty-msg">${result.error || 'Tidak dapat memuatkan rekod pencapaian'}</div>
+          </div>
+        `;
+        return;
+      }
+      
+      renderAchievements(student, result);
+      
+    } catch (err) {
+      console.error('Error loading achievements:', err);
+      container.innerHTML = `
+        <div class="ach-empty">
+          <div class="ach-empty-icon">⚠️</div>
+          <div class="ach-empty-title">Ralat Rangkaian</div>
+          <div class="ach-empty-msg">Tidak dapat menyambung ke server. Sila cuba lagi.</div>
+        </div>
+      `;
+    }
+  }
+  
+  function renderAchievements(student, data) {
+    const container = document.getElementById('dp-i-ach');
+    
+    // EMPTY STATE - No achievements found
+    if (!data.achievements || data.achievements.length === 0) {
+      // Check if Tingkatan 1 (new student)
+      const isTingkatanSatu = String(student.tingkatan || '').toLowerCase().indexOf('satu') !== -1 ||
+                              String(student.kelas || '').startsWith('1');
+      
+      if (isTingkatanSatu) {
+        // New student message
+        container.innerHTML = `
+          <div class="ach-info-banner">
+            <div class="ach-info-banner-title">ℹ️ Pelajar Baru</div>
+            <div style="font-size: 13px;">
+              Pelajar ini memulakan perjalanan kokurikulum di tingkatan 1 (${student.tahun || '2026'}).
+              Rekod pencapaian akan tersedia sebaik sahaja data pencapaian tahun ${student.tahun || '2026'} dikemaskini.
+            </div>
+          </div>
+          <div class="ach-empty">
+            <div class="ach-empty-icon">🌱</div>
+            <div class="ach-empty-title">Belum Ada Rekod Pencapaian</div>
+            <div class="ach-empty-msg">
+              Pelajar baru memulakan perjalanan kokurikulum.<br>
+              Galakkan penyertaan dalam aktiviti untuk membina rekod cemerlang!
+            </div>
+            <button class="ach-cross-link" onclick="alert('Buka tab Pencapaian untuk lihat semua rekod sekolah')">
+              🏆 Lihat Modul Pencapaian
+            </button>
+          </div>
+        `;
+      } else {
+        // Continuing student but no record
+        container.innerHTML = `
+          <div class="ach-empty">
+            <div class="ach-empty-icon">📭</div>
+            <div class="ach-empty-title">Tiada Rekod Dijumpai</div>
+            <div class="ach-empty-msg">
+              Tiada rekod pencapaian dijumpai untuk pelajar ini dalam pangkalan data.<br>
+              <strong>${student.nama}</strong> (${student.tingkatan || '-'})
+            </div>
+            <div style="margin-top: 16px; font-size: 12px; color: #94a3b8;">
+              💡 Nama mesti match dengan pencapaian database.<br>
+              Jika ada perbezaan ejaan, sila kemaskini.
+            </div>
+          </div>
+        `;
+      }
+      return;
+    }
+    
+    // HAS ACHIEVEMENTS - Render full view
+    const b = data.breakdown;
+    let html = '';
+    
+    // Stats summary cards
+    html += `
+      <div class="ach-stats">
+        <div class="ach-stat">
+          <div class="ach-stat-v">${b.total}</div>
+          <div class="ach-stat-l">Total Pencapaian</div>
+        </div>
+        <div class="ach-stat">
+          <div class="ach-stat-v">${b.by_rank.champion || 0}</div>
+          <div class="ach-stat-l">🏆 Champion</div>
+        </div>
+        <div class="ach-stat">
+          <div class="ach-stat-v">${b.by_level.international || 0}</div>
+          <div class="ach-stat-l">🌍 International</div>
+        </div>
+        <div class="ach-stat">
+          <div class="ach-stat-v">${b.by_level.national || 0}</div>
+          <div class="ach-stat-l">🇲🇾 National</div>
+        </div>
+      </div>
+    `;
+    
+    // Year breakdown if multiple years
+    const years = Object.keys(b.by_year).sort(function(a, b) { return parseInt(b) - parseInt(a); });
+    if (years.length > 1) {
+      html += `<div class="ach-section-title">📅 Mengikut Tahun</div>`;
+      html += `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">`;
+      years.forEach(function(yr) {
+        html += `<span class="ach-meta-i ach-meta-year">${yr}: ${b.by_year[yr]}</span>`;
+      });
+      html += `</div>`;
+    }
+    
+    // Achievements list
+    html += `<div class="ach-section-title">🏅 Senarai Pencapaian (${data.achievements.length})</div>`;
+    
+    data.achievements.forEach(function(a) {
+      const rank = String(a.rank || '').toLowerCase();
+      let rankClass = 'ach-rank-other';
+      let rankEmoji = '🎖️';
+      
+      if (rank.indexOf('champion') !== -1) { rankClass = 'ach-rank-champion'; rankEmoji = '🥇'; }
+      else if (rank.indexOf('second runner') !== -1) { rankClass = 'ach-rank-runner2'; rankEmoji = '🥉'; }
+      else if (rank.indexOf('third runner') !== -1) { rankClass = 'ach-rank-runner3'; rankEmoji = '4️⃣'; }
+      else if (rank.indexOf('runner') !== -1) { rankClass = 'ach-rank-runner'; rankEmoji = '🥈'; }
+      else if (rank.indexOf('participation') !== -1) { rankClass = 'ach-rank-part'; rankEmoji = '🎗️'; }
+      
+      html += `
+        <div class="ach-card">
+          <div class="ach-card-header">
+            <div class="ach-rank-badge ${rankClass}">${rankEmoji}</div>
+            <div class="ach-card-info">
+              <div class="ach-competition">${a.competition || '-'}</div>
+              <div class="ach-meta">
+                ${a.rank ? `<span class="ach-meta-i ach-meta-rank">🏆 ${a.rank}</span>` : ''}
+                ${a.level ? `<span class="ach-meta-i ach-meta-level">📊 ${a.level}</span>` : ''}
+                ${a.category ? `<span class="ach-meta-i ach-meta-category">📂 ${a.category}</span>` : ''}
+                ${a.tahun ? `<span class="ach-meta-i ach-meta-year">📅 ${a.tahun}</span>` : ''}
+                ${a.date ? `<span class="ach-meta-i ach-meta-date">🗓️ ${a.date}</span>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+  }
   
   function renderTable() {
     const total = state.filteredStudents.length;
@@ -12297,6 +12480,8 @@ console.log('🚀 [DataPelajar] Loading module...');
       
       const a = [['🏫 Sekolah', 'SMK Tinggi Kuching'], ['📚 Tingkatan', s.tingkatan], ['🎓 Kelas', s.kelas], ['📅 Tahun', new Date().getFullYear()], ['✅ Status', s.status_aktif || 'Aktif']];
       document.getElementById('dp-i-a').innerHTML = a.map(it => `<div class="m-ii"><div class="m-il">${it[0]}</div><div class="m-iv">${it[1]||'-'}</div></div>`).join('');
+            // ⭐ Load achievements asynchronously
+      loadStudentAchievements(s);
       
       document.getElementById('dpModal').classList.add('active');
       document.body.style.overflow = 'hidden';
