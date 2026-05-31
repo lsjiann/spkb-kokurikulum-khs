@@ -11841,7 +11841,7 @@ console.log('🚀 [DataPelajar] Loading module...');
     'YAKIN':     { warna: '#EAB308', label: 'Kuning', emoji: '🟡' }
   };
   
-  const state = {
+    let state = {
     initialized: false,
     loading: false,
     stats: null,
@@ -11850,7 +11850,24 @@ console.log('🚀 [DataPelajar] Loading module...');
     charts: { tingkatan: null, bangsa: null },
     currentPage: 1,
     filteredStudents: [],
-    filters: { search: '', tingkatan: '', rumah_sukan: '', bangsa: '' }
+    filters: { 
+      search: '', 
+      tingkatan: '', 
+      rumah_sukan: '', 
+      bangsa: '',
+      uniform: '',
+      kelab: '',
+      sukan: '',
+      gender_male: false,
+      gender_female: false,
+      has_uniform: false,
+      has_kelab: false,
+      has_sukan: false,
+      multi_activity: false,
+      quick_aktif: false,
+      quick_iban: false
+    },
+    quickFilters: []
   };
   
   // ============================================================
@@ -11996,6 +12013,329 @@ console.log('🚀 [DataPelajar] Loading module...');
       #dpModal .ach-info-banner-title { font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
       #dpModal .ach-cross-link { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; font-family: inherit; font-size: 14px; transition: all 0.2s; }
       #dpModal .ach-cross-link:hover { transform: translateY(-2px); box-shadow: 0 8px 12px rgba(37, 99, 235, 0.3); }
+            
+      /* ANALYTICS DASHBOARD */
+      #page-pelajar .dp-analytics { margin-bottom: 24px; }
+      
+      #page-pelajar .dp-analytics-h { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0; }
+      #page-pelajar .dp-analytics-h-icon { font-size: 28px; }
+      #page-pelajar .dp-analytics-h-text h2 { font-size: 20px; font-weight: 800; color: #0f172a; margin: 0; }
+      #page-pelajar .dp-analytics-h-text p { font-size: 13px; color: #64748b; margin: 2px 0 0; }
+      
+      /* OVERVIEW CARDS */
+      #page-pelajar .dp-ovr-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+      #page-pelajar .dp-ovr-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
+      #page-pelajar .dp-ovr-card::before { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; border-radius: 50%; opacity: 0.1; }
+      #page-pelajar .dp-ovr-card.c-rainbow::before { background: linear-gradient(135deg, #ec4899, #8b5cf6); }
+      #page-pelajar .dp-ovr-card.c-balance::before { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+      #page-pelajar .dp-ovr-card.c-active::before { background: linear-gradient(135deg, #10b981, #16a34a); }
+      #page-pelajar .dp-ovr-card.c-trophy::before { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+      
+      #page-pelajar .dp-ovr-icon { font-size: 32px; margin-bottom: 8px; position: relative; z-index: 1; }
+      #page-pelajar .dp-ovr-value { font-size: 32px; font-weight: 800; color: #0f172a; line-height: 1; margin-bottom: 6px; position: relative; z-index: 1; }
+      #page-pelajar .dp-ovr-label { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; position: relative; z-index: 1; }
+      #page-pelajar .dp-ovr-sub { font-size: 12px; color: #475569; position: relative; z-index: 1; }
+      #page-pelajar .dp-ovr-tag { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; margin-top: 4px; }
+      #page-pelajar .dp-ovr-tag.excellent { background: #d1fae5; color: #065f46; }
+      #page-pelajar .dp-ovr-tag.good { background: #dbeafe; color: #1e40af; }
+      #page-pelajar .dp-ovr-tag.warning { background: #fef3c7; color: #92400e; }
+      #page-pelajar .dp-ovr-tag.critical { background: #fee2e2; color: #991b1b; }
+      
+      /* PENGLIBATAN BARS */
+      #page-pelajar .dp-part-section { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 24px; }
+      #page-pelajar .dp-part-item { margin-bottom: 16px; }
+      #page-pelajar .dp-part-item:last-child { margin-bottom: 0; }
+      #page-pelajar .dp-part-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      #page-pelajar .dp-part-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #0f172a; }
+      #page-pelajar .dp-part-value { font-size: 14px; font-weight: 700; color: #475569; }
+      #page-pelajar .dp-part-bar-bg { background: #f1f5f9; height: 10px; border-radius: 100px; overflow: hidden; }
+      #page-pelajar .dp-part-bar { height: 100%; border-radius: 100px; transition: width 1s; }
+      #page-pelajar .dp-part-bar.b-uniform { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+      #page-pelajar .dp-part-bar.b-kelab { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+      #page-pelajar .dp-part-bar.b-sukan { background: linear-gradient(90deg, #16a34a, #4ade80); }
+      
+      #page-pelajar .dp-insight { margin-top: 16px; padding: 12px 16px; background: linear-gradient(135deg, #dbeafe, #ede9fe); border-radius: 8px; font-size: 13px; color: #1e40af; display: flex; align-items: flex-start; gap: 10px; }
+      #page-pelajar .dp-insight-icon { font-size: 20px; flex-shrink: 0; }
+      
+      /* TOP UNITS GRID */
+      #page-pelajar .dp-top-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-bottom: 24px; }
+      #page-pelajar .dp-top-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+      #page-pelajar .dp-top-h { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+      #page-pelajar .dp-top-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 6px; margin-bottom: 6px; transition: background 0.2s; }
+      #page-pelajar .dp-top-item:hover { background: #f8fafc; }
+      #page-pelajar .dp-top-rank { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: white; flex-shrink: 0; }
+      #page-pelajar .dp-top-rank.r1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+      #page-pelajar .dp-top-rank.r2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+      #page-pelajar .dp-top-rank.r3 { background: linear-gradient(135deg, #a16207, #854d0e); }
+      #page-pelajar .dp-top-rank.r4, #page-pelajar .dp-top-rank.r5 { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+      #page-pelajar .dp-top-name { flex: 1; font-size: 13px; font-weight: 600; color: #334155; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #page-pelajar .dp-top-bar-wrap { width: 80px; background: #f1f5f9; height: 6px; border-radius: 100px; overflow: hidden; flex-shrink: 0; }
+      #page-pelajar .dp-top-bar { height: 100%; background: linear-gradient(90deg, #2563eb, #60a5fa); border-radius: 100px; }
+      #page-pelajar .dp-top-count { font-size: 13px; font-weight: 700; color: #0f172a; min-width: 30px; text-align: right; flex-shrink: 0; }
+      
+      /* RUMAH INSIGHTS TABLE */
+      #page-pelajar .dp-rh-table { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 24px; }
+      #page-pelajar .dp-rh-table-h { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: #0f172a; }
+      #page-pelajar .dp-rh-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+      #page-pelajar .dp-rh-tbl thead th { background: #f8fafc; padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+      #page-pelajar .dp-rh-tbl tbody td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+      #page-pelajar .dp-rh-tbl tbody tr:last-child td { border-bottom: none; }
+      #page-pelajar .dp-rh-color-cell { width: 36px; height: 28px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 11px; }
+      #page-pelajar .dp-rh-gender { display: inline-flex; gap: 6px; font-size: 12px; }
+      #page-pelajar .dp-rh-gender-m { color: #2563eb; font-weight: 600; }
+      #page-pelajar .dp-rh-gender-f { color: #ec4899; font-weight: 600; }
+      #page-pelajar .dp-rh-bangsa-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+      #page-pelajar .dp-rh-chip { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; background: #ede9fe; color: #6b21a8; }
+      
+      /* STRATEGIC ALERTS */
+      #page-pelajar .dp-alerts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 24px; }
+      #page-pelajar .dp-alert { padding: 16px; border-radius: 10px; border-left: 4px solid; display: flex; align-items: flex-start; gap: 12px; }
+      #page-pelajar .dp-alert.a-success { background: #d1fae5; border-color: #10b981; color: #065f46; }
+      #page-pelajar .dp-alert.a-warning { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+      #page-pelajar .dp-alert.a-info { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+      #page-pelajar .dp-alert.a-danger { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+      #page-pelajar .dp-alert-icon { font-size: 24px; flex-shrink: 0; }
+      #page-pelajar .dp-alert-content { flex: 1; min-width: 0; }
+      #page-pelajar .dp-alert-title { font-weight: 700; margin-bottom: 4px; }
+      #page-pelajar .dp-alert-msg { font-size: 13px; line-height: 1.5; }
+            
+      /* EXPORT MODAL */
+      #dpExport { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px; }
+      #dpExport.active { display: flex; }
+      #dpExport .e-box { background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 800px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+      #dpExport .e-hero { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); color: white; padding: 24px 28px; position: relative; }
+      #dpExport .e-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+      #dpExport .e-title { font-size: 22px; font-weight: 800; margin: 0 0 4px 0; display: flex; align-items: center; gap: 12px; }
+      #dpExport .e-subtitle { font-size: 13px; opacity: 0.85; margin: 0; }
+      #dpExport .e-body { padding: 24px 28px; overflow-y: auto; }
+      #dpExport .e-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px; }
+      #dpExport .e-card { background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; transition: all 0.2s; }
+      #dpExport .e-card:hover { border-color: #2563eb; transform: translateY(-2px); box-shadow: 0 10px 15px rgba(37, 99, 235, 0.15); }
+      #dpExport .e-card-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin-bottom: 12px; }
+      #dpExport .e-card-icon.i-csv { background: linear-gradient(135deg, #10b981, #16a34a); }
+      #dpExport .e-card-icon.i-pdf { background: linear-gradient(135deg, #ef4444, #dc2626); }
+      #dpExport .e-card-icon.i-class { background: linear-gradient(135deg, #f59e0b, #d97706); }
+      #dpExport .e-card-icon.i-rumah { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+      #dpExport .e-card-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+      #dpExport .e-card-desc { font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 12px; min-height: 36px; }
+      #dpExport .e-card-action { display: flex; flex-direction: column; gap: 8px; }
+      #dpExport .e-card-select { padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: #f8fafc; cursor: pointer; font-family: inherit; }
+      #dpExport .e-card-select:focus { outline: none; border-color: #2563eb; background: white; }
+      #dpExport .e-card-btn { padding: 10px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+      #dpExport .e-card-btn.b-csv { background: #10b981; color: white; }
+      #dpExport .e-card-btn.b-csv:hover { background: #16a34a; transform: translateY(-1px); }
+      #dpExport .e-card-btn.b-pdf { background: #ef4444; color: white; }
+      #dpExport .e-card-btn.b-pdf:hover { background: #dc2626; transform: translateY(-1px); }
+      #dpExport .e-card-btn.b-class { background: #f59e0b; color: white; }
+      #dpExport .e-card-btn.b-class:hover { background: #d97706; transform: translateY(-1px); }
+      #dpExport .e-card-btn.b-rumah { background: #8b5cf6; color: white; }
+      #dpExport .e-card-btn.b-rumah:hover { background: #7c3aed; transform: translateY(-1px); }
+      #dpExport .e-note { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 6px; font-size: 12px; color: #1e40af; margin-top: 8px; }
+      #dpExport .e-note strong { display: block; margin-bottom: 4px; }
+      #dpExport .e-filter-status { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; border-radius: 6px; font-size: 12px; color: #92400e; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+      
+      /* PRINT STYLES */
+      @media print {
+        body * { visibility: hidden; }
+        #dp-print-area, #dp-print-area * { visibility: visible; }
+        #dp-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+        .dp-no-print { display: none !important; }
+        #page-pelajar, #dpModal, #dpExport, .sidebar { display: none !important; }
+      }
+      
+      /* PRINT AREA STYLES */
+      #dp-print-area { display: none; font-family: Arial, sans-serif; color: #000; }
+      #dp-print-area.show { display: block; }
+      #dp-print-area .pr-header { text-align: center; padding: 20px 0; border-bottom: 3px solid #1e3a5f; margin-bottom: 20px; }
+      #dp-print-area .pr-school { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+      #dp-print-area .pr-title { font-size: 22px; font-weight: 800; color: #1e3a5f; margin: 8px 0; }
+      #dp-print-area .pr-subtitle { font-size: 14px; color: #555; }
+      #dp-print-area .pr-meta { display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px; color: #555; border-bottom: 1px solid #ddd; margin-bottom: 16px; }
+      #dp-print-area .pr-section { margin-bottom: 20px; }
+      #dp-print-area .pr-section-title { font-size: 14px; font-weight: 700; color: #1e3a5f; padding: 8px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 12px; }
+      #dp-print-area .pr-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+      #dp-print-area .pr-stat { border: 1px solid #ccc; padding: 12px; text-align: center; border-radius: 4px; }
+      #dp-print-area .pr-stat-val { font-size: 20px; font-weight: 800; color: #1e3a5f; }
+      #dp-print-area .pr-stat-lbl { font-size: 10px; color: #666; text-transform: uppercase; }
+      #dp-print-area table { width: 100%; border-collapse: collapse; font-size: 11px; }
+      #dp-print-area table thead th { background: #1e3a5f; color: white; padding: 8px; text-align: left; font-weight: 700; }
+      #dp-print-area table tbody td { padding: 6px 8px; border-bottom: 1px solid #ddd; }
+      #dp-print-area table tbody tr:nth-child(even) { background: #f8fafc; }
+      #dp-print-area .pr-footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid #ccc; font-size: 11px; color: #666; }
+      #dp-print-area .pr-signatures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-top: 40px; }
+      #dp-print-area .pr-sig { text-align: center; }
+      #dp-print-area .pr-sig-line { border-top: 1px solid #000; padding-top: 4px; margin-top: 60px; font-size: 11px; }
+            
+      /* SMART SEARCH ENHANCEMENTS */
+      
+      /* Quick Filters Bar */
+      #page-pelajar .dp-qf-bar { background: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 16px; }
+      #page-pelajar .dp-qf-label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+      #page-pelajar .dp-qf-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      #page-pelajar .dp-qf-btn { padding: 6px 14px; border-radius: 100px; border: 2px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
+      #page-pelajar .dp-qf-btn:hover { border-color: #2563eb; background: #dbeafe; color: #1e40af; transform: translateY(-1px); }
+      #page-pelajar .dp-qf-btn.active { border-color: #2563eb; background: #2563eb; color: white; }
+      #page-pelajar .dp-qf-btn.active:hover { background: #1d4ed8; }
+      #page-pelajar .dp-qf-count { background: rgba(255,255,255,0.3); padding: 1px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+      #page-pelajar .dp-qf-btn:not(.active) .dp-qf-count { background: #e2e8f0; color: #475569; }
+      
+      /* Enhanced Search Input */
+      #page-pelajar .dp-search-wrap { position: relative; }
+      #page-pelajar .dp-search-input.has-value { background: white; }
+      #page-pelajar .dp-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; background: #cbd5e1; color: white; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; padding: 0; }
+      #page-pelajar .dp-search-clear.show { display: flex; }
+      #page-pelajar .dp-search-clear:hover { background: #64748b; }
+      
+      /* Search Suggestions Dropdown */
+      #page-pelajar .dp-suggestions { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); max-height: 320px; overflow-y: auto; z-index: 100; display: none; }
+      #page-pelajar .dp-suggestions.show { display: block; }
+      #page-pelajar .dp-sg-section { padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+      #page-pelajar .dp-sg-section:last-child { border-bottom: none; }
+      #page-pelajar .dp-sg-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 12px; }
+      #page-pelajar .dp-sg-item { padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s; font-size: 13px; }
+      #page-pelajar .dp-sg-item:hover { background: #f1f5f9; }
+      #page-pelajar .dp-sg-icon { font-size: 16px; flex-shrink: 0; }
+      #page-pelajar .dp-sg-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #334155; }
+      #page-pelajar .dp-sg-meta { font-size: 11px; color: #94a3b8; flex-shrink: 0; }
+      
+      /* Filter Chips */
+      #page-pelajar .dp-chips-section { background: white; padding: 12px 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      #page-pelajar .dp-chips-section.empty { display: none; }
+      #page-pelajar .dp-chips-label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+      #page-pelajar .dp-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+      #page-pelajar .dp-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 4px 4px 12px; background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 1px solid #2563eb; border-radius: 100px; font-size: 12px; font-weight: 600; color: #1e40af; }
+      #page-pelajar .dp-chip-x { background: #2563eb; color: white; border: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; padding: 0; }
+      #page-pelajar .dp-chip-x:hover { background: #1d4ed8; }
+      #page-pelajar .dp-chips-clear { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+      #page-pelajar .dp-chips-clear:hover { background: #fecaca; }
+      
+      /* Advanced Filters Dropdown */
+      #page-pelajar .dp-adv-btn { padding: 10px 16px; background: linear-gradient(135deg, #f8fafc, white); border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
+      #page-pelajar .dp-adv-btn:hover { border-color: #2563eb; color: #2563eb; }
+      #page-pelajar .dp-adv-btn.active { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-color: #2563eb; color: #1e40af; }
+      
+      /* Advanced Filter Modal */
+      #dpAdvFilter { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px; }
+      #dpAdvFilter.active { display: flex; }
+      #dpAdvFilter .af-box { background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+      #dpAdvFilter .af-hero { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); color: white; padding: 24px 28px; position: relative; }
+      #dpAdvFilter .af-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+      #dpAdvFilter .af-title { font-size: 20px; font-weight: 800; margin: 0 0 4px 0; }
+      #dpAdvFilter .af-subtitle { font-size: 13px; opacity: 0.85; margin: 0; }
+      #dpAdvFilter .af-body { padding: 24px 28px; overflow-y: auto; }
+      #dpAdvFilter .af-section { margin-bottom: 20px; }
+      #dpAdvFilter .af-section-title { font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+      #dpAdvFilter .af-input { width: 100%; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: #f8fafc; font-family: inherit; }
+      #dpAdvFilter .af-input:focus { outline: none; border-color: #2563eb; background: white; }
+      #dpAdvFilter .af-checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      #dpAdvFilter .af-checkbox { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: 13px; font-weight: 600; color: #475569; }
+      #dpAdvFilter .af-checkbox:hover { border-color: #2563eb; background: #dbeafe; }
+      #dpAdvFilter .af-checkbox.checked { border-color: #2563eb; background: #dbeafe; color: #1e40af; }
+      #dpAdvFilter .af-checkbox input { display: none; }
+      #dpAdvFilter .af-footer { padding: 16px 28px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 12px; justify-content: flex-end; }
+      #dpAdvFilter .af-btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 14px; }
+      #dpAdvFilter .af-btn-cancel { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+      #dpAdvFilter .af-btn-apply { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
+      
+      /* Updated filter bar with adv button */
+      #page-pelajar .dp-filters { grid-template-columns: 2fr 1fr 1fr 1fr auto auto; }
+            
+      /* ============================================================
+         PHASE E: FINAL POLISH STYLES
+         ============================================================ */
+      
+      /* Smooth Animations */
+      #page-pelajar * { transition: opacity 0.2s, transform 0.2s; }
+      
+      /* Help Button Header */
+      #page-pelajar .dp-help-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); }
+      #page-pelajar .dp-help-btn:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+      
+      /* Keyboard Shortcut Hint */
+      #page-pelajar .dp-kbd { display: inline-block; padding: 2px 8px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; font-family: 'SF Mono', Consolas, monospace; font-size: 11px; font-weight: 700; color: #475569; box-shadow: 0 2px 0 #cbd5e1; }
+      
+      /* Help Modal */
+      #dpHelp { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
+      #dpHelp.active { display: flex; opacity: 1; }
+      #dpHelp .h-box { background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 750px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s; }
+      #dpHelp.active .h-box { transform: scale(1); }
+      #dpHelp .h-hero { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); color: white; padding: 24px 28px; position: relative; }
+      #dpHelp .h-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+      #dpHelp .h-close:hover { background: rgba(255,255,255,0.25); transform: rotate(90deg); }
+      #dpHelp .h-title { font-size: 22px; font-weight: 800; margin: 0 0 4px 0; display: flex; align-items: center; gap: 12px; }
+      #dpHelp .h-subtitle { font-size: 13px; opacity: 0.85; margin: 0; }
+      #dpHelp .h-tabs { display: flex; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0 24px; gap: 4px; overflow-x: auto; }
+      #dpHelp .h-tab { padding: 14px 20px; background: transparent; border: none; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; white-space: nowrap; }
+      #dpHelp .h-tab:hover { color: #2563eb; }
+      #dpHelp .h-tab.active { color: #2563eb; border-bottom-color: #2563eb; background: white; }
+      #dpHelp .h-body { flex: 1; overflow-y: auto; padding: 28px; }
+      #dpHelp .h-tc { display: none; }
+      #dpHelp .h-tc.active { display: block; animation: dpFadeIn 0.3s; }
+      
+      @keyframes dpFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      
+      #dpHelp .h-section { margin-bottom: 24px; }
+      #dpHelp .h-section:last-child { margin-bottom: 0; }
+      #dpHelp .h-section-title { font-size: 14px; font-weight: 700; color: #1e3a5f; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+      
+      #dpHelp .h-feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+      #dpHelp .h-feature { padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+      #dpHelp .h-feature-icon { font-size: 28px; margin-bottom: 8px; }
+      #dpHelp .h-feature-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+      #dpHelp .h-feature-desc { font-size: 12px; color: #64748b; line-height: 1.5; }
+      
+      #dpHelp .h-shortcuts { display: grid; gap: 10px; }
+      #dpHelp .h-shortcut { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; transition: all 0.2s; }
+      #dpHelp .h-shortcut:hover { background: #dbeafe; border-color: #2563eb; }
+      #dpHelp .h-shortcut-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+      #dpHelp .h-shortcut-icon { font-size: 18px; flex-shrink: 0; }
+      #dpHelp .h-shortcut-desc { font-size: 13px; color: #334155; font-weight: 500; }
+      #dpHelp .h-shortcut-keys { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+      #dpHelp .h-shortcut-plus { color: #94a3b8; font-size: 11px; }
+      
+      #dpHelp .h-tip { padding: 14px; background: linear-gradient(135deg, #dbeafe, #ede9fe); border-left: 4px solid #2563eb; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+      #dpHelp .h-tip-icon { font-size: 20px; flex-shrink: 0; }
+      #dpHelp .h-tip-content { flex: 1; }
+      #dpHelp .h-tip-title { font-size: 13px; font-weight: 700; color: #1e40af; margin-bottom: 4px; }
+      #dpHelp .h-tip-text { font-size: 12px; color: #1e40af; line-height: 1.5; }
+      
+      /* Toast Notifications */
+      #dp-toast { position: fixed; bottom: 24px; right: 24px; z-index: 100000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+      #dp-toast .dp-toast-item { background: white; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 12px 16px; border-left: 4px solid; display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; min-width: 280px; max-width: 400px; pointer-events: auto; animation: dpToastIn 0.3s; }
+      #dp-toast .dp-toast-item.t-success { border-color: #10b981; color: #065f46; }
+      #dp-toast .dp-toast-item.t-info { border-color: #2563eb; color: #1e40af; }
+      #dp-toast .dp-toast-item.t-warning { border-color: #f59e0b; color: #92400e; }
+      #dp-toast .dp-toast-icon { font-size: 18px; flex-shrink: 0; }
+      
+      @keyframes dpToastIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes dpToastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+      
+      /* Skeleton Loader */
+      #page-pelajar .dp-skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: dpSkeleton 1.5s infinite; border-radius: 6px; }
+      
+      @keyframes dpSkeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+      
+      /* Smooth Hover Effects */
+      #page-pelajar .dp-stat-card { cursor: default; }
+      #page-pelajar .dp-stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px rgba(0,0,0,0.15); }
+      #page-pelajar .dp-rumah-item { cursor: pointer; }
+      #page-pelajar .dp-rumah-item:hover { transform: translateX(6px); background: #f1f5f9; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+      #page-pelajar .dp-st tbody tr { transition: background 0.15s; }
+      
+      /* Better Focus States */
+      #page-pelajar input:focus, #page-pelajar select:focus, #page-pelajar button:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+      
+      /* Print optimization for analytics */
+      @media print {
+        #page-pelajar .dp-qf-bar, #page-pelajar .dp-chips-section, #page-pelajar .dp-filters { display: none !important; }
+      }
+      
+      /* Mobile responsive enhancements */
+      @media (max-width: 600px) {
+        #page-pelajar .dp-qf-bar { padding: 12px 16px; }
+        #page-pelajar .dp-qf-btn { padding: 5px 10px; font-size: 12px; }
+        #dpHelp .h-tab { padding: 12px 14px; font-size: 13px; }
+      }
       @media (max-width: 900px) { #page-pelajar .dp-filters { grid-template-columns: 1fr 1fr; } #page-pelajar .dp-sb { grid-column: 1 / -1; } }
       @media (max-width: 600px) { #page-pelajar .dp-filters { grid-template-columns: 1fr; } }
     `;
@@ -12019,9 +12359,10 @@ console.log('🚀 [DataPelajar] Loading module...');
               <div class="dp-head-i">📂</div>
               <div><h1>Data Pelajar</h1><p>Pengurusan & Analitik Data Pelajar Kokurikulum</p></div>
             </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <button class="dp-btn dp-btn-g" onclick="DataPelajar.refresh()">🔄 Muat Semula</button>
-              <button class="dp-btn dp-btn-w" onclick="DataPelajar.exportCSV()">📥 Export CSV</button>
+                                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button class="dp-help-btn" onclick="DataPelajar.openHelp()" title="Help (Press ?)">❓ Help</button>
+              <button class="dp-btn dp-btn-g" onclick="DataPelajar.refresh()" title="Refresh (Ctrl+R)">🔄 Muat Semula</button>
+              <button class="dp-btn dp-btn-w" onclick="DataPelajar.openExportMenu()" title="Export (Ctrl+E)">📥 Bulk Export</button>
             </div>
           </div>
         </header>
@@ -12029,6 +12370,50 @@ console.log('🚀 [DataPelajar] Loading module...');
         <div id="dp-err" style="display:none;"></div>
         <div id="dp-cnt" style="display:none;">
           <div class="dp-stats" id="dp-stats"></div>
+                 
+          <!-- ANALYTICS DASHBOARD -->
+          <div class="dp-analytics" id="dp-analytics">
+            <div class="dp-analytics-h">
+              <div class="dp-analytics-h-icon">📊</div>
+              <div class="dp-analytics-h-text">
+                <h2>Advanced Analytics Dashboard</h2>
+                <p>Insights komprehensif untuk pengurusan strategik & pematuhan KPM</p>
+              </div>
+            </div>
+            
+            <div class="dp-ovr-cards" id="dp-ovr-cards"></div>
+            
+            <div class="dp-part-section">
+              <div class="dp-sec-h" style="margin-bottom: 16px; padding-bottom: 0; border: none;">
+                <div class="dp-sec-t" style="font-size: 16px;"><span style="font-size: 22px;">📈</span><span>Penglibatan Mengikut Kategori Kokurikulum</span></div>
+              </div>
+              <div id="dp-part-bars"></div>
+              <div class="dp-insight" id="dp-part-insight"></div>
+            </div>
+            
+            <div class="dp-top-grid" id="dp-top-grid"></div>
+            
+            <div class="dp-rh-table">
+              <div class="dp-rh-table-h"><span style="font-size: 22px;">🏠</span><span>Rumah Sukan Insights</span></div>
+              <div style="overflow-x: auto;">
+                <table class="dp-rh-tbl">
+                  <thead>
+                    <tr>
+                      <th>Rumah</th>
+                      <th>Total</th>
+                      <th>Gender</th>
+                      <th>Bangsa Breakdown</th>
+                      <th>Diversity</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dp-rh-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="dp-alerts" id="dp-alerts"></div>
+          </div>
+          
           <div class="dp-sec">
             <div class="dp-sec-h">
               <div class="dp-sec-t"><span style="font-size: 24px;">🏠</span><span>Taburan Pelajar Mengikut Rumah Sukan</span></div>
@@ -12040,13 +12425,35 @@ console.log('🚀 [DataPelajar] Loading module...');
             <div class="dp-chart"><div class="dp-sec-h" style="margin-bottom: 12px;"><div class="dp-sec-t"><span style="font-size: 24px;">📚</span><span>Mengikut Tingkatan</span></div></div><div class="dp-chart-c"><canvas id="dp-c-t"></canvas></div></div>
             <div class="dp-chart"><div class="dp-sec-h" style="margin-bottom: 12px;"><div class="dp-sec-t"><span style="font-size: 24px;">🌏</span><span>Mengikut Bangsa</span></div></div><div class="dp-chart-c"><canvas id="dp-c-b"></canvas></div></div>
           </div>
+                    
+          <!-- QUICK FILTERS BAR -->
+          <div class="dp-qf-bar">
+            <div class="dp-qf-label">⚡ Quick Filters</div>
+            <div class="dp-qf-grid" id="dp-qf-grid"></div>
+          </div>
+          
+          <!-- ACTIVE FILTER CHIPS -->
+          <div class="dp-chips-section empty" id="dp-chips-section">
+            <span class="dp-chips-label">🏷️ Active:</span>
+            <div class="dp-chips" id="dp-chips-list"></div>
+            <button class="dp-chips-clear" onclick="DataPelajar.clearAllFilters()">✕ Clear All</button>
+          </div>
+          
+          <!-- MAIN FILTER BAR -->
           <div class="dp-filters">
-            <div class="dp-sb"><span class="dp-sic">🔍</span><input type="text" id="dp-s" class="dp-si" placeholder="Cari nama atau no. pelajar..."></div>
+            <div class="dp-sb dp-search-wrap">
+              <span class="dp-sic">🔍</span>
+              <input type="text" id="dp-s" class="dp-si" placeholder="Cari nama, no. pelajar, atau multi-keyword (e.g., Amanda 1A)..." autocomplete="off">
+              <button class="dp-search-clear" id="dp-search-clear" onclick="DataPelajar.clearSearch()">✕</button>
+              <div class="dp-suggestions" id="dp-suggestions"></div>
+            </div>
             <select id="dp-f-t" class="dp-sel"><option value="">Semua Tingkatan</option></select>
             <select id="dp-f-r" class="dp-sel"><option value="">Semua Rumah</option><option value="AZAM">🔴 AZAM</option><option value="BERANI">🔵 BERANI</option><option value="CEMERLANG">🟠 CEMERLANG</option><option value="GIGIH">🟢 GIGIH</option><option value="TABAH">🟣 TABAH</option><option value="YAKIN">🟡 YAKIN</option></select>
             <select id="dp-f-b" class="dp-sel"><option value="">Semua Bangsa</option></select>
-            <button class="dp-clr" onclick="DataPelajar.clearFilters()">✕ Clear</button>
+            <button class="dp-adv-btn" id="dp-adv-btn" onclick="DataPelajar.openAdvFilter()">⚙️ More</button>
+            <button class="dp-clr" onclick="DataPelajar.clearAllFilters()">✕ Clear</button>
           </div>
+          
           <div class="dp-tbl">
             <div class="dp-tbl-h">
               <div class="dp-sec-t"><span style="font-size: 24px;">👥</span><span>Senarai Pelajar</span></div>
@@ -12100,6 +12507,521 @@ console.log('🚀 [DataPelajar] Loading module...');
       </div>
     `;
     document.body.appendChild(m);
+
+    
+    // Inject Export Modal
+    if (!document.getElementById('dpExport')) {
+      const exp = document.createElement('div');
+      exp.id = 'dpExport';
+      exp.onclick = function(e) { if (e.target.id === 'dpExport') DataPelajar.closeExportMenu(); };
+      exp.innerHTML = `
+        <div class="e-box">
+          <div class="e-hero">
+            <button class="e-close" onclick="DataPelajar.closeExportMenu()">✕</button>
+            <div class="e-title">📥 Bulk Export Center</div>
+            <div class="e-subtitle">Pilih format eksport yang anda perlukan</div>
+          </div>
+          <div class="e-body">
+            <div class="e-filter-status" id="dp-export-filter-status" style="display:none;">
+              <span>⚠️</span>
+              <span id="dp-export-filter-msg"></span>
+            </div>
+            <div class="e-grid">
+              <div class="e-card">
+                <div class="e-card-icon i-csv">📊</div>
+                <div class="e-card-title">CSV Analytics</div>
+                <div class="e-card-desc">Data lengkap dengan analytics summary. Sesuai untuk Excel atau Google Sheets.</div>
+                <div class="e-card-action">
+                  <button class="e-card-btn b-csv" onclick="DataPelajar.exportCSVEnhanced()">📥 Download CSV</button>
+                </div>
+              </div>
+              
+              <div class="e-card">
+                <div class="e-card-icon i-pdf">📄</div>
+                <div class="e-card-title">PDF Report</div>
+                <div class="e-card-desc">Visual report lengkap dengan analytics. Sesuai untuk audit dan presentation.</div>
+                <div class="e-card-action">
+                  <button class="e-card-btn b-pdf" onclick="DataPelajar.exportPDFReport()">🖨️ Generate PDF</button>
+                </div>
+              </div>
+              
+              <div class="e-card">
+                <div class="e-card-icon i-class">📋</div>
+                <div class="e-card-title">Class List Print</div>
+                <div class="e-card-desc">Senarai kelas siap print dengan signature lines untuk audit.</div>
+                <div class="e-card-action">
+                  <select id="dp-export-class" class="e-card-select">
+                    <option value="">-- Pilih Kelas --</option>
+                  </select>
+                  <button class="e-card-btn b-class" onclick="DataPelajar.printClassList()">🖨️ Print Class List</button>
+                </div>
+              </div>
+              
+              <div class="e-card">
+                <div class="e-card-icon i-rumah">🏠</div>
+                <div class="e-card-title">Rumah Sukan Roster</div>
+                <div class="e-card-desc">Senarai ahli Rumah Sukan, sesuai untuk pertandingan dan event.</div>
+                <div class="e-card-action">
+                  <select id="dp-export-rumah" class="e-card-select">
+                    <option value="">-- Pilih Rumah --</option>
+                    <option value="AZAM">🔴 AZAM (Merah)</option>
+                    <option value="BERANI">🔵 BERANI (Biru)</option>
+                    <option value="CEMERLANG">🟠 CEMERLANG (Oren)</option>
+                    <option value="GIGIH">🟢 GIGIH (Hijau)</option>
+                    <option value="TABAH">🟣 TABAH (Ungu)</option>
+                    <option value="YAKIN">🟡 YAKIN (Kuning)</option>
+                  </select>
+                  <button class="e-card-btn b-rumah" onclick="DataPelajar.printRumahRoster()">🖨️ Print Roster</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="e-note">
+              <strong>💡 Nota Penting:</strong>
+              • CSV & PDF akan apply filter aktif (search, tingkatan, rumah, bangsa)<br>
+              • Class List & Rumah Roster export specific selection (tidak terjejas filter)<br>
+              • Print dialog akan muncul untuk simpan sebagai PDF atau print fizikal
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(exp);
+    }
+
+    
+    // Inject Advanced Filter Modal
+    if (!document.getElementById('dpAdvFilter')) {
+      const af = document.createElement('div');
+      af.id = 'dpAdvFilter';
+      af.onclick = function(e) { if (e.target.id === 'dpAdvFilter') DataPelajar.closeAdvFilter(); };
+      af.innerHTML = `
+        <div class="af-box">
+          <div class="af-hero">
+            <button class="af-close" onclick="DataPelajar.closeAdvFilter()">✕</button>
+            <div class="af-title">⚙️ Advanced Filters</div>
+            <div class="af-subtitle">Filter granular untuk search spesifik</div>
+          </div>
+          <div class="af-body">
+            <div class="af-section">
+              <div class="af-section-title">🎖️ Unit Beruniform</div>
+              <input type="text" id="dp-af-uniform" class="af-input" placeholder="Cari dalam unit beruniform...">
+            </div>
+            <div class="af-section">
+              <div class="af-section-title">📚 Kelab / Persatuan</div>
+              <input type="text" id="dp-af-kelab" class="af-input" placeholder="Cari dalam kelab/persatuan...">
+            </div>
+            <div class="af-section">
+              <div class="af-section-title">⚽ Sukan & Permainan</div>
+              <input type="text" id="dp-af-sukan" class="af-input" placeholder="Cari dalam sukan...">
+            </div>
+            <div class="af-section">
+              <div class="af-section-title">⚧ Gender</div>
+              <div class="af-checkbox-grid">
+                <label class="af-checkbox" id="dp-af-male-label">
+                  <input type="checkbox" id="dp-af-male"> ♂ Lelaki sahaja
+                </label>
+                <label class="af-checkbox" id="dp-af-female-label">
+                  <input type="checkbox" id="dp-af-female"> ♀ Perempuan sahaja
+                </label>
+              </div>
+            </div>
+            <div class="af-section">
+              <div class="af-section-title">📊 Aktiviti</div>
+              <div class="af-checkbox-grid">
+                <label class="af-checkbox" id="dp-af-has-uniform-label">
+                  <input type="checkbox" id="dp-af-has-uniform"> 🎖️ Ada Uniform
+                </label>
+                <label class="af-checkbox" id="dp-af-has-kelab-label">
+                  <input type="checkbox" id="dp-af-has-kelab"> 📚 Ada Kelab
+                </label>
+                <label class="af-checkbox" id="dp-af-has-sukan-label">
+                  <input type="checkbox" id="dp-af-has-sukan"> ⚽ Ada Sukan
+                </label>
+                <label class="af-checkbox" id="dp-af-multi-label">
+                  <input type="checkbox" id="dp-af-multi"> 🏆 Multi-Aktiviti (3+)
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="af-footer">
+            <button class="af-btn af-btn-cancel" onclick="DataPelajar.resetAdvFilter()">🔄 Reset</button>
+            <button class="af-btn af-btn-apply" onclick="DataPelajar.applyAdvFilter()">✓ Apply Filters</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(af);
+    }
+        
+    // Inject Help Modal
+    if (!document.getElementById('dpHelp')) {
+      const hm = document.createElement('div');
+      hm.id = 'dpHelp';
+      hm.onclick = function(e) { if (e.target.id === 'dpHelp') DataPelajar.closeHelp(); };
+      hm.innerHTML = `
+        <div class="h-box">
+          <div class="h-hero">
+            <button class="h-close" onclick="DataPelajar.closeHelp()">✕</button>
+            <div class="h-title">❓ Help Center</div>
+            <div class="h-subtitle">Panduan lengkap Modul Data Pelajar SPKB v3.2</div>
+          </div>
+          <div class="h-tabs">
+            <button class="h-tab active" data-htab="features" onclick="DataPelajar.switchHelpTab('features')">🌟 Features</button>
+            <button class="h-tab" data-htab="shortcuts" onclick="DataPelajar.switchHelpTab('shortcuts')">⌨️ Shortcuts</button>
+            <button class="h-tab" data-htab="tips" onclick="DataPelajar.switchHelpTab('tips')">💡 Tips & Tricks</button>
+            <button class="h-tab" data-htab="about" onclick="DataPelajar.switchHelpTab('about')">ℹ️ About</button>
+          </div>
+          <div class="h-body">
+            
+            <!-- FEATURES TAB -->
+            <div class="h-tc active" id="dp-h-features">
+              <div class="h-section">
+                <div class="h-section-title">📊 Analytics & Insights</div>
+                <div class="h-feature-grid">
+                  <div class="h-feature">
+                    <div class="h-feature-icon">🌈</div>
+                    <div class="h-feature-title">Diversity Index</div>
+                    <div class="h-feature-desc">Pengukuran kepelbagaian bangsa pelajar berdasarkan formula Shannon Entropy.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">⚖️</div>
+                    <div class="h-feature-title">Gender Balance</div>
+                    <div class="h-feature-desc">Analisis keseimbangan jantina merentas Rumah Sukan dan kelas.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">🏆</div>
+                    <div class="h-feature-title">Top Units</div>
+                    <div class="h-feature-desc">Ranking unit kokurikulum paling popular dengan visual bars.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">⚠️</div>
+                    <div class="h-feature-title">Strategic Alerts</div>
+                    <div class="h-feature-desc">Notifikasi automatik untuk insights penting dan recommendations.</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="h-section">
+                <div class="h-section-title">🔍 Smart Search</div>
+                <div class="h-feature-grid">
+                  <div class="h-feature">
+                    <div class="h-feature-icon">⚡</div>
+                    <div class="h-feature-title">Quick Filters</div>
+                    <div class="h-feature-desc">8 shortcut filters untuk akses pantas (Aktif, Lelaki, Iban, Multi-Aktiviti, dll).</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">🔎</div>
+                    <div class="h-feature-title">Multi-Keyword</div>
+                    <div class="h-feature-desc">Cari beberapa keyword sekaligus (e.g., "Amanda 1A" → match kedua-dua).</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">🏷️</div>
+                    <div class="h-feature-title">Filter Chips</div>
+                    <div class="h-feature-desc">Visual chips menunjukkan filter aktif dengan butang ✕ untuk remove.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">⚙️</div>
+                    <div class="h-feature-title">Advanced Filters</div>
+                    <div class="h-feature-desc">Filter granular by uniform, kelab, sukan, jantina, dan multi-aktiviti.</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="h-section">
+                <div class="h-section-title">📥 Bulk Export</div>
+                <div class="h-feature-grid">
+                  <div class="h-feature">
+                    <div class="h-feature-icon">📊</div>
+                    <div class="h-feature-title">CSV Analytics</div>
+                    <div class="h-feature-desc">Export data lengkap dengan analytics summary untuk Excel/Sheets.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">📄</div>
+                    <div class="h-feature-title">PDF Report</div>
+                    <div class="h-feature-desc">Visual report siap print dengan formatting profesional.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">📋</div>
+                    <div class="h-feature-title">Class List</div>
+                    <div class="h-feature-desc">Senarai kelas siap print dengan signature lines.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">🏠</div>
+                    <div class="h-feature-title">Rumah Roster</div>
+                    <div class="h-feature-desc">Senarai ahli Rumah Sukan untuk events dan pertandingan.</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="h-section">
+                <div class="h-section-title">👤 Student Profile</div>
+                <div class="h-feature-grid">
+                  <div class="h-feature">
+                    <div class="h-feature-icon">📋</div>
+                    <div class="h-feature-title">Maklumat Peribadi</div>
+                    <div class="h-feature-desc">11 field lengkap dengan privacy controls (IC masking).</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">🏃</div>
+                    <div class="h-feature-title">Kokurikulum</div>
+                    <div class="h-feature-desc">Rumah Sukan feature card + uniform/kelab/sukan info.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">📚</div>
+                    <div class="h-feature-title">Akademik</div>
+                    <div class="h-feature-desc">Tingkatan, kelas, dan info akademik pelajar.</div>
+                  </div>
+                  <div class="h-feature">
+                    <div class="h-feature-icon">🏆</div>
+                    <div class="h-feature-title">Pencapaian</div>
+                    <div class="h-feature-desc">Cross-link automatik dengan rekod pencapaian sejarah.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- SHORTCUTS TAB -->
+            <div class="h-tc" id="dp-h-shortcuts">
+              <div class="h-section">
+                <div class="h-section-title">⌨️ Power User Shortcuts</div>
+                <div class="h-shortcuts">
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">🔍</div>
+                      <div class="h-shortcut-desc">Focus pada search bar</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">Ctrl</span>
+                      <span class="h-shortcut-plus">+</span>
+                      <span class="dp-kbd">F</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">📥</div>
+                      <div class="h-shortcut-desc">Buka Bulk Export menu</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">Ctrl</span>
+                      <span class="h-shortcut-plus">+</span>
+                      <span class="dp-kbd">E</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">🔄</div>
+                      <div class="h-shortcut-desc">Refresh data</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">Ctrl</span>
+                      <span class="h-shortcut-plus">+</span>
+                      <span class="dp-kbd">R</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">⚙️</div>
+                      <div class="h-shortcut-desc">Buka Advanced Filters</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">Ctrl</span>
+                      <span class="h-shortcut-plus">+</span>
+                      <span class="dp-kbd">M</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">✕</div>
+                      <div class="h-shortcut-desc">Clear semua filters</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">Ctrl</span>
+                      <span class="h-shortcut-plus">+</span>
+                      <span class="dp-kbd">K</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">❓</div>
+                      <div class="h-shortcut-desc">Buka Help Center</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">?</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">🚪</div>
+                      <div class="h-shortcut-desc">Tutup modal/dropdown</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">Esc</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">⬅️</div>
+                      <div class="h-shortcut-desc">Previous page</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">←</span>
+                    </div>
+                  </div>
+                  <div class="h-shortcut">
+                    <div class="h-shortcut-info">
+                      <div class="h-shortcut-icon">➡️</div>
+                      <div class="h-shortcut-desc">Next page</div>
+                    </div>
+                    <div class="h-shortcut-keys">
+                      <span class="dp-kbd">→</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- TIPS TAB -->
+            <div class="h-tc" id="dp-h-tips">
+              <div class="h-section">
+                <div class="h-section-title">💡 Pro Tips</div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">🔍</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Multi-Keyword Search</div>
+                    <div class="h-tip-text">Type "Amanda 1A" untuk match pelajar nama Amanda DAN kelas 1A serentak. Sangat berguna untuk narrow search!</div>
+                  </div>
+                </div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">⚡</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Quick Filter Stacking</div>
+                    <div class="h-tip-text">Combine quick filters dengan dropdown filters untuk drilling-down. Contoh: "🎯 Aktif" + Tingkatan "1A" + "🏆 Multi-Aktiviti".</div>
+                  </div>
+                </div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">📥</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Filter-Aware Export</div>
+                    <div class="h-tip-text">CSV dan PDF export akan automatic apply filter aktif. Filter pelajar dahulu, kemudian export untuk targeted data.</div>
+                  </div>
+                </div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">🏠</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Rumah Sukan Roster</div>
+                    <div class="h-tip-text">Print Rumah Sukan roster sebelum sukan tahunan — siap dengan signature lines untuk acknowledge oleh ketua rumah.</div>
+                  </div>
+                </div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">👤</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Privacy Controls</div>
+                    <div class="h-tip-text">Klik student → Modal profile → IC dipaparkan masked (xxxx). Klik butang privacy untuk lihat IC penuh.</div>
+                  </div>
+                </div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">🏆</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Cross-Link Pencapaian</div>
+                    <div class="h-tip-text">Tab Pencapaian dalam profile auto-search by nama. Untuk pelajar baru, message akan inform tiada rekod tahun semasa.</div>
+                  </div>
+                </div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">📊</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Analytics Dashboard</div>
+                    <div class="h-tip-text">4 metrics utama: Diversity, Gender Balance, Active Rate, Avg Activities. Strategic alerts auto-detect issues.</div>
+                  </div>
+                </div>
+                
+                <div class="h-tip">
+                  <div class="h-tip-icon">⌨️</div>
+                  <div class="h-tip-content">
+                    <div class="h-tip-title">Keyboard Power User</div>
+                    <div class="h-tip-text">Press <span class="dp-kbd">?</span> anytime untuk buka help. Gunakan <span class="dp-kbd">Ctrl+F</span> untuk instant search focus.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- ABOUT TAB -->
+            <div class="h-tc" id="dp-h-about">
+              <div class="h-section">
+                <div class="h-section-title">ℹ️ Tentang Modul Data Pelajar</div>
+                <div style="text-align: center; padding: 20px;">
+                  <div style="font-size: 64px; margin-bottom: 16px;">📂</div>
+                  <h2 style="font-size: 24px; font-weight: 800; color: #1e3a5f; margin: 0 0 8px;">Data Pelajar Module</h2>
+                  <p style="color: #64748b; margin: 0 0 4px;">SPKB v3.2 - SMK Tinggi Kuching</p>
+                  <p style="color: #94a3b8; font-size: 13px; margin: 0;">Sistem Pengurusan Kokurikulum</p>
+                </div>
+                
+                <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-top: 16px;">
+                  <div class="h-section-title" style="margin-top: 0;">🌟 Module Stats</div>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                      <div style="font-size: 24px; font-weight: 800; color: #2563eb;">5</div>
+                      <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Phases Built</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                      <div style="font-size: 24px; font-weight: 800; color: #2563eb;">30+</div>
+                      <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Features</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                      <div style="font-size: 24px; font-weight: 800; color: #2563eb;">9</div>
+                      <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Shortcuts</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                      <div style="font-size: 24px; font-weight: 800; color: #2563eb;">4</div>
+                      <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Export Types</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #dbeafe, #ede9fe); padding: 16px; border-radius: 8px; margin-top: 16px;">
+                  <div style="font-weight: 700; color: #1e40af; margin-bottom: 8px;">🏆 Capabilities</div>
+                  <ul style="margin: 0; padding-left: 20px; color: #1e40af; font-size: 13px; line-height: 1.8;">
+                    <li>Multi-year architecture (2026 ready, future-proof)</li>
+                    <li>Cross-link integration dengan modul Pencapaian</li>
+                    <li>Advanced analytics dengan strategic insights</li>
+                    <li>Bulk export untuk audit & compliance</li>
+                    <li>Smart search dengan 8 quick filters</li>
+                    <li>Professional polish dengan keyboard shortcuts</li>
+                  </ul>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 12px;">
+                  <div>🇲🇾 KPM Compliant • Audit Ready • Production Grade</div>
+                  <div style="margin-top: 4px;">© ${new Date().getFullYear()} SMK Tinggi Kuching</div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      `;
+      document.body.appendChild(hm);
+    }
+    
+    // Inject Toast Container
+    if (!document.getElementById('dp-toast')) {
+      const tc = document.createElement('div');
+      tc.id = 'dp-toast';
+      document.body.appendChild(tc);
+    }
+    
+    // Inject Print Area
+    if (!document.getElementById('dp-print-area')) {
+      const pa = document.createElement('div');
+      pa.id = 'dp-print-area';
+      document.body.appendChild(pa);
+    }
+
     console.log('✅ [DataPelajar] Modal injected');
   }
   
@@ -12149,9 +13071,11 @@ console.log('🚀 [DataPelajar] Loading module...');
       
       renderStats();
       renderRumah();
+      renderAnalytics();
       renderChart1();
       renderChart2();
       populateFilters();
+      renderQuickFilters();
       setupListeners();
       state.filteredStudents = state.students;
       renderTable();
@@ -12161,6 +13085,21 @@ console.log('🚀 [DataPelajar] Loading module...');
       state.initialized = true;
       state.loading = false;
       console.log('✅ [DataPelajar] Ready');
+      
+      // ⭐ Setup keyboard shortcuts after init
+      if (window.DataPelajar && window.DataPelajar.setupKeyboardShortcuts) {
+        window.DataPelajar.setupKeyboardShortcuts();
+      }
+      
+      // ⭐ Welcome toast on first load
+      if (!DataPelajar._welcomed) {
+        DataPelajar._welcomed = true;
+        setTimeout(function() {
+          if (window.DataPelajar && window.DataPelajar.showToast) {
+            window.DataPelajar.showToast('✨ Data Pelajar ready! Press ? for help', 'success');
+          }
+        }, 800);
+      }
     } catch (e) {
       state.loading = false;
       console.error('❌ [DataPelajar]:', e);
@@ -12195,6 +13134,331 @@ console.log('🚀 [DataPelajar] Loading module...');
       return `<div class="dp-rumah"><div class="dp-rumah-c" style="background:${cfg.warna};">${n.substring(0,2)}</div><div class="dp-rumah-i"><div class="dp-rumah-n">${cfg.emoji} ${n} <span style="color:${cfg.warna};">(${cfg.label})</span></div><div class="dp-rumah-bc"><div class="dp-rumah-b" style="width:${p}%;background:${cfg.warna};"></div></div><div class="dp-rumah-s"><span><span class="dp-rumah-cn">${count}</span> pelajar</span><span>${p}%</span></div></div></div>`;
     }).join('');
   }
+
+  
+  // ============================================================
+  // ANALYTICS DASHBOARD
+  // ============================================================
+  
+  function calculateAnalytics() {
+    const students = state.students;
+    const total = students.length;
+    
+    if (total === 0) return null;
+    
+    // Diversity Index (based on Bangsa)
+    const bangsaCount = {};
+    students.forEach(function(s) {
+      const b = s.bangsa || 'Unknown';
+      bangsaCount[b] = (bangsaCount[b] || 0) + 1;
+    });
+    
+    // Shannon Diversity Index normalized to 0-100%
+    let diversityIndex = 0;
+    Object.keys(bangsaCount).forEach(function(b) {
+      const p = bangsaCount[b] / total;
+      if (p > 0) diversityIndex -= p * Math.log(p);
+    });
+    const maxDiv = Math.log(Object.keys(bangsaCount).length || 1);
+    const diversityPct = maxDiv > 0 ? (diversityIndex / maxDiv * 100) : 0;
+    
+    // Gender Balance
+    let male = 0, female = 0;
+    students.forEach(function(s) {
+      if (s.gender === 'Male' || s.gender === 'M') male++;
+      else if (s.gender === 'Female' || s.gender === 'F') female++;
+    });
+    const genderBalance = total > 0 ? (Math.min(male, female) / Math.max(male, female, 1) * 100) : 0;
+    
+    // Participation rates
+    const uniformCount = students.filter(function(s) { return s.uniform && s.uniform.trim(); }).length;
+    const kelabCount = students.filter(function(s) { return s.kelab && s.kelab.trim(); }).length;
+    const sukanCount = students.filter(function(s) { return s.sukan && s.sukan.trim(); }).length;
+    
+    // Average activities per student
+    const totalActivities = students.reduce(function(sum, s) {
+      let count = 0;
+      if (s.uniform) count++;
+      if (s.kelab) count++;
+      if (s.sukan) count++;
+      return sum + count;
+    }, 0);
+    const avgActivities = total > 0 ? (totalActivities / total) : 0;
+    
+    // Top Units
+    const uniformMap = {}, kelabMap = {}, sukanMap = {};
+    students.forEach(function(s) {
+      if (s.uniform) uniformMap[s.uniform] = (uniformMap[s.uniform] || 0) + 1;
+      if (s.kelab) kelabMap[s.kelab] = (kelabMap[s.kelab] || 0) + 1;
+      if (s.sukan) sukanMap[s.sukan] = (sukanMap[s.sukan] || 0) + 1;
+    });
+    
+    const topUniform = Object.keys(uniformMap).map(function(k) { return { name: k, count: uniformMap[k] }; }).sort(function(a, b) { return b.count - a.count; }).slice(0, 5);
+    const topKelab = Object.keys(kelabMap).map(function(k) { return { name: k, count: kelabMap[k] }; }).sort(function(a, b) { return b.count - a.count; }).slice(0, 5);
+    
+    // Rumah Sukan detailed insights
+    const rumahInsights = {};
+    Object.keys(RUMAH).forEach(function(r) {
+      rumahInsights[r] = { total: 0, male: 0, female: 0, bangsa: {} };
+    });
+    students.forEach(function(s) {
+      if (s.rumah_sukan && rumahInsights[s.rumah_sukan]) {
+        const r = rumahInsights[s.rumah_sukan];
+        r.total++;
+        if (s.gender === 'Male' || s.gender === 'M') r.male++;
+        else if (s.gender === 'Female' || s.gender === 'F') r.female++;
+        const b = s.bangsa || 'Unknown';
+        r.bangsa[b] = (r.bangsa[b] || 0) + 1;
+      }
+    });
+    
+    return {
+      total: total,
+      diversityIndex: diversityPct,
+      diversityCount: Object.keys(bangsaCount).length,
+      bangsaCount: bangsaCount,
+      genderBalance: genderBalance,
+      male: male,
+      female: female,
+      uniformCount: uniformCount,
+      kelabCount: kelabCount,
+      sukanCount: sukanCount,
+      uniformPct: total > 0 ? (uniformCount / total * 100) : 0,
+      kelabPct: total > 0 ? (kelabCount / total * 100) : 0,
+      sukanPct: total > 0 ? (sukanCount / total * 100) : 0,
+      avgActivities: avgActivities,
+      topUniform: topUniform,
+      topKelab: topKelab,
+      rumahInsights: rumahInsights
+    };
+  }
+  
+  function renderAnalytics() {
+    const a = calculateAnalytics();
+    if (!a) return;
+    
+    // Overview cards
+    function getTag(val, type) {
+      if (type === 'diversity') {
+        if (val >= 70) return { class: 'excellent', label: 'Excellent' };
+        if (val >= 50) return { class: 'good', label: 'Good' };
+        if (val >= 30) return { class: 'warning', label: 'Limited' };
+        return { class: 'critical', label: 'Low' };
+      }
+      if (type === 'balance') {
+        if (val >= 80) return { class: 'excellent', label: 'Balanced' };
+        if (val >= 60) return { class: 'good', label: 'Good' };
+        if (val >= 40) return { class: 'warning', label: 'Skewed' };
+        return { class: 'critical', label: 'Imbalanced' };
+      }
+      if (type === 'active') {
+        if (val >= 90) return { class: 'excellent', label: 'Excellent' };
+        if (val >= 70) return { class: 'good', label: 'Good' };
+        if (val >= 50) return { class: 'warning', label: 'Average' };
+        return { class: 'critical', label: 'Low' };
+      }
+      if (type === 'avg') {
+        if (val >= 2.5) return { class: 'excellent', label: 'High Engagement' };
+        if (val >= 1.5) return { class: 'good', label: 'Good' };
+        if (val >= 0.5) return { class: 'warning', label: 'Low' };
+        return { class: 'critical', label: 'Very Low' };
+      }
+      return { class: 'good', label: 'OK' };
+    }
+    
+    const aktif = state.stats.aktif || a.total;
+    const aktifPct = a.total > 0 ? (aktif / a.total * 100) : 0;
+    
+    const cards = [
+      {
+        icon: '🌈',
+        value: a.diversityIndex.toFixed(0) + '%',
+        label: 'Diversity Index',
+        sub: a.diversityCount + ' kumpulan bangsa',
+        tag: getTag(a.diversityIndex, 'diversity'),
+        cls: 'c-rainbow'
+      },
+      {
+        icon: '⚖️',
+        value: a.genderBalance.toFixed(0) + '%',
+        label: 'Gender Balance',
+        sub: a.male + ' lelaki, ' + a.female + ' perempuan',
+        tag: getTag(a.genderBalance, 'balance'),
+        cls: 'c-balance'
+      },
+      {
+        icon: '🎯',
+        value: aktifPct.toFixed(0) + '%',
+        label: 'Rate Aktif',
+        sub: aktif + ' dari ' + a.total + ' pelajar',
+        tag: getTag(aktifPct, 'active'),
+        cls: 'c-active'
+      },
+      {
+        icon: '🏆',
+        value: a.avgActivities.toFixed(1),
+        label: 'Aktiviti / Pelajar',
+        sub: 'Purata penglibatan',
+        tag: getTag(a.avgActivities, 'avg'),
+        cls: 'c-trophy'
+      }
+    ];
+    
+    document.getElementById('dp-ovr-cards').innerHTML = cards.map(function(c) {
+      return '<div class="dp-ovr-card ' + c.cls + '">' +
+        '<div class="dp-ovr-icon">' + c.icon + '</div>' +
+        '<div class="dp-ovr-value">' + c.value + '</div>' +
+        '<div class="dp-ovr-label">' + c.label + '</div>' +
+        '<div class="dp-ovr-sub">' + c.sub + '</div>' +
+        '<span class="dp-ovr-tag ' + c.tag.class + '">' + c.tag.label + '</span>' +
+        '</div>';
+    }).join('');
+    
+    // Participation bars
+    const partBars = [
+      { icon: '🎖️', label: 'Unit Beruniform', count: a.uniformCount, pct: a.uniformPct, cls: 'b-uniform' },
+      { icon: '📚', label: 'Kelab/Persatuan', count: a.kelabCount, pct: a.kelabPct, cls: 'b-kelab' },
+      { icon: '⚽', label: 'Sukan & Permainan', count: a.sukanCount, pct: a.sukanPct, cls: 'b-sukan' }
+    ];
+    
+    document.getElementById('dp-part-bars').innerHTML = partBars.map(function(p) {
+      return '<div class="dp-part-item">' +
+        '<div class="dp-part-h">' +
+          '<div class="dp-part-label">' + p.icon + ' ' + p.label + '</div>' +
+          '<div class="dp-part-value">' + p.count + '/' + a.total + ' (' + p.pct.toFixed(1) + '%)</div>' +
+        '</div>' +
+        '<div class="dp-part-bar-bg"><div class="dp-part-bar ' + p.cls + '" style="width: ' + p.pct + '%;"></div></div>' +
+      '</div>';
+    }).join('');
+    
+    // Participation insight
+    const avgPct = (a.uniformPct + a.kelabPct + a.sukanPct) / 3;
+    let insight = '';
+    if (avgPct >= 90) insight = '✨ Excellent! Hampir semua pelajar terlibat aktif dalam ketiga-tiga kategori kokurikulum.';
+    else if (avgPct >= 70) insight = '👍 Good penglibatan! Majoriti pelajar terlibat dalam pelbagai aktiviti.';
+    else if (avgPct >= 50) insight = '💡 Penglibatan sederhana. Pertimbangkan strategi untuk meningkatkan participation.';
+    else insight = '⚠️ Penglibatan rendah. Perlu intervention strategik untuk meningkatkan engagement.';
+    
+    document.getElementById('dp-part-insight').innerHTML = 
+      '<span class="dp-insight-icon">💡</span><span><strong>Insight:</strong> ' + insight + '</span>';
+    
+    // Top Units
+    function renderTopList(items, title, icon, totalCount) {
+      let html = '<div class="dp-top-card">' +
+        '<div class="dp-top-h">' + icon + ' ' + title + '</div>';
+      if (items.length === 0) {
+        html += '<div style="color: #94a3b8; text-align: center; padding: 20px;">Tiada data</div>';
+      } else {
+        const maxCount = items[0].count;
+        items.forEach(function(item, idx) {
+          const rankCls = idx === 0 ? 'r1' : idx === 1 ? 'r2' : idx === 2 ? 'r3' : 'r' + (idx + 1);
+          const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1);
+          const barPct = (item.count / maxCount * 100);
+          html += '<div class="dp-top-item">' +
+            '<div class="dp-top-rank ' + rankCls + '">' + rankIcon + '</div>' +
+            '<div class="dp-top-name" title="' + item.name + '">' + item.name + '</div>' +
+            '<div class="dp-top-bar-wrap"><div class="dp-top-bar" style="width: ' + barPct + '%;"></div></div>' +
+            '<div class="dp-top-count">' + item.count + '</div>' +
+            '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+    
+    document.getElementById('dp-top-grid').innerHTML = 
+      renderTopList(a.topUniform, 'Top 5 Unit Beruniform', '🎖️', a.total) +
+      renderTopList(a.topKelab, 'Top 5 Kelab/Persatuan', '📚', a.total);
+    
+    // Rumah Sukan Insights Table
+    let rhHtml = '';
+    Object.keys(RUMAH).forEach(function(rName) {
+      const cfg = RUMAH[rName];
+      const r = a.rumahInsights[rName];
+      
+      // Bangsa chips
+      const bangsaChips = Object.keys(r.bangsa).map(function(b) {
+        return '<span class="dp-rh-chip" title="' + b + '">' + b.substring(0, 8) + (b.length > 8 ? '...' : '') + ': ' + r.bangsa[b] + '</span>';
+      }).join('');
+      
+      // Diversity per rumah
+      const rumahDivCount = Object.keys(r.bangsa).length;
+      let divLabel = '';
+      if (rumahDivCount >= 3) divLabel = '<span style="color:#10b981;font-weight:600;">🌈 Diverse</span>';
+      else if (rumahDivCount === 2) divLabel = '<span style="color:#3b82f6;font-weight:600;">✓ Mixed</span>';
+      else divLabel = '<span style="color:#64748b;font-weight:600;">Single</span>';
+      
+      rhHtml += '<tr>' +
+        '<td><span class="dp-rh-color-cell" style="background: ' + cfg.warna + ';">' + rName.substring(0, 2) + '</span> <strong>' + rName + '</strong></td>' +
+        '<td><strong>' + r.total + '</strong></td>' +
+        '<td><span class="dp-rh-gender"><span class="dp-rh-gender-m">♂ ' + r.male + '</span> / <span class="dp-rh-gender-f">♀ ' + r.female + '</span></span></td>' +
+        '<td><div class="dp-rh-bangsa-chips">' + bangsaChips + '</div></td>' +
+        '<td>' + divLabel + '</td>' +
+        '</tr>';
+    });
+    document.getElementById('dp-rh-tbody').innerHTML = rhHtml;
+    
+    // Strategic Alerts
+    const alerts = [];
+    
+    // Aktif check
+    if (aktifPct >= 95) {
+      alerts.push({ type: 'a-success', icon: '✅', title: 'Semua Pelajar Aktif', msg: 'Excellent! ' + aktifPct.toFixed(0) + '% pelajar aktif dalam kokurikulum.' });
+    } else if (aktifPct < 70) {
+      alerts.push({ type: 'a-warning', icon: '⚠️', title: 'Penglibatan Boleh Ditingkatkan', msg: 'Hanya ' + aktifPct.toFixed(0) + '% pelajar aktif. Pertimbangkan strategi engagement.' });
+    }
+    
+    // Diversity check
+    if (a.diversityIndex < 30) {
+      const bangsaKeys = Object.keys(a.bangsaCount);
+let dominantBangsa = bangsaKeys[0];
+let maxCount = a.bangsaCount[dominantBangsa];
+bangsaKeys.forEach(function(b) {
+  if (a.bangsaCount[b] > maxCount) {
+    maxCount = a.bangsaCount[b];
+    dominantBangsa = b;
+  }
+});
+const dominantPct = (a.bangsaCount[dominantBangsa] / a.total * 100).toFixed(0);
+alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dominantPct + '% pelajar adalah ' + dominantBangsa + '. Galakkan integrasi kaum.' });
+    } else if (a.diversityIndex >= 70) {
+      alerts.push({ type: 'a-success', icon: '🌈', title: 'Excellent Diversity', msg: 'Kepelbagaian kaum yang baik (' + a.diversityCount + ' kumpulan bangsa).' });
+    }
+    
+    // Gender balance
+    if (a.genderBalance >= 80) {
+      alerts.push({ type: 'a-success', icon: '⚖️', title: 'Gender Balanced', msg: 'Distribusi gender yang seimbang merentas Rumah Sukan.' });
+    } else if (a.genderBalance < 50) {
+      alerts.push({ type: 'a-warning', icon: '⚖️', title: 'Gender Imbalance', msg: 'Distribusi gender tidak seimbang. M:' + a.male + ' F:' + a.female });
+    }
+    
+    // Avg activities
+    if (a.avgActivities >= 2.5) {
+      alerts.push({ type: 'a-success', icon: '🏆', title: 'High Engagement', msg: 'Pelajar terlibat aktif dalam pelbagai kategori (purata ' + a.avgActivities.toFixed(1) + ' aktiviti).' });
+    } else if (a.avgActivities < 1) {
+      alerts.push({ type: 'a-danger', icon: '📉', title: 'Low Engagement', msg: 'Purata aktiviti rendah. Perlu intervention untuk meningkatkan penglibatan.' });
+    }
+    
+    // Participation gaps
+    if (a.uniformPct < 50) alerts.push({ type: 'a-warning', icon: '🎖️', title: 'Uniform Participation Low', msg: 'Hanya ' + a.uniformPct.toFixed(0) + '% pelajar dalam unit beruniform.' });
+    if (a.kelabPct < 50) alerts.push({ type: 'a-warning', icon: '📚', title: 'Kelab Participation Low', msg: 'Hanya ' + a.kelabPct.toFixed(0) + '% pelajar dalam kelab/persatuan.' });
+    if (a.sukanPct < 50) alerts.push({ type: 'a-warning', icon: '⚽', title: 'Sukan Participation Low', msg: 'Hanya ' + a.sukanPct.toFixed(0) + '% pelajar dalam sukan.' });
+    
+    if (alerts.length === 0) {
+      alerts.push({ type: 'a-info', icon: 'ℹ️', title: 'All Metrics Normal', msg: 'Tiada isu strategik yang perlu perhatian segera.' });
+    }
+    
+    document.getElementById('dp-alerts').innerHTML = alerts.map(function(al) {
+      return '<div class="dp-alert ' + al.type + '">' +
+        '<div class="dp-alert-icon">' + al.icon + '</div>' +
+        '<div class="dp-alert-content">' +
+          '<div class="dp-alert-title">' + al.title + '</div>' +
+          '<div class="dp-alert-msg">' + al.msg + '</div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+  }
+  
   
   function renderChart1() {
     const ctx = document.getElementById('dp-c-t').getContext('2d');
@@ -12224,25 +13488,304 @@ console.log('🚀 [DataPelajar] Loading module...');
     const bSel = document.getElementById('dp-f-b');
     Array.from(bSet).sort().forEach(b => { const o = document.createElement('option'); o.value = b; o.textContent = b; bSel.appendChild(o); });
   }
+
   
-  function setupListeners() {
-    let to;
-    document.getElementById('dp-s').addEventListener('input', e => { clearTimeout(to); to = setTimeout(() => { state.filters.search = e.target.value; applyFilters(); }, 300); });
-    document.getElementById('dp-f-t').addEventListener('change', e => { state.filters.tingkatan = e.target.value; applyFilters(); });
-    document.getElementById('dp-f-r').addEventListener('change', e => { state.filters.rumah_sukan = e.target.value; applyFilters(); });
-    document.getElementById('dp-f-b').addEventListener('change', e => { state.filters.bangsa = e.target.value; applyFilters(); });
+  function renderQuickFilters() {
+    const total = state.students.length;
+    const activeCount = state.students.filter(function(s) { return s.status_aktif === 'Aktif'; }).length;
+    const maleCount = state.students.filter(function(s) { return s.gender === 'Male' || s.gender === 'M'; }).length;
+    const femaleCount = state.students.filter(function(s) { return s.gender === 'Female' || s.gender === 'F'; }).length;
+    const ibanCount = state.students.filter(function(s) { return (s.bangsa || '').toLowerCase().indexOf('iban') !== -1; }).length;
+    const uniformCount = state.students.filter(function(s) { return s.uniform && s.uniform.trim(); }).length;
+    const kelabCount = state.students.filter(function(s) { return s.kelab && s.kelab.trim(); }).length;
+    const sukanCount = state.students.filter(function(s) { return s.sukan && s.sukan.trim(); }).length;
+    const multiCount = state.students.filter(function(s) {
+      let c = 0;
+      if (s.uniform && s.uniform.trim()) c++;
+      if (s.kelab && s.kelab.trim()) c++;
+      if (s.sukan && s.sukan.trim()) c++;
+      return c >= 3;
+    }).length;
+    
+    const filters = [
+      { key: 'quick_aktif', icon: '🎯', label: 'Aktif', count: activeCount },
+      { key: 'gender_male', icon: '♂', label: 'Lelaki', count: maleCount },
+      { key: 'gender_female', icon: '♀', label: 'Perempuan', count: femaleCount },
+      { key: 'quick_iban', icon: '🌏', label: 'Iban', count: ibanCount },
+      { key: 'has_uniform', icon: '🎖️', label: 'Uniform', count: uniformCount },
+      { key: 'has_kelab', icon: '📚', label: 'Kelab', count: kelabCount },
+      { key: 'has_sukan', icon: '⚽', label: 'Sukan', count: sukanCount },
+      { key: 'multi_activity', icon: '🏆', label: 'Multi-Aktiviti', count: multiCount }
+    ];
+    
+    document.getElementById('dp-qf-grid').innerHTML = filters.map(function(f) {
+      const active = state.filters[f.key];
+      return '<button class="dp-qf-btn ' + (active ? 'active' : '') + '" data-key="' + f.key + '" onclick="DataPelajar.toggleQuickFilter(\'' + f.key + '\')">' +
+        '<span>' + f.icon + '</span>' +
+        '<span>' + f.label + '</span>' +
+        '<span class="dp-qf-count">' + f.count + '</span>' +
+        '</button>';
+    }).join('');
   }
   
-  function applyFilters() {
+  function updateQuickFilterStates() {
+    document.querySelectorAll('#dp-qf-grid .dp-qf-btn').forEach(function(btn) {
+      const key = btn.getAttribute('data-key');
+      if (state.filters[key]) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+  }
+  
+  function renderActiveChips() {
     const f = state.filters;
-    let r = state.students;
-    if (f.search) { const t = f.search.toLowerCase(); r = r.filter(s => (s.nama||'').toLowerCase().includes(t) || String(s.student_no||'').includes(t)); }
-    if (f.tingkatan) r = r.filter(s => s.tingkatan === f.tingkatan);
-    if (f.rumah_sukan) r = r.filter(s => s.rumah_sukan === f.rumah_sukan);
-    if (f.bangsa) r = r.filter(s => s.bangsa === f.bangsa);
-    state.filteredStudents = r;
+    const chips = [];
+    
+    if (f.search) chips.push({ label: '🔍 Search: "' + f.search + '"', key: 'search', isText: true });
+    if (f.tingkatan) chips.push({ label: '📚 ' + f.tingkatan, key: 'tingkatan', isText: true });
+    if (f.rumah_sukan) chips.push({ label: '🏠 ' + f.rumah_sukan, key: 'rumah_sukan', isText: true });
+    if (f.bangsa) chips.push({ label: '🌏 ' + f.bangsa, key: 'bangsa', isText: true });
+    if (f.uniform) chips.push({ label: '🎖️ Uniform: ' + f.uniform, key: 'uniform', isText: true });
+    if (f.kelab) chips.push({ label: '📚 Kelab: ' + f.kelab, key: 'kelab', isText: true });
+    if (f.sukan) chips.push({ label: '⚽ Sukan: ' + f.sukan, key: 'sukan', isText: true });
+    if (f.gender_male) chips.push({ label: '♂ Lelaki', key: 'gender_male', isText: false });
+    if (f.gender_female) chips.push({ label: '♀ Perempuan', key: 'gender_female', isText: false });
+    if (f.has_uniform) chips.push({ label: '🎖️ Ada Uniform', key: 'has_uniform', isText: false });
+    if (f.has_kelab) chips.push({ label: '📚 Ada Kelab', key: 'has_kelab', isText: false });
+    if (f.has_sukan) chips.push({ label: '⚽ Ada Sukan', key: 'has_sukan', isText: false });
+    if (f.multi_activity) chips.push({ label: '🏆 Multi-Aktiviti', key: 'multi_activity', isText: false });
+    if (f.quick_aktif) chips.push({ label: '🎯 Aktif', key: 'quick_aktif', isText: false });
+    if (f.quick_iban) chips.push({ label: '🌏 Iban', key: 'quick_iban', isText: false });
+    
+    const section = document.getElementById('dp-chips-section');
+    if (chips.length === 0) {
+      section.classList.add('empty');
+      return;
+    }
+    section.classList.remove('empty');
+    
+    document.getElementById('dp-chips-list').innerHTML = chips.map(function(c) {
+      return '<span class="dp-chip">' + c.label + 
+        '<button class="dp-chip-x" onclick="DataPelajar.removeFilter(\'' + c.key + '\')">✕</button>' +
+        '</span>';
+    }).join('');
+  }
+  
+  function renderSuggestions(query) {
+    const sg = document.getElementById('dp-suggestions');
+    if (!query || query.length < 1) {
+      sg.classList.remove('show');
+      return;
+    }
+    
+    const q = query.toLowerCase();
+    const matches = { names: [], classes: [], rumah: [], bangsa: [], kelab: [], sukan: [] };
+    
+    state.students.forEach(function(s) {
+      if (s.nama && s.nama.toLowerCase().indexOf(q) !== -1 && matches.names.length < 5) {
+        if (!matches.names.find(function(m) { return m.id === s.student_no; })) {
+          matches.names.push({ text: s.nama, meta: s.kelas + ' • ' + s.bangsa, id: s.student_no });
+        }
+      }
+    });
+    
+    const uniqueClasses = {};
+    state.students.forEach(function(s) {
+      if (s.kelas && s.kelas.toLowerCase().indexOf(q) !== -1 && !uniqueClasses[s.kelas]) {
+        uniqueClasses[s.kelas] = state.students.filter(function(x) { return x.kelas === s.kelas; }).length;
+      }
+    });
+    Object.keys(uniqueClasses).slice(0, 3).forEach(function(k) {
+      matches.classes.push({ text: k, count: uniqueClasses[k] });
+    });
+    
+    Object.keys(RUMAH).forEach(function(r) {
+      if (r.toLowerCase().indexOf(q) !== -1) {
+        const count = state.students.filter(function(s) { return s.rumah_sukan === r; }).length;
+        matches.rumah.push({ text: r, count: count, cfg: RUMAH[r] });
+      }
+    });
+    
+    const uniqueBangsa = {};
+    state.students.forEach(function(s) {
+      if (s.bangsa && s.bangsa.toLowerCase().indexOf(q) !== -1 && !uniqueBangsa[s.bangsa]) {
+        uniqueBangsa[s.bangsa] = state.students.filter(function(x) { return x.bangsa === s.bangsa; }).length;
+      }
+    });
+    Object.keys(uniqueBangsa).slice(0, 3).forEach(function(b) {
+      matches.bangsa.push({ text: b, count: uniqueBangsa[b] });
+    });
+    
+    const totalMatches = matches.names.length + matches.classes.length + matches.rumah.length + matches.bangsa.length;
+    if (totalMatches === 0) {
+      sg.classList.remove('show');
+      return;
+    }
+    
+    let html = '';
+    
+    if (matches.names.length > 0) {
+      html += '<div class="dp-sg-section"><div class="dp-sg-title">👤 PELAJAR</div>';
+      matches.names.forEach(function(m) {
+        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + m.text.replace(/'/g, "\\'") + '\')">' +
+          '<span class="dp-sg-icon">👤</span>' +
+          '<span class="dp-sg-text">' + m.text + '</span>' +
+          '<span class="dp-sg-meta">' + m.meta + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+    
+    if (matches.classes.length > 0) {
+      html += '<div class="dp-sg-section"><div class="dp-sg-title">📚 KELAS</div>';
+      matches.classes.forEach(function(c) {
+        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + c.text + '\')">' +
+          '<span class="dp-sg-icon">📚</span>' +
+          '<span class="dp-sg-text">Kelas ' + c.text + '</span>' +
+          '<span class="dp-sg-meta">' + c.count + ' pelajar</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+    
+    if (matches.rumah.length > 0) {
+      html += '<div class="dp-sg-section"><div class="dp-sg-title">🏠 RUMAH SUKAN</div>';
+      matches.rumah.forEach(function(r) {
+        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + r.text + '\')">' +
+          '<span class="dp-sg-icon">' + r.cfg.emoji + '</span>' +
+          '<span class="dp-sg-text">' + r.text + ' (' + r.cfg.label + ')</span>' +
+          '<span class="dp-sg-meta">' + r.count + ' pelajar</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+    
+    if (matches.bangsa.length > 0) {
+      html += '<div class="dp-sg-section"><div class="dp-sg-title">🌏 BANGSA</div>';
+      matches.bangsa.forEach(function(b) {
+        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + b.text + '\')">' +
+          '<span class="dp-sg-icon">🌏</span>' +
+          '<span class="dp-sg-text">' + b.text + '</span>' +
+          '<span class="dp-sg-meta">' + b.count + ' pelajar</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+    
+    sg.innerHTML = html;
+    sg.classList.add('show');
+  }
+  
+  
+    function setupListeners() {
+    let to;
+    const searchInput = document.getElementById('dp-s');
+    const searchClear = document.getElementById('dp-search-clear');
+    
+    searchInput.addEventListener('input', function(e) {
+      const val = e.target.value;
+      clearTimeout(to);
+      
+      // Show/hide clear button
+      if (val) {
+        searchClear.classList.add('show');
+        searchInput.classList.add('has-value');
+      } else {
+        searchClear.classList.remove('show');
+        searchInput.classList.remove('has-value');
+      }
+      
+      // Show suggestions immediately
+      renderSuggestions(val);
+      
+      // Apply filter with debounce
+      to = setTimeout(function() {
+        state.filters.search = val;
+        applyFilters();
+      }, 300);
+    });
+    
+    searchInput.addEventListener('focus', function() {
+      if (searchInput.value) renderSuggestions(searchInput.value);
+    });
+    
+    // Close suggestions on click outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.dp-search-wrap')) {
+        document.getElementById('dp-suggestions').classList.remove('show');
+      }
+    });
+    
+    document.getElementById('dp-f-t').addEventListener('change', function(e) { state.filters.tingkatan = e.target.value; applyFilters(); });
+    document.getElementById('dp-f-r').addEventListener('change', function(e) { state.filters.rumah_sukan = e.target.value; applyFilters(); });
+    document.getElementById('dp-f-b').addEventListener('change', function(e) { state.filters.bangsa = e.target.value; applyFilters(); });
+  }
+  
+    function applyFilters() {
+    const f = state.filters;
+    let filtered = state.students;
+    
+    // Multi-keyword search
+    if (f.search) {
+      const keywords = f.search.toLowerCase().split(/\s+/).filter(function(k) { return k.length > 0; });
+      filtered = filtered.filter(function(s) {
+        const searchable = [
+          s.nama, s.student_no, s.no_kp_full, s.kelas, s.tingkatan, 
+          s.bangsa, s.rumah_sukan, s.uniform, s.kelab, s.sukan, s.gender
+        ].join(' ').toLowerCase();
+        return keywords.every(function(k) { return searchable.indexOf(k) !== -1; });
+      });
+    }
+    
+    if (f.tingkatan) filtered = filtered.filter(function(s) { return s.tingkatan === f.tingkatan; });
+    if (f.rumah_sukan) filtered = filtered.filter(function(s) { return s.rumah_sukan === f.rumah_sukan; });
+    if (f.bangsa) filtered = filtered.filter(function(s) { return s.bangsa === f.bangsa; });
+    
+    // Within-field searches
+    if (f.uniform) {
+      const u = f.uniform.toLowerCase();
+      filtered = filtered.filter(function(s) { return (s.uniform || '').toLowerCase().indexOf(u) !== -1; });
+    }
+    if (f.kelab) {
+      const k = f.kelab.toLowerCase();
+      filtered = filtered.filter(function(s) { return (s.kelab || '').toLowerCase().indexOf(k) !== -1; });
+    }
+    if (f.sukan) {
+      const sk = f.sukan.toLowerCase();
+      filtered = filtered.filter(function(s) { return (s.sukan || '').toLowerCase().indexOf(sk) !== -1; });
+    }
+    
+    // Gender filters
+    if (f.gender_male && !f.gender_female) {
+      filtered = filtered.filter(function(s) { return s.gender === 'Male' || s.gender === 'M'; });
+    } else if (f.gender_female && !f.gender_male) {
+      filtered = filtered.filter(function(s) { return s.gender === 'Female' || s.gender === 'F'; });
+    }
+    
+    // Activity filters
+    if (f.has_uniform) filtered = filtered.filter(function(s) { return s.uniform && s.uniform.trim(); });
+    if (f.has_kelab) filtered = filtered.filter(function(s) { return s.kelab && s.kelab.trim(); });
+    if (f.has_sukan) filtered = filtered.filter(function(s) { return s.sukan && s.sukan.trim(); });
+    if (f.multi_activity) {
+      filtered = filtered.filter(function(s) {
+        let count = 0;
+        if (s.uniform && s.uniform.trim()) count++;
+        if (s.kelab && s.kelab.trim()) count++;
+        if (s.sukan && s.sukan.trim()) count++;
+        return count >= 3;
+      });
+    }
+    
+    // Quick filters
+    if (f.quick_aktif) filtered = filtered.filter(function(s) { return s.status_aktif === 'Aktif'; });
+    if (f.quick_iban) filtered = filtered.filter(function(s) { 
+      return (s.bangsa || '').toLowerCase().indexOf('iban') !== -1; 
+    });
+    
+    state.filteredStudents = filtered;
     state.currentPage = 1;
     renderTable();
+    renderActiveChips();
+    updateQuickFilterStates();
   }
 
   // ⭐ ADD THIS NEW FUNCTION
@@ -12453,6 +13996,278 @@ console.log('🚀 [DataPelajar] Loading module...');
       document.getElementById('dp-f-b').value = '';
       applyFilters();
     },
+
+    
+    clearAllFilters: function() {
+      Object.keys(state.filters).forEach(function(k) {
+        if (typeof state.filters[k] === 'boolean') state.filters[k] = false;
+        else state.filters[k] = '';
+      });
+      document.getElementById('dp-s').value = '';
+      document.getElementById('dp-search-clear').classList.remove('show');
+      document.getElementById('dp-s').classList.remove('has-value');
+      document.getElementById('dp-f-t').value = '';
+      document.getElementById('dp-f-r').value = '';
+      document.getElementById('dp-f-b').value = '';
+      applyFilters();
+    },
+    
+    clearSearch: function() {
+      document.getElementById('dp-s').value = '';
+      document.getElementById('dp-search-clear').classList.remove('show');
+      document.getElementById('dp-s').classList.remove('has-value');
+      document.getElementById('dp-suggestions').classList.remove('show');
+      state.filters.search = '';
+      applyFilters();
+    },
+    
+    removeFilter: function(key) {
+      if (typeof state.filters[key] === 'boolean') {
+        state.filters[key] = false;
+      } else {
+        state.filters[key] = '';
+        if (key === 'search') {
+          document.getElementById('dp-s').value = '';
+          document.getElementById('dp-search-clear').classList.remove('show');
+        }
+        if (key === 'tingkatan') document.getElementById('dp-f-t').value = '';
+        if (key === 'rumah_sukan') document.getElementById('dp-f-r').value = '';
+        if (key === 'bangsa') document.getElementById('dp-f-b').value = '';
+      }
+      applyFilters();
+    },
+    
+    toggleQuickFilter: function(key) {
+      state.filters[key] = !state.filters[key];
+      applyFilters();
+    },
+    
+    selectSuggestion: function(text) {
+      document.getElementById('dp-s').value = text;
+      document.getElementById('dp-search-clear').classList.add('show');
+      document.getElementById('dp-s').classList.add('has-value');
+      document.getElementById('dp-suggestions').classList.remove('show');
+      state.filters.search = text;
+      applyFilters();
+    },
+    
+    openAdvFilter: function() {
+      // Populate current values
+      document.getElementById('dp-af-uniform').value = state.filters.uniform || '';
+      document.getElementById('dp-af-kelab').value = state.filters.kelab || '';
+      document.getElementById('dp-af-sukan').value = state.filters.sukan || '';
+      document.getElementById('dp-af-male').checked = state.filters.gender_male;
+      document.getElementById('dp-af-female').checked = state.filters.gender_female;
+      document.getElementById('dp-af-has-uniform').checked = state.filters.has_uniform;
+      document.getElementById('dp-af-has-kelab').checked = state.filters.has_kelab;
+      document.getElementById('dp-af-has-sukan').checked = state.filters.has_sukan;
+      document.getElementById('dp-af-multi').checked = state.filters.multi_activity;
+      
+      // Update checkbox visual states
+      ['male', 'female', 'has-uniform', 'has-kelab', 'has-sukan', 'multi'].forEach(function(id) {
+        const cb = document.getElementById('dp-af-' + id);
+        const lbl = document.getElementById('dp-af-' + id + '-label');
+        if (cb && lbl) {
+          if (cb.checked) lbl.classList.add('checked');
+          else lbl.classList.remove('checked');
+          cb.onchange = function() {
+            if (this.checked) lbl.classList.add('checked');
+            else lbl.classList.remove('checked');
+          };
+        }
+      });
+      
+      document.getElementById('dpAdvFilter').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    },
+    
+    closeAdvFilter: function() {
+      document.getElementById('dpAdvFilter').classList.remove('active');
+      document.body.style.overflow = '';
+    },
+    
+    resetAdvFilter: function() {
+      document.getElementById('dp-af-uniform').value = '';
+      document.getElementById('dp-af-kelab').value = '';
+      document.getElementById('dp-af-sukan').value = '';
+      ['male', 'female', 'has-uniform', 'has-kelab', 'has-sukan', 'multi'].forEach(function(id) {
+        const cb = document.getElementById('dp-af-' + id);
+        const lbl = document.getElementById('dp-af-' + id + '-label');
+        if (cb) cb.checked = false;
+        if (lbl) lbl.classList.remove('checked');
+      });
+    },
+    
+    applyAdvFilter: function() {
+      state.filters.uniform = document.getElementById('dp-af-uniform').value;
+      state.filters.kelab = document.getElementById('dp-af-kelab').value;
+      state.filters.sukan = document.getElementById('dp-af-sukan').value;
+      state.filters.gender_male = document.getElementById('dp-af-male').checked;
+      state.filters.gender_female = document.getElementById('dp-af-female').checked;
+      state.filters.has_uniform = document.getElementById('dp-af-has-uniform').checked;
+      state.filters.has_kelab = document.getElementById('dp-af-has-kelab').checked;
+      state.filters.has_sukan = document.getElementById('dp-af-has-sukan').checked;
+      state.filters.multi_activity = document.getElementById('dp-af-multi').checked;
+      
+      applyFilters();
+      this.closeAdvFilter();
+    },
+
+    
+    openHelp: function() {
+      document.getElementById('dpHelp').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    },
+    
+    closeHelp: function() {
+      document.getElementById('dpHelp').classList.remove('active');
+      document.body.style.overflow = '';
+    },
+    
+    switchHelpTab: function(name) {
+      document.querySelectorAll('#dpHelp .h-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('#dpHelp .h-tc').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelector('#dpHelp [data-htab="' + name + '"]').classList.add('active');
+      document.getElementById('dp-h-' + name).classList.add('active');
+    },
+    
+    showToast: function(message, type) {
+      type = type || 'info';
+      const icons = { success: '✅', info: 'ℹ️', warning: '⚠️' };
+      const container = document.getElementById('dp-toast');
+      if (!container) return;
+      
+      const toast = document.createElement('div');
+      toast.className = 'dp-toast-item t-' + type;
+      toast.innerHTML = '<span class="dp-toast-icon">' + (icons[type] || 'ℹ️') + '</span><span>' + message + '</span>';
+      container.appendChild(toast);
+      
+      setTimeout(function() {
+        toast.style.animation = 'dpToastOut 0.3s forwards';
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 3000);
+    },
+    
+    focusSearch: function() {
+      const search = document.getElementById('dp-s');
+      if (search) {
+        search.focus();
+        search.select();
+        DataPelajar.showToast('🔍 Search activated', 'info');
+      }
+    },
+    
+    setupKeyboardShortcuts: function() {
+      if (DataPelajar._shortcutsSetup) return;
+      DataPelajar._shortcutsSetup = true;
+      
+      document.addEventListener('keydown', function(e) {
+        // Only if Data Pelajar tab active
+        const activeNav = document.querySelector('.nav-item.active[data-page="pelajar"]');
+        if (!activeNav) return;
+        
+        // Don't trigger when typing in inputs (except for Esc)
+        const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+        
+        // Escape - close any modal
+        if (e.key === 'Escape') {
+          if (document.getElementById('dpHelp') && document.getElementById('dpHelp').classList.contains('active')) {
+            DataPelajar.closeHelp();
+            e.preventDefault();
+            return;
+          }
+          if (document.getElementById('dpModal') && document.getElementById('dpModal').classList.contains('active')) {
+            DataPelajar.closeProfile();
+            e.preventDefault();
+            return;
+          }
+          if (document.getElementById('dpExport') && document.getElementById('dpExport').classList.contains('active')) {
+            DataPelajar.closeExportMenu();
+            e.preventDefault();
+            return;
+          }
+          if (document.getElementById('dpAdvFilter') && document.getElementById('dpAdvFilter').classList.contains('active')) {
+            DataPelajar.closeAdvFilter();
+            e.preventDefault();
+            return;
+          }
+          const sg = document.getElementById('dp-suggestions');
+          if (sg && sg.classList.contains('show')) {
+            sg.classList.remove('show');
+            e.preventDefault();
+            return;
+          }
+        }
+        
+        if (isInput) return;
+        
+        // ? - Help
+        if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+          DataPelajar.openHelp();
+          e.preventDefault();
+          return;
+        }
+        
+        // Ctrl+F - Focus search
+        if (e.ctrlKey && e.key === 'f') {
+          DataPelajar.focusSearch();
+          e.preventDefault();
+          return;
+        }
+        
+        // Ctrl+E - Export
+        if (e.ctrlKey && e.key === 'e') {
+          DataPelajar.openExportMenu();
+          DataPelajar.showToast('📥 Export menu opened', 'info');
+          e.preventDefault();
+          return;
+        }
+        
+        // Ctrl+R - Refresh (intercept default)
+        if (e.ctrlKey && e.key === 'r') {
+          DataPelajar.refresh();
+          DataPelajar.showToast('🔄 Data refreshed', 'success');
+          e.preventDefault();
+          return;
+        }
+        
+        // Ctrl+M - Advanced Filters
+        if (e.ctrlKey && e.key === 'm') {
+          DataPelajar.openAdvFilter();
+          DataPelajar.showToast('⚙️ Advanced filters opened', 'info');
+          e.preventDefault();
+          return;
+        }
+        
+        // Ctrl+K - Clear filters
+        if (e.ctrlKey && e.key === 'k') {
+          DataPelajar.clearAllFilters();
+          DataPelajar.showToast('✕ All filters cleared', 'success');
+          e.preventDefault();
+          return;
+        }
+        
+        // Arrow keys for pagination
+        if (e.key === 'ArrowLeft' && state.currentPage > 1) {
+          DataPelajar.goToPage(state.currentPage - 1);
+          e.preventDefault();
+          return;
+        }
+        
+        if (e.key === 'ArrowRight') {
+          const total = state.filteredStudents.length;
+          const pages = Math.max(1, Math.ceil(total / 15));
+          if (state.currentPage < pages) {
+            DataPelajar.goToPage(state.currentPage + 1);
+            e.preventDefault();
+            return;
+          }
+        }
+      });
+      
+      console.log('⌨️ [DataPelajar] Keyboard shortcuts activated');
+    },
+
     openProfile: function(no) {
       const s = state.students.find(x => String(x.student_no) === String(no));
       if (!s) return;
@@ -12493,18 +14308,362 @@ console.log('🚀 [DataPelajar] Loading module...');
       document.querySelector(`#dpModal [data-tab="${n}"]`).classList.add('active');
       document.getElementById('dp-t-' + n).classList.add('active');
     },
-    exportCSV: function() {
+        exportCSV: function() {
+      // Legacy alias - redirect to enhanced
+      this.exportCSVEnhanced();
+    },
+    
+    openExportMenu: function() {
+      // Show filter status if filters active
+      const f = state.filters;
+      const hasFilters = f.search || f.tingkatan || f.rumah_sukan || f.bangsa;
+      const filterStatus = document.getElementById('dp-export-filter-status');
+      const filterMsg = document.getElementById('dp-export-filter-msg');
+      
+      if (hasFilters) {
+        const activeFilters = [];
+        if (f.search) activeFilters.push('Search: "' + f.search + '"');
+        if (f.tingkatan) activeFilters.push('Tingkatan: ' + f.tingkatan);
+        if (f.rumah_sukan) activeFilters.push('Rumah: ' + f.rumah_sukan);
+        if (f.bangsa) activeFilters.push('Bangsa: ' + f.bangsa);
+        filterMsg.innerHTML = '<strong>Filter aktif:</strong> ' + activeFilters.join(' • ') + ' — Export akan terpakai pada ' + state.filteredStudents.length + ' pelajar terfilter.';
+        filterStatus.style.display = 'flex';
+      } else {
+        filterStatus.style.display = 'none';
+      }
+      
+      // Populate class dropdown
+      const classSelect = document.getElementById('dp-export-class');
+      classSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      const classSet = {};
+      state.students.forEach(function(s) { if (s.kelas) classSet[s.kelas] = true; });
+      Object.keys(classSet).sort().forEach(function(c) {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c + ' (' + state.students.filter(function(s) { return s.kelas === c; }).length + ' pelajar)';
+        classSelect.appendChild(opt);
+      });
+      
+      document.getElementById('dpExport').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    },
+    
+    closeExportMenu: function() {
+      document.getElementById('dpExport').classList.remove('active');
+      document.body.style.overflow = '';
+    },
+    
+    exportCSVEnhanced: function() {
       const data = state.filteredStudents.length > 0 ? state.filteredStudents : state.students;
-      if (data.length === 0) return alert('Tiada data!');
-      const headers = ['No','Nama','Student No','Kelas','Tingkatan','Gender','Bangsa','Rumah','Uniform','Kelab','Sukan'];
-      const rows = data.map((s,i) => [i+1,s.nama,s.student_no,s.kelas,s.tingkatan,s.gender,s.bangsa,s.rumah_sukan,s.uniform,s.kelab,s.sukan]);
-      const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(','))].join('\n');
+      if (data.length === 0) return alert('Tiada data untuk di-export!');
+      
+      const now = new Date();
+      const dateStr = now.getDate() + '/' + (now.getMonth()+1) + '/' + now.getFullYear() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+      
+      // SECTION 1: Header
+      let csv = '';
+      csv += '"SPKB - DATA PELAJAR LAPORAN ANALITIK"\n';
+      csv += '"SMK Tinggi Kuching"\n';
+      csv += '"Dijana pada: ' + dateStr + '"\n';
+      csv += '"Tahun: ' + (state.stats.tahun || '2026') + '"\n';
+      csv += '\n';
+      
+      // SECTION 2: Analytics Summary
+      const a = calculateAnalytics();
+      if (a) {
+        csv += '"=== ANALYTICS SUMMARY ==="\n';
+        csv += '"Metric","Nilai","Status"\n';
+        csv += '"Total Pelajar","' + a.total + '","-"\n';
+        csv += '"Diversity Index","' + a.diversityIndex.toFixed(1) + '%","' + a.diversityCount + ' kumpulan bangsa"\n';
+        csv += '"Gender Balance","' + a.genderBalance.toFixed(1) + '%","M:' + a.male + ' F:' + a.female + '"\n';
+        csv += '"Penglibatan Uniform","' + a.uniformCount + '/' + a.total + '","' + a.uniformPct.toFixed(1) + '%"\n';
+        csv += '"Penglibatan Kelab","' + a.kelabCount + '/' + a.total + '","' + a.kelabPct.toFixed(1) + '%"\n';
+        csv += '"Penglibatan Sukan","' + a.sukanCount + '/' + a.total + '","' + a.sukanPct.toFixed(1) + '%"\n';
+        csv += '"Avg Aktiviti/Pelajar","' + a.avgActivities.toFixed(2) + '","-"\n';
+        csv += '\n';
+        
+        csv += '"=== RUMAH SUKAN BREAKDOWN ==="\n';
+        csv += '"Rumah","Total","Lelaki","Perempuan","Bangsa"\n';
+        Object.keys(RUMAH).forEach(function(rName) {
+          const r = a.rumahInsights[rName];
+          const bangsaStr = Object.keys(r.bangsa).map(function(b) { return b + ':' + r.bangsa[b]; }).join(' | ');
+          csv += '"' + rName + '","' + r.total + '","' + r.male + '","' + r.female + '","' + bangsaStr + '"\n';
+        });
+        csv += '\n';
+      }
+      
+      // SECTION 3: Student Data
+      csv += '"=== SENARAI PELAJAR (' + data.length + ' rekod) ==="\n';
+      const headers = ['No','Nama','Student No','Kelas','Tingkatan','Gender','Bangsa','Agama','Rumah Sukan','Unit Beruniform','Kelab/Persatuan','Sukan','Tahun','Status'];
+      csv += headers.map(function(h) { return '"' + h + '"'; }).join(',') + '\n';
+      
+      data.forEach(function(s, i) {
+        const row = [i+1, s.nama, s.student_no, s.kelas, s.tingkatan, s.gender, s.bangsa, s.agama, s.rumah_sukan, s.uniform, s.kelab, s.sukan, s.tahun || '2026', s.status_aktif || 'Aktif'];
+        csv += row.map(function(c) { return '"' + String(c || '').replace(/"/g,'""') + '"'; }).join(',') + '\n';
+      });
+      
       const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'Data_Pelajar_' + new Date().toISOString().split('T')[0] + '.csv';
+      link.download = 'SPKB_Data_Pelajar_Analytics_' + new Date().toISOString().split('T')[0] + '.csv';
       link.click();
-    }
+      
+      // Close menu
+      DataPelajar.closeExportMenu();
+    },
+    
+    exportPDFReport: function() {
+      const data = state.filteredStudents.length > 0 ? state.filteredStudents : state.students;
+      if (data.length === 0) return alert('Tiada data untuk di-export!');
+      
+      const a = calculateAnalytics();
+      const now = new Date();
+      const dateStr = now.getDate() + '/' + (now.getMonth()+1) + '/' + now.getFullYear();
+      const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+      
+      let html = `
+        <div class="pr-header">
+          <div class="pr-school">🇲🇾 KEMENTERIAN PENDIDIKAN MALAYSIA</div>
+          <div class="pr-school">SMK TINGGI KUCHING</div>
+          <div class="pr-title">LAPORAN DATA PELAJAR KOKURIKULUM</div>
+          <div class="pr-subtitle">Tahun ${state.stats.tahun || '2026'}</div>
+        </div>
+        <div class="pr-meta">
+          <span><strong>Tarikh Cetak:</strong> ${dateStr} ${timeStr}</span>
+          <span><strong>Jumlah Pelajar:</strong> ${data.length}</span>
+          <span><strong>Sistem:</strong> SPKB v3.2</span>
+        </div>
+      `;
+      
+      // Analytics Summary
+      if (a) {
+        html += `
+          <div class="pr-section">
+            <div class="pr-section-title">📊 RINGKASAN ANALITIK</div>
+            <div class="pr-stats">
+              <div class="pr-stat"><div class="pr-stat-val">${a.total}</div><div class="pr-stat-lbl">Total Pelajar</div></div>
+              <div class="pr-stat"><div class="pr-stat-val">${a.diversityIndex.toFixed(0)}%</div><div class="pr-stat-lbl">Diversity</div></div>
+              <div class="pr-stat"><div class="pr-stat-val">${a.genderBalance.toFixed(0)}%</div><div class="pr-stat-lbl">Gender Balance</div></div>
+              <div class="pr-stat"><div class="pr-stat-val">${a.avgActivities.toFixed(1)}</div><div class="pr-stat-lbl">Avg Aktiviti</div></div>
+            </div>
+            <table>
+              <thead><tr><th>Kategori</th><th>Bilangan</th><th>Peratus</th></tr></thead>
+              <tbody>
+                <tr><td>🎖️ Unit Beruniform</td><td>${a.uniformCount}/${a.total}</td><td>${a.uniformPct.toFixed(1)}%</td></tr>
+                <tr><td>📚 Kelab/Persatuan</td><td>${a.kelabCount}/${a.total}</td><td>${a.kelabPct.toFixed(1)}%</td></tr>
+                <tr><td>⚽ Sukan & Permainan</td><td>${a.sukanCount}/${a.total}</td><td>${a.sukanPct.toFixed(1)}%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+        
+        // Rumah Sukan
+        html += `
+          <div class="pr-section">
+            <div class="pr-section-title">🏠 RUMAH SUKAN BREAKDOWN</div>
+            <table>
+              <thead><tr><th>Rumah Sukan</th><th>Total</th><th>♂ Lelaki</th><th>♀ Perempuan</th><th>Bangsa</th></tr></thead>
+              <tbody>
+        `;
+        Object.keys(RUMAH).forEach(function(rName) {
+          const r = a.rumahInsights[rName];
+          const bangsaStr = Object.keys(r.bangsa).map(function(b) { return b + ':' + r.bangsa[b]; }).join(', ');
+          html += `<tr><td><strong>${rName}</strong></td><td>${r.total}</td><td>${r.male}</td><td>${r.female}</td><td>${bangsaStr}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // Student List
+      html += `
+        <div class="pr-section">
+          <div class="pr-section-title">👥 SENARAI PELAJAR (${data.length} rekod)</div>
+          <table>
+            <thead><tr><th>#</th><th>Nama</th><th>Kelas</th><th>Gender</th><th>Bangsa</th><th>Rumah</th><th>Uniform</th><th>Kelab</th></tr></thead>
+            <tbody>
+      `;
+      data.forEach(function(s, i) {
+        html += `<tr><td>${i+1}</td><td>${s.nama || '-'}</td><td>${s.kelas || '-'}</td><td>${s.gender || '-'}</td><td>${s.bangsa || '-'}</td><td>${s.rumah_sukan || '-'}</td><td>${s.uniform || '-'}</td><td>${s.kelab || '-'}</td></tr>`;
+      });
+      html += `</tbody></table></div>`;
+      
+      html += `
+        <div class="pr-footer">
+          <p>Dijana oleh: <strong>SPKB v3.2 - Data Pelajar Module</strong></p>
+          <p>SMK Tinggi Kuching | © ${now.getFullYear()}</p>
+        </div>
+      `;
+      
+      document.getElementById('dp-print-area').innerHTML = html;
+      document.getElementById('dp-print-area').classList.add('show');
+      
+      DataPelajar.closeExportMenu();
+      
+      setTimeout(function() {
+        window.print();
+        document.getElementById('dp-print-area').classList.remove('show');
+      }, 300);
+    },
+    
+    printClassList: function() {
+      const className = document.getElementById('dp-export-class').value;
+      if (!className) return alert('Sila pilih kelas dahulu!');
+      
+      const students = state.students.filter(function(s) { return s.kelas === className; });
+      if (students.length === 0) return alert('Tiada pelajar dalam kelas ' + className);
+      
+      const now = new Date();
+      const dateStr = now.getDate() + '/' + (now.getMonth()+1) + '/' + now.getFullYear();
+      const tingkatan = students[0].tingkatan || '-';
+      
+      // Gender breakdown
+      const male = students.filter(function(s) { return s.gender === 'Male' || s.gender === 'M'; }).length;
+      const female = students.filter(function(s) { return s.gender === 'Female' || s.gender === 'F'; }).length;
+      
+      let html = `
+        <div class="pr-header">
+          <div class="pr-school">🇲🇾 KEMENTERIAN PENDIDIKAN MALAYSIA</div>
+          <div class="pr-school">SMK TINGGI KUCHING</div>
+          <div class="pr-title">SENARAI PELAJAR KELAS</div>
+          <div class="pr-subtitle">${tingkatan} - Kelas ${className}</div>
+          <div class="pr-subtitle">Tahun ${state.stats.tahun || '2026'}</div>
+        </div>
+        <div class="pr-meta">
+          <span><strong>Tarikh:</strong> ${dateStr}</span>
+          <span><strong>Jumlah:</strong> ${students.length} pelajar</span>
+          <span><strong>♂ ${male}</strong> | <strong>♀ ${female}</strong></span>
+        </div>
+        <div class="pr-section">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 30px;">#</th>
+                <th>Nama Penuh</th>
+                <th>No. Pelajar</th>
+                <th>Gender</th>
+                <th>Bangsa</th>
+                <th>Rumah Sukan</th>
+                <th style="width: 80px;">Kehadiran</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      students.forEach(function(s, i) {
+        html += `<tr><td>${i+1}</td><td>${s.nama || '-'}</td><td>${s.student_no || '-'}</td><td>${s.gender || '-'}</td><td>${s.bangsa || '-'}</td><td>${s.rumah_sukan || '-'}</td><td></td></tr>`;
+      });
+      html += `</tbody></table></div>
+        <div class="pr-signatures">
+          <div class="pr-sig">
+            <div class="pr-sig-line">_________________________</div>
+            <div>Guru Kelas</div>
+          </div>
+          <div class="pr-sig">
+            <div class="pr-sig-line">_________________________</div>
+            <div>Penolong Kanan Kokurikulum</div>
+          </div>
+        </div>
+        <div class="pr-footer">
+          <p>Dijana oleh SPKB v3.2 | SMK Tinggi Kuching | ${dateStr}</p>
+        </div>
+      `;
+      
+      document.getElementById('dp-print-area').innerHTML = html;
+      document.getElementById('dp-print-area').classList.add('show');
+      
+      DataPelajar.closeExportMenu();
+      
+      setTimeout(function() {
+        window.print();
+        document.getElementById('dp-print-area').classList.remove('show');
+      }, 300);
+    },
+    
+    printRumahRoster: function() {
+      const rName = document.getElementById('dp-export-rumah').value;
+      if (!rName) return alert('Sila pilih Rumah Sukan dahulu!');
+      
+      const students = state.students.filter(function(s) { return s.rumah_sukan === rName; });
+      if (students.length === 0) return alert('Tiada pelajar dalam Rumah ' + rName);
+      
+      const cfg = RUMAH[rName];
+      const now = new Date();
+      const dateStr = now.getDate() + '/' + (now.getMonth()+1) + '/' + now.getFullYear();
+      
+      const male = students.filter(function(s) { return s.gender === 'Male' || s.gender === 'M'; }).length;
+      const female = students.filter(function(s) { return s.gender === 'Female' || s.gender === 'F'; }).length;
+      
+      // Group by tingkatan
+      const byTingkatan = {};
+      students.forEach(function(s) {
+        const t = s.tingkatan || 'Tidak Diketahui';
+        if (!byTingkatan[t]) byTingkatan[t] = [];
+        byTingkatan[t].push(s);
+      });
+      
+      let html = `
+        <div class="pr-header">
+          <div class="pr-school">🇲🇾 KEMENTERIAN PENDIDIKAN MALAYSIA</div>
+          <div class="pr-school">SMK TINGGI KUCHING</div>
+          <div class="pr-title">SENARAI AHLI RUMAH SUKAN</div>
+          <div class="pr-subtitle" style="font-size: 26px; color: ${cfg.warna};">${cfg.emoji} RUMAH ${rName} - ${cfg.label.toUpperCase()}</div>
+          <div class="pr-subtitle">Tahun ${state.stats.tahun || '2026'}</div>
+        </div>
+        <div class="pr-meta">
+          <span><strong>Tarikh:</strong> ${dateStr}</span>
+          <span><strong>Jumlah Ahli:</strong> ${students.length}</span>
+          <span><strong>♂ ${male}</strong> | <strong>♀ ${female}</strong></span>
+        </div>
+      `;
+      
+      Object.keys(byTingkatan).sort().forEach(function(t) {
+        const ts = byTingkatan[t];
+        html += `
+          <div class="pr-section">
+            <div class="pr-section-title">📚 ${t} (${ts.length} pelajar)</div>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 30px;">#</th>
+                  <th>Nama Penuh</th>
+                  <th>No. Pelajar</th>
+                  <th>Kelas</th>
+                  <th>Gender</th>
+                  <th>Bangsa</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        ts.forEach(function(s, i) {
+          html += `<tr><td>${i+1}</td><td>${s.nama || '-'}</td><td>${s.student_no || '-'}</td><td>${s.kelas || '-'}</td><td>${s.gender || '-'}</td><td>${s.bangsa || '-'}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+      });
+      
+      html += `
+        <div class="pr-signatures">
+          <div class="pr-sig">
+            <div class="pr-sig-line">_________________________</div>
+            <div>Ketua Rumah ${rName}</div>
+          </div>
+          <div class="pr-sig">
+            <div class="pr-sig-line">_________________________</div>
+            <div>Penyelaras Rumah Sukan</div>
+          </div>
+        </div>
+        <div class="pr-footer">
+          <p>Dijana oleh SPKB v3.2 | SMK Tinggi Kuching | ${dateStr}</p>
+        </div>
+      `;
+      
+      document.getElementById('dp-print-area').innerHTML = html;
+      document.getElementById('dp-print-area').classList.add('show');
+      
+      DataPelajar.closeExportMenu();
+      
+      setTimeout(function() {
+        window.print();
+        document.getElementById('dp-print-area').classList.remove('show');
+      }, 300);
+    },
   };
   
   // Override OLD
