@@ -14848,5 +14848,888 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 </script>
 
 
+
+
+
+<!-- ============================================================
+     MODUL GURU PENASIHAT v3.0 — PAPAN PEMUKA AUDIT & KPM
+     Sumber: SPKB_Data_Guru (90 guru · 265 tugasan · 327 JK)
+     3 dimensi beban: Tugasan Unit | Jawatankuasa | Rumah Sukan
+     ============================================================ -->
+<script>
+/* ============================================================
+   MODUL GURU PENASIHAT v3.0 — PAPAN PEMUKA AUDIT & KPM
+   SPKB SMK TINGGI KUCHING
+   Sumber: SPKB_Data_Guru (GP_Guru_Master, GP_Tugasan,
+   GP_Lookup_Unit, GP_Lookup_Jawatan, GP_Jawatankuasa, GP_Lookup_JK)
+   3 dimensi beban: Tugasan Unit · Jawatankuasa · Rumah Sukan
+   IIFE mandiri · prefix gp- · tema teal institusi
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const API_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+  const PAGE_SIZE = 12;
+
+  const KATEGORI = {
+    'Uniform': { emoji: '🎖️', label: 'Unit Beruniform', warna: '#0d9488', code: 'U' },
+    'Kelab': { emoji: '📚', label: 'Kelab/Persatuan', warna: '#8b5cf6', code: 'K' },
+    'Sukan': { emoji: '⚽', label: 'Sukan/Permainan', warna: '#f59e0b', code: 'S' }
+  };
+  const KAT_ORDER = ['Uniform', 'Kelab', 'Sukan'];
+  const KAT_FROM = { U: 'Uniform', K: 'Kelab', S: 'Sukan' };
+
+  const JAWATAN = {
+    'KG': { label: 'Ketua Guru Penasihat', short: 'Ketua', cls: 'k', skor: 3 },
+    'PK': { label: 'Penolong Ketua Guru Penasihat', short: 'Pen. Ketua', cls: 'p', skor: 2 },
+    'GP': { label: 'Guru Penasihat', short: 'Penasihat', cls: 'g', skor: 1 }
+  };
+  const RUMAH_J = { K: 'Ketua', P: 'Penolong', G: 'Guru' };
+
+  // Pemberat Indeks Beban Kerja (telus untuk audit)
+  const W = { unit_base: 3, jk_pimpin: 4, jk_urusetia: 3, jk_ahli: 2, rumah_K: 3, rumah_P: 2, rumah_G: 1 };
+  function jkTier(role) {
+    const s = String(role || '').toLowerCase();
+    if (s.indexOf('pengerusi') >= 0 || s.indexOf('penyelaras') >= 0 || s.indexOf('ketua') === 0) return 'pimpin';
+    if (s.indexOf('setiausaha') >= 0 || s.indexOf('s/u') >= 0 || s.indexOf('editor') >= 0) return 'urusetia';
+    return 'ahli';
+  }
+  function jkWeight(role) { const t = jkTier(role); return t === 'pimpin' ? W.jk_pimpin : t === 'urusetia' ? W.jk_urusetia : W.jk_ahli; }
+
+  const BANDS = [
+    { max: 16, label: 'Rendah', cls: 'rendah', warna: '#10b981' },
+    { max: 25, label: 'Sederhana', cls: 'sederhana', warna: '#0ea5e9' },
+    { max: 45, label: 'Tinggi', cls: 'tinggi', warna: '#f59e0b' },
+    { max: Infinity, label: 'Sangat Tinggi', cls: 'kritikal', warna: '#ef4444' }
+  ];
+  function bandOf(score) { for (let i = 0; i < BANDS.length; i++) if (score < BANDS[i].max) return BANDS[i]; return BANDS[BANDS.length - 1]; }
+
+  /* -------- DATA TERBENAM -------- */
+  var GP_DATA = {"meta":{"tahun":2026,"sekolah":"SMK Tinggi Kuching"},"guru":[{"id":"GP001","n":"ALDOUS ANAK JERIS","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP002","n":"BONG BOON PEI","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP003","n":"BONG SIEW FONG","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP004","n":"BUJANG BIN WAHAB","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP005","n":"CAORIS KEE YEN CHUN","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP006","n":"CAROLINE AK LANE","s":"Petang","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP007","n":"CHAI MIN HUI","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP008","n":"CHAI YU TAK","s":"Petang","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP009","n":"CHEN FONG HIN","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP010","n":"CHIEW SUI ING","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP011","n":"CHONG MING ENG","s":"Pagi","rs":"RUMAH TABAH","rj":"K"},{"id":"GP012","n":"CHONG OI LING","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP013","n":"CHUA ENG NGEE","s":"Petang","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP014","n":"CHUA LEE PING","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP015","n":"CHUNG KUI CHAI","s":"Petang","rs":"RUMAH BERANI","rj":"G"},{"id":"GP016","n":"CONNIE JONG LIEW SZE","s":"Petang","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP017","n":"DARA ANAK MUJAP","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP018","n":"DAYANG NORAZZIAH BINTI AWANG AZZAHARI","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP019","n":"ELIZABETH ANAK UNCHANG","s":"Pagi","rs":"RUMAH GIGIH","rj":"K"},{"id":"GP020","n":"FAUZIAH BINTI MOHD SALLEH","s":"Pagi","rs":"RUMAH GIGIH","rj":"P"},{"id":"GP021","n":"FEIZYLINE TAY","s":"Petang","rs":"RUMAH AZAM","rj":"G"},{"id":"GP022","n":"FONG KIM CHIEW","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP023","n":"GOH PEI SIA","s":"Pagi","rs":"RUMAH YAKIN","rj":"K"},{"id":"GP024","n":"GOH SIEW KIAN","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP025","n":"HO YUNG HUA","s":"Petang","rs":"RUMAH AZAM","rj":"G"},{"id":"GP026","n":"HU SING MIN","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP027","n":"HUAN CHAN PING","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP028","n":"IRENE CHUA LEE CHEN","s":"Petang","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP029","n":"IRENE SIA CHEW HONG","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP030","n":"IYLIA MADIHA BINTI AHMAD","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP031","n":"JACKSON BONG WEI WEE","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP032","n":"JEE SIAW HUEI, JOAN","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP033","n":"JENIVY ANAK MAURICE","s":"Petang","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP034","n":"JESSICA ANAK MANDAU","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP035","n":"JODIE FOSTER WOON","s":"Pagi","rs":"RUMAH YAKIN","rj":"P"},{"id":"GP036","n":"JOHN PHILIP ANAK PETER","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP037","n":"JUNAIDAH BINTI RAMLI","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP038","n":"KASMAWATI BINTI ONDEI","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP039","n":"KHAMYZA BINTI RAZALIE","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP040","n":"KHO CHO GEOK","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP041","n":"KHO HAN KIAT","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP042","n":"LAI HUI YIAN","s":"Pagi","rs":"RUMAH AZAM","rj":"P"},{"id":"GP043","n":"LEE LING RONG","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP044","n":"LEONG SY JIANN","s":"Pagi","rs":"","rj":"G"},{"id":"GP045","n":"LIEW CHIEW YEK","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP046","n":"LINA WONG","s":"Petang","rs":"RUMAH BERANI","rj":"G"},{"id":"GP047","n":"LUCYANA SIERRA ANAK TINGGI","s":"Petang","rs":"RUMAH BERANI","rj":"K"},{"id":"GP048","n":"MACKY ANAK JOSEPH","s":"Petang","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP049","n":"MICHELLE MUROH","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP050","n":"MOHAMAD NOOR BIN ISHAK","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP051","n":"MOHD NAZMAN BIN MOHD FAZIL","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP052","n":"NAH PEY PEY","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP053","n":"NG KOH CHIA","s":"Pagi","rs":"RUMAH BERANI","rj":"P"},{"id":"GP054","n":"NGOI HEA LAN","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"P"},{"id":"GP055","n":"NITA BINTI EDAMA","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP056","n":"NOORAZLIA BINTI MOSKAM","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP057","n":"NOR HAFIZA BINTI ABD RAHIM","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP058","n":"NORAINI BINTI WAHED","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP059","n":"NURUL HAZIQAH BINTI HASSAN","s":"Petang","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP060","n":"NUR ATIKAH BINTI MOHD BAHARUDDIN","s":"Petang","rs":"RUMAH TABAH","rj":"G"},{"id":"GP061","n":"NUR IDAYU BINTI SUHAIMI","s":"Petang","rs":"RUMAH TABAH","rj":"G"},{"id":"GP062","n":"ONG SIANG KING","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP063","n":"PIDAN AJANG","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP064","n":"ROJALI ANAK YUSSIN","s":"Petang","rs":"RUMAH TABAH","rj":"G"},{"id":"GP065","n":"SANTIYUSMA BINTI AHMAD","s":"Petang","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP066","n":"SHAMSINARIAH BINTI SUIB","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP067","n":"SHARIFAH NURFARAHIN BINTI WAN ABDULLAH","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"K"},{"id":"GP068","n":"SI HUI LING","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP069","n":"SIM PEI SIN","s":"Pagi","rs":"RUMAH AZAM","rj":"G"},{"id":"GP070","n":"SIM WEI NA","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP071","n":"SU KHER XING","s":"Petang","rs":"RUMAH TABAH","rj":"P"},{"id":"GP072","n":"SZ JAN LIN","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP073","n":"TAN KIM LIN","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP074","n":"TING SUK NGUYAN","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP075","n":"TING TIEU WEI","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP076","n":"TING YEE UNG","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP077","n":"TIONG HUNG KIENG","s":"Pagi","rs":"RUMAH YAKIN","rj":"G"},{"id":"GP078","n":"TIONG NGA HOUNG","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP079","n":"TONG MEI LING","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP080","n":"TURING ANAK ASUNG","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP081","n":"VANESSA PREMALA PATRICK","s":"Pagi","rs":"RUMAH GIGIH","rj":"K"},{"id":"GP082","n":"VANESSA SELUANG ANAK RAYMOND LEO ITOK","s":"Pagi","rs":"RUMAH TABAH","rj":"G"},{"id":"GP083","n":"WAN MOHAMAD RAMZI BIN WAN MOHAMAD YUSOP","s":"Pagi","rs":"RUMAH BERANI","rj":"G"},{"id":"GP084","n":"WEE PEI SZE","s":"Pagi","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP085","n":"YONG MEI CHIN","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP086","n":"AZIEMAH BT ABU BAKAR","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP087","n":"NUR ATIKA FARAAIN NABILAH BINTI JUINE","s":"Petang","rs":"RUMAH AZAM","rj":"K"},{"id":"GP088","n":"MERYL ANAK SAMSON","s":"Pagi","rs":"RUMAH CEMERLANG","rj":"G"},{"id":"GP089","n":"AZIZUL BIN OSAM@OTHMAN","s":"Petang","rs":"RUMAH GIGIH","rj":"G"},{"id":"GP090","n":"HO TZE EE","s":"Petang","rs":"","rj":""}],"tugasan":[{"g":"GP001","kt":"U","kod":"A05","j":"GP"},{"g":"GP001","kt":"K","kod":"D01","j":"GP"},{"g":"GP001","kt":"S","kod":"S03","j":"KG"},{"g":"GP002","kt":"U","kod":"A02","j":"PK"},{"g":"GP002","kt":"K","kod":"C06","j":"GP"},{"g":"GP002","kt":"S","kod":"S03","j":"GP"},{"g":"GP003","kt":"U","kod":"A02","j":"GP"},{"g":"GP003","kt":"K","kod":"D04C","j":"PK"},{"g":"GP003","kt":"S","kod":"S03","j":"GP"},{"g":"GP004","kt":"U","kod":"A06","j":"GP"},{"g":"GP004","kt":"K","kod":"D02","j":"GP"},{"g":"GP004","kt":"S","kod":"S10","j":"KG"},{"g":"GP005","kt":"U","kod":"A01","j":"GP"},{"g":"GP005","kt":"K","kod":"C03","j":"GP"},{"g":"GP005","kt":"S","kod":"S09","j":"KG"},{"g":"GP006","kt":"U","kod":"A07","j":"PK"},{"g":"GP006","kt":"K","kod":"C06","j":"GP"},{"g":"GP006","kt":"S","kod":"S01","j":"GP"},{"g":"GP007","kt":"U","kod":"A01","j":"GP"},{"g":"GP007","kt":"K","kod":"B04","j":"KG"},{"g":"GP007","kt":"S","kod":"S06","j":"GP"},{"g":"GP008","kt":"U","kod":"A02","j":"GP"},{"g":"GP008","kt":"K","kod":"C02","j":"GP"},{"g":"GP008","kt":"S","kod":"S11","j":"KG"},{"g":"GP009","kt":"U","kod":"A02","j":"GP"},{"g":"GP009","kt":"K","kod":"C06","j":"GP"},{"g":"GP009","kt":"S","kod":"S01","j":"KG"},{"g":"GP010","kt":"U","kod":"A02","j":"GP"},{"g":"GP010","kt":"K","kod":"C02","j":"PK"},{"g":"GP010","kt":"S","kod":"S11","j":"GP"},{"g":"GP011","kt":"U","kod":"A07","j":"GP"},{"g":"GP011","kt":"K","kod":"C01","j":"KG"},{"g":"GP011","kt":"S","kod":"S02","j":"GP"},{"g":"GP012","kt":"U","kod":"A02","j":"GP"},{"g":"GP012","kt":"K","kod":"C03","j":"KG"},{"g":"GP012","kt":"S","kod":"S11","j":"GP"},{"g":"GP013","kt":"U","kod":"A03","j":"PK"},{"g":"GP013","kt":"K","kod":"D02","j":"GP"},{"g":"GP013","kt":"S","kod":"S03","j":"GP"},{"g":"GP014","kt":"U","kod":"A02","j":"GP"},{"g":"GP014","kt":"K","kod":"D04A","j":"KG"},{"g":"GP014","kt":"S","kod":"S12","j":"GP"},{"g":"GP015","kt":"U","kod":"A08","j":"GP"},{"g":"GP015","kt":"K","kod":"D04A","j":"GP"},{"g":"GP015","kt":"S","kod":"S06","j":"KG"},{"g":"GP016","kt":"U","kod":"A01","j":"KG"},{"g":"GP016","kt":"K","kod":"C03","j":"GP"},{"g":"GP016","kt":"S","kod":"S02","j":"GP"},{"g":"GP017","kt":"U","kod":"A01","j":"GP"},{"g":"GP017","kt":"K","kod":"B02","j":"GP"},{"g":"GP017","kt":"S","kod":"S06","j":"GP"},{"g":"GP018","kt":"U","kod":"A01","j":"GP"},{"g":"GP018","kt":"K","kod":"C07","j":"GP"},{"g":"GP018","kt":"S","kod":"S11","j":"PK"},{"g":"GP019","kt":"U","kod":"A02","j":"GP"},{"g":"GP019","kt":"K","kod":"B02","j":"GP"},{"g":"GP019","kt":"S","kod":"S07","j":"KG"},{"g":"GP020","kt":"U","kod":"A01","j":"GP"},{"g":"GP020","kt":"K","kod":"B02","j":"GP"},{"g":"GP020","kt":"S","kod":"S08","j":"PK"},{"g":"GP021","kt":"U","kod":"A07","j":"GP"},{"g":"GP021","kt":"K","kod":"B01","j":"PK"},{"g":"GP021","kt":"S","kod":"S04","j":"GP"},{"g":"GP022","kt":"U","kod":"A02","j":"GP"},{"g":"GP022","kt":"K","kod":"C05","j":"GP"},{"g":"GP022","kt":"S","kod":"S11","j":"GP"},{"g":"GP023","kt":"U","kod":"A02","j":"GP"},{"g":"GP023","kt":"K","kod":"D04E","j":"PK"},{"g":"GP023","kt":"S","kod":"S07","j":"GP"},{"g":"GP024","kt":"U","kod":"A01","j":"GP"},{"g":"GP024","kt":"K","kod":"D04E","j":"GP"},{"g":"GP024","kt":"S","kod":"S13","j":"PK"},{"g":"GP025","kt":"U","kod":"A01","j":"PK"},{"g":"GP025","kt":"K","kod":"C07","j":"GP"},{"g":"GP025","kt":"S","kod":"S02","j":"GP"},{"g":"GP026","kt":"U","kod":"A08","j":"GP"},{"g":"GP026","kt":"K","kod":"D04B","j":"KG"},{"g":"GP026","kt":"S","kod":"S02","j":"GP"},{"g":"GP027","kt":"U","kod":"A07","j":"KG"},{"g":"GP027","kt":"K","kod":"D04D","j":"GP"},{"g":"GP027","kt":"S","kod":"S03","j":"GP"},{"g":"GP028","kt":"U","kod":"A02","j":"GP"},{"g":"GP028","kt":"K","kod":"D06B","j":"KG"},{"g":"GP028","kt":"S","kod":"S09","j":"GP"},{"g":"GP029","kt":"U","kod":"A02","j":"GP"},{"g":"GP029","kt":"K","kod":"C03","j":"GP"},{"g":"GP029","kt":"S","kod":"S03","j":"PK"},{"g":"GP030","kt":"U","kod":"A01","j":"GP"},{"g":"GP030","kt":"K","kod":"C05","j":"PK"},{"g":"GP030","kt":"S","kod":"S01","j":"GP"},{"g":"GP031","kt":"U","kod":"A03","j":"GP"},{"g":"GP031","kt":"K","kod":"D02","j":"PK"},{"g":"GP031","kt":"S","kod":"S02","j":"GP"},{"g":"GP032","kt":"U","kod":"A02","j":"GP"},{"g":"GP032","kt":"K","kod":"D04D","j":"KG"},{"g":"GP032","kt":"S","kod":"S06","j":"GP"},{"g":"GP033","kt":"U","kod":"A04","j":"KG"},{"g":"GP033","kt":"K","kod":"D01","j":"GP"},{"g":"GP033","kt":"S","kod":"S03","j":"GP"},{"g":"GP034","kt":"U","kod":"A01","j":"GP"},{"g":"GP034","kt":"K","kod":"C02","j":"GP"},{"g":"GP034","kt":"S","kod":"S01","j":"PK"},{"g":"GP035","kt":"U","kod":"A03","j":"GP"},{"g":"GP035","kt":"K","kod":"D04A","j":"GP"},{"g":"GP035","kt":"S","kod":"S03","j":"GP"},{"g":"GP036","kt":"U","kod":"A02","j":"GP"},{"g":"GP036","kt":"K","kod":"C06","j":"KG"},{"g":"GP036","kt":"S","kod":"S05","j":"GP"},{"g":"GP037","kt":"U","kod":"A01","j":"GP"},{"g":"GP037","kt":"K","kod":"C06","j":"PK"},{"g":"GP037","kt":"S","kod":"S09","j":"GP"},{"g":"GP038","kt":"U","kod":"A05","j":"GP"},{"g":"GP038","kt":"K","kod":"C06","j":"GP"},{"g":"GP038","kt":"S","kod":"S09","j":"GP"},{"g":"GP039","kt":"U","kod":"A02","j":"GP"},{"g":"GP039","kt":"K","kod":"C08","j":"GP"},{"g":"GP039","kt":"S","kod":"S07","j":"GP"},{"g":"GP040","kt":"U","kod":"A03","j":"GP"},{"g":"GP040","kt":"K","kod":"D04E","j":"KG"},{"g":"GP040","kt":"S","kod":"S01","j":"GP"},{"g":"GP041","kt":"U","kod":"A01","j":"GP"},{"g":"GP041","kt":"K","kod":"D04C","j":"KG"},{"g":"GP041","kt":"S","kod":"S06","j":"GP"},{"g":"GP042","kt":"U","kod":"A01","j":"GP"},{"g":"GP042","kt":"K","kod":"D05","j":"KG"},{"g":"GP042","kt":"S","kod":"S04","j":"GP"},{"g":"GP043","kt":"U","kod":"A02","j":"GP"},{"g":"GP043","kt":"K","kod":"B01","j":"KG"},{"g":"GP043","kt":"S","kod":"S03","j":"GP"},{"g":"GP044","kt":"U","kod":"A02","j":"KG"},{"g":"GP045","kt":"U","kod":"A01","j":"GP"},{"g":"GP045","kt":"K","kod":"D04C","j":"PK"},{"g":"GP045","kt":"S","kod":"S02","j":"PK"},{"g":"GP046","kt":"U","kod":"A07","j":"GP"},{"g":"GP046","kt":"K","kod":"B04","j":"PK"},{"g":"GP046","kt":"S","kod":"S04","j":"GP"},{"g":"GP047","kt":"U","kod":"A06","j":"KG"},{"g":"GP047","kt":"K","kod":"B02","j":"GP"},{"g":"GP047","kt":"S","kod":"S10","j":"GP"},{"g":"GP048","kt":"U","kod":"A03","j":"KG"},{"g":"GP048","kt":"K","kod":"D04D","j":"GP"},{"g":"GP048","kt":"S","kod":"S09","j":"GP"},{"g":"GP049","kt":"U","kod":"A05","j":"KG"},{"g":"GP049","kt":"K","kod":"D06A","j":"GP"},{"g":"GP049","kt":"S","kod":"S02","j":"GP"},{"g":"GP050","kt":"U","kod":"A06","j":"GP"},{"g":"GP050","kt":"K","kod":"D02","j":"GP"},{"g":"GP050","kt":"S","kod":"S05","j":"KG"},{"g":"GP051","kt":"U","kod":"A05","j":"GP"},{"g":"GP051","kt":"K","kod":"D01","j":"PK"},{"g":"GP051","kt":"S","kod":"S05","j":"GP"},{"g":"GP052","kt":"U","kod":"A02","j":"GP"},{"g":"GP052","kt":"K","kod":"C06","j":"GP"},{"g":"GP052","kt":"S","kod":"S06","j":"PK"},{"g":"GP053","kt":"U","kod":"A03","j":"GP"},{"g":"GP053","kt":"K","kod":"B02","j":"PK"},{"g":"GP053","kt":"S","kod":"S12","j":"GP"},{"g":"GP054","kt":"U","kod":"A03","j":"GP"},{"g":"GP054","kt":"K","kod":"D04D","j":"PK"},{"g":"GP054","kt":"S","kod":"S01","j":"GP"},{"g":"GP055","kt":"U","kod":"A02","j":"GP"},{"g":"GP055","kt":"K","kod":"C01","j":"PK"},{"g":"GP055","kt":"S","kod":"S09","j":"GP"},{"g":"GP056","kt":"U","kod":"A01","j":"GP"},{"g":"GP056","kt":"K","kod":"C07","j":"KG"},{"g":"GP056","kt":"S","kod":"S03","j":"GP"},{"g":"GP057","kt":"U","kod":"A03","j":"GP"},{"g":"GP057","kt":"K","kod":"D02","j":"GP"},{"g":"GP057","kt":"S","kod":"S08","j":"KG"},{"g":"GP058","kt":"U","kod":"A05","j":"GP"},{"g":"GP058","kt":"K","kod":"D04D","j":"GP"},{"g":"GP058","kt":"S","kod":"S02","j":"GP"},{"g":"GP059","kt":"U","kod":"A06","j":"PK"},{"g":"GP059","kt":"K","kod":"C07","j":"GP"},{"g":"GP059","kt":"S","kod":"S04","j":"GP"},{"g":"GP060","kt":"U","kod":"A05","j":"GP"},{"g":"GP060","kt":"K","kod":"C08","j":"KG"},{"g":"GP060","kt":"S","kod":"S10","j":"PK"},{"g":"GP061","kt":"U","kod":"A06","j":"GP"},{"g":"GP061","kt":"K","kod":"C05","j":"GP"},{"g":"GP061","kt":"S","kod":"S04","j":"KG"},{"g":"GP062","kt":"U","kod":"A02","j":"GP"},{"g":"GP062","kt":"K","kod":"D05","j":"PK"},{"g":"GP062","kt":"S","kod":"S03","j":"GP"},{"g":"GP063","kt":"U","kod":"A05","j":"GP"},{"g":"GP063","kt":"K","kod":"B03","j":"KG"},{"g":"GP063","kt":"S","kod":"S03","j":"GP"},{"g":"GP064","kt":"U","kod":"A03","j":"GP"},{"g":"GP064","kt":"K","kod":"D01","j":"GP"},{"g":"GP064","kt":"S","kod":"S10","j":"GP"},{"g":"GP065","kt":"U","kod":"A04","j":"GP"},{"g":"GP065","kt":"K","kod":"C07","j":"GP"},{"g":"GP065","kt":"S","kod":"S04","j":"PK"},{"g":"GP066","kt":"U","kod":"A03","j":"GP"},{"g":"GP066","kt":"K","kod":"C07","j":"PK"},{"g":"GP066","kt":"S","kod":"S01","j":"GP"},{"g":"GP067","kt":"U","kod":"A02","j":"GP"},{"g":"GP067","kt":"K","kod":"D04A","j":"GP"},{"g":"GP067","kt":"S","kod":"S04","j":"GP"},{"g":"GP068","kt":"U","kod":"A01","j":"GP"},{"g":"GP068","kt":"K","kod":"C06","j":"GP"},{"g":"GP068","kt":"S","kod":"S01","j":"GP"},{"g":"GP069","kt":"U","kod":"A08","j":"KG"},{"g":"GP069","kt":"K","kod":"D06C","j":"KG"},{"g":"GP069","kt":"S","kod":"S02","j":"GP"},{"g":"GP070","kt":"U","kod":"A03","j":"GP"},{"g":"GP070","kt":"K","kod":"D04B","j":"GP"},{"g":"GP070","kt":"S","kod":"S13","j":"GP"},{"g":"GP071","kt":"U","kod":"A08","j":"PK"},{"g":"GP071","kt":"K","kod":"D01","j":"GP"},{"g":"GP071","kt":"S","kod":"S08","j":"GP"},{"g":"GP072","kt":"U","kod":"A01","j":"GP"},{"g":"GP072","kt":"K","kod":"C03","j":"PK"},{"g":"GP072","kt":"S","kod":"S11","j":"GP"},{"g":"GP073","kt":"U","kod":"A07","j":"GP"},{"g":"GP073","kt":"K","kod":"D02","j":"KG"},{"g":"GP073","kt":"S","kod":"S07","j":"GP"},{"g":"GP074","kt":"U","kod":"A02","j":"GP"},{"g":"GP074","kt":"K","kod":"B02","j":"GP"},{"g":"GP074","kt":"S","kod":"S13","j":"KG"},{"g":"GP075","kt":"U","kod":"A08","j":"GP"},{"g":"GP075","kt":"K","kod":"B02","j":"KG"},{"g":"GP075","kt":"S","kod":"S01","j":"GP"},{"g":"GP076","kt":"U","kod":"A08","j":"GP"},{"g":"GP076","kt":"K","kod":"C04","j":"GP"},{"g":"GP076","kt":"S","kod":"S01","j":"GP"},{"g":"GP077","kt":"U","kod":"A03","j":"GP"},{"g":"GP077","kt":"K","kod":"C04","j":"GP"},{"g":"GP077","kt":"S","kod":"S02","j":"KG"},{"g":"GP078","kt":"U","kod":"A01","j":"GP"},{"g":"GP078","kt":"K","kod":"D04A","j":"PK"},{"g":"GP078","kt":"S","kod":"S02","j":"GP"},{"g":"GP079","kt":"U","kod":"A02","j":"GP"},{"g":"GP079","kt":"K","kod":"B01","j":"GP"},{"g":"GP079","kt":"S","kod":"S12","j":"KG"},{"g":"GP080","kt":"U","kod":"A02","j":"GP"},{"g":"GP080","kt":"K","kod":"C05","j":"KG"},{"g":"GP080","kt":"S","kod":"S05","j":"GP"},{"g":"GP081","kt":"U","kod":"A02","j":"GP"},{"g":"GP081","kt":"K","kod":"C02","j":"KG"},{"g":"GP081","kt":"S","kod":"S03","j":"GP"},{"g":"GP082","kt":"U","kod":"A03","j":"GP"},{"g":"GP082","kt":"K","kod":"D06B","j":"PK"},{"g":"GP082","kt":"S","kod":"S07","j":"GP"},{"g":"GP083","kt":"U","kod":"A05","j":"PK"},{"g":"GP083","kt":"K","kod":"D01","j":"GP"},{"g":"GP083","kt":"S","kod":"S05","j":"PK"},{"g":"GP084","kt":"U","kod":"A02","j":"GP"},{"g":"GP084","kt":"K","kod":"C04","j":"KG"},{"g":"GP084","kt":"S","kod":"S02","j":"GP"},{"g":"GP085","kt":"U","kod":"A03","j":"GP"},{"g":"GP085","kt":"K","kod":"C03","j":"GP"},{"g":"GP085","kt":"S","kod":"S02","j":"GP"},{"g":"GP086","kt":"U","kod":"A02","j":"GP"},{"g":"GP086","kt":"K","kod":"D04E","j":"GP"},{"g":"GP086","kt":"S","kod":"S07","j":"PK"},{"g":"GP087","kt":"U","kod":"A05","j":"GP"},{"g":"GP087","kt":"K","kod":"D01","j":"KG"},{"g":"GP087","kt":"S","kod":"S05","j":"GP"},{"g":"GP088","kt":"U","kod":"A01","j":"GP"},{"g":"GP088","kt":"K","kod":"D04E","j":"GP"},{"g":"GP088","kt":"S","kod":"S09","j":"PK"},{"g":"GP089","kt":"U","kod":"A03","j":"GP"},{"g":"GP089","kt":"K","kod":"D04D","j":"GP"},{"g":"GP089","kt":"S","kod":"S02","j":"GP"}],"jk":[{"g":"GP011","k":"KK00","j":"Pengerusi"},{"g":"GP044","k":"KK00","j":"Naib Pengerusi"},{"g":"GP026","k":"KK00","j":"Naib Pengerusi"},{"g":"GP076","k":"KK00","j":"Naib Pengerusi"},{"g":"GP090","k":"KK00","j":"Naib Pengerusi"},{"g":"GP025","k":"KK00","j":"S/U KOKURIKULUM"},{"g":"GP002","k":"KK00","j":"Pen. S/U KOKURIKULUM"},{"g":"GP001","k":"KK00","j":"S/U SUKAN"},{"g":"GP050","k":"KK00","j":"Pen. S/U SUKAN"},{"g":"GP083","k":"KK00","j":"Pen. S/U SUKAN"},{"g":"GP059","k":"KK00","j":"Pen. S/U SUKAN"},{"g":"GP016","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP048","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP062","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP068","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP062","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP076","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP068","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP069","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP076","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP069","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP001","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP050","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP075","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP028","k":"KK00","j":"Setiausaha"},{"g":"GP054","k":"KK00","j":"Ketua Penyelaras"},{"g":"GP059","k":"KK00","j":"Penolong Ketua Penyelaras"},{"g":"GP025","k":"KK00","j":"Setiausaha"},{"g":"GP011","k":"KK01","j":"Pengerusi"},{"g":"GP044","k":"KK01","j":"Naib Pengerusi"},{"g":"GP025","k":"KK01","j":"Setiausaha"},{"g":"GP001","k":"KK01","j":"Wakil Guru"},{"g":"GP048","k":"KK01","j":"Wakil Guru"},{"g":"GP002","k":"KK01","j":"Wakil Guru"},{"g":"GP060","k":"KK01","j":"Guru Pendidikan Islam"},{"g":"GP007","k":"KK01","j":"Guru Bimbingan dan Kaunseling"},{"g":"GP011","k":"KK02","j":"Pengerusi"},{"g":"GP044","k":"KK02","j":"Timbalan Pengerusi"},{"g":"GP076","k":"KK02","j":"Ketua Penyelaras"},{"g":"GP025","k":"KK02","j":"Penolong Ketua Penyelaras"},{"g":"GP002","k":"KK02","j":"Penolong Ketua Penyelaras"},{"g":"GP025","k":"KK02","j":"Fail Pengurusan kokurikulum"},{"g":"GP048","k":"KK02","j":"Fail-fail Badan Beruniform"},{"g":"GP062","k":"KK02","j":"Fail-Fail Kelab Khidmat dan Kebajikan komuniti"},{"g":"GP068","k":"KK02","j":"Fail-Fail Kelab Akademik"},{"g":"GP069","k":"KK02","j":"Fail-fail Kelab Hobi"},{"g":"GP001","k":"KK02","j":"Fail-Fail Kelab Sukan dan Permainan"},{"g":"GP011","k":"KK03","j":"Pengerusi"},{"g":"GP044","k":"KK03","j":"Timbalan Pengerusi"},{"g":"GP062","k":"KK03","j":"Ketua Penyelaras"},{"g":"GP028","k":"KK03","j":"Penolong Ketua Penyelaras"},{"g":"GP054","k":"KK03","j":"Unit Majalah"},{"g":"GP059","k":"KK03","j":"Unit Majalah"},{"g":"GP072","k":"KK03","j":"Unit Majalah"},{"g":"GP025","k":"KK03","j":"Unit Pengumpulan Bahan"},{"g":"GP028","k":"KK03","j":"Unit Pengumpulan Bahan"},{"g":"GP033","k":"KK03","j":"Unit Pengumpulan Bahan"},{"g":"GP054","k":"KK03","j":"Unit Publisiti - Media Cetak"},{"g":"GP010","k":"KK03","j":"Unit Publisiti - Media Cetak"},{"g":"GP055","k":"KK03","j":"Unit Publisiti - Media Cetak"},{"g":"GP045","k":"KK03","j":"Unit Publisiti - Media Sosial"},{"g":"GP081","k":"KK03","j":"Unit Publisiti - Media Sosial"},{"g":"GP062","k":"KK03","j":"Unit Fotografi dan Video"},{"g":"GP051","k":"KK03","j":"Unit Fotografi dan Video"},{"g":"GP083","k":"KK03","j":"Unit Fotografi dan Video"},{"g":"GP011","k":"KK04","j":"Pengerusi"},{"g":"GP044","k":"KK04","j":"Timbalan Pengerusi"},{"g":"GP001","k":"KK04","j":"Ketua Penyelaras"},{"g":"GP048","k":"KK04","j":"Penolong Ketua Penyelaras"},{"g":"GP025","k":"KK04","j":"Papan Kenyataan Sekolah"},{"g":"GP047","k":"KK04","j":"Papan Kenyataan Sekolah"},{"g":"GP066","k":"KK04","j":"Papan Kenyataan Sekolah"},{"g":"GP050","k":"KK04","j":"Peralatan kokurikulum dan Sukan"},{"g":"GP083","k":"KK04","j":"Peralatan kokurikulum dan Sukan"},{"g":"GP064","k":"KK04","j":"Peralatan kokurikulum dan Sukan"},{"g":"GP005","k":"KK04","j":"Galeri Kokurikulum"},{"g":"GP002","k":"KK04","j":"Galeri Kokurikulum"},{"g":"GP011","k":"KK05","j":"Pengerusi"},{"g":"GP044","k":"KK05","j":"Timbalan Pengerusi"},{"g":"GP025","k":"KK05","j":"Ketua Penyelaras"},{"g":"GP002","k":"KK05","j":"Penolong Ketua Penyelaras"},{"g":"GP002","k":"KK05","j":"EDMS"},{"g":"GP025","k":"KK05","j":"EDMS"},{"g":"GP029","k":"KK05","j":"APDM"},{"g":"GP011","k":"KK06","j":"Pengerusi"},{"g":"GP044","k":"KK06","j":"Timbalan Pengerusi"},{"g":"GP025","k":"KK06","j":"Ketua Penyelaras"},{"g":"GP002","k":"KK06","j":"Penolong Ketua Penyelaras"},{"g":"GP062","k":"KK06","j":"Ahli"},{"g":"GP068","k":"KK06","j":"Ahli"},{"g":"GP076","k":"KK06","j":"Ahli"},{"g":"GP069","k":"KK06","j":"Ahli"},{"g":"GP016","k":"KK06","j":"Ahli"},{"g":"GP001","k":"KK06","j":"Ahli"},{"g":"GP050","k":"KK06","j":"Ahli"},{"g":"GP083","k":"KK06","j":"Ahli"},{"g":"GP011","k":"KK07","j":"Pengerusi"},{"g":"GP044","k":"KK07","j":"Naib Pengerusi"},{"g":"GP076","k":"KK07","j":"Naib Pengerusi"},{"g":"GP047","k":"KK07","j":"Setiausaha"},{"g":"GP057","k":"KK07","j":"Pen. Setiausaha"},{"g":"GP026","k":"KK07","j":"AJK"},{"g":"GP090","k":"KK07","j":"AJK"},{"g":"GP062","k":"KK07","j":"AJK"},{"g":"GP068","k":"KK07","j":"AJK"},{"g":"GP069","k":"KK07","j":"AJK"},{"g":"GP076","k":"KK07","j":"AJK"},{"g":"GP001","k":"KK07","j":"AJK"},{"g":"GP016","k":"KK07","j":"AJK"},{"g":"GP011","k":"KK08","j":"Pengerusi"},{"g":"GP044","k":"KK08","j":"Timbalan Pengerusi"},{"g":"GP026","k":"KK08","j":"Naib Pengerusi"},{"g":"GP076","k":"KK08","j":"Naib Pengerusi"},{"g":"GP090","k":"KK08","j":"Naib Pengerusi"},{"g":"GP025","k":"KK08","j":"Setiausaha"},{"g":"GP002","k":"KK08","j":"Setiausaha"},{"g":"GP018","k":"KK08","j":"Bendahari"},{"g":"GP011","k":"KK09","j":"Pengerusi"},{"g":"GP044","k":"KK09","j":"Timbalan Pengerusi"},{"g":"GP026","k":"KK09","j":"Naib Pengerusi"},{"g":"GP076","k":"KK09","j":"Naib Pengerusi"},{"g":"GP090","k":"KK09","j":"Naib Pengerusi"},{"g":"GP025","k":"KK09","j":"Ketua Penyelaras"},{"g":"GP002","k":"KK09","j":"Penolong Ketua Penyelaras"},{"g":"GP062","k":"KK09","j":"Penolong Ketua Penyelaras"},{"g":"GP068","k":"KK09","j":"Penolong Ketua Penyelaras"},{"g":"GP069","k":"KK09","j":"Penolong Ketua Penyelaras"},{"g":"GP076","k":"KK09","j":"Penolong Ketua Penyelaras"},{"g":"GP011","k":"KK10","j":"Pengerusi"},{"g":"GP044","k":"KK10","j":"Timbalan Pengerusi"},{"g":"GP026","k":"KK10","j":"Naib Pengerusi"},{"g":"GP076","k":"KK10","j":"Naib Pengerusi"},{"g":"GP090","k":"KK10","j":"Naib Pengerusi"},{"g":"GP069","k":"KK10","j":"Setiausaha"},{"g":"GP056","k":"KK10","j":"Naib Pengerusi"},{"g":"GP018","k":"KK10","j":"Bendahari"},{"g":"GP011","k":"KK11","j":"Pengerusi"},{"g":"GP044","k":"KK11","j":"Timbalan Pengerusi"},{"g":"GP048","k":"KK11","j":"Ketua Penyelaras"},{"g":"GP001","k":"KK11","j":"Penolong Ketua Penyelaras"},{"g":"GP007","k":"KK11","j":"Ahli"},{"g":"GP086","k":"KK11","j":"Ahli"},{"g":"GP011","k":"KK12","j":"Pengerusi"},{"g":"GP044","k":"KK12","j":"Timbalan Pengerusi"},{"g":"GP025","k":"KK12","j":"Ketua Penyelaras"},{"g":"GP001","k":"KK12","j":"Penolong Ketua Penyelaras"},{"g":"GP083","k":"KK12","j":"Penolong Ketua Penyelaras"},{"g":"GP002","k":"KK12","j":"Penolong Ketua Penyelaras"},{"g":"GP011","k":"KK13","j":"Pengerusi"},{"g":"GP044","k":"KK13","j":"Timbalan Pengerusi"},{"g":"GP064","k":"KK13","j":"Ketua Penyelaras"},{"g":"GP012","k":"KK13","j":"Penolong Ketua Penyelaras"},{"g":"GP087","k":"KK13","j":"Ahli"},{"g":"GP014","k":"KK13","j":"Ahli"},{"g":"GP041","k":"KK13","j":"Ahli"},{"g":"GP040","k":"KK13","j":"Ahli"},{"g":"GP033","k":"KK13","j":"Ahli"},{"g":"GP032","k":"KK13","j":"Ahli"},{"g":"GP026","k":"KK13","j":"Ahli"},{"g":"GP071","k":"KK13","j":"Ahli"},{"g":"GP069","k":"KK13","j":"Ahli"},{"g":"GP051","k":"KK13","j":"Ahli"},{"g":"GP011","k":"KK14","j":"Pengerusi"},{"g":"GP044","k":"KK14","j":"Timbalan Pengerusi"},{"g":"GP026","k":"KK14","j":"Naib Pengerusi"},{"g":"GP076","k":"KK14","j":"Naib Pengerusi"},{"g":"GP090","k":"KK14","j":"Naib Pengerusi"},{"g":"GP069","k":"KK14","j":"Ketua Penyelaras"},{"g":"GP064","k":"KK14","j":"Penolong Ketua Penyelaras"},{"g":"GP012","k":"KK14","j":"Penolong Ketua Penyelaras"},{"g":"GP071","k":"KK14","j":"Penolong Ketua Penyelaras"},{"g":"GP062","k":"KK14","j":"Penolong Ketua Penyelaras"},{"g":"GP040","k":"KK14","j":"Penolong Ketua Penyelaras"},{"g":"GP011","k":"KK15","j":"Pengerusi"},{"g":"GP044","k":"KK15","j":"Timbalan Pengerusi"},{"g":"GP026","k":"KK15","j":"Naib Pengerusi"},{"g":"GP076","k":"KK15","j":"Naib Pengerusi"},{"g":"GP090","k":"KK15","j":"Naib Pengerusi"},{"g":"GP027","k":"KK15","j":"Ketua Penyelaras"},{"g":"GP075","k":"KK15","j":"Penolong Ketua Penyelaras"},{"g":"GP011","k":"KK16","j":"Pengerusi"},{"g":"GP044","k":"KK16","j":"Naib Pengerusi"},{"g":"GP075","k":"KK16","j":"Naib Pengerusi"},{"g":"GP028","k":"KK16","j":"Setiausaha"},{"g":"GP023","k":"KK16","j":"Bendahari"},{"g":"GP077","k":"KK16","j":"Pengurus Belian"},{"g":"GP010","k":"KK16","j":"Pengurus Stok"},{"g":"GP085","k":"KK16","j":"Juruaudit Dalaman"},{"g":"GP053","k":"KK16","j":"Juruaudit Dalaman"},{"g":"GP010","k":"KK16","j":"AJK"},{"g":"GP088","k":"KK16","j":"AJK"},{"g":"GP060","k":"KK16","j":"AJK"},{"g":"GP030","k":"KK16","j":"AJK"},{"g":"GP011","k":"KK17","j":"Pengerusi"},{"g":"GP044","k":"KK17","j":"Timbalan Pengerusi"},{"g":"GP026","k":"KK17","j":"Naib Pengerusi"},{"g":"GP076","k":"KK17","j":"Naib Pengerusi"},{"g":"GP090","k":"KK17","j":"Naib Pengerusi"},{"g":"GP054","k":"KK17","j":"Ketua Penyelaras"},{"g":"GP072","k":"KK17","j":"Penolong Ketua Penyelaras"},{"g":"GP059","k":"KK17","j":"Penolong Ketua Penyelaras"},{"g":"GP054","k":"KK17","j":"Ketua Editor"},{"g":"GP072","k":"KK17","j":"Pen. Ketua Editor."},{"g":"GP035","k":"KK17","j":"Pen. Ketua Editor."},{"g":"GP060","k":"KK17","j":"Pen. Ketua Editor."},{"g":"GP059","k":"KK17","j":"Pen. Ketua Editor."},{"g":"GP055","k":"KK17","j":"Editor Bahasa Melayu"},{"g":"GP028","k":"KK17","j":"Editor Bahasa Inggeris"},{"g":"GP078","k":"KK17","j":"Editor Bahasa Cina"},{"g":"GP037","k":"KK17","j":"Editor STEM"},{"g":"GP080","k":"KK17","j":"Editor Seni"},{"g":"GP025","k":"KK17","j":"Editor Laporan Kelab/Persatuan:"},{"g":"GP001","k":"KK17","j":"Editor Laporan Kelab/Persatuan:"},{"g":"GP025","k":"KK17","j":"Editor Laporan Kelab/Persatuan:"},{"g":"GP062","k":"KK17","j":"Jurufoto"},{"g":"GP051","k":"KK17","j":"Jurufoto"},{"g":"GP087","k":"KK17","j":"Jurufoto"},{"g":"GP088","k":"KK17","j":"Profil Murid Tingkatan 5"},{"g":"GP028","k":"KK17","j":"Bahan-bahan Am / Aktiviti Sekolah"},{"g":"GP019","k":"KK17","j":"Bahan-bahan Am / Aktiviti Sekolah"},{"g":"GP026","k":"KK17","j":"Pengiklanan"},{"g":"GP075","k":"KK17","j":"Sebut harga"},{"g":"GP011","k":"KK18","j":"Pengerusi"},{"g":"GP044","k":"KK18","j":"Timbalan Pengerusi"},{"g":"GP025","k":"KK18","j":"Ketua Penyelaras"},{"g":"GP002","k":"KK18","j":"Penolong Ketua Penyelaras"},{"g":"GP026","k":"KK18","j":"Ahli"},{"g":"GP076","k":"KK18","j":"Ahli"},{"g":"GP090","k":"KK18","j":"Ahli"},{"g":"GP062","k":"KK18","j":"Ahli"},{"g":"GP068","k":"KK18","j":"Ahli"},{"g":"GP069","k":"KK18","j":"Ahli"},{"g":"GP076","k":"KK18","j":"Ahli"},{"g":"GP083","k":"KK18","j":"Ahli"},{"g":"GP016","k":"KK18","j":"Ahli"},{"g":"GP001","k":"KK18","j":"Ahli"},{"g":"GP011","k":"SK02","j":"Pengerusi"},{"g":"GP044","k":"SK02","j":"Timbalan Pengerusi"},{"g":"GP026","k":"SK02","j":"Naib Pengerusi"},{"g":"GP076","k":"SK02","j":"Naib Pengerusi"},{"g":"GP090","k":"SK02","j":"Naib Pengerusi"},{"g":"GP001","k":"SK02","j":"Setiausaha"},{"g":"GP050","k":"SK02","j":"Pen. Setiausaha"},{"g":"GP083","k":"SK02","j":"Pen. Setiausaha"},{"g":"GP087","k":"SK02","j":"Rumah Azam"},{"g":"GP047","k":"SK02","j":"Rumah Berani"},{"g":"GP067","k":"SK02","j":"Rumah Cemerlang"},{"g":"GP081","k":"SK02","j":"Rumah Gigih"},{"g":"GP011","k":"SK02","j":"Rumah Tabah"},{"g":"GP023","k":"SK02","j":"Rumah Yakin"},{"g":"GP009","k":"SK02","j":"Badminton"},{"g":"GP077","k":"SK02","j":"Bola Keranjang"},{"g":"GP001","k":"SK02","j":"Bola Tampar"},{"g":"GP061","k":"SK02","j":"Bola Jaring"},{"g":"GP050","k":"SK02","j":"Bola Sepak/ Futsal"},{"g":"GP015","k":"SK02","j":"Ping Pong"},{"g":"GP083","k":"SK02","j":"Bola Baling"},{"g":"GP057","k":"SK02","j":"Tenis"},{"g":"GP005","k":"SK02","j":"Renang"},{"g":"GP004","k":"SK02","j":"Hoki"},{"g":"GP008","k":"SK02","j":"Catur"},{"g":"GP079","k":"SK02","j":"Wushu"},{"g":"GP074","k":"SK02","j":"Taekwando"},{"g":"GP050","k":"SK02","j":"Olahraga"},{"g":"GP019","k":"SK02","j":"Boling Ten Pin"},{"g":"GP025","k":"SK02","j":"Gimnastik"},{"g":"GP011","k":"SK03","j":"Pengerusi"},{"g":"GP044","k":"SK03","j":"Timbalan Pengerusi"},{"g":"GP001","k":"SK03","j":"Setiausaha"},{"g":"GP050","k":"SK03","j":"Pen. Setiausaha"},{"g":"GP083","k":"SK03","j":"Ketua Guru Penasihat Jurulatih"},{"g":"GP050","k":"SK03","j":"Acara Pecut dan Pagar"},{"g":"GP059","k":"SK03","j":"Acara Jarak Sederhana"},{"g":"GP001","k":"SK03","j":"Acara Jauh dan Jalan Kaki"},{"g":"GP050","k":"SK03","j":"Lontaran"},{"g":"GP036","k":"SK03","j":"Lontaran"},{"g":"GP061","k":"SK03","j":"Lontaran"},{"g":"GP064","k":"SK03","j":"Lompatan"},{"g":"GP050","k":"SK03","j":"Lompatan"},{"g":"GP011","k":"SK04","j":"Pengerusi"},{"g":"GP044","k":"SK04","j":"Timbalan Pengerusi"},{"g":"GP026","k":"SK04","j":"Naib Pengerusi"},{"g":"GP076","k":"SK04","j":"Naib Pengerusi"},{"g":"GP090","k":"SK04","j":"Naib Pengerusi"},{"g":"GP001","k":"SK04","j":"Setiausaha"},{"g":"GP050","k":"SK04","j":"Pen. Setiausaha"},{"g":"GP083","k":"SK04","j":"Ahli"},{"g":"GP011","k":"SK05","j":"Pengerusi"},{"g":"GP044","k":"SK05","j":"Timbalan Pengerusi"},{"g":"GP050","k":"SK05","j":"Ketua Penyelaras"},{"g":"GP001","k":"SK05","j":"Penolong Ketua Penyelaras"},{"g":"GP011","k":"SK06","j":"Pengerusi"},{"g":"GP044","k":"SK06","j":"Timbalan Pengerusi"},{"g":"GP026","k":"SK06","j":"Naib Pengerusi"},{"g":"GP076","k":"SK06","j":"Naib Pengerusi"},{"g":"GP090","k":"SK06","j":"Naib Pengerusi"},{"g":"GP001","k":"SK06","j":"Ketua Penyelaras"},{"g":"GP050","k":"SK06","j":"Penolong Ketua Penyelaras"},{"g":"GP011","k":"SK07","j":"Pengerusi"},{"g":"GP044","k":"SK07","j":"Timbalan Pengerusi"},{"g":"GP026","k":"SK07","j":"Naib Pengerusi"},{"g":"GP076","k":"SK07","j":"Naib Pengerusi"},{"g":"GP090","k":"SK07","j":"Naib Pengerusi"},{"g":"GP001","k":"SK07","j":"Ketua Penyelaras"},{"g":"GP050","k":"SK07","j":"Penolong Ketua Penyelaras"},{"g":"GP050","k":"SK07","j":"Merentas Desa"},{"g":"GP001","k":"SK07","j":"Sukantara"},{"g":"GP050","k":"SK07","j":"Sukan Olahraga"},{"g":"GP083","k":"SK07","j":"Rumah Sukan"},{"g":"GP011","k":"KK19","j":"Pengerusi"},{"g":"GP044","k":"KK19","j":"Timbalan Pengerusi"},{"g":"GP026","k":"KK19","j":"Naib Pengerusi"},{"g":"GP076","k":"KK19","j":"Naib Pengerusi"},{"g":"GP090","k":"KK19","j":"Naib Pengerusi"},{"g":"GP027","k":"KK19","j":"Lembaga Pengawas Sessi pagi"},{"g":"GP006","k":"KK19","j":"Pengawas Sessi Petang"},{"g":"GP084","k":"KK19","j":"Lembagas Pengawas Kokurikulum"},{"g":"GP058","k":"KK19","j":"Lembagas Pengawas Kokurikulum"},{"g":"GP049","k":"KK19","j":"Lembaga pengawas SPBT"},{"g":"GP014","k":"KK19","j":"Lembaga Pengawas Pusat Sumber"},{"g":"GP059","k":"KK19","j":"Sidang Redaksi Majalah Sekolah"},{"g":"GP007","k":"KK19","j":"Pembimbing Rakan Sebaya"},{"g":"GP046","k":"KK19","j":"SLAD"},{"g":"GP034","k":"KK19","j":"Majlis Ketua Guru Penasihat Tingkatan"},{"g":"GP075","k":"KK19","j":"Koperasi Sekolah"},{"g":"GP034","k":"KK19","j":"Kelab Pencegahan Jenayah"},{"g":"GP062","k":"KK19","j":"Unit Produksi dan Multimedia Sekolah"}],"unit_lookup":{"A01":["U","BULAN SABIT MERAH MALAYSIA"],"A02":["U","ST. JOHN AMBULANS MALAYSIA"],"A03":["U","PERSEKUTUAN PENGAKAP MALAYSIA"],"A04":["U","PERSATUAN PANDU PUTERI"],"A05":["U","PASUKAN KADET BOMBA DAN PENYELAMAT"],"A06":["U","PASUKAN KADET REMAJA SEKOLAH"],"A07":["U","BRIGED PUTERI MALAYSIA"],"A08":["U","BRIGED PUTERA MALAYSIA"],"B01":["K","INTERACT CLUB"],"B02":["K","LEO CLUB"],"B03":["K","KELAB RUKUN NEGARA"],"B04":["K","KELAB KERJAYA"],"C01":["K","PERSATUAN BAHASA MELAYU"],"C02":["K","ENGLISH LANGUAGE SOCIETY"],"C03":["K","PERSATUAN BAHASA DAN KEBUDAYAAN CINA"],"C04":["K","PERSATUAN SEJARAH"],"C05":["K","KELAB SENI VISUAL"],"C06":["K","PERSATUAN SAINS, TEKNOLOGI DAN MATEMATIK"],"C07":["K","KELAB SAINS KOMPUTER"],"C08":["K","PERSATUAN AGAMA ISLAM"],"D01":["K","KELAB SENI BUDAYA DAN WARISAN"],"D02":["K","KELAB ROBOTIK"],"D04A":["K","KELAB ORKESTRA TIONGHUA"],"D04B":["K","KELAB YOYO CINA (KENDAMA)"],"D04C":["K","KELAB TARIAN SINGA"],"D04D":["K","KELAB GENDANG 24 MUSIM"],"D04E":["K","KELAB TARIAN TIONGHUA"],"D05":["K","KELAB DHARMA (AGAMA BUDDHA)"],"D06A":["K","KELAB AGAMA KRISTIAN A"],"D06B":["K","KELAB AGAMA KRISTIAN B"],"D06C":["K","KELAB AGAMA KRISTIAN C"],"S01":["S","BADMINTON"],"S02":["S","BOLA KERANJANG"],"S03":["S","BOLA TAMPAR"],"S04":["S","BOLA JARING"],"S05":["S","BOLA SEPAK DAN FUTSAL"],"S06":["S","PING PONG"],"S07":["S","BOLING TENPIN"],"S08":["S","TENIS"],"S09":["S","RENANG"],"S10":["S","HOKI"],"S11":["S","KELAB CATUR DAN XIANGQI"],"S12":["S","WUSHU"],"S13":["S","TAEKWONDO"]},"jk_lookup":{"KK00":["Payung","JAWATANKUASA PENGURUSAN KOKURIKULUM SEKOLAH"],"KK01":["Kokurikulum","JAWATANKUASA BIMBINGAN MURID SEKOLAH"],"KK02":["Kokurikulum","JAWATANKUASA PENGURUSAN PEMANTAUAN DAN FAIL KOKURIKULUM SEKOLAH"],"KK03":["Kokurikulum","JAWATANKUASA DOKUMENTASI DAN PUBLISITI SEKOLAH"],"KK04":["Kokurikulum","JAWATANKUASA PRASARANA KOKURIKULUM SEKOLAH"],"KK05":["Kokurikulum","JAWATANKUASA PENGURUSAN DATA DAN MAKLUMAT MURID KOKURIKULUM SEKOLAH"],"KK06":["Kokurikulum","JAWATANKUASA PERANCANGAN STRATEGIK KOKURIKULUM SEKOLAH"],"KK07":["Kokurikulum","JAWATANKUASA PELAKSANAAN RIMUP PERINGKAT SEKOLAH"],"KK08":["Kokurikulum","JAWATANKUASA PERLAKSANAAN KHIDMAT MASYARAKAT MURID"],"KK09":["Kokurikulum","JAWATANKUASA PERLAKSANAAN PROJEK INOVASI KELAB DAN PERSATUAN DI SEKOLAH"],"KK10":["Kokurikulum","JAWATANKUASA INDUK 1 MURID 1 PROJEK"],"KK11":["Kokurikulum","JAWATANKUASA PENGURUSAN PROGRAM ANUGERAH REMAJA PERDANA RAKAN MUDA PERINGKAT SEKOLAH"],"KK12":["Kokurikulum","JAWATANKUASA PROJEK KHAS KOKURIKULUM"],"KK13":["Kokurikulum","JAWATANKUASA PEMBANGUNAN SENI BUDAYA SEKOLAH"],"KK14":["Kokurikulum","JAWATANKUASA INDUK KONSERT"],"KK15":["Kokurikulum","JAWATANKUASA INDUK HARI USAHAWANAN, KOPERASI DAN KOKURIKULUM"],"KK16":["Kokurikulum","KOPERASI SMJK TINGGI KUCHING BERHAD"],"KK17":["Kokurikulum","JAWATANKUASA PENERBITAN MAJALAH SEKOLAH"],"KK18":["Kokurikulum","JAWATANKUASA PENILAIAN KOKURIKULUM DAN PAJSK SEKOLAH"],"KK19":["Kokurikulum","JAWATANKUASA KETUA PENYELARAS EKSTRAKURIKULUM"],"SK01":["Sukan","JAWATANKUASA BIMBINGAN (SUKAN)"],"SK02":["Sukan","MAJLIS SUKAN SEKOLAH (MSS)"],"SK03":["Sukan","JAWATANKUASA PEMBANGUNAN OLAHRAGA SEKOLAH"],"SK04":["Sukan","JAWATANKUASA PERLAKSANAAN SATU MURID SATU SUKAN (1M1S) SEKOLAH"],"SK05":["Sukan","JAWATANKUASA STOR SUKAN SEKOLAH"],"SK06":["Sukan","JAWATANKUASA INDUK SUKAN TAHUNAN SEKOLAH"],"SK07":["Sukan","JAWATANKUASA AKTIVITI SUKAN SEKOLAH"]}};
+
+  let state = {
+    initialized: false, loading: false, source: '', view: 'ringkasan',
+    teachers: [], unitStats: [], jkStats: [],
+    dirFiltered: [], dirPage: 1, dirFilters: { search: '', sesi: '', kategori: '', jawatan: '', unit: '', rumah: '', band: '' },
+    wlSort: 'total',
+    charts: {}
+  };
+
+  /* -------- HELPERS -------- */
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function initials(n) { const p = String(n || '').replace(/^(HJH?\.?|HJ\.?|DR\.?|EN\.?|PN\.?|CIK)\s+/i, '').trim().split(/\s+/); return ((p[0] || '?')[0] + ((p[1] || '')[0] || '')).toUpperCase(); }
+  function avatarColor(n) { const c = ['#0d9488', '#0891b2', '#7c3aed', '#db2777', '#ea580c', '#16a34a', '#2563eb', '#9333ea']; let h = 0; for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % c.length; return c[h]; }
+  function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+
+  /* -------- BINA MODEL -------- */
+  function buildModel(data) {
+    const UL = data.unit_lookup || {}, JL = data.jk_lookup || {};
+    const byId = {};
+    (data.guru || []).forEach(function (g) {
+      byId[g.id] = {
+        id: g.id, nama: g.n, sesi: g.s || '', rumah: g.rs || '', rumah_jawatan: g.rj || '',
+        tugasan: [], jk: [], unitByKat: {}
+      };
+    });
+    (data.tugasan || []).forEach(function (t) {
+      const g = byId[t.g]; if (!g) return;
+      const ul = UL[t.kod] || [t.kt, t.kod];
+      const kat = KAT_FROM[t.kt] || 'Kelab';
+      const o = { kategori: kat, kod: t.kod, nama_unit: ul[1] || t.kod, jawatan: t.j || 'GP' };
+      g.tugasan.push(o); g.unitByKat[kat] = o;
+    });
+    (data.jk || []).forEach(function (j) {
+      const g = byId[j.g]; if (!g) return;
+      const jl = JL[j.k] || ['', j.k];
+      g.jk.push({ kod: j.k, nama_jk: jl[1] || j.k, kelompok: jl[0] || '', jawatan: j.j || 'Ahli', tier: jkTier(j.j) });
+    });
+
+    const teachers = Object.keys(byId).map(function (id) {
+      const t = byId[id];
+      t.bil_unit = t.tugasan.length;
+      t.bil_ketua_unit = t.tugasan.filter(function (u) { return u.jawatan === 'KG'; }).length;
+      t.kategori_set = Array.from(new Set(t.tugasan.map(function (u) { return u.kategori; })));
+      t.jawatan_set = Array.from(new Set(t.tugasan.map(function (u) { return u.jawatan; })));
+      t.bil_jk = t.jk.length;
+      t.bil_jk_pimpin = t.jk.filter(function (j) { return j.tier === 'pimpin'; }).length;
+      // Indeks beban kerja
+      let su = 0; t.tugasan.forEach(function (u) { su += W.unit_base + (JAWATAN[u.jawatan] ? JAWATAN[u.jawatan].skor : 1); });
+      let sj = 0; t.jk.forEach(function (j) { sj += jkWeight(j.jawatan); });
+      let sr = t.rumah_jawatan ? (W['rumah_' + t.rumah_jawatan] || 0) : 0;
+      t.wl = { unit: su, jk: sj, rumah: sr, total: su + sj + sr };
+      t.band = bandOf(t.wl.total);
+      return t;
+    });
+
+    // Stat unit (semua 44 unit dari lookup)
+    const unitMap = {};
+    Object.keys(UL).forEach(function (kod) { unitMap[kod] = { kod: kod, kategori: KAT_FROM[UL[kod][0]] || 'Kelab', nama: UL[kod][1], advisors: [], n: 0, petang: 0, ketua: 0 }; });
+    teachers.forEach(function (t) {
+      t.tugasan.forEach(function (u) {
+        if (!unitMap[u.kod]) unitMap[u.kod] = { kod: u.kod, kategori: u.kategori, nama: u.nama_unit, advisors: [], n: 0, petang: 0, ketua: 0 };
+        const um = unitMap[u.kod]; um.advisors.push({ id: t.id, nama: t.nama, sesi: t.sesi, jawatan: u.jawatan }); um.n++;
+        if (t.sesi === 'Petang') um.petang++; if (u.jawatan === 'KG') um.ketua++;
+      });
+    });
+    const unitStats = Object.keys(unitMap).map(function (k) { return unitMap[k]; });
+
+    // Stat jawatankuasa (semua 27)
+    const jkMap = {};
+    Object.keys(JL).forEach(function (kod) { jkMap[kod] = { kod: kod, kelompok: JL[kod][0], nama: JL[kod][1], members: [] }; });
+    teachers.forEach(function (t) {
+      t.jk.forEach(function (j) {
+        if (!jkMap[j.kod]) jkMap[j.kod] = { kod: j.kod, kelompok: j.kelompok, nama: j.nama_jk, members: [] };
+        jkMap[j.kod].members.push({ id: t.id, nama: t.nama, jawatan: j.jawatan, tier: j.tier });
+      });
+    });
+    const jkStats = Object.keys(jkMap).map(function (k) { return jkMap[k]; });
+
+    return { teachers: teachers, unitStats: unitStats, jkStats: jkStats };
+  }
+
+  /* ============================================================ CSS ============================================================ */
+  function injectCSS() {
+    if (document.getElementById('gp-styles-v3')) return;
+    const css = document.createElement('style'); css.id = 'gp-styles-v3';
+    css.textContent = `
+      #page-guru .gp-wrap{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a;}
+      #page-guru .gp-head{background:linear-gradient(120deg,#0f766e 0%,#0d9488 55%,#14b8a6 100%);color:#fff;padding:30px 32px;border-radius:18px;margin-bottom:22px;box-shadow:0 20px 40px -12px rgba(15,118,110,.5);position:relative;overflow:hidden;}
+      #page-guru .gp-head::before{content:'';position:absolute;top:-60%;right:-5%;width:420px;height:420px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);}
+      #page-guru .gp-head::after{content:'';position:absolute;bottom:-50%;left:30%;width:300px;height:300px;background:radial-gradient(circle,rgba(20,184,166,.4),transparent 70%);}
+      #page-guru .gp-head-c{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:18px;}
+      #page-guru .gp-head-t{display:flex;align-items:center;gap:16px;}
+      #page-guru .gp-head-i{width:60px;height:60px;background:rgba(255,255,255,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;backdrop-filter:blur(8px);}
+      #page-guru .gp-head h1{font-size:26px;font-weight:800;margin:0 0 3px;color:#fff;letter-spacing:-.02em;}
+      #page-guru .gp-head p{font-size:13px;opacity:.9;margin:0;}
+      #page-guru .gp-src{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;background:rgba(255,255,255,.18);}
+      #page-guru .gp-head-btns{display:flex;gap:10px;flex-wrap:wrap;}
+      #page-guru .gp-btn{padding:9px 16px;border-radius:9px;border:none;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit;transition:.2s;}
+      #page-guru .gp-btn-w{background:#fff;color:#0f766e;}#page-guru .gp-btn-g{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);}
+      #page-guru .gp-btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,0,0,.15);}
+
+      #page-guru .gp-tabs{display:flex;gap:4px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:5px;margin-bottom:22px;overflow-x:auto;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+      #page-guru .gp-tab{flex:1;min-width:130px;padding:11px 14px;border:none;background:none;border-radius:8px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;transition:.2s;font-family:inherit;}
+      #page-guru .gp-tab:hover{background:#f0fdfa;color:#0f766e;}
+      #page-guru .gp-tab.active{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;box-shadow:0 4px 10px rgba(15,118,110,.3);}
+      #page-guru .gp-view{display:none;animation:gpfade .35s;}#page-guru .gp-view.active{display:block;}
+      @keyframes gpfade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+      #page-guru .gp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:22px;}
+      #page-guru .gp-stat{background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 6px -1px rgba(0,0,0,.07);border:1px solid #e2e8f0;position:relative;overflow:hidden;transition:.25s;}
+      #page-guru .gp-stat:hover{transform:translateY(-4px);box-shadow:0 18px 30px -10px rgba(0,0,0,.15);}
+      #page-guru .gp-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#0f766e,#14b8a6);}
+      #page-guru .gp-stat.c-u::before{background:linear-gradient(90deg,#0d9488,#2dd4bf);}#page-guru .gp-stat.c-k::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa);}#page-guru .gp-stat.c-s::before{background:linear-gradient(90deg,#f59e0b,#fbbf24);}#page-guru .gp-stat.c-j::before{background:linear-gradient(90deg,#ec4899,#f472b6);}#page-guru .gp-stat.c-r::before{background:linear-gradient(90deg,#6366f1,#818cf8);}
+      #page-guru .gp-stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+      #page-guru .gp-stat-i{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#0f766e,#14b8a6);display:flex;align-items:center;justify-content:center;font-size:21px;color:#fff;}
+      #page-guru .gp-stat.c-u .gp-stat-i{background:linear-gradient(135deg,#0d9488,#2dd4bf);}#page-guru .gp-stat.c-k .gp-stat-i{background:linear-gradient(135deg,#8b5cf6,#a78bfa);}#page-guru .gp-stat.c-s .gp-stat-i{background:linear-gradient(135deg,#f59e0b,#fbbf24);}#page-guru .gp-stat.c-j .gp-stat-i{background:linear-gradient(135deg,#ec4899,#f472b6);}#page-guru .gp-stat.c-r .gp-stat-i{background:linear-gradient(135deg,#6366f1,#818cf8);}
+      #page-guru .gp-stat-v{font-size:32px;font-weight:800;color:#0f172a;line-height:1;margin-bottom:5px;letter-spacing:-.02em;}
+      #page-guru .gp-stat-l{font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+      #page-guru .gp-stat-sl{font-size:12px;color:#94a3b8;margin-top:4px;}
+
+      #page-guru .gp-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:22px;box-shadow:0 4px 6px -1px rgba(0,0,0,.06);margin-bottom:20px;}
+      #page-guru .gp-sec-t{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px;}
+      #page-guru .gp-sec-t .x{font-size:21px;}
+      #page-guru .gp-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;}
+      #page-guru .gp-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:20px;}
+      #page-guru .gp-chart-c{height:240px;position:relative;}
+
+      #page-guru .gp-ovr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+      #page-guru .gp-ovr-c{background:linear-gradient(135deg,#f0fdfa,#ecfeff);border:1px solid #99f6e4;border-radius:10px;padding:15px;text-align:center;}
+      #page-guru .gp-ovr-v{font-size:23px;font-weight:800;color:#0f766e;line-height:1;}
+      #page-guru .gp-ovr-l{font-size:11px;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-top:6px;}
+
+      #page-guru .gp-alerts{display:flex;flex-direction:column;gap:10px;}
+      #page-guru .gp-alert{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-radius:10px;font-size:13px;line-height:1.45;}
+      #page-guru .gp-alert.danger{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;}#page-guru .gp-alert.warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}#page-guru .gp-alert.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;}#page-guru .gp-alert.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;}
+      #page-guru .gp-alert-ic{font-size:18px;flex-shrink:0;}#page-guru .gp-alert b{font-weight:700;}
+
+      #page-guru .gp-bars{display:flex;flex-direction:column;gap:11px;}
+      #page-guru .gp-bar-row{display:flex;align-items:center;gap:12px;}
+      #page-guru .gp-bar-lab{width:175px;font-size:13px;font-weight:600;color:#334155;flex-shrink:0;display:flex;align-items:center;gap:6px;}
+      #page-guru .gp-bar-track{flex:1;height:24px;background:#f1f5f9;border-radius:7px;overflow:hidden;}
+      #page-guru .gp-bar-fill{height:100%;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:11px;font-weight:700;min-width:34px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+
+      #page-guru .gp-top-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f1f5f9;}
+      #page-guru .gp-top-item:last-child{border-bottom:none;}
+      #page-guru .gp-rank{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;background:#f1f5f9;color:#64748b;}
+      #page-guru .gp-rank.r1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;}#page-guru .gp-rank.r2{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#fff;}#page-guru .gp-rank.r3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff;}
+      #page-guru .gp-top-n{flex:1;min-width:0;font-size:13px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      #page-guru .gp-top-v{font-size:13px;font-weight:800;color:#0f766e;white-space:nowrap;}
+
+      /* WORKLOAD */
+      #page-guru .gp-wl-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #f1f5f9;cursor:pointer;}
+      #page-guru .gp-wl-row:hover{background:#f8fafc;}
+      #page-guru .gp-wl-rank{width:30px;text-align:center;font-size:14px;font-weight:800;color:#94a3b8;flex-shrink:0;}
+      #page-guru .gp-wl-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0;}
+      #page-guru .gp-wl-mid{flex:1;min-width:0;}
+      #page-guru .gp-wl-name{font-size:14px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      #page-guru .gp-wl-meta{font-size:11px;color:#94a3b8;margin-top:2px;}
+      #page-guru .gp-wl-stack{display:flex;height:9px;border-radius:5px;overflow:hidden;margin-top:6px;background:#f1f5f9;width:230px;max-width:42vw;}
+      #page-guru .gp-wl-seg{height:100%;}
+      #page-guru .gp-wl-score{text-align:right;flex-shrink:0;width:80px;}
+      #page-guru .gp-wl-num{font-size:20px;font-weight:800;color:#0f172a;line-height:1;}
+      #page-guru .gp-wl-band{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;display:inline-block;margin-top:4px;}
+      #page-guru .gp-band-rendah{background:#d1fae5;color:#065f46;}#page-guru .gp-band-sederhana{background:#e0f2fe;color:#075985;}#page-guru .gp-band-tinggi{background:#fef3c7;color:#92400e;}#page-guru .gp-band-kritikal{background:#fee2e2;color:#991b1b;}
+      #page-guru .gp-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#475569;margin-top:6px;}
+      #page-guru .gp-legend span{display:inline-flex;align-items:center;gap:6px;}
+      #page-guru .gp-dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+      #page-guru .gp-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+      #page-guru .gp-search-wrap{position:relative;flex:1;min-width:220px;}
+      #page-guru .gp-sic{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;}
+      #page-guru .gp-si{width:100%;padding:10px 36px 10px 38px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;}
+      #page-guru .gp-si:focus{outline:none;border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12);}
+      #page-guru .gp-search-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);border:none;background:#f1f5f9;color:#64748b;width:21px;height:21px;border-radius:50%;cursor:pointer;display:none;}
+      #page-guru .gp-sel{padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;background:#fff;cursor:pointer;max-width:210px;}
+      #page-guru .gp-sel:focus{outline:none;border-color:#14b8a6;}
+      #page-guru .gp-clr{padding:10px 14px;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;}
+      #page-guru .gp-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.1);max-height:280px;overflow-y:auto;z-index:50;display:none;}
+      #page-guru .gp-sug{padding:9px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:9px;}#page-guru .gp-sug:hover{background:#f0fdfa;}
+
+      #page-guru .gp-tbl-w{overflow-x:auto;border:1px solid #e2e8f0;border-radius:12px;}
+      #page-guru .gp-st{width:100%;border-collapse:collapse;font-size:13px;min-width:820px;background:#fff;}
+      #page-guru .gp-st th{background:#f8fafc;padding:11px 13px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid #e2e8f0;white-space:nowrap;}
+      #page-guru .gp-st td{padding:10px 13px;border-bottom:1px solid #f1f5f9;color:#1e293b;vertical-align:middle;}
+      #page-guru .gp-st tr:hover td{background:#f0fdfa;cursor:pointer;}
+      #page-guru .gp-av-sm{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;flex-shrink:0;}
+      #page-guru .gp-name-cell{display:flex;align-items:center;gap:9px;}
+      #page-guru .gp-sesi{display:inline-block;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700;}
+      #page-guru .gp-sesi.pagi{background:#fef9c3;color:#854d0e;}#page-guru .gp-sesi.petang{background:#e0e7ff;color:#3730a3;}
+      #page-guru .gp-ucell{display:flex;flex-direction:column;gap:2px;}
+      #page-guru .gp-uname{font-size:12px;color:#334155;max-width:185px;}
+      #page-guru .gp-rb{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;font-weight:700;width:fit-content;}
+      #page-guru .gp-rb.KG{background:#fef3c7;color:#92400e;}#page-guru .gp-rb.PK{background:#dbeafe;color:#1e40af;}#page-guru .gp-rb.GP{background:#f1f5f9;color:#64748b;}
+      #page-guru .gp-ucode{font-size:10px;color:#94a3b8;font-weight:700;}
+      #page-guru .gp-mini-band{font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;}
+
+      #page-guru .gp-pg{display:flex;align-items:center;justify-content:space-between;padding:14px 4px 0;flex-wrap:wrap;gap:10px;}
+      #page-guru .gp-pgi{font-size:13px;color:#64748b;}#page-guru .gp-pgc{display:flex;gap:6px;}
+      #page-guru .gp-pgb{width:33px;height:33px;border:1px solid #e2e8f0;background:#fff;border-radius:8px;font-size:13px;font-weight:600;color:#475569;cursor:pointer;}
+      #page-guru .gp-pgb.active{background:#0f766e;color:#fff;border-color:#0f766e;}#page-guru .gp-pgb:disabled{opacity:.4;cursor:not-allowed;}
+
+      #page-guru .gp-unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
+      #page-guru .gp-ucard{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;transition:.2s;}
+      #page-guru .gp-ucard:hover{box-shadow:0 8px 20px -6px rgba(0,0,0,.12);transform:translateY(-2px);}
+      #page-guru .gp-ucard-h{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+      #page-guru .gp-ucard-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0;}
+      #page-guru .gp-ucard-t{font-size:13px;font-weight:700;color:#1e293b;line-height:1.25;}
+      #page-guru .gp-ucard-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+      #page-guru .gp-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:#f1f5f9;color:#475569;}
+      #page-guru .gp-pill.bad{background:#fee2e2;color:#991b1b;}#page-guru .gp-pill.good{background:#dcfce7;color:#166534;}#page-guru .gp-pill.warn{background:#fef3c7;color:#92400e;}
+
+      #page-guru .gp-jk-group{margin-bottom:18px;}
+      #page-guru .gp-jk-gh{font-size:13px;font-weight:800;color:#0f766e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+      #page-guru .gp-jk-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:8px;}
+      #page-guru .gp-jk-top{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;}
+      #page-guru .gp-jk-name{font-size:13px;font-weight:600;color:#1e293b;flex:1;}
+      #page-guru .gp-jk-mem{display:none;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;flex-wrap:wrap;gap:7px;}
+      #page-guru .gp-jk-card.open .gp-jk-mem{display:flex;}
+      #page-guru .gp-mtag{font-size:11px;padding:4px 10px;border-radius:100px;background:#f8fafc;border:1px solid #e2e8f0;color:#334155;}
+      #page-guru .gp-mtag.lead{background:#f0fdfa;border-color:#5eead4;color:#0f766e;font-weight:600;}
+
+      #page-guru .gp-empty{text-align:center;padding:46px 20px;color:#94a3b8;}
+      #page-guru .gp-load{text-align:center;padding:80px 20px;}
+      #page-guru .gp-sp{width:44px;height:44px;border:4px solid #d1fae5;border-top-color:#0f766e;border-radius:50%;margin:0 auto 16px;animation:gpspin 1s linear infinite;}
+      @keyframes gpspin{to{transform:rotate(360deg);}}
+      #page-guru .gp-err{display:flex;align-items:center;gap:16px;padding:24px;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;color:#991b1b;}
+
+      #gpModal,#gpExport,#gpHelp{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:99999;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(2px);}
+      #gpModal.active,#gpExport.active,#gpHelp.active{display:flex;}
+      .gp-box{background:#fff;border-radius:18px;max-width:720px;width:100%;box-shadow:0 25px 60px rgba(0,0,0,.3);overflow:hidden;animation:gpup .3s;}
+      @keyframes gpup{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
+      .gp-hero{background:linear-gradient(120deg,#0f766e,#14b8a6);padding:28px 30px;color:#fff;position:relative;}
+      .gp-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;cursor:pointer;font-size:16px;}
+      .gp-hero-c{display:flex;align-items:center;gap:18px;}
+      .gp-av{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;flex-shrink:0;border:3px solid rgba(255,255,255,.3);}
+      .gp-hero h2{margin:0;font-size:21px;font-weight:800;}.gp-hero p{margin:4px 0 0;opacity:.92;font-size:13px;}
+      .gp-hero-tags{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+      .gp-htag{font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;background:rgba(255,255,255,.18);}
+      .gp-body{padding:24px 28px;max-height:60vh;overflow-y:auto;}
+      .gp-msec{margin-bottom:22px;}
+      .gp-msec-t{font-size:13px;font-weight:800;color:#0f766e;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+      .gp-unit{display:flex;align-items:center;gap:13px;padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:9px;}
+      .gp-unit-ic{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;flex-shrink:0;}
+      .gp-unit-i{flex:1;min-width:0;}.gp-unit-cat{font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;}.gp-unit-n{font-size:14px;font-weight:700;color:#1e293b;margin-top:1px;}
+      .gp-jbadge{padding:5px 12px;border-radius:100px;font-size:12px;font-weight:700;white-space:nowrap;}
+      .gp-jbadge.k{background:#fef3c7;color:#92400e;}.gp-jbadge.p{background:#dbeafe;color:#1e40af;}.gp-jbadge.g{background:#f1f5f9;color:#475569;}
+      .gp-wl-break{display:flex;gap:10px;flex-wrap:wrap;}
+      .gp-wl-bcard{flex:1;min-width:120px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:13px;text-align:center;}
+      .gp-wl-bv{font-size:22px;font-weight:800;color:#0f172a;}.gp-wl-bl{font-size:11px;color:#64748b;font-weight:600;margin-top:3px;}
+      .gp-jklist{display:flex;flex-direction:column;gap:6px;}
+      .gp-jkrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;background:#f8fafc;border-radius:8px;font-size:12px;}
+      .gp-jkrow .nm{color:#334155;flex:1;}.gp-jkrow .jw{font-weight:700;color:#0f766e;white-space:nowrap;}
+
+      .gp-exp-box{background:#fff;border-radius:16px;max-width:460px;width:100%;padding:26px;}
+      .gp-exp-h{font-size:18px;font-weight:800;margin-bottom:4px;color:#0f172a;}
+      .gp-exp-opt{display:flex;align-items:center;gap:14px;padding:15px;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;margin-top:11px;transition:.2s;}
+      .gp-exp-opt:hover{border-color:#14b8a6;background:#f0fdfa;}.gp-exp-ic{font-size:23px;}.gp-exp-t{font-size:14px;font-weight:700;color:#1e293b;}.gp-exp-d{font-size:12px;color:#64748b;}
+
+      .gp-help-box{background:#fff;border-radius:16px;max-width:580px;width:100%;overflow:hidden;}
+      .gp-help-h{background:linear-gradient(120deg,#0f766e,#14b8a6);padding:22px 26px;color:#fff;position:relative;}
+      .gp-help-tabs{display:flex;gap:4px;padding:13px 26px 0;border-bottom:1px solid #e2e8f0;flex-wrap:wrap;}
+      .gp-htab{padding:9px 14px;border:none;background:none;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;}.gp-htab.active{color:#0f766e;border-bottom-color:#0f766e;}
+      .gp-htc{display:none;padding:22px 26px;max-height:50vh;overflow-y:auto;}.gp-htc.active{display:block;}
+      .gp-kbd{display:inline-block;padding:2px 8px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:5px;font-family:monospace;font-size:12px;font-weight:700;}
+      .gp-help-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;}
+      .gp-rubric{font-size:13px;color:#475569;line-height:1.7;}
+      .gp-rubric b{color:#0f172a;}
+
+      .gp-toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:13px 19px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999999;animation:gptin .3s;}
+      .gp-toast.success{background:#0f766e;}.gp-toast.info{background:#2563eb;}.gp-toast.warn{background:#d97706;}
+      @keyframes gptin{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}@keyframes gpToastOut{to{transform:translateY(20px);opacity:0;}}
+      @media print{#sidebar,.topbar,.gp-tabs,.gp-filters,.gp-head-btns,.gp-pg{display:none!important;}#page-guru .gp-view{display:block!important;}}
+    `;
+    document.head.appendChild(css);
+  }
+
+  /* === SAMBUNGAN: HTML, RENDER, INIT (skop sama) === */
+
+  /* ============================================================ HTML ============================================================ */
+  function ensurePage() {
+    let page = document.getElementById('page-guru');
+    if (!page) {
+      page = document.createElement('section'); page.id = 'page-guru'; page.className = 'page'; page.style.display = 'none';
+      const ref = document.getElementById('page-pelajar') || document.querySelector('.page');
+      if (ref && ref.parentNode) ref.parentNode.appendChild(page); else document.body.appendChild(page);
+    }
+    return page;
+  }
+
+  function injectHTML() {
+    const page = ensurePage();
+    page.innerHTML = `
+      <div class="gp-wrap">
+        <header class="gp-head"><div class="gp-head-c">
+          <div class="gp-head-t"><div class="gp-head-i">👨‍🏫</div>
+            <div><h1>Papan Pemuka Guru Penasihat</h1><p>Pengurusan Tugas Kokurikulum 2026 · Audit & Pelaporan KPM · SMK Tinggi Kuching</p>
+            <span class="gp-src" id="gp-src">⏳ Memuatkan…</span></div></div>
+          <div class="gp-head-btns">
+            <button class="gp-btn gp-btn-g" onclick="GuruPenasihat.openHelp()">❓ Bantuan</button>
+            <button class="gp-btn gp-btn-g" onclick="GuruPenasihat.refresh()">🔄 Muat Semula</button>
+            <button class="gp-btn gp-btn-w" onclick="GuruPenasihat.openExportMenu()">📥 Eksport</button>
+          </div></div></header>
+
+        <div id="gp-load" class="gp-load"><div class="gp-sp"></div><div style="color:#64748b;font-weight:500;">Memuatkan data guru penasihat…</div></div>
+        <div id="gp-err" style="display:none;"></div>
+
+        <div id="gp-cnt" style="display:none;">
+          <div class="gp-tabs" id="gp-tabs">
+            <button class="gp-tab active" data-view="ringkasan" onclick="GuruPenasihat.tab('ringkasan')">📊 Ringkasan</button>
+            <button class="gp-tab" data-view="beban" onclick="GuruPenasihat.tab('beban')">⚖️ Beban Kerja</button>
+            <button class="gp-tab" data-view="direktori" onclick="GuruPenasihat.tab('direktori')">👥 Direktori Guru</button>
+            <button class="gp-tab" data-view="unit" onclick="GuruPenasihat.tab('unit')">🗂️ Unit & Kapasiti</button>
+            <button class="gp-tab" data-view="jk" onclick="GuruPenasihat.tab('jk')">🏛️ Jawatankuasa</button>
+          </div>
+
+          <section class="gp-view active" id="v-ringkasan"></section>
+          <section class="gp-view" id="v-beban"></section>
+          <section class="gp-view" id="v-direktori"></section>
+          <section class="gp-view" id="v-unit"></section>
+          <section class="gp-view" id="v-jk"></section>
+        </div>
+      </div>`;
+  }
+
+  function injectModal() {
+    if (!document.getElementById('gpModal')) {
+      const m = document.createElement('div'); m.id = 'gpModal';
+      m.onclick = function (e) { if (e.target.id === 'gpModal') GuruPenasihat.closeProfile(); };
+      m.innerHTML = `<div class="gp-box"><div class="gp-hero"><button class="gp-close" onclick="GuruPenasihat.closeProfile()">✕</button>
+        <div class="gp-hero-c"><div class="gp-av" id="gp-m-av">👤</div><div><h2 id="gp-m-nama">—</h2><p id="gp-m-sub">—</p>
+        <div class="gp-hero-tags" id="gp-m-tags"></div></div></div></div>
+        <div class="gp-body" id="gp-m-body"></div></div>`;
+      document.body.appendChild(m);
+    }
+    if (!document.getElementById('gpExport')) {
+      const e = document.createElement('div'); e.id = 'gpExport';
+      e.onclick = function (ev) { if (ev.target.id === 'gpExport') GuruPenasihat.closeExportMenu(); };
+      e.innerHTML = `<div class="gp-exp-box"><div class="gp-exp-h">📥 Eksport Data Audit</div><div style="font-size:13px;color:#64748b;">Format CSV (Excel) untuk pelaporan.</div>
+        <div class="gp-exp-opt" onclick="GuruPenasihat.exportWorkload()"><div class="gp-exp-ic">⚖️</div><div><div class="gp-exp-t">Laporan Beban Kerja</div><div class="gp-exp-d">Indeks + pecahan unit/JK/rumah setiap guru</div></div></div>
+        <div class="gp-exp-opt" onclick="GuruPenasihat.exportGuru()"><div class="gp-exp-ic">👥</div><div><div class="gp-exp-t">Senarai Guru Penasihat</div><div class="gp-exp-d">3 bidang + sesi + rumah sukan</div></div></div>
+        <div class="gp-exp-opt" onclick="GuruPenasihat.exportTugasan()"><div class="gp-exp-ic">🗂️</div><div><div class="gp-exp-t">Senarai Tugasan Unit</div><div class="gp-exp-d">Satu baris setiap tugasan</div></div></div>
+        <div class="gp-exp-opt" onclick="GuruPenasihat.exportJK()"><div class="gp-exp-ic">🏛️</div><div><div class="gp-exp-t">Senarai Jawatankuasa</div><div class="gp-exp-d">Keahlian + jawatan dalam JK</div></div></div>
+        <div class="gp-exp-opt" onclick="window.print()"><div class="gp-exp-ic">🖨️</div><div><div class="gp-exp-t">Cetak / PDF</div><div class="gp-exp-d">Paparan semasa</div></div></div>
+        <button class="gp-clr" style="width:100%;margin-top:14px;" onclick="GuruPenasihat.closeExportMenu()">Tutup</button></div>`;
+      document.body.appendChild(e);
+    }
+    if (!document.getElementById('gpHelp')) {
+      const h = document.createElement('div'); h.id = 'gpHelp';
+      h.onclick = function (ev) { if (ev.target.id === 'gpHelp') GuruPenasihat.closeHelp(); };
+      h.innerHTML = `<div class="gp-help-box"><div class="gp-help-h"><button class="gp-close" onclick="GuruPenasihat.closeHelp()">✕</button><h2 style="margin:0;font-size:18px;">❓ Panduan Papan Pemuka</h2></div>
+        <div class="gp-help-tabs"><button class="gp-htab active" data-htab="tab" onclick="GuruPenasihat.helpTab('tab')">Tab</button><button class="gp-htab" data-htab="beban" onclick="GuruPenasihat.helpTab('beban')">Indeks Beban</button><button class="gp-htab" data-htab="pintasan" onclick="GuruPenasihat.helpTab('pintasan')">Pintasan</button></div>
+        <div class="gp-htc active" data-htc="tab">
+          <div class="gp-help-row"><span>📊 Ringkasan</span><span style="color:#64748b;">KPI, carta & penemuan audit</span></div>
+          <div class="gp-help-row"><span>⚖️ Beban Kerja</span><span style="color:#64748b;">indeks & ekuiti beban guru</span></div>
+          <div class="gp-help-row"><span>👥 Direktori Guru</span><span style="color:#64748b;">carian, tapis & profil 360°</span></div>
+          <div class="gp-help-row"><span>🗂️ Unit & Kapasiti</span><span style="color:#64748b;">liputan & kapasiti setiap unit</span></div>
+          <div class="gp-help-row"><span>🏛️ Jawatankuasa</span><span style="color:#64748b;">struktur AJK pengurusan KK</span></div>
+        </div>
+        <div class="gp-htc" data-htc="beban"><div class="gp-rubric">
+          <b>Indeks Beban Kerja</b> dikira secara telus dari tiga dimensi:<br><br>
+          <b>1. Tugasan Unit</b> — ${W.unit_base} mata asas setiap tugasan + jawatan (Ketua +${JAWATAN.KG.skor}, Penolong Ketua +${JAWATAN.PK.skor}, Guru Penasihat +${JAWATAN.GP.skor}).<br>
+          <b>2. Jawatankuasa</b> — Pimpinan/Pengerusi/Penyelaras +${W.jk_pimpin}, Urusetia/Setiausaha +${W.jk_urusetia}, Ahli/AJK +${W.jk_ahli} setiap keahlian.<br>
+          <b>3. Rumah Sukan</b> — Ketua +${W.rumah_K}, Penolong +${W.rumah_P}, Guru +${W.rumah_G}.<br><br>
+          Band: <b>Rendah</b> &lt;16 · <b>Sederhana</b> 16–24 · <b>Tinggi</b> 25–44 · <b>Sangat Tinggi</b> ≥45.
+        </div></div>
+        <div class="gp-htc" data-htc="pintasan">
+          <div class="gp-help-row"><span>Cari (dalam Direktori)</span><span class="gp-kbd">Ctrl + F</span></div>
+          <div class="gp-help-row"><span>Eksport</span><span class="gp-kbd">Ctrl + E</span></div>
+          <div class="gp-help-row"><span>Muat semula</span><span class="gp-kbd">Ctrl + R</span></div>
+          <div class="gp-help-row"><span>Bantuan</span><span class="gp-kbd">?</span></div>
+          <div class="gp-help-row"><span>Tutup</span><span class="gp-kbd">Esc</span></div>
+        </div></div>`;
+      document.body.appendChild(h);
+    }
+  }
+
+  /* ============================================================ API + INIT ============================================================ */
+  function api(action) { return fetch(API_URL + '?action=' + action + '&_t=' + Date.now()).then(function (r) { return r.json(); }); }
+
+  function init() {
+    if (state.loading) return;
+    if (state.initialized && document.getElementById('gp-cnt')) { showPage(); return; }
+    state.loading = true;
+    injectCSS(); injectHTML(); injectModal(); showPage();
+
+    const timeout = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('timeout')); }, 7000); });
+    Promise.race([api('guru_penasihat_all'), timeout])
+      .then(function (res) {
+        if (res && res.success && res.data && Array.isArray(res.data.guru) && res.data.guru.length) { state._data = res.data; state.source = 'live'; }
+        else throw new Error('empty');
+      })
+      .catch(function () { state._data = GP_DATA; state.source = 'rasmi'; })
+      .then(function () {
+        const m = buildModel(state._data);
+        state.teachers = m.teachers; state.unitStats = m.unitStats; state.jkStats = m.jkStats;
+        state.dirFiltered = state.teachers.slice();
+        renderSource(); renderAll();
+        const l = document.getElementById('gp-load'); if (l) l.style.display = 'none';
+        const c = document.getElementById('gp-cnt'); if (c) c.style.display = 'block';
+        state.initialized = true; state.loading = false; setupKeyboard();
+        if (!state._welcomed) { state._welcomed = true; setTimeout(function () { toast('✅ Papan pemuka dimuat: ' + state.teachers.length + ' guru · ' + state.jkStats.length + ' jawatankuasa', 'success'); }, 700); }
+      })
+      .catch(function (e) {
+        state.loading = false; const l = document.getElementById('gp-load'); if (l) l.style.display = 'none';
+        const err = document.getElementById('gp-err'); if (err) { err.style.display = 'block'; err.innerHTML = '<div class="gp-err"><div style="font-size:28px;">⚠️</div><div><h3 style="margin:0;">Ralat</h3><p style="margin:4px 0 0;">' + esc(e.message) + '</p></div></div>'; }
+      });
+  }
+
+  function renderSource() { const el = document.getElementById('gp-src'); if (el) el.innerHTML = state.source === 'live' ? '📡 Data Langsung (Sheet)' : '📋 Data Rasmi 2026 (terbenam)'; }
+  function renderAll() { renderRingkasan(); renderBeban(); renderDirektori(); renderUnit(); renderJK(); }
+
+  /* ============================================================ VIEW 1: RINGKASAN ============================================================ */
+  function unitsInKat(kat) { return state.unitStats.filter(function (u) { return u.kategori === kat && u.n > 0; }).length; }
+  function renderRingkasan() {
+    const T = state.teachers;
+    const total = T.length;
+    const petang = T.filter(function (t) { return t.sesi === 'Petang'; }).length;
+    const tugasan = T.reduce(function (s, t) { return s + t.bil_unit; }, 0);
+    const jkAhli = T.reduce(function (s, t) { return s + t.bil_jk; }, 0);
+    const nUnit = state.unitStats.filter(function (u) { return u.n > 0; }).length;
+
+    const cards = [
+      { i: '👨‍🏫', v: total, l: 'Jumlah Guru', sl: 'Penasihat Kokurikulum', c: '' },
+      { i: '🗂️', v: tugasan, l: 'Tugasan Unit', sl: nUnit + ' unit aktif', c: 'c-u' },
+      { i: '🏛️', v: jkAhli, l: 'Keahlian Jawatankuasa', sl: state.jkStats.length + ' jawatankuasa', c: 'c-j' },
+      { i: '🌆', v: petang, l: 'Guru Sesi Petang', sl: pct(petang, total) + '% daripada guru', c: 'c-r' }
+    ];
+    let ketua = 0, penolong = 0; T.forEach(function (t) { t.tugasan.forEach(function (u) { if (u.jawatan === 'KG') ketua++; else if (u.jawatan === 'PK') penolong++; }); });
+    const pagi = total - petang;
+    const multi = T.filter(function (t) { return t.bil_ketua_unit >= 2; }).length;
+
+    let html = '<div class="gp-stats">' + cards.map(function (c) {
+      return '<div class="gp-stat ' + c.c + '"><div class="gp-stat-top"><div class="gp-stat-i">' + c.i + '</div></div><div class="gp-stat-v">' + c.v + '</div><div class="gp-stat-l">' + c.l + '</div><div class="gp-stat-sl">' + c.sl + '</div></div>';
+    }).join('') + '</div>';
+
+    // KPI ringkas
+    html += '<div class="gp-card"><div class="gp-sec-t"><span class="x">🎯</span>Petunjuk Prestasi Utama</div><div class="gp-ovr">' + [
+      { v: KAT_ORDER.map(function (k) { return unitsInKat(k); }).reduce(function (a, b) { return a + b; }, 0), l: 'Unit Ditawarkan' },
+      { v: ketua, l: 'Jawatan Ketua' },
+      { v: penolong, l: 'Penolong Ketua' },
+      { v: pagi + ' / ' + petang, l: 'Pagi / Petang' },
+      { v: multi, l: 'Kepimpinan Berganda' }
+    ].map(function (o) { return '<div class="gp-ovr-c"><div class="gp-ovr-v">' + o.v + '</div><div class="gp-ovr-l">' + o.l + '</div></div>'; }).join('') + '</div></div>';
+
+    // Carta
+    html += '<div class="gp-charts">' +
+      '<div class="gp-card" style="margin:0;"><div class="gp-sec-t"><span class="x">🕐</span>Sesi Mengajar</div><div class="gp-chart-c"><canvas id="gp-c-sesi"></canvas></div></div>' +
+      '<div class="gp-card" style="margin:0;"><div class="gp-sec-t"><span class="x">🎖️</span>Jawatan Penasihat</div><div class="gp-chart-c"><canvas id="gp-c-jaw"></canvas></div></div>' +
+      '<div class="gp-card" style="margin:0;"><div class="gp-sec-t"><span class="x">🏠</span>Rumah Sukan</div><div class="gp-chart-c"><canvas id="gp-c-rumah"></canvas></div></div>' +
+      '</div>';
+
+    // Penemuan audit
+    html += '<div class="gp-card"><div class="gp-sec-t"><span class="x">⚠️</span>Penemuan Audit & Tindakan Strategik</div><div class="gp-alerts" id="gp-alerts"></div></div>';
+
+    document.getElementById('v-ringkasan').innerHTML = html;
+    renderAlerts();
+    renderRingkasanCharts();
+  }
+
+  function renderAlerts() {
+    const us = state.unitStats.filter(function (u) { return u.n > 0; });
+    const alerts = [];
+    const noPetang = us.filter(function (u) { return u.petang === 0; });
+    if (noPetang.length) alerts.push({ t: 'danger', ic: '🌆', h: noPetang.length + ' unit tiada guru sesi Petang', d: 'Liputan aktiviti petang berisiko: ' + noPetang.slice(0, 3).map(function (u) { return u.nama; }).join(', ') + (noPetang.length > 3 ? '…' : '') });
+    else alerts.push({ t: 'ok', ic: '✅', h: 'Semua unit ada guru sesi Petang', d: 'Liputan sesi petang lengkap' });
+    const noKetua = us.filter(function (u) { return u.ketua === 0; });
+    if (noKetua.length) alerts.push({ t: 'warn', ic: '🚩', h: noKetua.length + ' unit tanpa Ketua Guru Penasihat', d: noKetua.slice(0, 4).map(function (u) { return u.nama; }).join(', ') + (noKetua.length > 4 ? '…' : '') });
+    const solo = us.filter(function (u) { return u.n === 1; });
+    if (solo.length) alerts.push({ t: 'info', ic: '👤', h: solo.length + ' unit hanya 1 guru penasihat', d: 'Disyorkan tambah pembantu untuk kesinambungan' });
+    const noTugasan = state.teachers.filter(function (t) { return t.bil_unit === 0; });
+    if (noTugasan.length) alerts.push({ t: 'warn', ic: '❓', h: noTugasan.length + ' guru tiada tugasan unit', d: noTugasan.map(function (t) { return t.nama; }).join(', ') });
+    // Ekuiti beban
+    const tots = state.teachers.map(function (t) { return t.wl.total; }).sort(function (a, b) { return b - a; });
+    const sum = tots.reduce(function (a, b) { return a + b; }, 0);
+    const top10 = tots.slice(0, 10).reduce(function (a, b) { return a + b; }, 0);
+    alerts.push({ t: 'info', ic: '⚖️', h: '10 guru tertinggi memikul ' + pct(top10, sum) + '% jumlah beban kerja', d: 'Pertimbang agihan semula untuk ekuiti beban (rujuk tab Beban Kerja)' });
+    document.getElementById('gp-alerts').innerHTML = alerts.map(function (a) { return '<div class="gp-alert ' + a.t + '"><div class="gp-alert-ic">' + a.ic + '</div><div><b>' + a.h + '</b><br><span style="opacity:.85;">' + esc(a.d) + '</span></div></div>'; }).join('');
+  }
+
+  function renderRingkasanCharts() {
+    if (typeof Chart === 'undefined') return;
+    const T = state.teachers;
+    const pagi = T.filter(function (t) { return t.sesi === 'Pagi'; }).length, petang = T.filter(function (t) { return t.sesi === 'Petang'; }).length;
+    mkChart('sesi', 'gp-c-sesi', { type: 'doughnut', data: { labels: ['Pagi', 'Petang'], datasets: [{ data: [pagi, petang], backgroundColor: ['#fbbf24', '#6366f1'], borderWidth: 2, borderColor: '#fff' }] }, options: doughOpt() });
+    let k = 0, p = 0, g = 0; T.forEach(function (t) { t.tugasan.forEach(function (u) { if (u.jawatan === 'KG') k++; else if (u.jawatan === 'PK') p++; else g++; }); });
+    mkChart('jaw', 'gp-c-jaw', { type: 'bar', data: { labels: ['Ketua', 'Pen. Ketua', 'Penasihat'], datasets: [{ data: [k, p, g], backgroundColor: ['#f59e0b', '#3b82f6', '#94a3b8'], borderRadius: 6 }] }, options: barOpt() });
+    const rumah = {}; T.forEach(function (t) { if (t.rumah) rumah[t.rumah] = (rumah[t.rumah] || 0) + 1; });
+    const rl = Object.keys(rumah);
+    mkChart('rumah', 'gp-c-rumah', { type: 'doughnut', data: { labels: rl.map(function (r) { return r.replace('RUMAH ', ''); }), datasets: [{ data: rl.map(function (r) { return rumah[r]; }), backgroundColor: ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], borderWidth: 2, borderColor: '#fff' }] }, options: doughOpt() });
+  }
+  function mkChart(key, id, cfg) { const el = document.getElementById(id); if (!el) return; if (state.charts[key]) state.charts[key].destroy(); state.charts[key] = new Chart(el, cfg); }
+  function doughOpt() { return { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12 } } } }; }
+  function barOpt() { return { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }; }
+
+  /* ============================================================ VIEW 2: BEBAN KERJA ============================================================ */
+  function renderBeban() {
+    const T = state.teachers.slice();
+    const tots = T.map(function (t) { return t.wl.total; });
+    const sum = tots.reduce(function (a, b) { return a + b; }, 0);
+    const avg = T.length ? (sum / T.length) : 0;
+    const max = Math.max.apply(null, tots), min = Math.min.apply(null, tots);
+
+    let html = '<div class="gp-stats">' + [
+      { i: '📐', v: avg.toFixed(1), l: 'Purata Indeks', sl: 'setiap guru', c: '' },
+      { i: '🔺', v: max, l: 'Beban Tertinggi', sl: T.reduce(function (a, b) { return a.wl.total > b.wl.total ? a : b; }).nama.split(' ')[0], c: 's' },
+      { i: '🔻', v: min, l: 'Beban Terendah', sl: 'minimum', c: 'u' },
+      { i: '🚨', v: T.filter(function (t) { return t.band.cls === 'kritikal'; }).length, l: 'Beban Sangat Tinggi', sl: '≥45 mata', c: 'k' }
+    ].map(function (c) { return '<div class="gp-stat c-' + c.c + '"><div class="gp-stat-top"><div class="gp-stat-i">' + c.i + '</div></div><div class="gp-stat-v">' + c.v + '</div><div class="gp-stat-l">' + c.l + '</div><div class="gp-stat-sl">' + c.sl + '</div></div>'; }).join('') + '</div>';
+
+    // Taburan band
+    const bandCount = {}; BANDS.forEach(function (b) { bandCount[b.cls] = 0; });
+    T.forEach(function (t) { bandCount[t.band.cls]++; });
+    html += '<div class="gp-grid2"><div class="gp-card" style="margin:0;"><div class="gp-sec-t"><span class="x">📊</span>Taburan Band Beban Kerja</div><div class="gp-bars">';
+    const maxBand = Math.max.apply(null, BANDS.map(function (b) { return bandCount[b.cls]; })) || 1;
+    BANDS.forEach(function (b) { const n = bandCount[b.cls]; html += '<div class="gp-bar-row"><div class="gp-bar-lab">' + b.label + '</div><div class="gp-bar-track"><div class="gp-bar-fill" style="width:' + Math.max(pct(n, maxBand), 8) + '%;background:' + b.warna + ';">' + n + ' guru</div></div></div>'; });
+    html += '</div><div class="gp-legend"><span><span class="gp-dot" style="background:#0d9488;"></span>Tugasan Unit</span><span><span class="gp-dot" style="background:#ec4899;"></span>Jawatankuasa</span><span><span class="gp-dot" style="background:#6366f1;"></span>Rumah Sukan</span></div></div>';
+
+    // Pecahan komposisi beban (purata)
+    const cu = T.reduce(function (s, t) { return s + t.wl.unit; }, 0), cj = T.reduce(function (s, t) { return s + t.wl.jk; }, 0), cr = T.reduce(function (s, t) { return s + t.wl.rumah; }, 0);
+    const ct = cu + cj + cr || 1;
+    html += '<div class="gp-card" style="margin:0;"><div class="gp-sec-t"><span class="x">🧩</span>Komposisi Jumlah Beban</div><div class="gp-bars">' + [
+      { l: '🗂️ Tugasan Unit', v: cu, c: '#0d9488' }, { l: '🏛️ Jawatankuasa', v: cj, c: '#ec4899' }, { l: '🏠 Rumah Sukan', v: cr, c: '#6366f1' }
+    ].map(function (o) { return '<div class="gp-bar-row"><div class="gp-bar-lab">' + o.l + '</div><div class="gp-bar-track"><div class="gp-bar-fill" style="width:' + Math.max(pct(o.v, ct), 6) + '%;background:' + o.c + ';">' + pct(o.v, ct) + '%</div></div></div>'; }).join('') + '</div><p style="font-size:12px;color:#94a3b8;margin:14px 0 0;">Beban kokurikulum sekolah didominasi oleh komponen jawatankuasa pengurusan.</p></div></div>';
+
+    // Carta histogram + ranking
+    html += '<div class="gp-card"><div class="gp-sec-t"><span class="x">👑</span>Ranking Beban Kerja Guru <span style="font-size:12px;font-weight:500;color:#94a3b8;margin-left:auto;">(klik untuk profil)</span></div>';
+    html += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;"><button class="gp-qf-sort gp-clr" data-sort="total" onclick="GuruPenasihat.sortWl(\'total\')" style="background:#0f766e;color:#fff;border-color:#0f766e;">Jumlah Indeks</button><button class="gp-clr" onclick="GuruPenasihat.sortWl(\'jk\')">Jawatankuasa</button><button class="gp-clr" onclick="GuruPenasihat.sortWl(\'unit\')">Tugasan Unit</button></div>';
+    html += '<div id="gp-wl-list"></div></div>';
+
+    document.getElementById('v-beban').innerHTML = html;
+    renderWlList();
+  }
+  function renderWlList() {
+    const key = state.wlSort;
+    const T = state.teachers.slice().sort(function (a, b) { return b.wl[key] - a.wl[key] || b.wl.total - a.wl.total; });
+    const maxT = Math.max.apply(null, T.map(function (t) { return t.wl.total; })) || 1;
+    document.getElementById('gp-wl-list').innerHTML = T.map(function (t, i) {
+      const w = t.wl;
+      const su = pct(w.unit, maxT), sj = pct(w.jk, maxT), sr = pct(w.rumah, maxT);
+      return '<div class="gp-wl-row" onclick="GuruPenasihat.openProfile(\'' + t.id + '\')">' +
+        '<div class="gp-wl-rank">' + (i + 1) + '</div>' +
+        '<div class="gp-wl-av" style="background:' + avatarColor(t.nama) + ';">' + initials(t.nama) + '</div>' +
+        '<div class="gp-wl-mid"><div class="gp-wl-name">' + esc(t.nama) + '</div><div class="gp-wl-meta">' + t.bil_unit + ' unit · ' + t.bil_jk + ' JK · ' + (t.rumah ? t.rumah.replace('RUMAH ', '🏠') : '—') + '</div>' +
+        '<div class="gp-wl-stack"><div class="gp-wl-seg" style="width:' + su + '%;background:#0d9488;"></div><div class="gp-wl-seg" style="width:' + sj + '%;background:#ec4899;"></div><div class="gp-wl-seg" style="width:' + sr + '%;background:#6366f1;"></div></div></div>' +
+        '<div class="gp-wl-score"><div class="gp-wl-num">' + w.total + '</div><span class="gp-wl-band gp-band-' + t.band.cls + '">' + t.band.label + '</span></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  /* ============================================================ VIEW 3: DIREKTORI ============================================================ */
+  function renderDirektori() {
+    let html = '<div class="gp-card"><div class="gp-filters">' +
+      '<div class="gp-search-wrap"><span class="gp-sic">🔍</span><input type="text" id="gp-s" class="gp-si" placeholder="Cari nama guru, unit, atau jawatankuasa…" autocomplete="off"><button class="gp-search-clear" id="gp-s-clr" onclick="GuruPenasihat.clearSearch()">✕</button><div class="gp-suggestions" id="gp-sug"></div></div>' +
+      '<select id="gp-f-se" class="gp-sel"><option value="">Semua Sesi</option><option value="Pagi">🌅 Pagi</option><option value="Petang">🌆 Petang</option></select>' +
+      '<select id="gp-f-k" class="gp-sel"><option value="">Semua Kategori</option><option value="Uniform">🎖️ Uniform</option><option value="Kelab">📚 Kelab</option><option value="Sukan">⚽ Sukan</option></select>' +
+      '<select id="gp-f-j" class="gp-sel"><option value="">Semua Jawatan</option><option value="KG">Ketua Guru Penasihat</option><option value="PK">Penolong Ketua</option><option value="GP">Guru Penasihat</option></select>' +
+      '<select id="gp-f-b" class="gp-sel"><option value="">Semua Band Beban</option>' + BANDS.map(function (b) { return '<option value="' + b.cls + '">' + b.label + '</option>'; }).join('') + '</select>' +
+      '<select id="gp-f-u" class="gp-sel"><option value="">Semua Unit</option></select>' +
+      '<button class="gp-clr" onclick="GuruPenasihat.clearAll()">✕ Reset</button>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;"><div class="gp-sec-t" style="margin:0;"><span class="x">👥</span>Senarai Guru</div><div style="font-size:13px;color:#64748b;">Menunjukkan <strong id="gp-ts">0</strong> / <strong id="gp-tt">0</strong> guru</div></div>' +
+      '<div class="gp-tbl-w"><table class="gp-st"><thead><tr><th>#</th><th>Nama Guru</th><th>Sesi</th><th>🎖️ Uniform</th><th>📚 Kelab</th><th>⚽ Sukan</th><th>JK</th><th>Beban</th></tr></thead><tbody id="gp-tb"></tbody></table></div>' +
+      '<div class="gp-pg"><div class="gp-pgi" id="gp-pgi">Halaman 1 / 1</div><div class="gp-pgc" id="gp-pgc"></div></div>' +
+      '</div>';
+    document.getElementById('v-direktori').innerHTML = html;
+    populateUnitFilter(); setupDirListeners(); applyDirFilters();
+  }
+  function populateUnitFilter() {
+    const sel = document.getElementById('gp-f-u'); if (!sel) return;
+    const byKat = { Uniform: [], Kelab: [], Sukan: [] };
+    state.unitStats.forEach(function (u) { if (byKat[u.kategori]) byKat[u.kategori].push(u); });
+    sel.innerHTML = '<option value="">Semua Unit</option>' + KAT_ORDER.map(function (kat) {
+      const list = byKat[kat].filter(function (u) { return u.n > 0; }).sort(function (a, b) { return a.kod.localeCompare(b.kod); });
+      if (!list.length) return '';
+      return '<optgroup label="' + KATEGORI[kat].label + '">' + list.map(function (u) { return '<option value="' + esc(u.kod) + '">' + esc(u.kod + ' ' + u.nama) + '</option>'; }).join('') + '</optgroup>';
+    }).join('');
+  }
+  function setupDirListeners() {
+    const s = document.getElementById('gp-s');
+    s.addEventListener('input', function (e) { state.dirFilters.search = e.target.value.trim(); document.getElementById('gp-s-clr').style.display = e.target.value ? 'block' : 'none'; renderSuggestions(e.target.value.trim()); applyDirFilters(); });
+    document.addEventListener('click', function (e) { if (!e.target.closest('#gp-s') && !e.target.closest('#gp-sug')) { const b = document.getElementById('gp-sug'); if (b) b.style.display = 'none'; } });
+    [['gp-f-se', 'sesi'], ['gp-f-k', 'kategori'], ['gp-f-j', 'jawatan'], ['gp-f-b', 'band'], ['gp-f-u', 'unit']].forEach(function (p) {
+      const el = document.getElementById(p[0]); if (el) el.addEventListener('change', function (e) { state.dirFilters[p[1]] = e.target.value; applyDirFilters(); });
+    });
+  }
+  function renderSuggestions(qv) {
+    const box = document.getElementById('gp-sug'); if (!box) return; if (!qv) { box.style.display = 'none'; return; }
+    const ql = qv.toLowerCase();
+    const names = state.teachers.filter(function (t) { return t.nama.toLowerCase().indexOf(ql) >= 0; }).slice(0, 6);
+    let html = names.map(function (t) { return '<div class="gp-sug" onclick="GuruPenasihat.pickSuggestion(\'' + esc(t.nama).replace(/'/g, '') + '\')"><span class="gp-av-sm" style="background:' + avatarColor(t.nama) + ';width:24px;height:24px;font-size:10px;">' + initials(t.nama) + '</span><span>' + esc(t.nama) + '</span></div>'; }).join('');
+    if (!html) html = '<div class="gp-sug" style="color:#94a3b8;">Tiada padanan</div>';
+    box.innerHTML = html; box.style.display = 'block';
+  }
+  function applyDirFilters() {
+    const f = state.dirFilters; let list = state.teachers.slice();
+    if (f.search) { const q = f.search.toLowerCase(); list = list.filter(function (t) { return t.nama.toLowerCase().indexOf(q) >= 0 || t.tugasan.some(function (u) { return u.nama_unit.toLowerCase().indexOf(q) >= 0; }) || t.jk.some(function (j) { return j.nama_jk.toLowerCase().indexOf(q) >= 0; }); }); }
+    if (f.sesi) list = list.filter(function (t) { return t.sesi === f.sesi; });
+    if (f.kategori) list = list.filter(function (t) { return t.kategori_set.indexOf(f.kategori) >= 0; });
+    if (f.jawatan) list = list.filter(function (t) { return t.jawatan_set.indexOf(f.jawatan) >= 0; });
+    if (f.band) list = list.filter(function (t) { return t.band.cls === f.band; });
+    if (f.unit) list = list.filter(function (t) { return t.tugasan.some(function (u) { return u.kod === f.unit; }); });
+    state.dirFiltered = list; state.dirPage = 1; renderDirTable();
+  }
+  function dirUnitCell(t, kat) {
+    const u = t.unitByKat[kat]; if (!u) return '<span style="color:#cbd5e1;">—</span>';
+    const j = JAWATAN[u.jawatan] || JAWATAN.GP;
+    return '<div class="gp-ucell"><span class="gp-uname"><span class="gp-ucode">' + esc(u.kod) + '</span> ' + esc(u.nama_unit) + '</span><span class="gp-rb ' + u.jawatan + '">' + j.short + '</span></div>';
+  }
+  function renderDirTable() {
+    const total = state.dirFiltered.length;
+    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (state.dirPage > pages) state.dirPage = pages;
+    const start = (state.dirPage - 1) * PAGE_SIZE, end = Math.min(start + PAGE_SIZE, total);
+    const page = state.dirFiltered.slice(start, end);
+    document.getElementById('gp-ts').textContent = total === 0 ? 0 : (start + 1) + '-' + end;
+    document.getElementById('gp-tt').textContent = total;
+    const tb = document.getElementById('gp-tb');
+    if (!page.length) tb.innerHTML = '<tr><td colspan="8"><div class="gp-empty">🔍 Tiada guru sepadan</div></td></tr>';
+    else tb.innerHTML = page.map(function (t, i) {
+      return '<tr onclick="GuruPenasihat.openProfile(\'' + t.id + '\')">' +
+        '<td>' + (start + i + 1) + '</td>' +
+        '<td><div class="gp-name-cell"><span class="gp-av-sm" style="background:' + avatarColor(t.nama) + ';">' + initials(t.nama) + '</span><div style="font-weight:600;">' + esc(t.nama) + '</div></div></td>' +
+        '<td><span class="gp-sesi ' + (t.sesi === 'Petang' ? 'petang' : 'pagi') + '">' + esc(t.sesi || '—') + '</span></td>' +
+        '<td>' + dirUnitCell(t, 'Uniform') + '</td><td>' + dirUnitCell(t, 'Kelab') + '</td><td>' + dirUnitCell(t, 'Sukan') + '</td>' +
+        '<td><strong>' + t.bil_jk + '</strong></td>' +
+        '<td><span class="gp-mini-band gp-band-' + t.band.cls + '">' + t.wl.total + '</span></td>' +
+        '</tr>';
+    }).join('');
+    document.getElementById('gp-pgi').textContent = 'Halaman ' + state.dirPage + ' / ' + pages;
+    const c = document.getElementById('gp-pgc'); let h = '';
+    h += '<button class="gp-pgb" ' + (state.dirPage === 1 ? 'disabled' : '') + ' onclick="GuruPenasihat.dirPage(' + (state.dirPage - 1) + ')">‹</button>';
+    let from = Math.max(1, state.dirPage - 2), to = Math.min(pages, from + 4); from = Math.max(1, to - 4);
+    for (let p = from; p <= to; p++) h += '<button class="gp-pgb ' + (p === state.dirPage ? 'active' : '') + '" onclick="GuruPenasihat.dirPage(' + p + ')">' + p + '</button>';
+    h += '<button class="gp-pgb" ' + (state.dirPage === pages ? 'disabled' : '') + ' onclick="GuruPenasihat.dirPage(' + (state.dirPage + 1) + ')">›</button>';
+    c.innerHTML = h;
+  }
+
+  /* ============================================================ VIEW 4: UNIT & KAPASITI ============================================================ */
+  function renderUnit() {
+    let html = '';
+    KAT_ORDER.forEach(function (kat) {
+      const units = state.unitStats.filter(function (u) { return u.kategori === kat && u.n > 0; }).sort(function (a, b) { return a.kod.localeCompare(b.kod); });
+      if (!units.length) return;
+      const cfg = KATEGORI[kat];
+      html += '<div class="gp-jk-group"><div class="gp-jk-gh">' + cfg.emoji + ' ' + cfg.label + ' <span style="color:#94a3b8;font-weight:600;">(' + units.length + ' unit)</span></div><div class="gp-unit-grid">';
+      units.forEach(function (u) {
+        const noKetua = u.ketua === 0, noPetang = u.petang === 0, solo = u.n === 1;
+        html += '<div class="gp-ucard"><div class="gp-ucard-h"><div class="gp-ucard-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-ucard-t"><span class="gp-ucode">' + esc(u.kod) + '</span><br>' + esc(u.nama) + '</div></div>' +
+          '<div class="gp-ucard-meta">' +
+          '<span class="gp-pill ' + (solo ? 'warn' : 'good') + '">👥 ' + u.n + ' guru</span>' +
+          '<span class="gp-pill ' + (noKetua ? 'bad' : 'good') + '">' + (noKetua ? '🚩 Tiada Ketua' : '⭐ ' + u.ketua + ' Ketua') + '</span>' +
+          '<span class="gp-pill ' + (noPetang ? 'bad' : 'good') + '">🌆 ' + u.petang + ' petang</span>' +
+          '</div></div>';
+      });
+      html += '</div></div>';
+    });
+    document.getElementById('v-unit').innerHTML = html || '<div class="gp-empty">Tiada data unit</div>';
+  }
+
+  /* ============================================================ VIEW 5: JAWATANKUASA ============================================================ */
+  const TIER_RANK = { 'pimpin': 0, 'urusetia': 1, 'ahli': 2 };
+  function renderJK() {
+    const groups = {};
+    state.jkStats.forEach(function (j) { const g = j.kelompok || 'Lain-lain'; (groups[g] = groups[g] || []).push(j); });
+    const order = ['Payung', 'Kokurikulum', 'Sukan'];
+    const keys = Object.keys(groups).sort(function (a, b) { const ia = order.indexOf(a), ib = order.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+    let html = '<div class="gp-card" style="margin-bottom:18px;"><div class="gp-sec-t"><span class="x">🏛️</span>Struktur Jawatankuasa Pengurusan Kokurikulum</div><div class="gp-ovr">' + [
+      { v: state.jkStats.length, l: 'Jumlah JK' },
+      { v: state.jkStats.reduce(function (s, j) { return s + j.members.length; }, 0), l: 'Jumlah Keahlian' },
+      { v: new Set(state.teachers.filter(function (t) { return t.bil_jk > 0; }).map(function (t) { return t.id; })).size, l: 'Guru Terlibat' },
+      { v: keys.length, l: 'Kelompok' }
+    ].map(function (o) { return '<div class="gp-ovr-c"><div class="gp-ovr-v">' + o.v + '</div><div class="gp-ovr-l">' + o.l + '</div></div>'; }).join('') + '</div></div>';
+
+    keys.forEach(function (k) {
+      const list = groups[k].sort(function (a, b) { return a.kod.localeCompare(b.kod); });
+      html += '<div class="gp-jk-group"><div class="gp-jk-gh">📁 ' + esc(k) + ' <span style="color:#94a3b8;font-weight:600;">(' + list.length + ' JK)</span></div>';
+      list.forEach(function (j) {
+        const members = j.members.slice().sort(function (a, b) { return TIER_RANK[a.tier] - TIER_RANK[b.tier]; });
+        const chair = members.find(function (m) { return String(m.jawatan).toLowerCase().indexOf('pengerusi') >= 0 && String(m.jawatan).toLowerCase().indexOf('naib') < 0 && String(m.jawatan).toLowerCase().indexOf('timbalan') < 0; });
+        html += '<div class="gp-jk-card" onclick="GuruPenasihat.toggleJK(this)"><div class="gp-jk-top"><div class="gp-jk-name">' + esc(j.nama) + '</div><div style="display:flex;gap:8px;align-items:center;"><span class="gp-pill">' + members.length + ' ahli</span><span style="color:#94a3b8;">▾</span></div></div>' +
+          (chair ? '<div style="font-size:12px;color:#64748b;margin-top:4px;">👤 Pengerusi: <strong>' + esc(chair.nama) + '</strong></div>' : '') +
+          '<div class="gp-jk-mem">' + members.map(function (m) { return '<span class="gp-mtag ' + (m.tier !== 'ahli' ? 'lead' : '') + '">' + esc(m.nama.split(/\s+/).slice(0, 2).join(' ')) + ' · ' + esc(m.jawatan) + '</span>'; }).join('') + '</div></div>';
+      });
+      html += '</div>';
+    });
+    document.getElementById('v-jk').innerHTML = html;
+  }
+
+  /* ============================================================ PROFIL 360° ============================================================ */
+  function openProfile(id) {
+    const t = state.teachers.find(function (x) { return x.id === id; }); if (!t) return;
+    document.getElementById('gp-m-av').textContent = initials(t.nama);
+    document.getElementById('gp-m-nama').textContent = t.nama;
+    document.getElementById('gp-m-sub').textContent = 'Sesi ' + (t.sesi || '—') + (t.rumah ? ' · ' + t.rumah : '');
+    document.getElementById('gp-m-tags').innerHTML =
+      '<span class="gp-htag">⚖️ Indeks ' + t.wl.total + ' (' + t.band.label + ')</span>' +
+      '<span class="gp-htag">🗂️ ' + t.bil_unit + ' unit</span>' +
+      '<span class="gp-htag">🏛️ ' + t.bil_jk + ' JK</span>';
+
+    let html = '';
+    // Pecahan beban
+    html += '<div class="gp-msec"><div class="gp-msec-t">⚖️ Pecahan Indeks Beban Kerja</div><div class="gp-wl-break">' +
+      '<div class="gp-wl-bcard"><div class="gp-wl-bv" style="color:#0d9488;">' + t.wl.unit + '</div><div class="gp-wl-bl">Tugasan Unit</div></div>' +
+      '<div class="gp-wl-bcard"><div class="gp-wl-bv" style="color:#ec4899;">' + t.wl.jk + '</div><div class="gp-wl-bl">Jawatankuasa</div></div>' +
+      '<div class="gp-wl-bcard"><div class="gp-wl-bv" style="color:#6366f1;">' + t.wl.rumah + '</div><div class="gp-wl-bl">Rumah Sukan</div></div>' +
+      '<div class="gp-wl-bcard" style="background:#0f766e;border-color:#0f766e;"><div class="gp-wl-bv" style="color:#fff;">' + t.wl.total + '</div><div class="gp-wl-bl" style="color:#d1fae5;">JUMLAH</div></div>' +
+      '</div></div>';
+
+    // Tugasan unit 3 bidang
+    html += '<div class="gp-msec"><div class="gp-msec-t">🗂️ Tugasan Kokurikulum (3 Bidang)</div>';
+    html += KAT_ORDER.map(function (kat) {
+      const u = t.unitByKat[kat]; const cfg = KATEGORI[kat];
+      if (!u) return '<div class="gp-unit"><div class="gp-unit-ic" style="background:#cbd5e1;">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + '</div><div class="gp-unit-n" style="color:#94a3b8;">Tiada tugasan</div></div></div>';
+      const j = JAWATAN[u.jawatan] || JAWATAN.GP;
+      return '<div class="gp-unit"><div class="gp-unit-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + ' · ' + esc(u.kod) + '</div><div class="gp-unit-n">' + esc(u.nama_unit) + '</div></div><span class="gp-jbadge ' + j.cls + '">' + j.label + '</span></div>';
+    }).join('') + '</div>';
+
+    // Rumah sukan
+    if (t.rumah) html += '<div class="gp-msec"><div class="gp-msec-t">🏠 Rumah Sukan</div><div class="gp-unit"><div class="gp-unit-ic" style="background:#6366f1;">🏠</div><div class="gp-unit-i"><div class="gp-unit-cat">Penasihat Rumah</div><div class="gp-unit-n">' + esc(t.rumah) + '</div></div><span class="gp-jbadge ' + (t.rumah_jawatan === 'K' ? 'k' : t.rumah_jawatan === 'P' ? 'p' : 'g') + '">' + (RUMAH_J[t.rumah_jawatan] || 'Guru') + '</span></div></div>';
+
+    // Jawatankuasa
+    if (t.jk.length) {
+      const sorted = t.jk.slice().sort(function (a, b) { return TIER_RANK[a.tier] - TIER_RANK[b.tier]; });
+      html += '<div class="gp-msec"><div class="gp-msec-t">🏛️ Keahlian Jawatankuasa (' + t.jk.length + ')</div><div class="gp-jklist">' +
+        sorted.map(function (j) { return '<div class="gp-jkrow"><span class="nm">' + esc(j.nama_jk) + '</span><span class="jw">' + esc(j.jawatan) + '</span></div>'; }).join('') + '</div></div>';
+    }
+    document.getElementById('gp-m-body').innerHTML = html;
+    document.getElementById('gpModal').classList.add('active');
+  }
+
+  /* ============================================================ EKSPORT ============================================================ */
+  function dl(fn, content) { const b = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = fn; a.click(); URL.revokeObjectURL(u); }
+  function q(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
+  function exportWorkload() {
+    const keys = ['id_guru', 'nama_guru', 'sesi', 'rumah_sukan', 'bil_tugasan_unit', 'bil_ketua_unit', 'bil_jawatankuasa', 'skor_unit', 'skor_jk', 'skor_rumah', 'indeks_beban', 'band'];
+    let csv = q('SPKB — LAPORAN BEBAN KERJA GURU PENASIHAT 2026') + '\n' + q('SMK Tinggi Kuching · ' + new Date().toLocaleDateString('ms-MY')) + '\n\n' + keys.map(q).join(',') + '\n';
+    state.teachers.slice().sort(function (a, b) { return b.wl.total - a.wl.total; }).forEach(function (t) {
+      csv += [t.id, t.nama, t.sesi, t.rumah, t.bil_unit, t.bil_ketua_unit, t.bil_jk, t.wl.unit, t.wl.jk, t.wl.rumah, t.wl.total, t.band.label].map(q).join(',') + '\n';
+    });
+    dl('SPKB_Beban_Kerja_2026_' + Date.now() + '.csv', csv); toast('✅ Laporan beban kerja dieksport', 'success'); closeExportMenu();
+  }
+  function exportGuru() {
+    let csv = ['id_guru', 'nama_guru', 'sesi', 'rumah_sukan', 'uniform', 'jawatan_u', 'kelab', 'jawatan_k', 'sukan', 'jawatan_s'].map(q).join(',') + '\n';
+    state.teachers.forEach(function (t) {
+      function c(k) { const u = t.unitByKat[k]; return u ? [u.kod + ' ' + u.nama_unit, (JAWATAN[u.jawatan] || JAWATAN.GP).label] : ['', '']; }
+      const U = c('Uniform'), K = c('Kelab'), S = c('Sukan');
+      csv += [t.id, t.nama, t.sesi, t.rumah, U[0], U[1], K[0], K[1], S[0], S[1]].map(q).join(',') + '\n';
+    });
+    dl('SPKB_Guru_Penasihat_2026_' + Date.now() + '.csv', csv); toast('✅ Senarai guru dieksport', 'success'); closeExportMenu();
+  }
+  function exportTugasan() {
+    let csv = ['id_guru', 'nama_guru', 'kategori', 'kod_unit', 'nama_unit', 'jawatan'].map(q).join(',') + '\n';
+    state.teachers.forEach(function (t) { t.tugasan.forEach(function (u) { csv += [t.id, t.nama, u.kategori, u.kod, u.nama_unit, (JAWATAN[u.jawatan] || JAWATAN.GP).label].map(q).join(',') + '\n'; }); });
+    dl('SPKB_Tugasan_Unit_2026_' + Date.now() + '.csv', csv); toast('✅ Senarai tugasan dieksport', 'success'); closeExportMenu();
+  }
+  function exportJK() {
+    let csv = ['kod_jk', 'jawatankuasa', 'kelompok', 'id_guru', 'nama_guru', 'jawatan_dlm_jk'].map(q).join(',') + '\n';
+    state.jkStats.forEach(function (j) { j.members.forEach(function (m) { csv += [j.kod, j.nama, j.kelompok, m.id, m.nama, m.jawatan].map(q).join(',') + '\n'; }); });
+    dl('SPKB_Jawatankuasa_2026_' + Date.now() + '.csv', csv); toast('✅ Senarai jawatankuasa dieksport', 'success'); closeExportMenu();
+  }
+
+  function toast(msg, type) { const t = document.createElement('div'); t.className = 'gp-toast ' + (type || ''); t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.style.animation = 'gpToastOut .3s forwards'; setTimeout(function () { t.remove(); }, 300); }, 3200); }
+
+  let kbBound = false;
+  function setupKeyboard() {
+    if (kbBound) return; kbBound = true;
+    document.addEventListener('keydown', function (e) {
+      const page = document.getElementById('page-guru');
+      const visible = page && (page.classList.contains('active') || page.style.display === 'block' || getComputedStyle(page).display !== 'none');
+      if (!visible) return;
+      const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].indexOf(e.target.tagName) >= 0;
+      if (e.key === 'Escape') { GuruPenasihat.closeProfile(); GuruPenasihat.closeExportMenu(); GuruPenasihat.closeHelp(); return; }
+      if (!isInput && (e.key === '?' || (e.shiftKey && e.key === '/'))) { e.preventDefault(); GuruPenasihat.openHelp(); }
+      if (e.ctrlKey && e.key === 'f') { e.preventDefault(); GuruPenasihat.tab('direktori'); const s = document.getElementById('gp-s'); if (s) { s.focus(); toast('🔍 Carian aktif', 'info'); } }
+      if (e.ctrlKey && e.key === 'e') { e.preventDefault(); GuruPenasihat.openExportMenu(); }
+      if (e.ctrlKey && e.key === 'r') { e.preventDefault(); GuruPenasihat.refresh(); }
+    });
+  }
+
+  function showPage() {
+    const page = document.getElementById('page-guru'); if (!page) return;
+    document.querySelectorAll('section.page, div.page').forEach(function (p) { if (p.id !== 'page-guru') { p.style.display = 'none'; p.classList.remove('active'); } });
+    page.style.cssText = 'display:block !important;'; page.classList.add('active');
+    const titleEl = document.getElementById('topbarTitle'); if (titleEl) titleEl.innerHTML = 'SPKB v3.1 — Guru Penasihat<small>Papan Pemuka Audit KK 2026</small>';
+  }
+
+  /* ============================================================ PUBLIC API ============================================================ */
+  window.GuruPenasihat = {
+    init: init,
+    refresh: function () { state.initialized = false; Object.keys(state.charts).forEach(function (k) { if (state.charts[k]) { state.charts[k].destroy(); state.charts[k] = null; } }); const l = document.getElementById('gp-load'); if (l) l.style.display = 'block'; const c = document.getElementById('gp-cnt'); if (c) c.style.display = 'none'; init(); },
+    tab: function (v) {
+      state.view = v;
+      document.querySelectorAll('#gp-tabs .gp-tab').forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-view') === v); });
+      document.querySelectorAll('#gp-cnt .gp-view').forEach(function (s) { s.classList.toggle('active', s.id === 'v-' + v); });
+      if (v === 'ringkasan') setTimeout(renderRingkasanCharts, 50);
+    },
+    sortWl: function (k) { state.wlSort = k; document.querySelectorAll('#v-beban .gp-clr').forEach(function (b) { const on = b.getAttribute('data-sort') === k || (b.getAttribute('onclick') || '').indexOf("'" + k + "'") >= 0; b.style.background = on ? '#0f766e' : '#fff'; b.style.color = on ? '#fff' : '#64748b'; b.style.borderColor = on ? '#0f766e' : '#e2e8f0'; }); renderWlList(); },
+    dirPage: function (p) { state.dirPage = p; renderDirTable(); },
+    toggleJK: function (el) { el.classList.toggle('open'); },
+    openProfile: openProfile,
+    closeProfile: function () { const m = document.getElementById('gpModal'); if (m) m.classList.remove('active'); },
+    openExportMenu: function () { const m = document.getElementById('gpExport'); if (m) m.classList.add('active'); },
+    closeExportMenu: function () { const m = document.getElementById('gpExport'); if (m) m.classList.remove('active'); },
+    exportWorkload: exportWorkload, exportGuru: exportGuru, exportTugasan: exportTugasan, exportJK: exportJK,
+    openHelp: function () { const m = document.getElementById('gpHelp'); if (m) m.classList.add('active'); },
+    closeHelp: function () { const m = document.getElementById('gpHelp'); if (m) m.classList.remove('active'); },
+    helpTab: function (n) { document.querySelectorAll('#gpHelp .gp-htab').forEach(function (t) { t.classList.remove('active'); }); document.querySelectorAll('#gpHelp .gp-htc').forEach(function (t) { t.classList.remove('active'); }); const a = document.querySelector('#gpHelp [data-htab="' + n + '"]'), b = document.querySelector('#gpHelp [data-htc="' + n + '"]'); if (a) a.classList.add('active'); if (b) b.classList.add('active'); },
+    clearSearch: function () { state.dirFilters.search = ''; const s = document.getElementById('gp-s'); if (s) s.value = ''; const c = document.getElementById('gp-s-clr'); if (c) c.style.display = 'none'; const sg = document.getElementById('gp-sug'); if (sg) sg.style.display = 'none'; applyDirFilters(); },
+    clearAll: function () { state.dirFilters = { search: '', sesi: '', kategori: '', jawatan: '', unit: '', rumah: '', band: '' }; const s = document.getElementById('gp-s'); if (s) s.value = ''; ['gp-f-se', 'gp-f-k', 'gp-f-j', 'gp-f-b', 'gp-f-u'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; }); const c = document.getElementById('gp-s-clr'); if (c) c.style.display = 'none'; applyDirFilters(); toast('🧹 Penapis dikosongkan', 'info'); },
+    pickSuggestion: function (txt) { state.dirFilters.search = txt; const s = document.getElementById('gp-s'); if (s) s.value = txt; const sg = document.getElementById('gp-sug'); if (sg) sg.style.display = 'none'; const c = document.getElementById('gp-s-clr'); if (c) c.style.display = 'block'; applyDirFilters(); },
+    showToast: toast, _state: state
+  };
+
+  window.loadGuruPenasihat = function () { state.initialized = false; init(); };
+
+  document.addEventListener('click', function (e) {
+    const nav = e.target.closest('.nav-item[data-page="guru"]'); if (!nav) return;
+    setTimeout(function () { if (!state.initialized) init(); else showPage(); }, 60);
+    setTimeout(function () { showPage(); if (!document.getElementById('gp-cnt')) { state.initialized = false; init(); } }, 260);
+  });
+
+  console.log('✅ [GuruPenasihat] Modul v3.0 (Papan Pemuka Audit KK 2026) dimuatkan');
+})();
+
+</script>
 </body>
 </html>
