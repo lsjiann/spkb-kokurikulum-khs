@@ -15069,6 +15069,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       #page-guru .gp-wl-score{text-align:right;flex-shrink:0;width:80px;}
       #page-guru .gp-wl-num{font-size:20px;font-weight:800;color:#0f172a;line-height:1;}
       #page-guru .gp-wl-band{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;display:inline-block;margin-top:4px;}
+      #page-guru .gp-wl-sub{font-size:10px;color:#94a3b8;font-weight:600;margin-top:1px;}
       #page-guru .gp-band-rendah{background:#d1fae5;color:#065f46;}#page-guru .gp-band-sederhana{background:#e0f2fe;color:#075985;}#page-guru .gp-band-tinggi{background:#fef3c7;color:#92400e;}#page-guru .gp-band-kritikal{background:#fee2e2;color:#991b1b;}
       #page-guru .gp-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#475569;margin-top:6px;}
       #page-guru .gp-legend span{display:inline-flex;align-items:center;gap:6px;}
@@ -15446,6 +15447,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     // Carta histogram + ranking
     html += '<div class="gp-card"><div class="gp-sec-t"><span class="x">👑</span>Ranking Beban Kerja Guru <span style="font-size:12px;font-weight:500;color:#94a3b8;margin-left:auto;">(klik untuk profil)</span></div>';
     html += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;"><button class="gp-qf-sort gp-clr" data-sort="total" onclick="GuruPenasihat.sortWl(\'total\')" style="background:#0f766e;color:#fff;border-color:#0f766e;">Jumlah Indeks</button><button class="gp-clr" onclick="GuruPenasihat.sortWl(\'jk\')">Jawatankuasa</button><button class="gp-clr" onclick="GuruPenasihat.sortWl(\'unit\')">Tugasan Unit</button></div>';
+    html += '<div id="gp-wl-cap" style="font-size:12px;color:#64748b;margin:0 0 12px;padding:9px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;"></div>';
     html += '<div id="gp-wl-list"></div></div>';
 
     document.getElementById('v-beban').innerHTML = html;
@@ -15455,15 +15457,23 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     const key = state.wlSort;
     const T = state.teachers.slice().sort(function (a, b) { return b.wl[key] - a.wl[key] || b.wl.total - a.wl.total; });
     const maxT = Math.max.apply(null, T.map(function (t) { return t.wl.total; })) || 1;
+    const metricLbl = key === 'jk' ? 'mata Jawatankuasa' : key === 'unit' ? 'mata Tugasan Unit' : 'Jumlah Indeks';
+    const cap = document.getElementById('gp-wl-cap');
+    if (cap) cap.innerHTML = (key === 'total')
+      ? '\u2696\ufe0f Disusun ikut <b>Jumlah Indeks Beban Kerja</b> \u2014 gabungan tugasan unit + jawatankuasa + rumah sukan. Nombor besar = indeks penuh.'
+      : '\ud83d\udd0d Disusun ikut komponen <b>' + metricLbl + '</b> sahaja. Nombor besar = ' + metricLbl + '; lencana <b>\u03a3</b> menunjukkan jumlah indeks penuh.';
     document.getElementById('gp-wl-list').innerHTML = T.map(function (t, i) {
       const w = t.wl;
       const su = pct(w.unit, maxT), sj = pct(w.jk, maxT), sr = pct(w.rumah, maxT);
+      const scoreInner = (key === 'total')
+        ? '<div class="gp-wl-num">' + w.total + '</div><span class="gp-wl-band gp-band-' + t.band.cls + '">' + t.band.label + '</span>'
+        : '<div class="gp-wl-num">' + w[key] + '</div><div class="gp-wl-sub">' + metricLbl + '</div><span class="gp-wl-band gp-band-' + t.band.cls + '" title="Jumlah indeks penuh">\u03a3 ' + w.total + '</span>';
       return '<div class="gp-wl-row" onclick="GuruPenasihat.openProfile(\'' + t.id + '\')">' +
         '<div class="gp-wl-rank">' + (i + 1) + '</div>' +
         '<div class="gp-wl-av" style="background:' + avatarColor(t.nama) + ';">' + initials(t.nama) + '</div>' +
-        '<div class="gp-wl-mid"><div class="gp-wl-name">' + esc(t.nama) + '</div><div class="gp-wl-meta">' + t.bil_unit + ' unit · ' + t.bil_jk + ' JK · ' + (t.rumah ? t.rumah.replace('RUMAH ', '🏠') : '—') + '</div>' +
+        '<div class="gp-wl-mid"><div class="gp-wl-name">' + esc(t.nama) + '</div><div class="gp-wl-meta">' + t.bil_unit + ' unit \u00b7 ' + t.bil_jk + ' JK \u00b7 ' + (t.rumah ? t.rumah.replace('RUMAH ', '\ud83c\udfe0') : '\u2014') + '</div>' +
         '<div class="gp-wl-stack"><div class="gp-wl-seg" style="width:' + su + '%;background:#0d9488;"></div><div class="gp-wl-seg" style="width:' + sj + '%;background:#ec4899;"></div><div class="gp-wl-seg" style="width:' + sr + '%;background:#6366f1;"></div></div></div>' +
-        '<div class="gp-wl-score"><div class="gp-wl-num">' + w.total + '</div><span class="gp-wl-band gp-band-' + t.band.cls + '">' + t.band.label + '</span></div>' +
+        '<div class="gp-wl-score">' + scoreInner + '</div>' +
         '</div>';
     }).join('');
   }
@@ -15754,6 +15764,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
   console.log('✅ [GuruPenasihat] Modul v3.0 (Papan Pemuka Audit KK 2026) dimuatkan');
 })();
+
 
 
 </script>
