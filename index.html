@@ -16246,5 +16246,355 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 })();
 
 </script>
+
+
+<!-- ============================================================
+     MODUL PROFIL PENTADBIR v1.1 — SPKB SMK TINGGI KUCHING
+     Carta Pelaksana Komponen Pengurusan Kokurikulum Sekolah
+     ============================================================ -->
+<script>
+/* ============================================================
+   MODUL PROFIL PENTADBIR v1.1 — SPKB SMK TINGGI KUCHING
+   Carta Pelaksana Komponen Pengurusan Kokurikulum Sekolah
+   Struktur: Pengetua → GPK → Jawatankuasa (JM) → Jawatan (PM)
+   Berbilang ahli + peranan (Ketua/Pen). Patuh KPM.
+   Sumber: sheet GP_Pentadbir. IIFE · prefix pt- · tema teal
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const GURU_API_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+
+  // Struktur lalai terbenam (kod + jawatan + hierarki). Nama diisi melalui sheet GP_Pentadbir.
+  const DEFAULT_PENTADBIR = [
+    { post_id: 'HM01', kod: 'HM01', peringkat: 1, lapor_kepada: '', jawatan: 'Pengetua', ahli: '', bidang_tugas: 'Bertanggungjawab keseluruhan pengurusan kokurikulum | Mempengerusikan Mesyuarat Jawatankuasa Pengurusan Kokurikulum | Meluluskan dasar, takwim & perancangan tahunan', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'HM02', kod: 'HM02', peringkat: 2, lapor_kepada: 'HM01', jawatan: 'Guru Penolong Kanan Pentadbiran', ahli: '', bidang_tugas: '', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'HM03', kod: 'HM03', peringkat: 2, lapor_kepada: 'HM01', jawatan: 'Guru Penolong Kanan Hal Ehwal Murid', ahli: '', bidang_tugas: '', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'HM04', kod: 'HM04', peringkat: 2, lapor_kepada: 'HM01', jawatan: 'Guru Penolong Kanan Kokurikulum', ahli: '', bidang_tugas: 'Membantu Pengerusi menyelia pelaksanaan kokurikulum | Memantau prestasi unit beruniform, kelab & sukan', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'HM05', kod: 'HM05', peringkat: 2, lapor_kepada: 'HM01', jawatan: 'Guru Penolong Kanan Petang', ahli: '', bidang_tugas: '', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'JM30', kod: 'JM30', peringkat: 3, lapor_kepada: 'HM04', jawatan: 'JK Pengurusan Kokurikulum', ahli: '', bidang_tugas: '', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'JM31', kod: 'JM31', peringkat: 3, lapor_kepada: 'HM04', jawatan: 'JK Pembangunan Sukan Sekolah', ahli: '', bidang_tugas: '', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'JM32', kod: 'JM32', peringkat: 3, lapor_kepada: 'HM04', jawatan: 'JK Sukan Tahunan Sekolah', ahli: '', bidang_tugas: '', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'JM33', kod: 'JM33', peringkat: 3, lapor_kepada: 'HM04', jawatan: 'JK Koperasi Sekolah', ahli: '', bidang_tugas: '', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'PM06', kod: 'PM06', peringkat: 4, lapor_kepada: 'JM30', jawatan: 'Setiausaha Kokurikulum', ahli: '', bidang_tugas: 'Menyelaras mesyuarat & minit | Menyimpan rekod & fail kokurikulum | Menyediakan takwim & laporan tahunan', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'PM17A', kod: 'PM17', peringkat: 4, lapor_kepada: 'JM30', jawatan: 'Penyelaras Badan Beruniform', ahli: '', bidang_tugas: 'Menyelaras semua badan beruniform | Memantau perjumpaan, kehadiran & pencapaian', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'PM17B', kod: 'PM17', peringkat: 4, lapor_kepada: 'JM30', jawatan: 'Penyelaras Kelab Persatuan', ahli: '', bidang_tugas: 'Menyelaras kelab/persatuan akademik & bukan akademik | Memantau aktiviti & pencapaian', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'PM17C', kod: 'PM17', peringkat: 4, lapor_kepada: 'JM30', jawatan: 'Penyelaras Sukan dan Permainan', ahli: '', bidang_tugas: 'Menyelaras sukan & permainan | Mengurus pertandingan dalaman & MSSM', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'PM18', kod: 'PM18', peringkat: 4, lapor_kepada: 'JM30', jawatan: 'Guru Penasihat Unit Kokurikulum', ahli: 'Guru Penasihat Badan Beruniform; Guru Penasihat Kelab Persatuan; Guru Penasihat Sukan dan Permainan', bidang_tugas: 'Melaksana aktiviti unit mengikut perancangan | Merekod kehadiran & pencapaian ahli', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'PM16A', kod: 'PM16', peringkat: 4, lapor_kepada: 'JM31', jawatan: 'Setiausaha Sukan', ahli: '', bidang_tugas: 'Menyelaras pembangunan sukan sekolah | Mengurus latihan & pertandingan', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'PM16B', kod: 'PM16', peringkat: 4, lapor_kepada: 'JM32', jawatan: 'Setiausaha Sukan', ahli: '', bidang_tugas: 'Menyelaras Kejohanan Sukan Tahunan (Sukan Tara) | Mengurus acara & keputusan', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' },
+    { post_id: 'KOP', kod: '', peringkat: 4, lapor_kepada: 'JM33', jawatan: 'Penyelaras Koperasi', ahli: '', bidang_tugas: 'Menyelaras operasi koperasi sekolah | Mengurus jualan & akaun koperasi', tarikh_lantikan: '', rujukan_surat: '', status: 'Aktif' }
+  ];
+
+  let state = { initialized: false, loading: false, source: 'rasmi', posts: [], current: null };
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function val(v) { return (v == null || String(v).trim() === '') ? null : String(v).trim(); }
+  function initials(n) { const p = String(n || '').replace(/^(HJH?\.?|HJ\.?|DR\.?|EN\.?|PN\.?|CIK|TUAN|PUAN)\s+/i, '').trim().split(/\s+/); return ((p[0] || '?')[0] + ((p[1] || '')[0] || '')).toUpperCase(); }
+  function avatarColor(n) { const c = ['#0d9488', '#0891b2', '#7c3aed', '#db2777', '#ea580c', '#16a34a', '#2563eb', '#9333ea']; let h = 0; n = String(n || 'x'); for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % c.length; return c[h]; }
+  function dutyList(s) { return String(s || '').split(/\s*[|;]\s*/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  function parseAhli(s) {
+    return String(s || '').split(/\s*;\s*/).map(function (x) {
+      x = x.trim(); if (!x) return null;
+      const m = x.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+      return m ? { nama: m[1].trim(), peranan: m[2].trim() } : { nama: x, peranan: '' };
+    }).filter(Boolean);
+  }
+  function roleCls(r) { r = String(r || '').toLowerCase(); if (r.indexOf('ketua') >= 0) return 'k'; if (r.indexOf('pen') >= 0) return 'p'; return ''; }
+
+  function buildPosts(rows) {
+    return rows.map(function (p) {
+      return {
+        post_id: String(p.post_id || p.id || ''), kod: String(p.kod || ''), peringkat: Number(p.peringkat) || 4,
+        lapor_kepada: String(p.lapor_kepada || ''), jawatan: String(p.jawatan || ''),
+        ahli: parseAhli(p.ahli), ahli_raw: String(p.ahli || ''),
+        bidang_tugas: String(p.bidang_tugas || ''), tarikh_lantikan: String(p.tarikh_lantikan || ''),
+        rujukan_surat: String(p.rujukan_surat || ''), status: String(p.status || 'Aktif')
+      };
+    });
+  }
+
+  /* ============================================================ CSS ============================================================ */
+  function injectCSS() {
+    if (document.getElementById('pt-styles')) return;
+    const css = document.createElement('style'); css.id = 'pt-styles';
+    css.textContent = `
+      #page-profil .pt-wrap{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a;}
+      #page-profil .pt-hero{background:linear-gradient(120deg,#0f766e,#0d9488 55%,#14b8a6);color:#fff;padding:30px 34px;border-radius:18px;margin-bottom:22px;box-shadow:0 20px 40px -12px rgba(15,118,110,.5);position:relative;overflow:hidden;}
+      #page-profil .pt-hero::before{content:'';position:absolute;top:-60%;right:-5%;width:420px;height:420px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);}
+      #page-profil .pt-hero-c{position:relative;z-index:1;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+      #page-profil .pt-hero-i{width:58px;height:58px;background:rgba(255,255,255,.16);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+      #page-profil .pt-hero h1{font-size:25px;font-weight:800;margin:0 0 3px;color:#fff;letter-spacing:-.02em;}
+      #page-profil .pt-hero p{font-size:13px;opacity:.92;margin:0;}
+      #page-profil .pt-src{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;background:rgba(255,255,255,.18);}
+      #page-profil .pt-actions{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;}
+      #page-profil .pt-btn{padding:9px 16px;border-radius:9px;border:1px solid rgba(255,255,255,.25);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit;background:rgba(255,255,255,.15);color:#fff;transition:.2s;}
+      #page-profil .pt-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.25);}
+
+      #page-profil .pt-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px;}
+      #page-profil .pt-stat{background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 6px -1px rgba(0,0,0,.07);border:1px solid #e2e8f0;position:relative;overflow:hidden;}
+      #page-profil .pt-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#0f766e,#14b8a6);}
+      #page-profil .pt-stat.c2::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa);}#page-profil .pt-stat.c3::before{background:linear-gradient(90deg,#f59e0b,#fbbf24);}#page-profil .pt-stat.c4::before{background:linear-gradient(90deg,#ec4899,#f472b6);}
+      #page-profil .pt-stat-v{font-size:30px;font-weight:800;color:#0f172a;line-height:1;margin-bottom:5px;}
+      #page-profil .pt-stat-l{font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+
+      #page-profil .pt-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:24px;box-shadow:0 4px 6px -1px rgba(0,0,0,.06);margin-bottom:20px;}
+      #page-profil .pt-sec-t{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;color:#0f172a;margin-bottom:4px;}
+      #page-profil .pt-sec-t .x{font-size:21px;}
+      #page-profil .pt-sec-d{font-size:13px;color:#94a3b8;margin-bottom:20px;}
+      #page-profil .pt-chart-title{text-align:center;font-size:14px;font-weight:800;letter-spacing:.04em;color:#0f172a;text-transform:uppercase;border:2px solid #0f172a;border-radius:8px;padding:12px 18px;max-width:560px;margin:0 auto 8px;}
+
+      /* CARTA */
+      #page-profil .pt-chart{overflow-x:auto;padding:10px 4px 8px;}
+      #page-profil .pt-chart-inner{min-width:740px;}
+      #page-profil .pt-top{display:flex;flex-direction:column;align-items:center;}
+      #page-profil .pt-conn{width:2px;height:22px;background:#cbd5e1;}
+      #page-profil .pt-conn-h{height:2px;background:#cbd5e1;margin:0 auto;}
+      #page-profil .pt-pengetua{width:280px;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;border-radius:12px;padding:16px;text-align:center;cursor:pointer;box-shadow:0 10px 25px -8px rgba(15,118,110,.6);transition:.2s;}
+      #page-profil .pt-pengetua:hover{transform:translateY(-3px);}
+      #page-profil .pt-pengetua .pt-kod{background:rgba(255,255,255,.25);color:#fff;}
+      #page-profil .pt-pengetua .pt-bn{font-size:16px;font-weight:800;margin-top:6px;}
+      #page-profil .pt-gpkrow{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+      #page-profil .pt-gpk{width:200px;background:#fff;border:2px solid #5eead4;border-radius:11px;padding:13px;text-align:center;cursor:pointer;transition:.2s;}
+      #page-profil .pt-gpk:hover{border-color:#0f766e;transform:translateY(-3px);box-shadow:0 10px 22px -10px rgba(15,118,110,.5);}
+      #page-profil .pt-gpk .pt-bj{font-size:11.5px;font-weight:700;color:#0f766e;line-height:1.25;}
+      #page-profil .pt-gpk .pt-bn{font-size:13px;font-weight:600;color:#1e293b;margin-top:5px;}
+
+      #page-profil .pt-kod{display:inline-block;font-size:10px;font-weight:800;background:#0f766e;color:#fff;padding:2px 7px;border-radius:5px;letter-spacing:.03em;}
+      #page-profil .pt-bn.kosong{color:#cbd5e1;font-style:italic;font-weight:400;}
+
+      #page-profil .pt-jkcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:8px;}
+      #page-profil .pt-jkcol{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;}
+      #page-profil .pt-jkhead{background:linear-gradient(135deg,#0f172a,#334155);color:#fff;border-radius:9px;padding:11px 13px;cursor:pointer;margin-bottom:12px;transition:.2s;}
+      #page-profil .pt-jkhead:hover{filter:brightness(1.15);}
+      #page-profil .pt-jkhead .pt-kod{background:rgba(255,255,255,.22);}
+      #page-profil .pt-jkhead .pt-jkn{font-size:12.5px;font-weight:700;margin-top:5px;line-height:1.25;}
+      #page-profil .pt-post{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:11px 12px;margin-bottom:9px;cursor:pointer;transition:.2s;}
+      #page-profil .pt-post:last-child{margin-bottom:0;}
+      #page-profil .pt-post:hover{border-color:#14b8a6;box-shadow:0 6px 14px -8px rgba(15,118,110,.4);transform:translateX(2px);}
+      #page-profil .pt-post-h{font-size:12px;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+      #page-profil .pt-mem{display:flex;align-items:center;gap:7px;font-size:12px;color:#334155;padding:2px 0;}
+      #page-profil .pt-mdot{width:7px;height:7px;border-radius:50%;background:#cbd5e1;flex-shrink:0;}
+      #page-profil .pt-mdot.k{background:#f59e0b;}#page-profil .pt-mdot.p{background:#3b82f6;}
+      #page-profil .pt-mrole{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:4px;background:#f1f5f9;color:#64748b;}
+      #page-profil .pt-mrole.k{background:#fef3c7;color:#92400e;}#page-profil .pt-mrole.p{background:#dbeafe;color:#1e40af;}
+      #page-profil .pt-mem-empty{font-size:12px;color:#cbd5e1;font-style:italic;}
+
+      #page-profil .pt-foot{font-size:12px;color:#94a3b8;text-align:center;padding:16px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;}
+      #page-profil .pt-load{text-align:center;padding:80px 20px;}
+      #page-profil .pt-sp{width:44px;height:44px;border:4px solid #d1fae5;border-top-color:#0f766e;border-radius:50%;margin:0 auto 16px;animation:ptspin 1s linear infinite;}
+      @keyframes ptspin{to{transform:rotate(360deg);}}
+
+      #ptModal{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:99999;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(2px);}
+      #ptModal.active{display:flex;}
+      .pt-box-modal{background:#fff;border-radius:18px;max-width:600px;width:100%;box-shadow:0 25px 60px rgba(0,0,0,.3);overflow:hidden;animation:ptup .3s;}
+      @keyframes ptup{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
+      .pt-mhero{background:linear-gradient(120deg,#0f766e,#14b8a6);padding:24px 28px;color:#fff;position:relative;}
+      .pt-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;cursor:pointer;font-size:16px;}
+      .pt-mhero .pt-kod{background:rgba(255,255,255,.25);}
+      .pt-mhero h2{margin:8px 0 0;font-size:19px;font-weight:800;}
+      .pt-mbody{padding:22px 26px;max-height:62vh;overflow-y:auto;}
+      .pt-msec{margin-bottom:20px;}
+      .pt-msec-t{font-size:12px;font-weight:800;color:#0f766e;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;}
+      .pt-mlist{display:flex;flex-direction:column;gap:7px;}
+      .pt-mrow{display:flex;align-items:center;gap:11px;padding:9px 11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;}
+      .pt-mrow-av{width:34px;height:34px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;}
+      .pt-mrow-n{flex:1;font-size:13px;font-weight:600;color:#1e293b;}
+      .pt-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+      .pt-info{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:11px 13px;}
+      .pt-info-k{font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;}
+      .pt-info-v{font-size:13px;color:#1e293b;font-weight:600;margin-top:3px;}
+      .pt-info-v.kosong,.pt-mem-empty2{color:#cbd5e1;font-style:italic;font-weight:400;}
+      .pt-duty{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155;line-height:1.5;}
+      .pt-duty:last-child{border-bottom:none;}
+      .pt-duty-n{width:22px;height:22px;border-radius:6px;background:#0f766e;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+      .pt-toast{position:fixed;bottom:24px;right:24px;background:#0f766e;color:#fff;padding:13px 19px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999999;animation:pttin .3s;}
+      @keyframes pttin{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}@keyframes ptToastOut{to{transform:translateY(20px);opacity:0;}}
+      @media print{#sidebar,.topbar,#page-profil .pt-actions,#page-profil .pt-stats{display:none!important;}#page-profil .pt-card{box-shadow:none;border:none;}}
+      @media(max-width:560px){.pt-info-grid{grid-template-columns:1fr;}}
+    `;
+    document.head.appendChild(css);
+  }
+
+  /* ============================================================ HTML ============================================================ */
+  function ensurePage() {
+    let page = document.getElementById('page-profil');
+    if (!page) {
+      page = document.createElement('section'); page.id = 'page-profil'; page.className = 'page'; page.style.display = 'none';
+      const ref = document.getElementById('page-sekolah') || document.getElementById('page-guru') || document.querySelector('.page');
+      if (ref && ref.parentNode) ref.parentNode.appendChild(page); else document.body.appendChild(page);
+    }
+    return page;
+  }
+  function injectHTML() {
+    ensurePage().innerHTML = `<div class="pt-wrap"><div id="pt-load" class="pt-load"><div class="pt-sp"></div><div style="color:#64748b;font-weight:500;">Memuatkan carta organisasi…</div></div><div id="pt-cnt" style="display:none;"></div></div>`;
+  }
+  function injectModal() {
+    if (document.getElementById('ptModal')) return;
+    const m = document.createElement('div'); m.id = 'ptModal';
+    m.onclick = function (e) { if (e.target.id === 'ptModal') ProfilPentadbir.closeProfile(); };
+    m.innerHTML = `<div class="pt-box-modal"><div class="pt-mhero"><button class="pt-close" onclick="ProfilPentadbir.closeProfile()">✕</button><span class="pt-kod" id="pt-m-kod">—</span><h2 id="pt-m-jawatan">—</h2></div><div class="pt-mbody" id="pt-m-body"></div></div>`;
+    document.body.appendChild(m);
+  }
+
+  /* ============================================================ DATA ============================================================ */
+  function api(action) { return fetch(GURU_API_URL + '?action=' + action + '&_t=' + Date.now()).then(function (r) { return r.json(); }); }
+  function init() {
+    if (state.loading) return;
+    if (state.initialized && document.getElementById('pt-cnt')) { showPage(); return; }
+    state.loading = true;
+    injectCSS(); injectHTML(); injectModal(); showPage();
+    const timeout = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('timeout')); }, 7000); });
+    Promise.race([api('pentadbir'), timeout])
+      .then(function (res) {
+        if (res && res.success && res.data && Array.isArray(res.data.pentadbir) && res.data.pentadbir.length) { state.posts = buildPosts(res.data.pentadbir); state.source = 'live'; }
+        else throw new Error('empty');
+      })
+      .catch(function () { state.posts = buildPosts(DEFAULT_PENTADBIR); state.source = 'rasmi'; })
+      .then(function () {
+        render();
+        const l = document.getElementById('pt-load'); if (l) l.style.display = 'none';
+        const c = document.getElementById('pt-cnt'); if (c) c.style.display = 'block';
+        state.initialized = true; state.loading = false;
+      });
+  }
+
+  /* ============================================================ RENDER ============================================================ */
+  function render() {
+    const c = document.getElementById('pt-cnt');
+    const totalAhli = state.posts.reduce(function (s, p) { return s + p.ahli.length; }, 0);
+    const jkCount = state.posts.filter(function (p) { return p.peringkat === 3; }).length;
+    const terisi = state.posts.filter(function (p) { return p.ahli.length > 0; }).length;
+
+    let html = '';
+    html += '<div class="pt-hero"><div class="pt-hero-c"><div class="pt-hero-i">🏛️</div>' +
+      '<div><h1>Profil Pentadbir Kokurikulum</h1><p>Carta Pelaksana Komponen Pengurusan Kokurikulum Sekolah · Patuh KPM</p>' +
+      '<span class="pt-src">' + (state.source === 'live' ? '📡 Data Langsung (Sheet)' : '📋 Data Rasmi (terbenam)') + '</span></div>' +
+      '<div class="pt-actions"><button class="pt-btn" onclick="ProfilPentadbir.refresh()">🔄 Muat Semula</button><button class="pt-btn" onclick="window.print()">🖨️ Cetak Carta</button></div>' +
+      '</div></div>';
+
+    html += '<div class="pt-stats">' + [
+      { v: state.posts.length, l: 'Jawatan', c: '' },
+      { v: terisi, l: 'Jawatan Terisi', c: 'c2' },
+      { v: totalAhli, l: 'Jumlah Pegawai', c: 'c3' },
+      { v: jkCount, l: 'Jawatankuasa', c: 'c4' }
+    ].map(function (o) { return '<div class="pt-stat ' + o.c + '"><div class="pt-stat-v">' + o.v + '</div><div class="pt-stat-l">' + o.l + '</div></div>'; }).join('') + '</div>';
+
+    html += '<div class="pt-card"><div class="pt-chart-title">Carta Pelaksana Komponen<br>Pengurusan Kokurikulum Sekolah</div><div class="pt-sec-d" style="text-align:center;">Klik mana-mana kotak untuk lihat ahli, bidang tugas & maklumat lantikan.</div><div class="pt-chart"><div class="pt-chart-inner" id="pt-chart"></div></div></div>';
+
+    html += '<div class="pt-foot">💡 Carta dijana automatik dari sheet <b>GP_Pentadbir</b> mengikut <b>peringkat</b> (1 Pengetua · 2 GPK · 3 Jawatankuasa · 4 Jawatan) & <b>lapor_kepada</b>. Semua nama & ahli dikemas kini dalam sheet tersebut.</div>';
+
+    c.innerHTML = html;
+    renderChart();
+  }
+
+  function postBox(p, cls) {
+    const nm = p.ahli.length ? p.ahli.map(function (a) { return esc(a.nama); }).join(', ') : '';
+    return '<div class="' + cls + '" onclick="ProfilPentadbir.openProfile(\'' + esc(p.post_id) + '\')">' +
+      (p.kod ? '<span class="pt-kod">' + esc(p.kod) + '</span>' : '') +
+      '<div class="pt-bj">' + esc(p.jawatan) + '</div>' +
+      '<div class="pt-bn ' + (nm ? '' : 'kosong') + '">' + (nm || 'Belum diisi') + '</div></div>';
+  }
+  function memberLine(a) { const rc = roleCls(a.peranan); return '<div class="pt-mem"><span class="pt-mdot ' + rc + '"></span>' + esc(a.nama) + (a.peranan ? ' <span class="pt-mrole ' + rc + '">' + esc(a.peranan) + '</span>' : '') + '</div>'; }
+  function postCard(p) {
+    const mem = p.ahli.length ? p.ahli.map(memberLine).join('') : '<div class="pt-mem-empty">Belum diisi</div>';
+    return '<div class="pt-post" onclick="ProfilPentadbir.openProfile(\'' + esc(p.post_id) + '\')">' +
+      '<div class="pt-post-h">' + (p.kod ? '<span class="pt-kod">' + esc(p.kod) + '</span>' : '') + esc(p.jawatan) + '</div>' + mem + '</div>';
+  }
+
+  function renderChart() {
+    const box = document.getElementById('pt-chart'); if (!box) return;
+    const byLvl = function (n) { return state.posts.filter(function (p) { return p.peringkat === n; }); };
+    const children = function (id) { return state.posts.filter(function (p) { return p.peringkat === 4 && p.lapor_kepada === id; }); };
+
+    let html = '';
+    // Tier 1 + 2
+    const top = byLvl(1), gpk = byLvl(2);
+    html += '<div class="pt-top">';
+    top.forEach(function (p) {
+      const nm = p.ahli.length ? p.ahli.map(function (a) { return esc(a.nama); }).join(', ') : '';
+      html += '<div class="pt-pengetua" onclick="ProfilPentadbir.openProfile(\'' + esc(p.post_id) + '\')">' +
+        '<span class="pt-kod">' + esc(p.kod || 'HM01') + '</span><div style="font-size:12px;font-weight:700;margin-top:5px;opacity:.95;">' + esc(p.jawatan) + '</div>' +
+        '<div class="pt-bn ' + (nm ? '' : 'kosong') + '" style="color:#fff;">' + (nm || 'Belum diisi') + '</div></div>';
+    });
+    if (gpk.length) {
+      html += '<div class="pt-conn"></div>';
+      html += '<div class="pt-gpkrow">' + gpk.map(function (p) { return postBox(p, 'pt-gpk'); }).join('') + '</div>';
+    }
+    html += '</div>';
+
+    // Tier 3 (JK) sebagai lajur + tier 4 di bawah
+    const jks = byLvl(3);
+    if (jks.length) {
+      html += '<div class="pt-conn" style="margin:0 auto;"></div>';
+      html += '<div class="pt-jkcols">' + jks.map(function (jk) {
+        const kids = children(jk.post_id);
+        return '<div class="pt-jkcol">' +
+          '<div class="pt-jkhead" onclick="ProfilPentadbir.openProfile(\'' + esc(jk.post_id) + '\')">' + (jk.kod ? '<span class="pt-kod">' + esc(jk.kod) + '</span>' : '') + '<div class="pt-jkn">' + esc(jk.jawatan) + '</div></div>' +
+          (kids.length ? kids.map(postCard).join('') : '<div class="pt-mem-empty" style="padding:8px;">Tiada jawatan</div>') +
+          '</div>';
+      }).join('') + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  /* ============================================================ PROFIL MODAL ============================================================ */
+  function openProfile(id) {
+    const p = state.posts.filter(function (x) { return String(x.post_id) === String(id); })[0]; if (!p) return;
+    document.getElementById('pt-m-kod').textContent = p.kod || 'JAWATAN';
+    document.getElementById('pt-m-jawatan').textContent = p.jawatan;
+    let html = '';
+    // Ahli
+    html += '<div class="pt-msec"><div class="pt-msec-t">👥 Ahli / Pegawai (' + p.ahli.length + ')</div>';
+    if (p.ahli.length) html += '<div class="pt-mlist">' + p.ahli.map(function (a) {
+      const rc = roleCls(a.peranan);
+      return '<div class="pt-mrow"><div class="pt-mrow-av" style="background:' + avatarColor(a.nama) + ';">' + initials(a.nama) + '</div><div class="pt-mrow-n">' + esc(a.nama) + '</div>' + (a.peranan ? '<span class="pt-mrole ' + rc + '">' + esc(a.peranan) + '</span>' : '') + '</div>';
+    }).join('') + '</div>';
+    else html += '<div class="pt-mem-empty2">Belum diisi — kemas kini lajur <b>ahli</b> dalam sheet GP_Pentadbir</div>';
+    html += '</div>';
+    // Maklumat lantikan
+    html += '<div class="pt-msec"><div class="pt-msec-t">📌 Maklumat Lantikan</div><div class="pt-info-grid">' +
+      infoCell('Kod Jawatan', val(p.kod)) + infoCell('Tarikh Lantikan', val(p.tarikh_lantikan)) +
+      infoCell('Rujukan Surat', val(p.rujukan_surat)) + infoCell('Status', val(p.status)) +
+      '</div></div>';
+    // Bidang tugas
+    const duties = dutyList(p.bidang_tugas);
+    html += '<div class="pt-msec"><div class="pt-msec-t">📋 Bidang Tugas</div>';
+    html += duties.length ? duties.map(function (d, i) { return '<div class="pt-duty"><span class="pt-duty-n">' + (i + 1) + '</span><span>' + esc(d) + '</span></div>'; }).join('') : '<div class="pt-mem-empty2">Belum diisi</div>';
+    html += '</div>';
+    document.getElementById('pt-m-body').innerHTML = html;
+    document.getElementById('ptModal').classList.add('active');
+  }
+  function infoCell(k, v) { return '<div class="pt-info"><div class="pt-info-k">' + k + '</div><div class="pt-info-v ' + (v ? '' : 'kosong') + '">' + (v ? esc(v) : 'Belum diisi') + '</div></div>'; }
+
+  function toast(msg) { const t = document.createElement('div'); t.className = 'pt-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.style.animation = 'ptToastOut .3s forwards'; setTimeout(function () { t.remove(); }, 300); }, 3000); }
+  function showPage() {
+    const page = document.getElementById('page-profil'); if (!page) return;
+    document.querySelectorAll('section.page, div.page').forEach(function (p) { if (p.id !== 'page-profil') { p.style.display = 'none'; p.classList.remove('active'); } });
+    page.style.cssText = 'display:block !important;'; page.classList.add('active');
+    const titleEl = document.getElementById('topbarTitle'); if (titleEl) titleEl.innerHTML = 'SPKB v3.1 — Profil Pentadbir<small>Carta Organisasi Kokurikulum</small>';
+  }
+
+  window.ProfilPentadbir = {
+    init: init,
+    refresh: function () { state.initialized = false; const l = document.getElementById('pt-load'); if (l) l.style.display = 'block'; const c = document.getElementById('pt-cnt'); if (c) c.style.display = 'none'; init(); toast('🔄 Memuat semula…'); },
+    openProfile: openProfile,
+    closeProfile: function () { const m = document.getElementById('ptModal'); if (m) m.classList.remove('active'); },
+    showToast: toast, _state: state
+  };
+  window.loadProfilPentadbir = function () { state.initialized = false; init(); };
+
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') ProfilPentadbir.closeProfile(); });
+  document.addEventListener('click', function (e) {
+    const nav = e.target.closest('.nav-item[data-page="profil"]'); if (!nav) return;
+    setTimeout(function () { if (!state.initialized) init(); else showPage(); }, 60);
+    setTimeout(function () { showPage(); if (!document.getElementById('pt-cnt')) { state.initialized = false; init(); } }, 260);
+  });
+
+  console.log('✅ [ProfilPentadbir] Modul v1.1 (Carta Organisasi) dimuatkan');
+})();
+
+</script>
 </body>
 </html>
