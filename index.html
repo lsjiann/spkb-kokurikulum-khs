@@ -14939,7 +14939,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
           res.students.forEach(function (s) {
             [['uniform', 'Uniform'], ['kelab', 'Kelab'], ['sukan', 'Sukan']].forEach(function (p) {
               var c = codeOf(s[p[0]]);
-              if (c) { (idx[c] = idx[c] || []).push({ nama: s.nama || '-', kelas: s.kelas || '', tingkatan: s.tingkatan || '', rumah: s.rumah_sukan || '', gender: s.gender || '', kategori: p[1] }); }
+              if (c) { (idx[c] = idx[c] || []).push({ nama: s.nama || '-', kelas: s.kelas || '', tingkatan: s.tingkatan || '', rumah: s.rumah_sukan || '', gender: s.gender || '', bangsa: s.bangsa || '', kategori: p[1] }); }
             });
           });
           state.studentIndex = idx; state.studentsLoaded = true; state.studentsLoading = false;
@@ -15218,6 +15218,18 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       .gp-su-n{font-size:13px;font-weight:600;color:#1e293b;}
       .gp-su-m{font-size:11px;color:#94a3b8;margin-top:1px;}
       #gpStudents{z-index:100001;}
+      .gp-su-demo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+      .gp-su-dcard{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:13px 15px;}
+      .gp-su-dt{font-size:12px;font-weight:800;color:#0f172a;margin-bottom:10px;}
+      .gp-su-gbar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#f1f5f9;margin-bottom:9px;}
+      .gp-su-gbar div{height:100%;transition:width .5s;}
+      .gp-su-gleg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#475569;font-weight:600;}
+      .gp-su-gleg span{display:inline-flex;align-items:center;gap:6px;}
+      .gp-su-gleg b{color:#0f172a;}
+      .gp-su-races{display:flex;flex-wrap:wrap;gap:7px;}
+      .gp-su-rpill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:100px;padding:4px 10px;}
+      .gp-su-rpill b{color:#0f766e;}
+      @media(max-width:560px){.gp-su-demo{grid-template-columns:1fr;}}
       .gp-toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:13px 19px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999999;animation:gptin .3s;}
       .gp-toast.success{background:#0f766e;}.gp-toast.info{background:#2563eb;}.gp-toast.warn{background:#d97706;}
       @keyframes gptin{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}@keyframes gpToastOut{to{transform:translateY(20px);opacity:0;}}
@@ -15739,18 +15751,37 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   function renderUnitStudents(code) {
     const body = document.getElementById('gp-su-body');
     const list = studentsForCode(code);
-    if (!list.length) { body.innerHTML = '<div class="gp-empty">👥 Tiada pelajar direkodkan menyertai unit ini dalam Data Pelajar.</div>'; return; }
+    if (!list.length) { body.innerHTML = '<div class="gp-empty">\ud83d\udc65 Tiada pelajar direkodkan menyertai unit ini dalam Data Pelajar.</div>'; return; }
     // Kumpul ikut kelas
     const byClass = {};
     list.forEach(function (s) { const k = s.kelas || 'Lain-lain'; (byClass[k] = byClass[k] || []).push(s); });
     const classes = Object.keys(byClass).sort();
-    let html = '<div class="gp-su-summary"><div class="gp-su-cnt">' + list.length + '</div><div class="gp-su-cntl">pelajar menyertai unit ini · ' + classes.length + ' kelas</div></div>';
+    // Rumusan jantina
+    let L = 0, P = 0;
+    list.forEach(function (s) { const g = String(s.gender || '').toLowerCase(); if (g.indexOf('female') >= 0 || g.indexOf('perempuan') >= 0 || g === 'f' || g === 'p') P++; else if (g.indexOf('male') >= 0 || g.indexOf('lelaki') >= 0 || g === 'm' || g === 'l') L++; });
+    const gtot = (L + P) || 1;
+    // Taburan bangsa
+    const race = {}; list.forEach(function (s) { const b = (String(s.bangsa || '').trim()) || 'Tidak Dinyatakan'; race[b] = (race[b] || 0) + 1; });
+    const raceArr = Object.keys(race).map(function (k) { return { n: k, c: race[k] }; }).sort(function (a, b) { return b.c - a.c; });
+    const rc = ['#0d9488', '#8b5cf6', '#f59e0b', '#ec4899', '#3b82f6', '#10b981', '#ef4444', '#6366f1'];
+
+    let html = '<div class="gp-su-summary"><div class="gp-su-cnt">' + list.length + '</div><div class="gp-su-cntl">pelajar menyertai unit ini \u00b7 ' + classes.length + ' kelas</div></div>';
+    // Panel demografi: jantina + bangsa
+    html += '<div class="gp-su-demo">';
+    html += '<div class="gp-su-dcard"><div class="gp-su-dt">\u2695\ufe0f Jantina</div>' +
+      '<div class="gp-su-gbar"><div style="width:' + Math.round(L / gtot * 100) + '%;background:#3b82f6;"></div><div style="width:' + Math.round(P / gtot * 100) + '%;background:#ec4899;"></div></div>' +
+      '<div class="gp-su-gleg"><span><span class="gp-dot" style="background:#3b82f6;"></span>Lelaki <b>' + L + '</b> (' + Math.round(L / gtot * 100) + '%)</span><span><span class="gp-dot" style="background:#ec4899;"></span>Perempuan <b>' + P + '</b> (' + Math.round(P / gtot * 100) + '%)</span></div></div>';
+    html += '<div class="gp-su-dcard"><div class="gp-su-dt">\ud83c\udf0f Bangsa (' + raceArr.length + ')</div><div class="gp-su-races">' +
+      raceArr.map(function (r, i) { return '<span class="gp-su-rpill"><span class="gp-dot" style="background:' + rc[i % rc.length] + ';"></span>' + esc(r.n) + ' <b>' + r.c + '</b></span>'; }).join('') +
+      '</div></div>';
+    html += '</div>';
+    // Senarai pelajar ikut kelas
     classes.forEach(function (cls) {
       const studs = byClass[cls].sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); });
-      html += '<div class="gp-su-class"><div class="gp-su-ch">📚 ' + esc(cls) + ' <span style="color:#94a3b8;font-weight:600;">(' + studs.length + ')</span></div>';
+      html += '<div class="gp-su-class"><div class="gp-su-ch">\ud83d\udcda ' + esc(cls) + ' <span style="color:#94a3b8;font-weight:600;">(' + studs.length + ')</span></div>';
       html += studs.map(function (s) {
         return '<div class="gp-su-row"><span class="gp-av-sm" style="background:' + avatarColor(s.nama) + ';">' + initials(s.nama) + '</span>' +
-          '<div class="gp-su-info"><div class="gp-su-n">' + esc(s.nama) + '</div><div class="gp-su-m">' + (s.gender ? esc(s.gender) + ' · ' : '') + (s.rumah ? '🏠 ' + esc(String(s.rumah).replace('RUMAH ', '')) : '') + '</div></div></div>';
+          '<div class="gp-su-info"><div class="gp-su-n">' + esc(s.nama) + '</div><div class="gp-su-m">' + (s.gender ? esc(s.gender) + ' \u00b7 ' : '') + (s.bangsa ? esc(s.bangsa) + ' \u00b7 ' : '') + (s.rumah ? '\ud83c\udfe0 ' + esc(String(s.rumah).replace('RUMAH ', '')) : '') + '</div></div></div>';
       }).join('');
       html += '</div>';
     });
@@ -15864,6 +15895,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
   console.log('✅ [GuruPenasihat] Modul v3.0 (Papan Pemuka Audit KK 2026) dimuatkan');
 })();
+
 
 
 
