@@ -14870,6 +14870,8 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
   const API_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
   const PAGE_SIZE = 12;
+  // Endpoint Data Pelajar (untuk silang-pautan pelajar-unit)
+  const STUDENT_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
   const KATEGORI = {
     'Uniform': { emoji: '🎖️', label: 'Unit Beruniform', warna: '#0d9488', code: 'U' },
@@ -14912,6 +14914,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     teachers: [], unitStats: [], jkStats: [],
     dirFiltered: [], dirPage: 1, dirFilters: { search: '', sesi: '', kategori: '', jawatan: '', unit: '', rumah: '', band: '' },
     wlSort: 'total',
+    students: [], studentIndex: {}, studentsLoaded: false, studentsLoading: false,
     charts: {}
   };
 
@@ -14920,6 +14923,32 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   function initials(n) { const p = String(n || '').replace(/^(HJH?\.?|HJ\.?|DR\.?|EN\.?|PN\.?|CIK)\s+/i, '').trim().split(/\s+/); return ((p[0] || '?')[0] + ((p[1] || '')[0] || '')).toUpperCase(); }
   function avatarColor(n) { const c = ['#0d9488', '#0891b2', '#7c3aed', '#db2777', '#ea580c', '#16a34a', '#2563eb', '#9333ea']; let h = 0; for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % c.length; return c[h]; }
   function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+
+  function codeOf(s) { var mm = String(s == null ? '' : s).match(/^([A-Z]\d+[A-Z]?)/); return mm ? mm[1] : ''; }
+
+  function loadStudents(cb) {
+    if (state.studentsLoaded) { if (cb) cb(true); return; }
+    if (state.studentsLoading) { return; }
+    state.studentsLoading = true;
+    fetch(STUDENT_API_URL + '?action=data_pelajar_all&_t=' + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.success && Array.isArray(res.students)) {
+          state.students = res.students;
+          var idx = {};
+          res.students.forEach(function (s) {
+            [['uniform', 'Uniform'], ['kelab', 'Kelab'], ['sukan', 'Sukan']].forEach(function (p) {
+              var c = codeOf(s[p[0]]);
+              if (c) { (idx[c] = idx[c] || []).push({ nama: s.nama || '-', kelas: s.kelas || '', tingkatan: s.tingkatan || '', rumah: s.rumah_sukan || '', gender: s.gender || '', kategori: p[1] }); }
+            });
+          });
+          state.studentIndex = idx; state.studentsLoaded = true; state.studentsLoading = false;
+          if (cb) cb(true);
+        } else { state.studentsLoading = false; if (cb) cb(false); }
+      })
+      .catch(function () { state.studentsLoading = false; if (cb) cb(false); });
+  }
+  function studentsForCode(code) { return state.studentIndex[code] || []; }
 
   /* -------- BINA MODEL -------- */
   function buildModel(data) {
@@ -15175,6 +15204,20 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       .gp-rubric{font-size:13px;color:#475569;line-height:1.7;}
       .gp-rubric b{color:#0f172a;}
 
+      #page-guru .gp-unit-click{cursor:pointer;transition:.18s;}
+      #page-guru .gp-unit-click:hover{border-color:#14b8a6;background:#f0fdfa;transform:translateX(2px);}
+      #page-guru .gp-ucard-click{cursor:pointer;}
+      #page-guru .gp-stud-hint{display:inline-block;margin-top:5px;font-size:11px;font-weight:700;color:#0f766e;}
+      .gp-su-summary{display:flex;align-items:center;gap:14px;padding:14px 16px;background:linear-gradient(135deg,#f0fdfa,#ecfeff);border:1px solid #99f6e4;border-radius:12px;margin-bottom:18px;}
+      .gp-su-cnt{font-size:32px;font-weight:800;color:#0f766e;line-height:1;}
+      .gp-su-cntl{font-size:13px;color:#475569;font-weight:600;}
+      .gp-su-class{margin-bottom:16px;}
+      .gp-su-ch{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #e2e8f0;}
+      .gp-su-row{display:flex;align-items:center;gap:11px;padding:8px 6px;border-bottom:1px solid #f1f5f9;}
+      .gp-su-info{flex:1;min-width:0;}
+      .gp-su-n{font-size:13px;font-weight:600;color:#1e293b;}
+      .gp-su-m{font-size:11px;color:#94a3b8;margin-top:1px;}
+      #gpStudents{z-index:100001;}
       .gp-toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:13px 19px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999999;animation:gptin .3s;}
       .gp-toast.success{background:#0f766e;}.gp-toast.info{background:#2563eb;}.gp-toast.warn{background:#d97706;}
       @keyframes gptin{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}@keyframes gpToastOut{to{transform:translateY(20px);opacity:0;}}
@@ -15282,6 +15325,14 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
         </div></div>`;
       document.body.appendChild(h);
     }
+    if (!document.getElementById('gpStudents')) {
+      const sd = document.createElement('div'); sd.id = 'gpStudents';
+      sd.onclick = function (ev) { if (ev.target.id === 'gpStudents') GuruPenasihat.closeStudents(); };
+      sd.innerHTML = '<div class="gp-box"><div class="gp-hero"><button class="gp-close" onclick="GuruPenasihat.closeStudents()">✕</button>' +
+        '<div class="gp-hero-c"><div class="gp-av" id="gp-su-ic">🗂️</div><div><h2 id="gp-su-nama">—</h2><p id="gp-su-sub">—</p><div class="gp-hero-tags" id="gp-su-tags"></div></div></div></div>' +
+        '<div class="gp-body" id="gp-su-body"></div></div>';
+      document.body.appendChild(sd);
+    }
   }
 
   /* ============================================================ API + INIT ============================================================ */
@@ -15308,6 +15359,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
         const l = document.getElementById('gp-load'); if (l) l.style.display = 'none';
         const c = document.getElementById('gp-cnt'); if (c) c.style.display = 'block';
         state.initialized = true; state.loading = false; setupKeyboard();
+        loadStudents();  // pramuat data pelajar di latar untuk silang-pautan
         if (!state._welcomed) { state._welcomed = true; setTimeout(function () { toast('✅ Papan pemuka dimuat: ' + state.teachers.length + ' guru · ' + state.jkStats.length + ' jawatankuasa', 'success'); }, 700); }
       })
       .catch(function (e) {
@@ -15576,7 +15628,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       html += '<div class="gp-jk-group"><div class="gp-jk-gh">' + cfg.emoji + ' ' + cfg.label + ' <span style="color:#94a3b8;font-weight:600;">(' + units.length + ' unit)</span></div><div class="gp-unit-grid">';
       units.forEach(function (u) {
         const noKetua = u.ketua === 0, noPetang = u.petang === 0, solo = u.n === 1;
-        html += '<div class="gp-ucard"><div class="gp-ucard-h"><div class="gp-ucard-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-ucard-t"><span class="gp-ucode">' + esc(u.kod) + '</span><br>' + esc(u.nama) + '</div></div>' +
+        html += '<div class="gp-ucard gp-ucard-click" onclick="GuruPenasihat.openUnitStudents(\'' + esc(u.kod) + '\',\'' + kat + '\')"><div class="gp-ucard-h"><div class="gp-ucard-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-ucard-t"><span class="gp-ucode">' + esc(u.kod) + '</span><br>' + esc(u.nama) + '</div></div>' +
           '<div class="gp-ucard-meta">' +
           '<span class="gp-pill ' + (solo ? 'warn' : 'good') + '">👥 ' + u.n + ' guru</span>' +
           '<span class="gp-pill ' + (noKetua ? 'bad' : 'good') + '">' + (noKetua ? '🚩 Tiada Ketua' : '⭐ ' + u.ketua + ' Ketua') + '</span>' +
@@ -15643,7 +15695,9 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       const u = t.unitByKat[kat]; const cfg = KATEGORI[kat];
       if (!u) return '<div class="gp-unit"><div class="gp-unit-ic" style="background:#cbd5e1;">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + '</div><div class="gp-unit-n" style="color:#94a3b8;">Tiada tugasan</div></div></div>';
       const j = JAWATAN[u.jawatan] || JAWATAN.GP;
-      return '<div class="gp-unit"><div class="gp-unit-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + ' · ' + esc(u.kod) + '</div><div class="gp-unit-n">' + esc(u.nama_unit) + '</div></div><span class="gp-jbadge ' + j.cls + '">' + j.label + '</span></div>';
+      var sc = state.studentsLoaded ? studentsForCode(u.kod).length : null;
+      var scHint = (sc !== null) ? '<span class="gp-stud-hint">👥 ' + sc + ' pelajar ›</span>' : '<span class="gp-stud-hint">👥 lihat pelajar ›</span>';
+      return '<div class="gp-unit gp-unit-click" onclick="GuruPenasihat.openUnitStudents(\'' + esc(u.kod) + '\',\'' + kat + '\')"><div class="gp-unit-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + ' · ' + esc(u.kod) + '</div><div class="gp-unit-n">' + esc(u.nama_unit) + '</div>' + scHint + '</div><span class="gp-jbadge ' + j.cls + '">' + j.label + '</span></div>';
     }).join('') + '</div>';
 
     // Rumah sukan
@@ -15657,6 +15711,50 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     }
     document.getElementById('gp-m-body').innerHTML = html;
     document.getElementById('gpModal').classList.add('active');
+  }
+
+  /* ============================================================ SILANG-PAUTAN PELAJAR ============================================================ */
+  function openUnitStudents(code, kat) {
+    const modal = document.getElementById('gpStudents'); if (!modal) return;
+    const cfg = KATEGORI[kat] || { emoji: '🗂️', warna: '#0f766e', label: 'Unit' };
+    const us = state.unitStats.filter(function (u) { return u.kod === code; })[0];
+    document.getElementById('gp-su-ic').textContent = cfg.emoji;
+    document.getElementById('gp-su-ic').style.background = cfg.warna;
+    document.getElementById('gp-su-nama').textContent = (us ? us.nama : code);
+    document.getElementById('gp-su-sub').textContent = cfg.label + ' · ' + code;
+    // Tag guru penasihat unit
+    let tagHtml = '';
+    if (us && us.advisors && us.advisors.length) {
+      const lead = us.advisors.filter(function (a) { return a.jawatan === 'KG'; }).map(function (a) { return a.nama.split(/\s+/).slice(0, 2).join(' '); });
+      tagHtml = '<span class="gp-htag">👨‍🏫 ' + us.advisors.length + ' guru penasihat</span>' + (lead.length ? '<span class="gp-htag">⭐ Ketua: ' + lead.join(', ') + '</span>' : '');
+    }
+    document.getElementById('gp-su-tags').innerHTML = tagHtml;
+    modal.classList.add('active');
+    const body = document.getElementById('gp-su-body');
+    if (!state.studentsLoaded) {
+      body.innerHTML = '<div class="gp-load"><div class="gp-sp"></div><div style="color:#64748b;">Memuatkan data pelajar…</div></div>';
+      loadStudents(function (ok) { if (modal.classList.contains('active')) { if (ok) renderUnitStudents(code); else body.innerHTML = '<div class="gp-err"><div style="font-size:24px;">⚠️</div><div><b>Gagal memuat data pelajar.</b><br><span style="font-size:13px;">Pastikan sambungan internet & endpoint Data Pelajar aktif.</span></div></div>'; } });
+    } else { renderUnitStudents(code); }
+  }
+  function renderUnitStudents(code) {
+    const body = document.getElementById('gp-su-body');
+    const list = studentsForCode(code);
+    if (!list.length) { body.innerHTML = '<div class="gp-empty">👥 Tiada pelajar direkodkan menyertai unit ini dalam Data Pelajar.</div>'; return; }
+    // Kumpul ikut kelas
+    const byClass = {};
+    list.forEach(function (s) { const k = s.kelas || 'Lain-lain'; (byClass[k] = byClass[k] || []).push(s); });
+    const classes = Object.keys(byClass).sort();
+    let html = '<div class="gp-su-summary"><div class="gp-su-cnt">' + list.length + '</div><div class="gp-su-cntl">pelajar menyertai unit ini · ' + classes.length + ' kelas</div></div>';
+    classes.forEach(function (cls) {
+      const studs = byClass[cls].sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); });
+      html += '<div class="gp-su-class"><div class="gp-su-ch">📚 ' + esc(cls) + ' <span style="color:#94a3b8;font-weight:600;">(' + studs.length + ')</span></div>';
+      html += studs.map(function (s) {
+        return '<div class="gp-su-row"><span class="gp-av-sm" style="background:' + avatarColor(s.nama) + ';">' + initials(s.nama) + '</span>' +
+          '<div class="gp-su-info"><div class="gp-su-n">' + esc(s.nama) + '</div><div class="gp-su-m">' + (s.gender ? esc(s.gender) + ' · ' : '') + (s.rumah ? '🏠 ' + esc(String(s.rumah).replace('RUMAH ', '')) : '') + '</div></div></div>';
+      }).join('');
+      html += '</div>';
+    });
+    body.innerHTML = html;
   }
 
   /* ============================================================ EKSPORT ============================================================ */
@@ -15700,7 +15798,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       const visible = page && (page.classList.contains('active') || page.style.display === 'block' || getComputedStyle(page).display !== 'none');
       if (!visible) return;
       const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].indexOf(e.target.tagName) >= 0;
-      if (e.key === 'Escape') { GuruPenasihat.closeProfile(); GuruPenasihat.closeExportMenu(); GuruPenasihat.closeHelp(); return; }
+      if (e.key === 'Escape') { GuruPenasihat.closeStudents(); GuruPenasihat.closeProfile(); GuruPenasihat.closeExportMenu(); GuruPenasihat.closeHelp(); return; }
       if (!isInput && (e.key === '?' || (e.shiftKey && e.key === '/'))) { e.preventDefault(); GuruPenasihat.openHelp(); }
       if (e.ctrlKey && e.key === 'f') { e.preventDefault(); GuruPenasihat.tab('direktori'); const s = document.getElementById('gp-s'); if (s) { s.focus(); toast('🔍 Carian aktif', 'info'); } }
       if (e.ctrlKey && e.key === 'e') { e.preventDefault(); GuruPenasihat.openExportMenu(); }
@@ -15742,6 +15840,8 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     toggleJK: function (el) { el.classList.toggle('open'); },
     openProfile: openProfile,
     closeProfile: function () { const m = document.getElementById('gpModal'); if (m) m.classList.remove('active'); },
+    openUnitStudents: openUnitStudents,
+    closeStudents: function () { const m = document.getElementById('gpStudents'); if (m) m.classList.remove('active'); },
     openExportMenu: function () { const m = document.getElementById('gpExport'); if (m) m.classList.add('active'); },
     closeExportMenu: function () { const m = document.getElementById('gpExport'); if (m) m.classList.remove('active'); },
     exportWorkload: exportWorkload, exportGuru: exportGuru, exportTugasan: exportTugasan, exportJK: exportJK,
@@ -15764,6 +15864,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
   console.log('✅ [GuruPenasihat] Modul v3.0 (Papan Pemuka Audit KK 2026) dimuatkan');
 })();
+
 
 
 
