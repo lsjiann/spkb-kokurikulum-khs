@@ -221,6 +221,25 @@ body.demo-active .main { margin-top: 98px; }
   color: #fff;
 }
 
+.badge-nav.live {
+  background: #0d9488;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge-nav.live::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #5eead4;
+  animation: pulse 1.6s infinite;
+}
+.badge-nav.soon {
+  background: #f59e0b;
+  color: #fff;
+}
+
 /* ============================================================
    TOPBAR — Header Atas
    ============================================================ */
@@ -1910,6 +1929,7 @@ body.demo-active .main { margin-top: 98px; }
     <a class="nav-item" data-page="fail">
       <i class="fas fa-file-alt"></i>
       <span class="nav-text">Pengurusan Fail</span>
+      <span class="badge-nav new">Active</span>
     </a>
     <a class="nav-item" data-page="jana">
       <i class="fas fa-file-export"></i>
@@ -1924,10 +1944,12 @@ body.demo-active .main { margin-top: 98px; }
     <a class="nav-item" data-page="pelajar">
       <i class="fas fa-user-graduate"></i>
       <span class="nav-text">Data Pelajar</span>
+      <span class="badge-nav live">Live</span>
     </a>
     <a class="nav-item" data-page="guru">
       <i class="fas fa-chalkboard-teacher"></i>
       <span class="nav-text">Guru Penasihat</span>
+      <span class="badge-nav live">Live</span>
     </a>
   </div>
 
@@ -1937,14 +1959,17 @@ body.demo-active .main { margin-top: 98px; }
     <a class="nav-item" data-page="sekolah">
       <i class="fas fa-school"></i>
       <span class="nav-text">Maklumat Sekolah</span>
+      <span class="badge-nav live">Live</span>
     </a>
     <a class="nav-item" data-page="profil">
       <i class="fas fa-user-tie"></i>
       <span class="nav-text">Profil Pentadbir</span>
+      <span class="badge-nav live">Live</span>
     </a>
     <a class="nav-item" data-page="tetapan">
       <i class="fas fa-cog"></i>
       <span class="nav-text">Tetapan Sistem</span>
+      <span class="badge-nav new">Active</span>
     </a>
   </div>
 </aside>
@@ -16693,6 +16718,311 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   });
 
   console.log('✅ [ProfilPentadbir] Modul v1.1 (Carta Organisasi) dimuatkan');
+})();
+
+</script>
+
+<!-- ============================================================
+     MODUL TETAPAN SISTEM v1.0 — SPKB SMK TINGGI KUCHING
+     Sesi · Sambungan · Status Modul · Paparan · Penyelenggaraan · PIN
+     ============================================================ -->
+<script>
+/* ============================================================
+   MODUL TETAPAN SISTEM v1.0 — SPKB SMK TINGGI KUCHING
+   A) Sesi & Tahun  B) Sambungan Data  C) Status Modul
+   D) Paparan  E) Penyelenggaraan  F) Tentang  G) Kunci PIN
+   IIFE · prefix ts- · storan localStorage + fallback memori
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const GURU_API_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+  const STUDENT_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+  const VERSI = 'SPKB v3.1';
+
+  // ---- Storan: localStorage + fallback memori (kekal dlm deployment, selamat dlm pratonton) ----
+  const mem = {};
+  function sget(k, d) { try { const v = localStorage.getItem(k); return v == null ? (mem[k] !== undefined ? mem[k] : d) : v; } catch (e) { return mem[k] !== undefined ? mem[k] : d; } }
+  function sset(k, v) { try { localStorage.setItem(k, v); } catch (e) { } mem[k] = v; }
+  function sdel(k) { try { localStorage.removeItem(k); } catch (e) { } delete mem[k]; }
+
+  let unlocked = false;
+
+  const MODULES = [
+    { n: 'Papan Pemuka', v: 'Teras', s: 'active' },
+    { n: 'Pengurusan Kelab/Persatuan', v: 'v3', s: 'active' },
+    { n: 'Penilaian PAJSK', v: '—', s: 'active' },
+    { n: 'Pencapaian', v: '—', s: 'active' },
+    { n: 'Pengurusan SK@S 3.2', v: '—', s: 'active' },
+    { n: 'Pengurusan Fail', v: 'Bersepadu', s: 'active' },
+    { n: 'Jana Dokumen', v: '—', s: 'active' },
+    { n: 'Data Pelajar', v: '—', s: 'live' },
+    { n: 'Guru Penasihat', v: 'v3.0', s: 'live' },
+    { n: 'Maklumat Sekolah', v: 'v1.0', s: 'live' },
+    { n: 'Profil Pentadbir', v: 'v1.1', s: 'live' },
+    { n: 'Tetapan Sistem', v: 'v1.0', s: 'active' }
+  ];
+  const PAGES = [
+    ['dashboard', 'Papan Pemuka'], ['pengurusan-kelab', 'Pengurusan Kelab/Persatuan'], ['pajsk', 'Penilaian PAJSK'],
+    ['pencapaian', 'Pencapaian'], ['skas', 'Pengurusan SK@S 3.2'], ['jana', 'Jana Dokumen'],
+    ['pelajar', 'Data Pelajar'], ['guru', 'Guru Penasihat'], ['sekolah', 'Maklumat Sekolah'], ['profil', 'Profil Pentadbir']
+  ];
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  /* ============================================================ CSS ============================================================ */
+  function injectCSS() {
+    if (document.getElementById('ts-styles')) return;
+    const css = document.createElement('style'); css.id = 'ts-styles';
+    css.textContent = `
+      #page-tetapan .ts-wrap{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a;}
+      #page-tetapan .ts-hero{background:linear-gradient(120deg,#1a3c6e,#2e86c1);color:#fff;padding:28px 32px;border-radius:16px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+      #page-tetapan .ts-hero-i{width:54px;height:54px;background:rgba(255,255,255,.18);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;}
+      #page-tetapan .ts-hero h1{font-size:23px;font-weight:800;margin:0;}
+      #page-tetapan .ts-hero p{font-size:13px;opacity:.9;margin:3px 0 0;}
+      #page-tetapan .ts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px;}
+      #page-tetapan .ts-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:22px;box-shadow:0 4px 6px -1px rgba(0,0,0,.06);}
+      #page-tetapan .ts-ct{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px;}
+      #page-tetapan .ts-ct .x{font-size:20px;}
+      #page-tetapan .ts-cd{font-size:12px;color:#94a3b8;margin-bottom:16px;}
+      #page-tetapan label{display:block;font-size:12px;font-weight:700;color:#475569;margin:12px 0 5px;}
+      #page-tetapan select,#page-tetapan input[type=text],#page-tetapan input[type=password]{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;}
+      #page-tetapan .ts-btn{padding:10px 16px;border-radius:9px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--primary,#1a3c6e);color:#fff;display:inline-flex;align-items:center;gap:7px;transition:.18s;}
+      #page-tetapan .ts-btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+      #page-tetapan .ts-btn.gray{background:#64748b;}#page-tetapan .ts-btn.green{background:#16a34a;}#page-tetapan .ts-btn.red{background:#dc2626;}#page-tetapan .ts-btn.ghost{background:#f1f5f9;color:#334155;}
+      #page-tetapan .ts-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;}
+      #page-tetapan .ts-conn{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;margin-bottom:11px;}
+      #page-tetapan .ts-conn-i{width:38px;height:38px;border-radius:9px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+      #page-tetapan .ts-conn-n{font-size:13px;font-weight:700;color:#1e293b;}
+      #page-tetapan .ts-conn-u{font-size:10.5px;color:#94a3b8;font-family:monospace;word-break:break-all;}
+      #page-tetapan .ts-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:100px;white-space:nowrap;}
+      #page-tetapan .ts-status.idle{background:#f1f5f9;color:#64748b;}#page-tetapan .ts-status.ok{background:#dcfce7;color:#15803d;}#page-tetapan .ts-status.err{background:#fee2e2;color:#b91c1c;}#page-tetapan .ts-status.run{background:#fef9c3;color:#a16207;}
+      #page-tetapan .ts-mod{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #f1f5f9;}
+      #page-tetapan .ts-mod:last-child{border-bottom:none;}
+      #page-tetapan .ts-mod-n{font-size:13px;font-weight:600;color:#1e293b;}
+      #page-tetapan .ts-mod-v{font-size:11px;color:#94a3b8;}
+      #page-tetapan .ts-badge{font-size:9.5px;font-weight:800;text-transform:uppercase;padding:2px 8px;border-radius:100px;}
+      #page-tetapan .ts-badge.live{background:#0d9488;color:#fff;}#page-tetapan .ts-badge.active{background:#16a34a;color:#fff;}#page-tetapan .ts-badge.soon{background:#f59e0b;color:#fff;}
+      #page-tetapan .ts-seg{display:inline-flex;border:1px solid #cbd5e1;border-radius:9px;overflow:hidden;}
+      #page-tetapan .ts-seg button{padding:9px 16px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#475569;font-family:inherit;}
+      #page-tetapan .ts-seg button.on{background:var(--primary,#1a3c6e);color:#fff;}
+      #page-tetapan .ts-about{font-size:13px;color:#475569;line-height:1.8;}
+      #page-tetapan .ts-about b{color:#0f172a;}
+      #page-tetapan .ts-hint{font-size:11px;color:#94a3b8;margin-top:8px;}
+      #page-tetapan .ts-msg{font-size:12px;font-weight:600;margin-top:8px;}
+      #page-tetapan .ts-msg.ok{color:#15803d;}#page-tetapan .ts-msg.err{color:#dc2626;}
+
+      /* MOD GELAP — latar gelap, kad putih kekal */
+      html[data-theme="dark"] body{background:#0f172a !important;color:#e2e8f0;}
+      html[data-theme="dark"] .main{background:#0f172a !important;}
+      html[data-theme="dark"] .topbar{background:#1e293b !important;border-color:#334155 !important;}
+      html[data-theme="dark"] .breadcrumb,html[data-theme="dark"] .breadcrumb a{color:#94a3b8 !important;}
+
+      /* KUNCI PIN */
+      #sysLock{position:fixed;inset:0;z-index:2147483647;background:linear-gradient(135deg,#0f172a,#1a3c6e);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+      #sysLock .lk{background:#fff;border-radius:18px;padding:36px 34px;width:330px;max-width:90vw;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.4);}
+      #sysLock .lk-ic{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1a3c6e,#2e86c1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
+      #sysLock h2{font-size:18px;font-weight:800;color:#0f172a;margin:0 0 4px;}
+      #sysLock p{font-size:12px;color:#94a3b8;margin:0 0 20px;}
+      #sysLock input{width:100%;padding:13px;border:2px solid #cbd5e1;border-radius:10px;font-size:20px;text-align:center;letter-spacing:8px;font-family:monospace;}
+      #sysLock input:focus{outline:none;border-color:#2e86c1;}
+      #sysLock button{width:100%;margin-top:14px;padding:13px;border:none;border-radius:10px;background:var(--primary,#1a3c6e);color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+      #sysLock .lk-err{font-size:12px;color:#dc2626;font-weight:600;margin-top:10px;min-height:16px;}
+      .ts-toast{position:fixed;bottom:24px;right:24px;background:#1a3c6e;color:#fff;padding:13px 19px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999999;animation:tstin .3s;}
+      @keyframes tstin{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}@keyframes tsToastOut{to{transform:translateY(20px);opacity:0;}}
+    `;
+    document.head.appendChild(css);
+  }
+
+  /* ============================================================ KUNCI PIN ============================================================ */
+  function showLock() {
+    if (unlocked) return;
+    const pin = sget('spkb_pin', '');
+    if (!pin) { unlocked = true; return; }
+    if (document.getElementById('sysLock')) return;
+    const d = document.createElement('div'); d.id = 'sysLock';
+    d.innerHTML = '<div class="lk"><div class="lk-ic">🔒</div><h2>SPKB Terkunci</h2><p>Masukkan PIN untuk akses sistem</p>' +
+      '<input id="lkInput" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••">' +
+      '<button id="lkBtn">Buka Sistem</button><div class="lk-err" id="lkErr"></div></div>';
+    document.body.appendChild(d);
+    try { document.body.style.overflow = 'hidden'; } catch (e) { }
+    const inp = document.getElementById('lkInput'), btn = document.getElementById('lkBtn'), err = document.getElementById('lkErr');
+    setTimeout(function () { inp.focus(); }, 100);
+    function tryUnlock() {
+      if (inp.value === sget('spkb_pin', '')) { unlocked = true; d.remove(); try { document.body.style.overflow = ''; } catch (e) { } applyDefaultPage(); }
+      else { err.textContent = '✕ PIN salah'; inp.value = ''; inp.focus(); }
+    }
+    btn.onclick = tryUnlock;
+    inp.onkeydown = function (e) { if (e.key === 'Enter') tryUnlock(); };
+  }
+  function applyDefaultPage() {
+    const dp = sget('spkb_default_page', '');
+    if (dp && dp !== 'dashboard' && window.navigateTo) { setTimeout(function () { try { window.navigateTo(dp); } catch (e) { } }, 300); }
+  }
+
+  /* ============================================================ HALAMAN ============================================================ */
+  function ensurePage() {
+    let page = document.getElementById('page-tetapan');
+    if (!page) {
+      page = document.createElement('section'); page.id = 'page-tetapan'; page.className = 'page';
+      const ref = document.getElementById('page-profil') || document.getElementById('page-placeholder') || document.querySelector('.page');
+      if (ref && ref.parentNode) ref.parentNode.insertBefore(page, ref); else document.body.appendChild(page);
+    }
+    return page;
+  }
+
+  function render() {
+    const page = ensurePage();
+    const tahun = sget('spkb_tahun', '2026');
+    const theme = sget('spkb_theme', 'light');
+    const defPage = sget('spkb_default_page', 'dashboard');
+    const hasPin = !!sget('spkb_pin', '');
+
+    let html = '<div class="ts-wrap">';
+    html += '<div class="ts-hero"><div class="ts-hero-i">⚙️</div><div><h1>Tetapan Sistem</h1><p>Bilik kawalan SPKB — sesi, sambungan data, paparan & keselamatan</p></div></div>';
+    html += '<div class="ts-grid">';
+
+    // A) SESI & TAHUN
+    html += '<div class="ts-card"><div class="ts-ct"><span class="x">📅</span>Sesi & Tahun Akademik</div><div class="ts-cd">Tahun semasa yang digunakan merentas sistem.</div>' +
+      '<label>Tahun Akademik Semasa</label><select id="ts-tahun" onchange="TetapanSistem.setTahun(this.value)">' +
+      ['2024', '2025', '2026', '2027', '2028'].map(function (y) { return '<option value="' + y + '"' + (y === tahun ? ' selected' : '') + '>' + y + '</option>'; }).join('') +
+      '</select><div class="ts-hint">💡 Modul seperti Guru Penasihat turut ada pemilih tahun tersendiri untuk data berbilang tahun.</div></div>';
+
+    // B) SAMBUNGAN DATA
+    html += '<div class="ts-card"><div class="ts-ct"><span class="x">🔌</span>Sambungan Data</div><div class="ts-cd">Status sambungan Google Sheet. Klik "Uji" untuk semak.</div>' +
+      conn('guru', '📊', 'Data Guru & Kokurikulum', GURU_API_URL) +
+      conn('pelajar', '🎓', 'Data Pelajar', STUDENT_API_URL) +
+      '<div class="ts-row"><button class="ts-btn" onclick="TetapanSistem.testAll()">🔄 Uji Semua Sambungan</button></div></div>';
+
+    // C) STATUS & VERSI MODUL
+    html += '<div class="ts-card"><div class="ts-ct"><span class="x">🧩</span>Status & Versi Modul</div><div class="ts-cd">' + MODULES.length + ' modul · ' + MODULES.filter(function (m) { return m.s === 'live'; }).length + ' bersambung data langsung</div>' +
+      MODULES.map(function (m) { return '<div class="ts-mod"><div><div class="ts-mod-n">' + esc(m.n) + '</div><div class="ts-mod-v">' + esc(m.v) + '</div></div><span class="ts-badge ' + m.s + '">' + (m.s === 'live' ? 'Live' : m.s === 'soon' ? 'Soon' : 'Active') + '</span></div>'; }).join('') +
+      '</div>';
+
+    // D) PAPARAN
+    html += '<div class="ts-card"><div class="ts-ct"><span class="x">🎨</span>Tetapan Paparan</div><div class="ts-cd">Tema & halaman lalai semasa sistem dibuka.</div>' +
+      '<label>Tema</label><div class="ts-seg"><button id="ts-th-light" class="' + (theme === 'light' ? 'on' : '') + '" onclick="TetapanSistem.setTheme(\'light\')">☀️ Terang</button><button id="ts-th-dark" class="' + (theme === 'dark' ? 'on' : '') + '" onclick="TetapanSistem.setTheme(\'dark\')">🌙 Gelap</button></div>' +
+      '<label style="margin-top:16px;">Halaman Lalai (semasa buka sistem)</label><select id="ts-defpage" onchange="TetapanSistem.setDefaultPage(this.value)">' +
+      PAGES.map(function (p) { return '<option value="' + p[0] + '"' + (p[0] === defPage ? ' selected' : '') + '>' + esc(p[1]) + '</option>'; }).join('') +
+      '</select></div>';
+
+    // E) PENYELENGGARAAN
+    html += '<div class="ts-card"><div class="ts-ct"><span class="x">🛠️</span>Penyelenggaraan Data</div><div class="ts-cd">Segarkan data langsung & urus tetapan.</div>' +
+      '<div class="ts-row"><button class="ts-btn green" onclick="TetapanSistem.refreshAll()">🔄 Muat Semula Semua Data</button></div>' +
+      '<div class="ts-row"><button class="ts-btn ghost" onclick="TetapanSistem.exportSettings()">📥 Eksport Tetapan</button>' +
+      '<button class="ts-btn red" onclick="TetapanSistem.resetSettings()">♻️ Set Semula Tetapan</button></div>' +
+      '<div class="ts-hint">Muat semula memanggil segar-data semua modul langsung (Guru, Pelajar, Sekolah, Pentadbir).</div></div>';
+
+    // G) KESELAMATAN — PIN
+    html += '<div class="ts-card"><div class="ts-ct"><span class="x">🔐</span>Keselamatan — Kunci PIN</div><div class="ts-cd">Lindungi sistem dengan PIN semasa dibuka.</div><div id="ts-pin-box">' + pinBox(hasPin) + '</div>' +
+      '<div class="ts-hint">⚠️ PIN ini lapisan asas (di pelayar), bukan keselamatan penuh. Jangan guna PIN penting.</div></div>';
+
+    // F) TENTANG
+    html += '<div class="ts-card"><div class="ts-ct"><span class="x">ℹ️</span>Tentang Sistem</div>' +
+      '<div class="ts-about"><b>Sistem:</b> SPKB — Sistem Pengurusan Kokurikulum<br><b>Versi:</b> ' + VERSI + '<br><b>Sekolah:</b> SMJK Tinggi Kuching<br><b>Sesi:</b> ' + esc(tahun) + '<br><b>Modul aktif:</b> ' + MODULES.length + '</div></div>';
+
+    html += '</div></div>';
+    page.innerHTML = html;
+  }
+  function conn(id, ic, nama, url) {
+    const short = url.replace('https://script.google.com/macros/s/', '…/').slice(0, 38) + '…/exec';
+    return '<div class="ts-conn"><div class="ts-conn-i">' + ic + '</div><div style="flex:1;min-width:0;"><div class="ts-conn-n">' + esc(nama) + '</div><div class="ts-conn-u">' + esc(short) + '</div></div>' +
+      '<span class="ts-status idle" id="ts-st-' + id + '">Belum diuji</span><button class="ts-btn ghost" style="padding:7px 12px;" onclick="TetapanSistem.test(\'' + id + '\')">Uji</button></div>';
+  }
+  function pinBox(hasPin) {
+    if (!hasPin) {
+      return '<label>PIN Baharu (4–6 digit)</label><input id="ts-pin1" type="password" inputmode="numeric" maxlength="6" placeholder="••••">' +
+        '<label>Sahkan PIN</label><input id="ts-pin2" type="password" inputmode="numeric" maxlength="6" placeholder="••••">' +
+        '<div class="ts-row"><button class="ts-btn green" onclick="TetapanSistem.setPin()">🔒 Tetapkan PIN</button></div><div class="ts-msg" id="ts-pin-msg"></div>';
+    }
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#15803d;font-weight:700;margin-bottom:8px;">✅ PIN aktif — sistem dilindungi</div>' +
+      '<label>PIN Semasa</label><input id="ts-pin-cur" type="password" inputmode="numeric" maxlength="6" placeholder="••••">' +
+      '<label>PIN Baharu (kosongkan jika hanya nak buang)</label><input id="ts-pin-new" type="password" inputmode="numeric" maxlength="6" placeholder="••••">' +
+      '<div class="ts-row"><button class="ts-btn" onclick="TetapanSistem.changePin()">🔁 Tukar PIN</button><button class="ts-btn red" onclick="TetapanSistem.removePin()">🗑️ Buang PIN</button></div><div class="ts-msg" id="ts-pin-msg"></div>';
+  }
+
+  function toast(m) { const t = document.createElement('div'); t.className = 'ts-toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.style.animation = 'tsToastOut .3s forwards'; setTimeout(function () { t.remove(); }, 300); }, 3000); }
+  function showPage() {
+    const page = document.getElementById('page-tetapan'); if (!page) return;
+    document.querySelectorAll('section.page, div.page').forEach(function (p) { if (p.id !== 'page-tetapan') { p.style.display = 'none'; p.classList.remove('active'); } });
+    page.style.cssText = 'display:block !important;'; page.classList.add('active');
+    const t = document.getElementById('topbarTitle'); if (t) t.innerHTML = 'SPKB v3.1 — Tetapan Sistem<small>Bilik Kawalan</small>';
+  }
+
+  /* ============================================================ PUBLIC API ============================================================ */
+  window.TetapanSistem = {
+    initPage: function () { injectCSS(); render(); showPage(); },
+    setTahun: function (v) { sset('spkb_tahun', v); toast('📅 Tahun akademik: ' + v); },
+    setTheme: function (t) { sset('spkb_theme', t); document.documentElement.setAttribute('data-theme', t); var l = document.getElementById('ts-th-light'), d = document.getElementById('ts-th-dark'); if (l && d) { l.className = t === 'light' ? 'on' : ''; d.className = t === 'dark' ? 'on' : ''; } toast(t === 'dark' ? '🌙 Tema gelap' : '☀️ Tema terang'); },
+    setDefaultPage: function (p) { sset('spkb_default_page', p); toast('🏠 Halaman lalai dikemas kini'); },
+    test: function (id) {
+      const url = id === 'guru' ? GURU_API_URL : STUDENT_API_URL;
+      const action = id === 'guru' ? 'guru_penasihat_all' : 'data_pelajar_all';
+      const el = document.getElementById('ts-st-' + id); if (el) { el.className = 'ts-status run'; el.textContent = 'Menguji…'; }
+      const t0 = Date.now();
+      fetch(url + '?action=' + action + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+        if (el) { if (res && res.success) { el.className = 'ts-status ok'; el.textContent = '✅ Sambung (' + (Date.now() - t0) + 'ms)'; } else { el.className = 'ts-status err'; el.textContent = '⚠️ Respons tidak dijangka'; } }
+      }).catch(function () { if (el) { el.className = 'ts-status err'; el.textContent = '❌ Gagal sambung'; } });
+    },
+    testAll: function () { this.test('guru'); this.test('pelajar'); toast('🔄 Menguji semua sambungan…'); },
+    refreshAll: function () {
+      ['GuruPenasihat', 'MaklumatSekolah', 'ProfilPentadbir'].forEach(function (m) { if (window[m] && typeof window[m].refresh === 'function') { try { window[m].refresh(); } catch (e) { } } });
+      ['loadSKASData', 'loadPencapaianDashboard', 'loadPAJSKDashboard'].forEach(function (fn) { if (typeof window[fn] === 'function') { try { window[fn](); } catch (e) { } } });
+      toast('🔄 Semua data dimuat semula');
+    },
+    exportSettings: function () {
+      const keys = ['spkb_tahun', 'spkb_theme', 'spkb_default_page'];
+      const data = {}; keys.forEach(function (k) { data[k] = sget(k, ''); });
+      data.eksport_pada = new Date().toISOString();
+      try {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tetapan_spkb.json'; a.click();
+        toast('📥 Tetapan dieksport');
+      } catch (e) { toast('⚠️ Eksport gagal'); }
+    },
+    resetSettings: function () {
+      if (!confirm('Set semula semua tetapan paparan & sesi? (PIN tidak terjejas)')) return;
+      ['spkb_tahun', 'spkb_theme', 'spkb_default_page'].forEach(sdel);
+      document.documentElement.setAttribute('data-theme', 'light');
+      render(); showPage(); toast('♻️ Tetapan diset semula');
+    },
+    setPin: function () {
+      const a = (document.getElementById('ts-pin1') || {}).value || '', b = (document.getElementById('ts-pin2') || {}).value || '';
+      const msg = document.getElementById('ts-pin-msg');
+      if (!/^\d{4,6}$/.test(a)) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN mesti 4–6 digit nombor.'; } return; }
+      if (a !== b) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN tidak sepadan.'; } return; }
+      sset('spkb_pin', a); unlocked = true;
+      document.getElementById('ts-pin-box').innerHTML = pinBox(true); toast('🔒 PIN ditetapkan');
+    },
+    changePin: function () {
+      const cur = (document.getElementById('ts-pin-cur') || {}).value || '', nw = (document.getElementById('ts-pin-new') || {}).value || '';
+      const msg = document.getElementById('ts-pin-msg');
+      if (cur !== sget('spkb_pin', '')) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN semasa salah.'; } return; }
+      if (!/^\d{4,6}$/.test(nw)) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN baharu mesti 4–6 digit.'; } return; }
+      sset('spkb_pin', nw); document.getElementById('ts-pin-box').innerHTML = pinBox(true); toast('🔁 PIN ditukar');
+    },
+    removePin: function () {
+      const cur = (document.getElementById('ts-pin-cur') || {}).value || '', msg = document.getElementById('ts-pin-msg');
+      if (cur !== sget('spkb_pin', '')) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN semasa salah.'; } return; }
+      sdel('spkb_pin'); document.getElementById('ts-pin-box').innerHTML = pinBox(false); toast('🗑️ PIN dibuang');
+    },
+    _state: { sget: sget }
+  };
+
+  // ---- Pada muat: tema, kunci PIN, halaman lalai, sedia halaman ----
+  try { document.documentElement.setAttribute('data-theme', sget('spkb_theme', 'light')); } catch (e) { }
+  injectCSS();
+  ensurePage();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { showLock(); applyDefaultPage(); });
+  else { showLock(); applyDefaultPage(); }
+
+  document.addEventListener('click', function (e) {
+    const nav = e.target.closest('.nav-item[data-page="tetapan"]'); if (!nav) return;
+    setTimeout(function () { TetapanSistem.initPage(); }, 60);
+    setTimeout(function () { showPage(); if (!document.getElementById('page-tetapan').querySelector('.ts-wrap')) TetapanSistem.initPage(); }, 260);
+  });
+
+  console.log('✅ [TetapanSistem] Modul v1.0 dimuatkan');
 })();
 
 </script>
