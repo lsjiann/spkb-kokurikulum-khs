@@ -15163,8 +15163,8 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       @keyframes gpspin{to{transform:rotate(360deg);}}
       #page-guru .gp-err{display:flex;align-items:center;gap:16px;padding:24px;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;color:#991b1b;}
 
-      #gpModal,#gpExport,#gpHelp{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:99999;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(2px);}
-      #gpModal.active,#gpExport.active,#gpHelp.active{display:flex;}
+      #gpModal,#gpExport,#gpHelp,#gpStudents{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:99999;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(2px);}
+      #gpModal.active,#gpExport.active,#gpHelp.active,#gpStudents.active{display:flex;}
       .gp-box{background:#fff;border-radius:18px;max-width:720px;width:100%;box-shadow:0 25px 60px rgba(0,0,0,.3);overflow:hidden;animation:gpup .3s;}
       @keyframes gpup{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
       .gp-hero{background:linear-gradient(120deg,#0f766e,#14b8a6);padding:28px 30px;color:#fff;position:relative;}
@@ -15696,7 +15696,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       if (!u) return '<div class="gp-unit"><div class="gp-unit-ic" style="background:#cbd5e1;">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + '</div><div class="gp-unit-n" style="color:#94a3b8;">Tiada tugasan</div></div></div>';
       const j = JAWATAN[u.jawatan] || JAWATAN.GP;
       var sc = state.studentsLoaded ? studentsForCode(u.kod).length : null;
-      var scHint = (sc !== null) ? '<span class="gp-stud-hint">👥 ' + sc + ' pelajar ›</span>' : '<span class="gp-stud-hint">👥 lihat pelajar ›</span>';
+      var scHint = (sc !== null) ? '<span class="gp-stud-hint">👥 ' + sc + ' pelajar · lihat senarai ›</span>' : '<span class="gp-stud-hint">👥 Klik untuk lihat pelajar ›</span>';
       return '<div class="gp-unit gp-unit-click" onclick="GuruPenasihat.openUnitStudents(\'' + esc(u.kod) + '\',\'' + kat + '\')"><div class="gp-unit-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + ' · ' + esc(u.kod) + '</div><div class="gp-unit-n">' + esc(u.nama_unit) + '</div>' + scHint + '</div><span class="gp-jbadge ' + j.cls + '">' + j.label + '</span></div>';
     }).join('') + '</div>';
 
