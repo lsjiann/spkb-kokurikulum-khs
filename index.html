@@ -15901,5 +15901,350 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
 
 </script>
+
+<!-- ============================================================
+     MODUL MAKLUMAT SEKOLAH v1.0 — SPKB SMK TINGGI KUCHING
+     Identiti rasmi · header dokumen · statistik auto
+     ============================================================ -->
+<script>
+/* ============================================================
+   MODUL MAKLUMAT SEKOLAH v1.0 — SPKB SMK TINGGI KUCHING
+   Identiti rasmi sistem · header dokumen · dashboard sekolah
+   Sumber: sheet GP_Maklumat_Sekolah (kunci-nilai) + auto-stats
+   IIFE mandiri · prefix ms- · tema teal
+   ============================================================ */
+(function () {
+  'use strict';
+
+  // Endpoint SPKB_Data_Guru (maklumat sekolah + statistik guru/unit/JK)
+  const GURU_API_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+  // Endpoint Data Pelajar (statistik pelajar/kelas)
+  const STUDENT_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+
+  // Nilai lalai terbenam — boleh diganti oleh sheet GP_Maklumat_Sekolah
+  const DEFAULT_INFO = {
+    nama_penuh: 'SMK TINGGI KUCHING',
+    nama_ringkas: 'SMKTK',
+    kod_sekolah: '',
+    jenis_sekolah: 'Sekolah Menengah Kebangsaan',
+    alamat: '',
+    poskod: '',
+    bandar: 'Kuching',
+    negeri: 'Sarawak',
+    telefon: '',
+    faks: '',
+    emel: '',
+    laman_web: '',
+    media_sosial: '',
+    ppd: '',
+    jpn: 'Jabatan Pendidikan Negeri Sarawak',
+    zon: '',
+    sesi: 'Pagi & Petang',
+    moto: '',
+    visi: '',
+    misi: '',
+    piagam: '',
+    pengetua: '',
+    pk_kokurikulum: '',
+    su_kokurikulum: '',
+    tahun_semasa: '2026',
+    logo_url: 'https://i.postimg.cc/7YHzV6B2/photo-2026-03-04-20-01-20.png'
+  };
+  const DEFAULT_STATS = { pelajar: '—', guru: '—', unit: '—', jk: '—', kelas: '—', rumah: '—', kelasByTingkatan: [] };
+
+  let state = { initialized: false, loading: false, source: 'rasmi', info: {}, stats: {}, statsLoaded: false };
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function val(v) { return (v == null || String(v).trim() === '') ? null : String(v).trim(); }
+  function initials(n) { const p = String(n || '').replace(/^(HJH?\.?|HJ\.?|DR\.?|EN\.?|PN\.?|CIK|TUAN|PUAN)\s+/i, '').trim().split(/\s+/); return ((p[0] || '?')[0] + ((p[1] || '')[0] || '')).toUpperCase(); }
+
+  /* ============================================================ CSS ============================================================ */
+  function injectCSS() {
+    if (document.getElementById('ms-styles')) return;
+    const css = document.createElement('style'); css.id = 'ms-styles';
+    css.textContent = `
+      #page-sekolah .ms-wrap{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a;}
+      #page-sekolah .ms-hero{background:linear-gradient(120deg,#0f766e 0%,#0d9488 55%,#14b8a6 100%);color:#fff;padding:34px 36px;border-radius:18px;margin-bottom:22px;box-shadow:0 20px 40px -12px rgba(15,118,110,.5);position:relative;overflow:hidden;}
+      #page-sekolah .ms-hero::before{content:'';position:absolute;top:-60%;right:-5%;width:440px;height:440px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);}
+      #page-sekolah .ms-hero-c{position:relative;z-index:1;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+      #page-sekolah .ms-logo{width:96px;height:96px;border-radius:18px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.25);backdrop-filter:blur(8px);}
+      #page-sekolah .ms-logo img{width:100%;height:100%;object-fit:contain;}
+      #page-sekolah .ms-logo .ms-logo-fb{font-size:42px;}
+      #page-sekolah .ms-hero h1{font-size:28px;font-weight:800;margin:0 0 4px;color:#fff;letter-spacing:-.02em;}
+      #page-sekolah .ms-hero .ms-sub{font-size:14px;opacity:.92;margin:0 0 4px;}
+      #page-sekolah .ms-hero .ms-moto{font-size:13px;font-style:italic;opacity:.85;margin:0;}
+      #page-sekolah .ms-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+      #page-sekolah .ms-badge{font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;background:rgba(255,255,255,.18);display:inline-flex;align-items:center;gap:6px;}
+      #page-sekolah .ms-src{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 12px;border-radius:100px;background:rgba(255,255,255,.14);}
+      #page-sekolah .ms-hero-actions{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;}
+      #page-sekolah .ms-btn{padding:9px 16px;border-radius:9px;border:none;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);transition:.2s;}
+      #page-sekolah .ms-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.25);}
+
+      #page-sekolah .ms-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-bottom:22px;}
+      #page-sekolah .ms-stat{background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 6px -1px rgba(0,0,0,.07);border:1px solid #e2e8f0;position:relative;overflow:hidden;transition:.25s;}
+      #page-sekolah .ms-stat:hover{transform:translateY(-4px);box-shadow:0 18px 30px -10px rgba(0,0,0,.15);}
+      #page-sekolah .ms-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#0f766e,#14b8a6);}
+      #page-sekolah .ms-stat.c2::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa);}#page-sekolah .ms-stat.c3::before{background:linear-gradient(90deg,#f59e0b,#fbbf24);}#page-sekolah .ms-stat.c4::before{background:linear-gradient(90deg,#ec4899,#f472b6);}#page-sekolah .ms-stat.c5::before{background:linear-gradient(90deg,#3b82f6,#60a5fa);}#page-sekolah .ms-stat.c6::before{background:linear-gradient(90deg,#6366f1,#818cf8);}
+      #page-sekolah .ms-stat-i{font-size:24px;margin-bottom:8px;}
+      #page-sekolah .ms-stat-v{font-size:30px;font-weight:800;color:#0f172a;line-height:1;margin-bottom:5px;letter-spacing:-.02em;}
+      #page-sekolah .ms-stat-l{font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+
+      #page-sekolah .ms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px;margin-bottom:18px;}
+      #page-sekolah .ms-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:24px;box-shadow:0 4px 6px -1px rgba(0,0,0,.06);margin-bottom:18px;}
+      #page-sekolah .ms-card-t{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;color:#0f172a;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #f1f5f9;}
+      #page-sekolah .ms-card-t .x{font-size:21px;}
+      #page-sekolah .ms-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f8fafc;}
+      #page-sekolah .ms-row:last-child{border-bottom:none;}
+      #page-sekolah .ms-row-ic{width:30px;font-size:15px;flex-shrink:0;text-align:center;}
+      #page-sekolah .ms-row-k{width:130px;font-size:13px;color:#64748b;font-weight:600;flex-shrink:0;}
+      #page-sekolah .ms-row-v{flex:1;font-size:14px;color:#1e293b;font-weight:500;word-break:break-word;}
+      #page-sekolah .ms-row-v a{color:#0f766e;text-decoration:none;}#page-sekolah .ms-row-v a:hover{text-decoration:underline;}
+      #page-sekolah .ms-empty-v{color:#cbd5e1;font-style:italic;font-weight:400;}
+
+      #page-sekolah .ms-vmm{display:flex;flex-direction:column;gap:14px;}
+      #page-sekolah .ms-vmm-card{border-radius:12px;padding:18px;border:1px solid #e2e8f0;}
+      #page-sekolah .ms-vmm-card.visi{background:linear-gradient(135deg,#f0fdfa,#ecfeff);border-color:#99f6e4;}
+      #page-sekolah .ms-vmm-card.misi{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border-color:#bfdbfe;}
+      #page-sekolah .ms-vmm-card.moto{background:linear-gradient(135deg,#fefce8,#fffbeb);border-color:#fde68a;}
+      #page-sekolah .ms-vmm-card.piagam{background:#fafafa;}
+      #page-sekolah .ms-vmm-t{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+      #page-sekolah .ms-vmm-card.visi .ms-vmm-t{color:#0f766e;}#page-sekolah .ms-vmm-card.misi .ms-vmm-t{color:#1e40af;}#page-sekolah .ms-vmm-card.moto .ms-vmm-t{color:#92400e;}#page-sekolah .ms-vmm-card.piagam .ms-vmm-t{color:#475569;}
+      #page-sekolah .ms-vmm-x{font-size:14px;line-height:1.6;color:#334155;white-space:pre-line;}
+
+      #page-sekolah .ms-lead{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+      #page-sekolah .ms-lead-c{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid #e2e8f0;border-radius:12px;background:#fafafa;}
+      #page-sekolah .ms-lead-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex-shrink:0;}
+      #page-sekolah .ms-lead-i{min-width:0;}
+      #page-sekolah .ms-lead-j{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+      #page-sekolah .ms-lead-n{font-size:15px;font-weight:700;color:#1e293b;margin-top:2px;}
+
+      #page-sekolah .ms-bars{display:flex;flex-direction:column;gap:11px;}
+      #page-sekolah .ms-bar-row{display:flex;align-items:center;gap:12px;}
+      #page-sekolah .ms-bar-lab{width:150px;font-size:13px;font-weight:600;color:#334155;flex-shrink:0;}
+      #page-sekolah .ms-bar-track{flex:1;height:24px;background:#f1f5f9;border-radius:7px;overflow:hidden;}
+      #page-sekolah .ms-bar-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,#0f766e,#14b8a6);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:11px;font-weight:700;min-width:34px;transition:width .6s;}
+
+      #page-sekolah .ms-foot{font-size:12px;color:#94a3b8;text-align:center;padding:16px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;}
+      #page-sekolah .ms-load{text-align:center;padding:80px 20px;}
+      #page-sekolah .ms-sp{width:44px;height:44px;border:4px solid #d1fae5;border-top-color:#0f766e;border-radius:50%;margin:0 auto 16px;animation:msspin 1s linear infinite;}
+      @keyframes msspin{to{transform:rotate(360deg);}}
+      .ms-toast{position:fixed;bottom:24px;right:24px;background:#0f766e;color:#fff;padding:13px 19px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999999;animation:mstin .3s;}
+      @keyframes mstin{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}@keyframes msToastOut{to{transform:translateY(20px);opacity:0;}}
+      @media print{#sidebar,.topbar,#page-sekolah .ms-hero-actions{display:none!important;}}
+    `;
+    document.head.appendChild(css);
+  }
+
+  /* ============================================================ HTML ============================================================ */
+  function ensurePage() {
+    let page = document.getElementById('page-sekolah');
+    if (!page) {
+      page = document.createElement('section'); page.id = 'page-sekolah'; page.className = 'page'; page.style.display = 'none';
+      const ref = document.getElementById('page-guru') || document.getElementById('page-pelajar') || document.querySelector('.page');
+      if (ref && ref.parentNode) ref.parentNode.appendChild(page); else document.body.appendChild(page);
+    }
+    return page;
+  }
+
+  function injectHTML() {
+    const page = ensurePage();
+    page.innerHTML = `
+      <div class="ms-wrap">
+        <div id="ms-load" class="ms-load"><div class="ms-sp"></div><div style="color:#64748b;font-weight:500;">Memuatkan maklumat sekolah…</div></div>
+        <div id="ms-cnt" style="display:none;"></div>
+      </div>`;
+  }
+
+  /* ============================================================ DATA ============================================================ */
+  function api(url, action) { return fetch(url + '?action=' + action + '&_t=' + Date.now()).then(function (r) { return r.json(); }); }
+
+  function init() {
+    if (state.loading) return;
+    if (state.initialized && document.getElementById('ms-cnt')) { showPage(); return; }
+    state.loading = true;
+    injectCSS(); injectHTML(); showPage();
+
+    const timeout = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('timeout')); }, 7000); });
+    Promise.race([api(GURU_API_URL, 'maklumat_sekolah'), timeout])
+      .then(function (res) {
+        if (res && res.success && res.data && Object.keys(res.data).length) { state.info = Object.assign({}, DEFAULT_INFO, res.data); state.source = 'live'; }
+        else throw new Error('empty');
+      })
+      .catch(function () { state.info = Object.assign({}, DEFAULT_INFO); state.source = 'rasmi'; })
+      .then(function () {
+        state.stats = Object.assign({}, DEFAULT_STATS);
+        render();
+        const l = document.getElementById('ms-load'); if (l) l.style.display = 'none';
+        const c = document.getElementById('ms-cnt'); if (c) c.style.display = 'block';
+        state.initialized = true; state.loading = false;
+        loadStats();
+      });
+  }
+
+  function loadStats() {
+    if (state.statsLoaded) { renderStats(); return; }
+    Promise.all([
+      api(GURU_API_URL, 'guru_penasihat_all').catch(function () { return null; }),
+      api(STUDENT_API_URL, 'data_pelajar_all').catch(function () { return null; })
+    ]).then(function (r) {
+      const g = r[0], s = r[1];
+      const st = Object.assign({}, DEFAULT_STATS);
+      if (g && g.success && g.data && Array.isArray(g.data.guru)) {
+        st.guru = g.data.guru.length;
+        st.unit = Object.keys(g.data.unit_lookup || {}).length || (function () { var u = {}; (g.data.tugasan || []).forEach(function (t) { u[t.kod] = 1; }); return Object.keys(u).length; })();
+        st.jk = Object.keys(g.data.jk_lookup || {}).length;
+        st.rumah = (function () { var rs = {}; g.data.guru.forEach(function (x) { if (x.rs) rs[x.rs] = 1; }); return Object.keys(rs).length; })();
+      }
+      if (s && s.success && Array.isArray(s.students)) {
+        st.pelajar = s.students.length;
+        var kelasSet = {}, tingMap = {};
+        s.students.forEach(function (x) { if (x.kelas) { kelasSet[x.kelas] = 1; var t = x.tingkatan || 'Lain-lain'; (tingMap[t] = tingMap[t] || {})[x.kelas] = 1; } });
+        st.kelas = Object.keys(kelasSet).length;
+        st.kelasByTingkatan = Object.keys(tingMap).map(function (t) { return { t: t, n: Object.keys(tingMap[t]).length }; }).sort(function (a, b) { return String(a.t).localeCompare(String(b.t)); });
+      }
+      state.stats = st; state.statsLoaded = true;
+      renderStats(); renderKelas();
+    });
+  }
+
+  /* ============================================================ RENDER ============================================================ */
+  function vrow(icon, key, value, isLink) {
+    var v = val(value);
+    var inner = v ? (isLink === 'tel' ? '<a href="tel:' + esc(v) + '">' + esc(v) + '</a>' : isLink === 'mail' ? '<a href="mailto:' + esc(v) + '">' + esc(v) + '</a>' : isLink === 'web' ? '<a href="' + (v.indexOf('http') === 0 ? esc(v) : 'https://' + esc(v)) + '" target="_blank" rel="noopener">' + esc(v) + '</a>' : esc(v)) : '<span class="ms-empty-v">Belum diisi</span>';
+    return '<div class="ms-row"><div class="ms-row-ic">' + icon + '</div><div class="ms-row-k">' + key + '</div><div class="ms-row-v">' + inner + '</div></div>';
+  }
+
+  function render() {
+    const i = state.info;
+    const c = document.getElementById('ms-cnt');
+    const alamatPenuh = [val(i.alamat), [val(i.poskod), val(i.bandar)].filter(Boolean).join(' '), val(i.negeri)].filter(Boolean).join(', ');
+
+    let html = '';
+    // HERO
+    html += '<div class="ms-hero"><div class="ms-hero-c">' +
+      '<div class="ms-logo">' + (val(i.logo_url) ? '<img src="' + esc(i.logo_url) + '" alt="logo" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<span class=&quot;ms-logo-fb&quot;>🏫</span>\';">' : '<span class="ms-logo-fb">🏫</span>') + '</div>' +
+      '<div style="min-width:0;"><h1>' + esc(i.nama_penuh || 'Nama Sekolah') + '</h1>' +
+      '<p class="ms-sub">' + esc(i.jenis_sekolah || '') + (val(i.bandar) ? ' · ' + esc(i.bandar) : '') + (val(i.negeri) ? ', ' + esc(i.negeri) : '') + '</p>' +
+      (val(i.moto) ? '<p class="ms-moto">❝ ' + esc(i.moto) + ' ❞</p>' : '') +
+      '<div class="ms-badges">' +
+      (val(i.kod_sekolah) ? '<span class="ms-badge">🆔 ' + esc(i.kod_sekolah) + '</span>' : '') +
+      (val(i.nama_ringkas) ? '<span class="ms-badge">🏷️ ' + esc(i.nama_ringkas) + '</span>' : '') +
+      '<span class="ms-badge">📅 Tahun ' + esc(i.tahun_semasa || '—') + '</span>' +
+      '<span class="ms-src" id="ms-src">' + (state.source === 'live' ? '📡 Data Langsung (Sheet)' : '📋 Data Rasmi (terbenam)') + '</span>' +
+      '</div></div>' +
+      '<div class="ms-hero-actions"><button class="ms-btn" onclick="MaklumatSekolah.refresh()">🔄 Muat Semula</button><button class="ms-btn" onclick="window.print()">🖨️ Cetak</button></div>' +
+      '</div></div>';
+
+    // STATISTIK AUTO
+    html += '<div class="ms-stats" id="ms-stats"></div>';
+
+    // GRID: Identiti & Perhubungan + Pentadbiran
+    html += '<div class="ms-grid">';
+    html += '<div class="ms-card" style="margin:0;"><div class="ms-card-t"><span class="x">🏫</span>Identiti & Perhubungan</div>' +
+      vrow('🆔', 'Kod Sekolah', i.kod_sekolah) +
+      vrow('🏫', 'Jenis Sekolah', i.jenis_sekolah) +
+      vrow('📍', 'Alamat', alamatPenuh) +
+      vrow('📞', 'No. Telefon', i.telefon, 'tel') +
+      vrow('📠', 'No. Faks', i.faks) +
+      vrow('📧', 'E-mel', i.emel, 'mail') +
+      vrow('🌐', 'Laman Web', i.laman_web, 'web') +
+      vrow('📱', 'Media Sosial', i.media_sosial) +
+      '</div>';
+    html += '<div class="ms-card" style="margin:0;"><div class="ms-card-t"><span class="x">🏛️</span>Pentadbiran & Sesi</div>' +
+      vrow('🏢', 'PPD', i.ppd) +
+      vrow('🏛️', 'JPN', i.jpn) +
+      vrow('🗺️', 'Zon / Daerah', i.zon) +
+      vrow('🌆', 'Bandar', i.bandar) +
+      vrow('📌', 'Negeri', i.negeri) +
+      vrow('🕐', 'Sesi Persekolahan', i.sesi) +
+      vrow('📅', 'Tahun Akademik', i.tahun_semasa) +
+      '</div>';
+    html += '</div>';
+
+    // VISI, MISI, MOTO, PIAGAM
+    html += '<div class="ms-card"><div class="ms-card-t"><span class="x">🎯</span>Visi, Misi & Moto</div><div class="ms-vmm">' +
+      '<div class="ms-vmm-card visi"><div class="ms-vmm-t">🌟 Visi</div><div class="ms-vmm-x">' + (val(i.visi) ? esc(i.visi) : '<span class="ms-empty-v">Belum diisi</span>') + '</div></div>' +
+      '<div class="ms-vmm-card misi"><div class="ms-vmm-t">🎯 Misi</div><div class="ms-vmm-x">' + (val(i.misi) ? esc(i.misi) : '<span class="ms-empty-v">Belum diisi</span>') + '</div></div>' +
+      '<div class="ms-vmm-card moto"><div class="ms-vmm-t">💬 Moto</div><div class="ms-vmm-x">' + (val(i.moto) ? esc(i.moto) : '<span class="ms-empty-v">Belum diisi</span>') + '</div></div>' +
+      '<div class="ms-vmm-card piagam"><div class="ms-vmm-t">📜 Piagam Pelanggan</div><div class="ms-vmm-x">' + (val(i.piagam) ? esc(i.piagam) : '<span class="ms-empty-v">Belum diisi</span>') + '</div></div>' +
+      '</div></div>';
+
+    // KEPIMPINAN
+    const leads = [
+      { j: 'Pengetua', n: i.pengetua, ic: '👔' },
+      { j: 'PK Kokurikulum', n: i.pk_kokurikulum, ic: '🎽' },
+      { j: 'S/U Kokurikulum', n: i.su_kokurikulum, ic: '📋' }
+    ];
+    html += '<div class="ms-card"><div class="ms-card-t"><span class="x">👥</span>Barisan Kepimpinan Kokurikulum</div><div class="ms-lead">' +
+      leads.map(function (l) {
+        var nm = val(l.n);
+        return '<div class="ms-lead-c"><div class="ms-lead-av">' + (nm ? initials(nm) : l.ic) + '</div><div class="ms-lead-i"><div class="ms-lead-j">' + l.j + '</div><div class="ms-lead-n">' + (nm ? esc(nm) : '<span class="ms-empty-v">Belum diisi</span>') + '</div></div></div>';
+      }).join('') +
+      '</div></div>';
+
+    // KELAS IKUT TINGKATAN (auto)
+    html += '<div class="ms-card" id="ms-kelas-card" style="display:none;"><div class="ms-card-t"><span class="x">📚</span>Bilangan Kelas Mengikut Tingkatan</div><div class="ms-bars" id="ms-kelas"></div></div>';
+
+    // FOOTER
+    html += '<div class="ms-foot">💡 Maklumat identiti dibaca dari sheet <b>GP_Maklumat_Sekolah</b> · Statistik dikira automatik dari modul Data Pelajar & Guru Penasihat · Medan "Belum diisi" boleh dikemas kini dalam sheet.</div>';
+
+    c.innerHTML = html;
+    renderStats();
+  }
+
+  function renderStats() {
+    const el = document.getElementById('ms-stats'); if (!el) return;
+    const s = state.stats;
+    const cards = [
+      { i: '🎓', v: s.pelajar, l: 'Jumlah Pelajar', c: '' },
+      { i: '👨‍🏫', v: s.guru, l: 'Jumlah Guru', c: 'c2' },
+      { i: '🗂️', v: s.unit, l: 'Unit Kokurikulum', c: 'c3' },
+      { i: '🏛️', v: s.jk, l: 'Jawatankuasa', c: 'c4' },
+      { i: '📚', v: s.kelas, l: 'Jumlah Kelas', c: 'c5' },
+      { i: '🏠', v: s.rumah, l: 'Rumah Sukan', c: 'c6' }
+    ];
+    el.innerHTML = cards.map(function (c) { return '<div class="ms-stat ' + c.c + '"><div class="ms-stat-i">' + c.i + '</div><div class="ms-stat-v">' + c.v + '</div><div class="ms-stat-l">' + c.l + '</div></div>'; }).join('');
+    const src = document.getElementById('ms-src'); if (src) src.innerHTML = state.source === 'live' ? '📡 Data Langsung (Sheet)' : '📋 Data Rasmi (terbenam)';
+  }
+
+  function renderKelas() {
+    const card = document.getElementById('ms-kelas-card'), box = document.getElementById('ms-kelas');
+    if (!card || !box) return;
+    const list = state.stats.kelasByTingkatan || [];
+    if (!list.length) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    const max = Math.max.apply(null, list.map(function (x) { return x.n; })) || 1;
+    box.innerHTML = list.map(function (x) {
+      return '<div class="ms-bar-row"><div class="ms-bar-lab">' + esc(x.t) + '</div><div class="ms-bar-track"><div class="ms-bar-fill" style="width:' + Math.max(Math.round(x.n / max * 100), 10) + '%;">' + x.n + ' kelas</div></div></div>';
+    }).join('');
+  }
+
+  function toast(msg) { const t = document.createElement('div'); t.className = 'ms-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.style.animation = 'msToastOut .3s forwards'; setTimeout(function () { t.remove(); }, 300); }, 3000); }
+
+  function showPage() {
+    const page = document.getElementById('page-sekolah'); if (!page) return;
+    document.querySelectorAll('section.page, div.page').forEach(function (p) { if (p.id !== 'page-sekolah') { p.style.display = 'none'; p.classList.remove('active'); } });
+    page.style.cssText = 'display:block !important;'; page.classList.add('active');
+    const titleEl = document.getElementById('topbarTitle'); if (titleEl) titleEl.innerHTML = 'SPKB v3.1 — Maklumat Sekolah<small>Identiti Rasmi Sekolah</small>';
+  }
+
+  /* ============================================================ PUBLIC API ============================================================ */
+  window.MaklumatSekolah = {
+    init: init,
+    refresh: function () { state.initialized = false; state.statsLoaded = false; const l = document.getElementById('ms-load'); if (l) l.style.display = 'block'; const c = document.getElementById('ms-cnt'); if (c) c.style.display = 'none'; init(); toast('🔄 Memuat semula…'); },
+    showToast: toast, _state: state
+  };
+  window.loadMaklumatSekolah = function () { state.initialized = false; init(); };
+
+  document.addEventListener('click', function (e) {
+    const nav = e.target.closest('.nav-item[data-page="sekolah"]'); if (!nav) return;
+    setTimeout(function () { if (!state.initialized) init(); else showPage(); }, 60);
+    setTimeout(function () { showPage(); if (!document.getElementById('ms-cnt')) { state.initialized = false; init(); } }, 260);
+  });
+
+  console.log('✅ [MaklumatSekolah] Modul v1.0 dimuatkan');
+})();
+
+</script>
 </body>
 </html>
