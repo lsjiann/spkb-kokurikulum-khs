@@ -2147,22 +2147,22 @@ body.demo-active .main { margin-top: 98px; }
         <div class="admin-meta-card">
           <div class="admin-meta-label">Guru Penasihat Aktif</div>
           <div class="admin-meta-value" id="schoolAdvisors">48</div>
-          <div class="admin-meta-sub">Dari 48 unit</div>
+          <div class="admin-meta-sub" id="schoolUnitsSub">Dari 48 unit</div>
         </div>
         <div class="admin-meta-card">
           <div class="admin-meta-label">Telefon Sekolah</div>
           <div class="admin-meta-value" id="schoolPhone" style="font-size:13px;">03-4291 6000</div>
-          <div class="admin-meta-sub">Faks: 03-4291 6001</div>
+          <div class="admin-meta-sub" id="schoolFax">Faks: 03-4291 6001</div>
         </div>
         <div class="admin-meta-card">
           <div class="admin-meta-label">Pengetua</div>
           <div class="admin-meta-value" id="schoolPrincipal" style="font-size:13px;">Tn. Hj. Roslan Ismail</div>
-          <div class="admin-meta-sub">DG54</div>
+          <div class="admin-meta-sub" id="schoolPrincipalSub">DG54</div>
         </div>
         <div class="admin-meta-card">
           <div class="admin-meta-label">Sesi</div>
           <div class="admin-meta-value" id="schoolSession">Pagi</div>
-          <div class="admin-meta-sub">7:30 pg – 1:45 tgh</div>
+          <div class="admin-meta-sub" id="schoolSessionSub">7:30 pg – 1:45 tgh</div>
         </div>
       </div>
 
@@ -2170,23 +2170,23 @@ body.demo-active .main { margin-top: 98px; }
       <div class="admin-kpi-grid">
         <div class="admin-kpi-card">
           <div class="admin-kpi-value" id="kpiPenyertaan">97.4%</div>
-          <div class="admin-kpi-label">Kadar Penyertaan</div>
-          <div class="admin-kpi-trend up">▲ +2.1%</div>
+          <div class="admin-kpi-label">GPS PAJSK 2025</div>
+          <div class="admin-kpi-trend up" id="kpiPenyertaanTrend">▲ +2.1%</div>
         </div>
         <div class="admin-kpi-card">
           <div class="admin-kpi-value" id="kpiPAJSK">4.2</div>
-          <div class="admin-kpi-label">Purata PAJSK</div>
-          <div class="admin-kpi-trend up">▲ +0.3</div>
+          <div class="admin-kpi-label">Unit Kokurikulum</div>
+          <div class="admin-kpi-trend up" id="kpiPAJSKTrend">▲ +0.3</div>
         </div>
         <div class="admin-kpi-card">
           <div class="admin-kpi-value" id="kpiKehadiran">88.6%</div>
-          <div class="admin-kpi-label">Purata Kehadiran</div>
-          <div class="admin-kpi-trend down">▼ -1.2%</div>
+          <div class="admin-kpi-label">Rumah Sukan</div>
+          <div class="admin-kpi-trend down" id="kpiKehadiranTrend">▼ -1.2%</div>
         </div>
         <div class="admin-kpi-card">
           <div class="admin-kpi-value" id="kpiPencapaian">47</div>
-          <div class="admin-kpi-label">Pencapaian 2026</div>
-          <div class="admin-kpi-trend up">▲ +12</div>
+          <div class="admin-kpi-label">Jawatankuasa Kokurikulum</div>
+          <div class="admin-kpi-trend up" id="kpiPencapaianTrend">▲ +12</div>
         </div>
       </div>
 
@@ -2205,24 +2205,23 @@ body.demo-active .main { margin-top: 98px; }
     <!-- Session Banner -->
     <div class="session-banner">
       <div class="session-info">
-        <h3><i class="fas fa-calendar-check"></i> Sesi 2025/2026 — Semester 2 Sedang Berjalan</h3>
-        <p>Minggu ke-14 daripada 20 minggu · 42 hari sehingga tarikh akhir PAJSK</p>
+        <h3 id="bannerTitle"><i class="fas fa-calendar-check"></i> Sesi 2026 — Semester 2 Sedang Berjalan</h3>
       </div>
       <div class="session-stats">
         <div class="session-stat">
-          <span class="num">1,515</span>
+          <span class="num" id="banner-pelajar">1,515</span>
           <span class="lbl">Pelajar</span>
         </div>
         <div class="session-stat">
-          <span class="num">46</span>
-          <span class="lbl">Kelab</span>
+          <span class="num" id="banner-kelab">46</span>
+          <span class="lbl">Unit</span>
         </div>
         <div class="session-stat">
-          <span class="num">68</span>
-          <span class="lbl">Aktiviti</span>
+          <span class="num" id="banner-peserta">68</span>
+          <span class="lbl">Peserta</span>
         </div>
         <div class="session-stat">
-          <span class="num">47</span>
+          <span class="num" id="banner-pencapaian">47</span>
           <span class="lbl">Pencapaian</span>
         </div>
         <div class="session-stat">
@@ -2237,7 +2236,7 @@ body.demo-active .main { margin-top: 98px; }
       <div class="stat-card">
         <div class="stat-icon blue"><i class="fas fa-users"></i></div>
         <div class="stat-info">
-          <div class="num">46</div>
+          <div class="num" id="db-kelab">46</div>
           <div class="label">Kelab & Persatuan</div>
           <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +2 sesi lepas</div>
         </div>
@@ -2246,7 +2245,7 @@ body.demo-active .main { margin-top: 98px; }
       <div class="stat-card">
         <div class="stat-icon teal"><i class="fas fa-medal"></i></div>
         <div class="stat-info">
-          <div class="num">8</div>
+          <div class="num" id="db-uniform">8</div>
           <div class="label">Badan Beruniform</div>
           <div class="trend trend-same"><i class="fas fa-minus"></i> Tiada perubahan</div>
         </div>
@@ -2255,7 +2254,7 @@ body.demo-active .main { margin-top: 98px; }
       <div class="stat-card">
         <div class="stat-icon orange"><i class="fas fa-futbol"></i></div>
         <div class="stat-info">
-          <div class="num">14</div>
+          <div class="num" id="db-sukan">14</div>
           <div class="label">Sukan & Permainan</div>
           <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +3 sesi lepas</div>
         </div>
@@ -2264,9 +2263,9 @@ body.demo-active .main { margin-top: 98px; }
       <div class="stat-card">
         <div class="stat-icon yellow"><i class="fas fa-trophy"></i></div>
         <div class="stat-info">
-          <div class="num">47</div>
+          <div class="num" id="db-pencapaian">47</div>
           <div class="label">Pencapaian 2026</div>
-          <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +12 dari 2025</div>
+          <div class="trend trend-up" id="db-pencapaian-trend"><i class="fas fa-arrow-up"></i> +12 dari 2025</div>
         </div>
       </div>
 
@@ -2291,18 +2290,18 @@ body.demo-active .main { margin-top: 98px; }
       <div class="stat-card">
         <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
         <div class="stat-info">
-          <div class="num">1,475</div>
+          <div class="num" id="db-pelajar-aktif">1,475</div>
           <div class="label">Pelajar Aktif</div>
           <div class="trend trend-up"><i class="fas fa-arrow-up"></i> 97.4% penyertaan</div>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
         <div class="stat-info">
-          <div class="num">32</div>
-          <div class="label">Perlu Perhatian</div>
-          <div class="trend trend-down"><i class="fas fa-arrow-down"></i> Kehadiran < 50%</div>
+          <div class="num" id="db-peserta">32</div>
+          <div class="label">Jumlah Peserta 2026</div>
+          <div class="trend trend-up"><i class="fas fa-user"></i> Aktif dalam unit</div>
         </div>
       </div>
 
@@ -2319,34 +2318,34 @@ body.demo-active .main { margin-top: 98px; }
     <!-- PAJSK Summary -->
     <div class="pajsk-summary">
       <div class="pajsk-comp">
-        <div class="pc-icon">📊</div>
-        <div class="pc-score">4.1</div>
-        <div class="pc-label">Kehadiran</div>
-        <span class="pc-weight">25%</span>
+        <div class="pc-icon">🏫</div>
+        <div class="pc-score" id="pcScore1">—</div>
+        <div class="pc-label">GPS Keseluruhan</div>
+        <span class="pc-weight" id="pcPill1">—</span>
       </div>
       <div class="pajsk-comp">
-        <div class="pc-icon">👔</div>
-        <div class="pc-score">3.9</div>
-        <div class="pc-label">Jawatan</div>
-        <span class="pc-weight">20%</span>
+        <div class="pc-icon">🎖️</div>
+        <div class="pc-score" id="pcScore2">—</div>
+        <div class="pc-label">Uniform</div>
+        <span class="pc-weight" id="pcPill2">—</span>
+      </div>
+      <div class="pajsk-comp">
+        <div class="pc-icon">📚</div>
+        <div class="pc-score" id="pcScore3">—</div>
+        <div class="pc-label">Kelab</div>
+        <span class="pc-weight" id="pcPill3">—</span>
+      </div>
+      <div class="pajsk-comp">
+        <div class="pc-icon">⚽</div>
+        <div class="pc-score" id="pcScore4">—</div>
+        <div class="pc-label">Sukan</div>
+        <span class="pc-weight" id="pcPill4">—</span>
       </div>
       <div class="pajsk-comp">
         <div class="pc-icon">🎯</div>
-        <div class="pc-score">4.2</div>
-        <div class="pc-label">Penyertaan</div>
-        <span class="pc-weight">20%</span>
-      </div>
-      <div class="pajsk-comp">
-        <div class="pc-icon">🏆</div>
-        <div class="pc-score">4.0</div>
-        <div class="pc-label">Pencapaian</div>
-        <span class="pc-weight">20%</span>
-      </div>
-      <div class="pajsk-comp">
-        <div class="pc-icon">🤝</div>
-        <div class="pc-score">3.8</div>
-        <div class="pc-label">Sumbangan</div>
-        <span class="pc-weight">15%</span>
+        <div class="pc-score" id="pcScore5">—</div>
+        <div class="pc-label" id="pcLabel5">Sasaran 2026</div>
+        <span class="pc-weight" id="pcPill5">Sasaran</span>
       </div>
     </div>
 
@@ -2355,7 +2354,7 @@ body.demo-active .main { margin-top: 98px; }
       <!-- Trend PAJSK Chart -->
       <div class="card">
         <div class="card-header">
-          <h3><i class="fas fa-chart-line"></i> Trend Pencapaian PAJSK — 6 Tahun</h3>
+          <h3 id="pajskTrendTitle"><i class="fas fa-chart-line"></i> Trend GPS PAJSK — 10 Tahun</h3>
           <button class="btn btn-outline" onclick="toggleChart()" style="font-size:11px;padding:6px 12px;">
             <i class="fas fa-exchange-alt"></i> Tukar Carta
           </button>
@@ -2370,7 +2369,7 @@ body.demo-active .main { margin-top: 98px; }
       <!-- Doughnut Chart -->
       <div class="card">
         <div class="card-header">
-          <h3><i class="fas fa-chart-pie"></i> Wajaran PAJSK</h3>
+          <h3 id="wajaranTitle"><i class="fas fa-chart-area"></i> Radar GPS Kategori PAJSK</h3>
         </div>
         <div class="card-body">
           <div class="chart-container" style="height:300px;">
@@ -2385,9 +2384,9 @@ body.demo-active .main { margin-top: 98px; }
       <!-- Top 5 Kelab -->
       <div class="card">
         <div class="card-header">
-          <h3><i class="fas fa-trophy"></i> Top 5 Kelab / Persatuan</h3>
+          <h3><i class="fas fa-trophy"></i> Top 5 Unit Kokurikulum</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body" id="topClubsBody">
           <div class="club-item">
             <div class="club-rank gold">1</div>
             <div class="club-info">
@@ -5590,6 +5589,9 @@ function navigateTo(pageId) {
   if (pageId === 'jana') {
     setTimeout(loadJanaDokumen, 100);
   }
+  if (pageId === 'dashboard') {
+    setTimeout(function () { if (typeof hydrateDashboardLive === 'function') hydrateDashboardLive(); }, 100);
+  }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -5617,31 +5619,40 @@ function openKelabFullscreen() {
 const labels6 = ['2020/21','2021/22','2022/23','2023/24','2024/25','2025/26'];
 let pajskChart;
 let chartType = 'line';
+let pajskHistory = null;
+let dashRadarInstance = null;
 
 function buildPajsk(type) {
   if (pajskChart) pajskChart.destroy();
-  pajskChart = new Chart(document.getElementById('pajskChart'), {
-    type: type,
-    data: {
-      labels: labels6,
-      datasets: [
-        { label:'Keseluruhan', data:[3.04,3.22,3.38,3.56,3.80,4.00], borderColor:'#1a3c6e', backgroundColor: type==='bar'?'rgba(26,60,110,0.8)':'rgba(26,60,110,0.08)', borderWidth:3, tension:0.4, fill: type==='line', pointRadius:5 },
-        { label:'Kehadiran',   data:[3.4,3.5,3.6,3.7,3.9,4.1],       borderColor:'#2e86c1', backgroundColor:'rgba(46,134,193,0.5)', borderWidth:2, tension:0.4, pointRadius:4 },
-        { label:'Penyertaan',  data:[3.3,3.5,3.6,3.8,4.0,4.2],       borderColor:'#27ae60', backgroundColor:'rgba(39,174,96,0.5)',  borderWidth:2, tension:0.4, pointRadius:4 },
-        { label:'Pencapaian',  data:[2.8,3.0,3.2,3.5,3.8,4.0],       borderColor:'#f39c12', backgroundColor:'rgba(243,156,18,0.5)', borderWidth:2, tension:0.4, pointRadius:4 },
-        { label:'Sumbangan',   data:[2.6,2.9,3.1,3.3,3.6,3.8],       borderColor:'#e74c3c', backgroundColor:'rgba(231,76,60,0.5)',  borderWidth:2, tension:0.4, pointRadius:4 }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
-      scales: {
-        y: { min: 2.0, max: 5.0, ticks: { stepSize: 0.5, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-        x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+  var cfg;
+  if (pajskHistory && pajskHistory.length) {
+    var labels = pajskHistory.map(function (h) { return String(h.tahun); });
+    var actual = pajskHistory.map(function (h) { return h.isTarget ? null : h.gps; });
+    var target = pajskHistory.map(function (h) { return h.isTarget ? h.gps : null; });
+    var lastIdx = -1;
+    for (var i = 0; i < pajskHistory.length; i++) { if (!pajskHistory[i].isTarget) lastIdx = i; }
+    if (lastIdx >= 0) target[lastIdx] = pajskHistory[lastIdx].gps;
+    cfg = {
+      type: type,
+      data: { labels: labels, datasets: [
+        { label: 'GPS Sebenar', data: actual, borderColor: '#667eea', backgroundColor: type === 'bar' ? 'rgba(102,126,234,0.8)' : 'rgba(102,126,234,0.1)', borderWidth: 3, tension: 0.3, fill: type === 'line', pointRadius: 5, spanGaps: false },
+        { label: 'Sasaran', data: target, borderColor: '#f39c12', backgroundColor: 'rgba(243,156,18,0.1)', borderWidth: 2, borderDash: [8, 4], tension: 0, fill: false, pointRadius: 6 }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
+        scales: {
+          y: { suggestedMin: 1.0, suggestedMax: 5.0, ticks: { stepSize: 0.5, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+        }
       }
-    }
-  });
+    };
+  } else {
+    cfg = { type: type, data: { labels: labels6, datasets: [
+      { label: 'Keseluruhan', data: [3.04,3.22,3.38,3.56,3.80,4.00], borderColor: '#1a3c6e', backgroundColor: type==='bar'?'rgba(26,60,110,0.8)':'rgba(26,60,110,0.08)', borderWidth: 3, tension: 0.4, fill: type==='line', pointRadius: 5 }
+    ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } }, scales: { y: { min: 2.0, max: 5.0, ticks: { stepSize: 0.5 } }, x: { grid: { display: false } } } } };
+  }
+  pajskChart = new Chart(document.getElementById('pajskChart'), cfg);
 }
 
 function toggleChart() {
@@ -5652,25 +5663,35 @@ function toggleChart() {
 // Build chart awal
 buildPajsk('line');
 
-// Doughnut Chart — Wajaran PAJSK
-new Chart(document.getElementById('donutChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Kehadiran','Jawatan','Penyertaan','Pencapaian','Sumbangan'],
-    datasets: [{
-      data: [25,20,20,20,15],
-      backgroundColor: ['#1a3c6e','#2e86c1','#27ae60','#f39c12','#e74c3c'],
-      borderWidth: 2,
-      borderColor: '#fff'
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '65%',
-    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }
-  }
-});
+// Radar GPS Kategori PAJSK (gantian donat Wajaran) — diisi oleh hydrateDashboardLive
+function renderDashboardRadar(d) {
+  var canvas = document.getElementById('donutChart');
+  if (!canvas || typeof Chart === 'undefined') return;
+  var pu = (d && d.perUnit) || {};
+  var units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
+  var labels = ['Sekolah', 'Beruniform', 'Kelab & Persatuan', 'Sukan & Permainan'];
+  var gps = units.map(function (u) { return (pu[u] || {}).gps || 0; });
+  var gpsLepas = units.map(function (u) { return (pu[u] || {}).gpsLepas || 0; });
+  var tahun = d.tahun || (new Date().getFullYear() - 1);
+  var tahunLepas = d.tahunLepas || (tahun - 1);
+  if (dashRadarInstance) dashRadarInstance.destroy();
+  if (Chart.getChart) { var ex = Chart.getChart(canvas); if (ex) ex.destroy(); }
+  dashRadarInstance = new Chart(canvas, {
+    type: 'radar',
+    data: { labels: labels, datasets: [
+      { label: '' + tahunLepas, data: gpsLepas, backgroundColor: 'rgba(149,165,166,0.2)', borderColor: '#7f8c8d', borderWidth: 2, pointBackgroundColor: '#7f8c8d', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5 },
+      { label: '' + tahun, data: gps, backgroundColor: 'rgba(102,126,234,0.3)', borderColor: '#667eea', borderWidth: 3, pointBackgroundColor: '#667eea', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 6 }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 14 } },
+        tooltip: { callbacks: { label: function (c) { return c.dataset.label + ': GPS ' + c.parsed.r.toFixed(2); } } }
+      },
+      scales: { r: { min: 1.0, max: 3.5, ticks: { stepSize: 0.5, font: { size: 10 }, callback: function (v) { return v.toFixed(1); }, backdropColor: 'rgba(255,255,255,0.8)' }, grid: { color: 'rgba(0,0,0,0.1)' }, angleLines: { color: 'rgba(0,0,0,0.1)' }, pointLabels: { font: { size: 11, weight: 'bold' }, color: '#2c3e50' } } }
+    }
+  });
+}
 
 /* ============================================================
    MODUL SK@S 3.2
@@ -6268,29 +6289,42 @@ async function loadPAJSKDashboard() {
 
 function renderPAJSKHeroStats(data) {
   const k = data.keseluruhan || {};
+  const pu = data.perUnit || {};
+  const sk = pu.SEKOLAH || {};
   const tahun = data.tahun || 2025;
 
-  // Card 1: GPS
+  // Pilih GPS sekolah dgn rantai fallback (konsisten dgn Trend & Radar):
+  //   1) keseluruhan.gpsSekolah  (selepas tampalan backend — paling jelas)
+  //   2) perUnit.SEKOLAH.gps     (backend lama — masih betul)
+  //   3) keseluruhan.gps         (fallback terakhir — purata kategori)
+  const schoolGps     = (k.gpsSekolah != null) ? k.gpsSekolah : (sk.gps != null ? sk.gps : k.gps);
+  const schoolGpsLepas = (k.gpsSekolahLepas != null) ? k.gpsSekolahLepas
+                        : (sk.gpsLepas != null ? sk.gpsLepas : (data.keseluruhanLepas || {}).gps);
+  const schoolPeratus = (k.peratusGPSSekolah != null) ? k.peratusGPSSekolah
+                        : (sk.peratusGPS != null ? sk.peratusGPS : k.peratusGPS);
+  const schoolRating  = (k.ratingSekolah && k.ratingSekolah.label) ? k.ratingSekolah.label
+                        : (k.rating && k.rating.label) ? k.rating.label : '';
+
+  // Card 1: GPS Sekolah
   const gpsEl = document.getElementById('pajskHeroGPSNum');
-  if (gpsEl) gpsEl.textContent = k.gps || '--';
+  if (gpsEl) gpsEl.textContent = (schoolGps != null) ? schoolGps : '--';
   const yearEl = document.getElementById('pajskHeroYear');
   if (yearEl) yearEl.textContent = tahun;
   const ratingEl = document.getElementById('pajskHeroRating');
-  if (ratingEl && k.rating) {
-    ratingEl.innerHTML = '<i class="fas fa-star"></i> <span>' + k.rating.label + '</span>';
+  if (ratingEl && schoolRating) {
+    ratingEl.innerHTML = '<i class="fas fa-star"></i> <span>' + schoolRating + '</span>';
   }
 
-  // Card 2: % GPS
+  // Card 2: % GPS Sekolah
   const peratusEl = document.getElementById('pajskHeroPeratus');
-  if (peratusEl) peratusEl.textContent = (k.peratusGPS || 0).toFixed(2) + '%';
+  if (peratusEl) peratusEl.textContent = (schoolPeratus || 0).toFixed(2) + '%';
 
-  // Card 3: vs Tahun Lepas
-  const lepas = data.keseluruhanLepas || {};
+  // Card 3: vs Tahun Lepas (banding GPS sekolah)
   const changeEl = document.getElementById('pajskHeroChangeNum');
   const changeSub = document.getElementById('pajskHeroChangeSub');
 
-  if (lepas.gps && k.gps) {
-    const change = (k.gps - lepas.gps).toFixed(2);
+  if (schoolGpsLepas != null && schoolGps != null) {
+    const change = (schoolGps - schoolGpsLepas).toFixed(2);
     if (changeEl) changeEl.textContent = (change > 0 ? '+' : '') + change;
     if (changeSub) {
       let icon, label;
@@ -11779,11 +11813,13 @@ function syncAdminNotifBadge() {
 
 /* Admin Actions */
 function editAdminProfile() {
-  alert('🛠️ Edit Profil\n\nFitur ini akan membuka borang edit profil pentadbir.\n\nDalam pembangunan untuk Phase 3.');
+  alert('🛠️ Profil Pentadbir\n\nNama & jawatan pentadbir diambil terus dari Maklumat Sekolah (medan pk_kokurikulum) dan Profil Pentadbir.\n\nUntuk kemas kini: edit sheet GP_Maklumat_Sekolah / GP_Pentadbir, kemudian Muat Semula.');
+  if (typeof navigateTo === 'function') navigateTo('sekolah');
 }
 
 function changeAdminPassword() {
-  alert('🔐 Tukar Kata Laluan\n\nFitur ini akan membuka borang tukar kata laluan.\n\nDalam pembangunan untuk Phase 3.');
+  alert('🔐 Keselamatan\n\nKeselamatan sistem kini diuruskan melalui Kunci PIN di Tetapan Sistem.');
+  if (typeof navigateTo === 'function') navigateTo('tetapan');
 }
 
 function confirmLogout() {
@@ -11793,21 +11829,221 @@ function confirmLogout() {
 }
 
 function backupData() {
-  if (confirm('💾 Sandaran Data\n\nSistem akan backup keseluruhan data ke Google Drive.\n\nTeruskan?')) {
-    alert('✅ Sandaran data telah dijadualkan!\n\nAnda akan terima notifikasi apabila selesai.');
-  }
+  alert('💾 Sandaran & Data\n\nData utama disimpan langsung dalam Google Sheets (auto-tersimpan).\n\nUntuk Eksport Tetapan & Muat Semula Semua Data, pergi ke Tetapan Sistem.');
+  if (typeof navigateTo === 'function') navigateTo('tetapan');
 }
 
 function showAuditLog() {
-  alert('🛡️ Log Audit\n\nMemaparkan log aktiviti sistem.\n\nDalam pembangunan untuk Phase 3.');
+  alert('🛡️ Log Audit\n\nModul log audit (jejak aktiviti pengguna) belum tersedia. Boleh dibina sebagai kemas kini akan datang.');
 }
 
 function showCalendar() {
-  alert('📅 Takwim Kokurikulum\n\nMemaparkan kalendar aktiviti.\n\nDalam pembangunan untuk Phase 3.');
+  alert('📅 Takwim Kokurikulum\n\nModul takwim/kalendar aktiviti belum tersedia. Boleh dibina sebagai kemas kini akan datang.');
+}
+
+
+/* ============================================================
+   HYDRATE PAPAN PEMUKA — data sebenar dari modul langsung
+   ============================================================ */
+function hydrateDashboardLive() {
+  var GURU = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+  var STUDENT = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+  var setNum = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+  var setSub = setNum;
+  var pfx = function (s, p) { s = String(s || '').trim(); if (!s) return p + ': —'; return new RegExp('^' + p, 'i').test(s) ? s : (p + ': ' + s); };
+
+  // Banner: semester automatik (Jan–Mei = Sem 1, Jun–Dis = Sem 2)
+  (function () {
+    var bt = document.getElementById('bannerTitle');
+    if (!bt) return;
+    var now = new Date();
+    var sem = (now.getMonth() <= 4) ? 1 : 2;
+    bt.innerHTML = '<i class="fas fa-calendar-check"></i> Sesi ' + now.getFullYear() + ' — Semester ' + sem + ' Sedang Berjalan';
+  })();
+
+  // (A) Maklumat Sekolah
+  fetch(GURU + '?action=maklumat_sekolah&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res || !res.success || !res.data) return;
+    var d = res.data;
+    if (d.nama_penuh) SCHOOL_INFO.name = d.nama_penuh;
+    SCHOOL_INFO.address = (d.alamat && d.alamat.trim()) ? d.alamat.trim() : ([d.poskod, d.bandar, d.negeri].filter(Boolean).join(', ') || 'Belum diisi');
+    SCHOOL_INFO.code = (d.kod_sekolah && d.kod_sekolah.trim()) ? d.kod_sekolah.trim() : '—';
+    SCHOOL_INFO.ppd = pfx(d.ppd, 'PPD');
+    SCHOOL_INFO.jpn = pfx(d.jpn, 'JPN');
+    if (d.telefon && d.telefon.trim()) SCHOOL_INFO.phone = d.telefon.trim();
+    SCHOOL_INFO.principal = (d.pengetua && d.pengetua.trim()) ? d.pengetua.trim() : 'Belum diisi';
+    if (d.sesi && d.sesi.trim()) SCHOOL_INFO.session = d.sesi.trim();
+    if (d.pk_kokurikulum && d.pk_kokurikulum.trim()) ADMIN_INFO.name = d.pk_kokurikulum.trim();
+    ADMIN_INFO.avatar = '';
+    ADMIN_INFO.id = 'Belum diisi'; ADMIN_INFO.email = 'Belum diisi'; ADMIN_INFO.phone = 'Belum diisi'; ADMIN_INFO.appointed = 'Belum diisi';
+    setSub('schoolFax', (d.faks && d.faks.trim()) ? ('Faks: ' + d.faks.trim()) : 'Faks: —');
+    setSub('schoolPrincipalSub', '');
+    setSub('schoolSessionSub', '');
+    populateAdminPanel();
+  }).catch(function () {});
+
+  // (B) Guru Penasihat — kiraan guru, unit, kategori
+  fetch(GURU + '?action=guru_penasihat_all&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res || !res.success || !res.data) return;
+    var g = res.data, UL = g.unit_lookup || {};
+    var codes = Object.keys(UL);
+    var uniform = 0, kelab = 0, sukan = 0;
+    codes.forEach(function (k) { var c = String(k).charAt(0).toUpperCase(); if (c === 'A') uniform++; else if (c === 'S') sukan++; else kelab++; });
+    var advisors = (function () { var s = {}; (g.tugasan || []).forEach(function (t) { s[t.g] = 1; }); return Object.keys(s).length; })();
+    SCHOOL_INFO.teachers = (g.guru || []).length;
+    SCHOOL_INFO.advisors = advisors || codes.length;
+    populateAdminPanel();
+    setNum('db-kelab', kelab); setNum('db-uniform', uniform); setNum('db-sukan', sukan);
+    setNum('banner-kelab', codes.length);
+    setSub('schoolUnitsSub', 'Dari ' + codes.length + ' unit');
+    // KPI hero (Rajah 1)
+    var rumah = (function () { var s = {}; (g.guru || []).forEach(function (x) { var r = x.rs && String(x.rs).trim(); if (r) s[r] = 1; }); return Object.keys(s).length; })();
+    var jk = Object.keys(g.jk_lookup || {}).length;
+    setNum('kpiPAJSK', codes.length); setSub('kpiPAJSKTrend', '');
+    setNum('kpiKehadiran', rumah || 6); setSub('kpiKehadiranTrend', '');
+    setNum('kpiPencapaian', jk); setSub('kpiPencapaianTrend', '');
+  }).catch(function () {});
+
+  // (E) PAJSK — Rajah 3: hero GPS, 5 kad komponen, radar, sasaran, trend 10 tahun
+  var SK = (typeof SKAS_API_URL !== 'undefined' && SKAS_API_URL) ? SKAS_API_URL : GURU;
+  var pjYear = new Date().getFullYear() - 1; // tahun PAJSK terkini disiapkan
+  var fix2 = function (v) { return (v != null && !isNaN(v)) ? Number(v).toFixed(2) : '—'; };
+  // (E1) Dashboard tahun terkini → hero GPS + 5 kad + radar
+  fetch(SK + '?action=pajsk_dashboard&tahun=' + pjYear + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res || !res.success || !res.data) return;
+    var d = res.data, k = d.keseluruhan || {}, pu = d.perUnit || {};
+    var gOf = function (u) { return (pu[u] && pu[u].gps != null) ? fix2(pu[u].gps) : '—'; };
+    var thn = String(d.tahun || pjYear);
+    // Pilih GPS sekolah dgn rantai fallback:
+    //   1) keseluruhan.gpsSekolah  (selepas tampalan backend — paling jelas)
+    //   2) perUnit.SEKOLAH.gps     (backend lama — masih betul)
+    //   3) keseluruhan.gps         (fallback terakhir — purata kategori)
+    var schoolGps = (k.gpsSekolah != null) ? k.gpsSekolah
+                  : (pu.SEKOLAH && pu.SEKOLAH.gps != null) ? pu.SEKOLAH.gps
+                  : k.gps;
+    var schoolRating = (k.ratingSekolah && k.ratingSekolah.label) ? k.ratingSekolah.label
+                     : (k.rating && k.rating.label) ? k.rating.label : '';
+    // Hero KPI (Rajah 1): GPS PAJSK 2025
+    if (schoolGps != null) setNum('kpiPenyertaan', fix2(schoolGps));
+    setSub('kpiPenyertaanTrend', schoolRating);
+    // 5 kad komponen (Rajah 3)
+    setNum('pcScore1', schoolGps != null ? fix2(schoolGps) : '—'); setNum('pcPill1', schoolRating || thn);
+    setNum('pcScore2', gOf('BADAN_BERUNIFORM')); setNum('pcPill2', thn);
+    setNum('pcScore3', gOf('KELAB_PERSATUAN'));  setNum('pcPill3', thn);
+    setNum('pcScore4', gOf('SUKAN_PERMAINAN'));  setNum('pcPill4', thn);
+    if (typeof renderDashboardRadar === 'function') renderDashboardRadar(d);
+  }).catch(function () {});
+  // (E2) Sasaran tahun semasa
+  var curY = new Date().getFullYear();
+  fetch(SK + '?action=pajsk_target&tahun=' + curY + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (res && res.success && res.data && res.data.targetGPS != null) setNum('pcScore5', fix2(res.data.targetGPS));
+    setSub('pcLabel5', 'Sasaran ' + curY);
+  }).catch(function () {});
+  // (E3) Trend 10 tahun
+  fetch(SK + '?action=pajsk_history&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (res && res.success && res.data && res.data.history && res.data.history.length) {
+      pajskHistory = res.data.history;
+      if (typeof buildPajsk === 'function') buildPajsk(chartType || 'line');
+    }
+  }).catch(function () {});
+
+  // (F) Pencapaian — jumlah pencapaian tahun semasa (modul Pencapaian) + banding tahun lepas
+  var PEN = (typeof PENCAPAIAN_API_URL !== 'undefined' && PENCAPAIAN_API_URL) ? PENCAPAIAN_API_URL : STUDENT;
+  var thnNow = new Date().getFullYear();
+  Promise.all([
+    fetch(PEN + '?action=pencapaian_ringkasan&tahun=' + thnNow + '&_t=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return null; }),
+    fetch(PEN + '?action=pencapaian_ringkasan&tahun=' + (thnNow - 1) + '&_t=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return null; })
+  ]).then(function (arr) {
+    var cur = arr[0], prev = arr[1];
+    if (!cur || !cur.success || !cur.data || !cur.data.summary) return;
+    var tp = cur.data.summary.totalPencapaian;
+    if (tp != null) { setNum('db-pencapaian', tp); setNum('banner-pencapaian', tp); }
+    var trendEl = document.getElementById('db-pencapaian-trend');
+    if (trendEl) {
+      var prevTp = (prev && prev.success && prev.data && prev.data.summary) ? prev.data.summary.totalPencapaian : null;
+      if (prevTp != null && tp != null) {
+        var diff = tp - prevTp, up = diff >= 0;
+        trendEl.className = 'trend ' + (up ? 'trend-up' : 'trend-down');
+        trendEl.innerHTML = '<i class="fas fa-arrow-' + (up ? 'up' : 'down') + '"></i> ' + (up ? '+' : '') + diff + ' dari ' + (thnNow - 1);
+      } else {
+        trendEl.className = 'trend trend-same';
+        trendEl.innerHTML = '<i class="fas fa-calendar"></i> Rekod ' + thnNow;
+      }
+    }
+  }).catch(function () {});
+
+  // (D) Profil Pentadbir — kontak pentadbir (GPK Kokurikulum / HM04)
+  fetch(GURU + '?action=pentadbir&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res || !res.success || !res.data || !res.data.pentadbir) return;
+    var hm = res.data.pentadbir.filter(function (p) { return Number(p.peringkat) === 2 && /kokurikulum/i.test(p.jawatan || ''); })[0];
+    if (!hm) return;
+    var nm = String(hm.ahli || '').split(';')[0].replace(/\(.*?\)/, '').trim();
+    if (nm) ADMIN_INFO.name = nm;
+    ADMIN_INFO.avatar = '';
+    if (hm.kontak && String(hm.kontak).trim()) ADMIN_INFO.phone = String(hm.kontak).trim();
+    if (hm.tarikh_lantikan && String(hm.tarikh_lantikan).trim()) ADMIN_INFO.appointed = String(hm.tarikh_lantikan).trim();
+    if (hm.rujukan_surat && String(hm.rujukan_surat).trim()) ADMIN_INFO.id = String(hm.rujukan_surat).trim();
+    populateAdminPanel();
+  }).catch(function () {});
+
+  // (C) Data Pelajar — kiraan pelajar
+  fetch(STUDENT + '?action=data_pelajar_all&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res || !res.success || !Array.isArray(res.students)) return;
+    var n = res.students.length;
+    var aktif = res.students.filter(function (s) { return (s.uniform && String(s.uniform).trim()) || (s.kelab && String(s.kelab).trim()) || (s.sukan && String(s.sukan).trim()); }).length;
+    SCHOOL_INFO.students = n; populateAdminPanel();
+    setNum('db-pelajar-aktif', aktif.toLocaleString());
+    setNum('banner-pelajar', n.toLocaleString());
+    setNum('db-peserta', aktif.toLocaleString());
+    setNum('banner-peserta', aktif.toLocaleString());
+    // RAJAH 4: Top 5 Unit Kokurikulum (uniform + kelab + sukan) ikut bilangan ahli
+    var cmap = {};
+    var katOf = function (kod) {
+      var c = String(kod).charAt(0).toUpperCase();
+      if (c === 'A') return 'Badan Beruniform';
+      if (c === 'S') return 'Sukan & Permainan';
+      return 'Kelab & Persatuan';
+    };
+    res.students.forEach(function (s) {
+      ['uniform', 'kelab', 'sukan'].forEach(function (f) {
+        var v = String(s[f] || '').trim(); if (!v) return;
+        var m = v.match(/^([A-Za-z]\d+[A-Za-z]?)\s*(.*)$/);
+        var kod = m ? m[1].toUpperCase() : v;
+        var nama = (m && m[2]) ? m[2].trim() : v;
+        if (!cmap[kod]) cmap[kod] = { nama: nama, n: 0, kat: katOf(kod) };
+        cmap[kod].n++;
+      });
+    });
+    var top = Object.keys(cmap).map(function (kod) { return { kod: kod, nama: cmap[kod].nama, n: cmap[kod].n, kat: cmap[kod].kat }; })
+      .sort(function (a, b) { return b.n - a.n; }).slice(0, 5);
+    var body = document.getElementById('topClubsBody');
+    if (body) {
+      if (!top.length) {
+        body.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-light);">Belum ada data keahlian kelab.</div>';
+      } else {
+        var maxN = top[0].n || 1;
+        var ranks = ['gold', 'silver', 'bronze', '', ''];
+        body.innerHTML = top.map(function (c, i) {
+          var w = Math.round(c.n / maxN * 100);
+          var col = i < 3 ? 'var(--success)' : 'var(--secondary)';
+          return '<div class="club-item">' +
+            '<div class="club-rank ' + ranks[i] + '">' + (i + 1) + '</div>' +
+            '<div class="club-info">' +
+              '<div class="club-name">' + c.nama + '</div>' +
+              '<div class="club-type">' + (c.kat || 'Unit Kokurikulum') + ' · ' + c.kod + '</div>' +
+              '<div class="prog-wrap"><div class="prog-bar" style="width:' + w + '%;background:' + col + ';"></div></div>' +
+            '</div>' +
+            '<div class="club-score"><div class="pts">' + c.n + '</div><div class="lbl">ahli</div></div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+  }).catch(function () {});
 }
 
 // Initialize Admin Panel on load
 populateAdminPanel();
+hydrateDashboardLive();
 
 // Sync admin notification badge dengan notification dropdown
 const _origUpdateNotifBadge = updateNotifBadge;
