@@ -16,7 +16,7 @@
   --khs-blue:#1e5fa8; --khs-gold:#f4b942;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f4f8;color:var(--dark);}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f0f4f8;color:var(--dark);}
 
 /* ===== SIDEBAR KANAN (SISTEM PENTADBIR) ===== */
 .admin-sidebar{position:fixed;right:0;top:0;width:280px;height:100vh;background:linear-gradient(180deg,#0d2447 0%,var(--primary) 100%);z-index:1000;transition:transform 0.3s ease;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.15);transform:translateX(260px);}
@@ -431,9 +431,22 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f4f8;
 
 /* Header Action Buttons */
 .skas-header-actions{display:flex;gap:10px;justify-content:flex-end;margin-bottom:20px;flex-wrap:wrap;}
+
+/* Butang Kembali ke SPKB (hanya muncul dalam iframe) */
+.spkb-back-btn{position:fixed;top:12px;left:12px;z-index:99999;background:var(--primary);color:#fff;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:none;align-items:center;gap:6px;transition:transform 0.2s,opacity 0.2s;opacity:0.92;}
+.spkb-back-btn:hover{transform:scale(1.05);opacity:1;}
+.spkb-back-btn i{font-size:11px;}
+body.in-spkb .spkb-back-btn{display:flex;}
+body.in-spkb .data-banner{display:none;}
 </style>
 </head>
 <body>
+
+<!-- Butang Kembali ke SPKB (iframe mode) -->
+<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'},'*')">
+  <i class="fas fa-arrow-left"></i> Kembali ke SPKB
+</div>
+
 
 <!-- SIDEBAR KANAN -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -563,7 +576,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f4f8;
         <i class="fas fa-sync-alt"></i> Refresh Sekarang
       </button>
     </div>
-    
+
     <!-- Overall Score -->
     <div class="skas-overall" id="skasOverall">
       <div class="skas-overall-skor">
@@ -852,7 +865,6 @@ async function loadDataFromSheets(forceFresh = false) {
     const cacheParam = forceFresh ? 'false' : 'true';
     const url = `${SPKB_CONFIG.API_URL}?action=all&cache=${cacheParam}&_t=${timestamp}`;
 
-    console.log('🔄 Fetching:', url);
     const response = await fetch(url);
 
     if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -860,7 +872,6 @@ async function loadDataFromSheets(forceFresh = false) {
     const result = await response.json();
     if (!result.success) throw new Error(result.error);
 
-    console.log('📥 Raw data:', result.data);
 
     // ⭐ NORMALISASI DATA (tukar string → number/boolean)
     clubsData = result.data.clubs
@@ -877,7 +888,7 @@ async function loadDataFromSheets(forceFresh = false) {
     aktif:  c.aktif !== false && c.aktif !== 'FALSE',
     youtube_url: String(c.youtube_url || '').trim(),
     drive_folder_id: String(c.drive_folder_id || '').trim(),
-    
+
     // ⭐ BAHARU: Field untuk modal kluster
     laporan_24:     Number(c.laporan_24) || 0,
     kk_aktiviti:    Number(c.kk_aktiviti) || 0,
@@ -904,13 +915,6 @@ async function loadDataFromSheets(forceFresh = false) {
       desc: String(s.desc || '').trim(),
       url:  String(s.url || '#').trim()
     }));
-
-    console.log('✅ Selepas normalisasi:', {
-      kelab: clubsData.length,
-      borang: formsData.length,
-      sistem: adminSystemsData.length,
-      A01: clubsData.find(c => c.kod === 'A01')
-    });
 
     // Render semula keseluruhan UI
     renderAdminSystems();
@@ -978,16 +982,16 @@ function renderForms(){
           </div>
         </div>
         <div class="form-actions">
-          <a class="form-btn ${f.special ? 'special' : 'primary'}" 
-             onclick="openForm('${f.id}')" 
+          <a class="form-btn ${f.special ? 'special' : 'primary'}"
+             onclick="openForm('${f.id}')"
              style="cursor:pointer;"><i class="fas fa-external-link-alt"></i> Buka Borang</a>
-          <a class="form-btn" 
-             onclick="copyFormLink('${f.id}')" 
-             title="Salin Link" 
+          <a class="form-btn"
+             onclick="copyFormLink('${f.id}')"
+             title="Salin Link"
              style="cursor:pointer;"><i class="fas fa-link"></i></a>
-          <a class="form-btn" 
-             onclick="showQRCode('${f.id}')" 
-             title="QR Code" 
+          <a class="form-btn"
+             onclick="showQRCode('${f.id}')"
+             title="QR Code"
              style="cursor:pointer;"><i class="fas fa-qrcode"></i></a>
         </div>
       </div>`;
@@ -1096,13 +1100,13 @@ function openSystem(id){
     alert('❌ Sistem tidak dijumpai');
     return;
   }
-  
+
   // Semak jika URL sah
   if (!sys.url || sys.url === '#' || !sys.url.toString().startsWith('http')) {
     alert(`⚠️ ${sys.nama}\n\nURL sistem belum ditetapkan.\n\nSila kemas kini di Google Sheets:\nSPKB_Admin_Systems → kolum "url"`);
     return;
   }
-  
+
   // Buka dalam tab baharu
   window.open(sys.url, '_blank');
 }
@@ -1117,12 +1121,12 @@ function openForm(formId) {
     alert('❌ Borang tidak dijumpai');
     return;
   }
-  
+
   if (!form.url || form.url === '#' || !form.url.toString().startsWith('http')) {
     alert(`⚠️ ${form.nama}\n\nURL Google Form belum ditetapkan.\n\nSila kemas kini di Google Sheets:\nSPKB_Form_Registry → kolum "url"`);
     return;
   }
-  
+
   window.open(form.url, '_blank');
 }
 
@@ -1132,7 +1136,7 @@ function copyFormLink(formId) {
     alert('⚠️ URL borang belum ditetapkan');
     return;
   }
-  
+
   navigator.clipboard.writeText(form.url).then(() => {
     showToast(`✅ Link disalin: ${form.nama}`);
   }).catch(() => {
@@ -1143,14 +1147,14 @@ function copyFormLink(formId) {
 function showQRCode(formId) {
   const form = formsData.find(f => f.id === formId);
   if (!form) return;
-  
+
   if (!form.url || form.url === '#') {
     alert('⚠️ URL borang belum ditetapkan');
     return;
   }
-  
+
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(form.url)}`;
-  
+
   const modal = document.createElement('div');
   modal.style.cssText = `
     position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;
@@ -1162,7 +1166,7 @@ function showQRCode(formId) {
       <p style="font-size:11px;color:#7f8c8d;margin-bottom:16px;">Imbas QR untuk akses borang</p>
       <img src="${qrUrl}" alt="QR Code" style="width:100%;max-width:300px;border:2px solid #eee;border-radius:8px;">
       <div style="font-size:10px;color:#7f8c8d;margin-top:12px;word-break:break-all;background:#f8fafc;padding:8px;border-radius:6px;">${form.url}</div>
-      <button onclick="this.closest('div[style*=fixed]').remove()" 
+      <button onclick="this.closest('div[style*=fixed]').remove()"
               style="margin-top:16px;padding:10px 24px;background:var(--khs-blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;">
         Tutup
       </button>
@@ -1210,7 +1214,7 @@ async function openClub(kod, nama) {
   document.querySelectorAll('.page, .data-banner, .khs-header, .stat-row, .forms-zone, .filter-bar, #categoriesContainer').forEach(el => {
     if (el.id !== 'page-clubDetail' && el.id !== 'page-main') el.style.display = 'none';
   });
-  
+
   // Papar halaman detail
   document.getElementById('page-clubDetail').classList.add('active');
   document.getElementById('page-clubDetail').style.display = 'block';
@@ -1223,9 +1227,9 @@ async function openClub(kod, nama) {
 
   // Render maklumat asas
   document.getElementById('detailTitle').textContent = `${club.kod} ${club.nama.toUpperCase()}`;
-  document.getElementById('detailSubtitle').innerHTML = 
-    `<i class="fas fa-chalkboard-user"></i> ${club.guru} · 
-     <i class="fas fa-users"></i> ${club.ahli} ahli aktif · 
+  document.getElementById('detailSubtitle').innerHTML =
+    `<i class="fas fa-chalkboard-user"></i> ${club.guru} ·
+     <i class="fas fa-users"></i> ${club.ahli} ahli aktif ·
      <i class="fas fa-calendar"></i> Kategori ${club.kat}`;
 
   // Emblem ikut kategori
@@ -1244,7 +1248,7 @@ async function openClub(kod, nama) {
 
     // Render kluster
   renderClusters(club);
-  
+
   // ⭐ BAHARU: Muat senarai guru penasihat
   loadGuruByKelab(kod);
 }
@@ -1254,24 +1258,24 @@ async function loadSkpmDetail(kod) {
     const url = `${SPKB_CONFIG.API_URL}?action=detail&kod=${kod}&_t=${Date.now()}`;
     const res = await fetch(url);
     const result = await res.json();
-    
+
     if (result.success && result.data) {
       const d = result.data;
-      
+
       // Skor keseluruhan
       const overallEl = document.getElementById('skpmOverall');
       overallEl.textContent = d.skor + '%';
       overallEl.className = 'skpm-overall ' + d.status;
-      
+
       // Kriteria A
       document.getElementById('skpmA_value').textContent = d.laporan_24 || 0;
       document.getElementById('skpmA_target').textContent = Math.round(d.sasaranLaporan);
       document.getElementById('skpmA_bar').style.width = Math.min(100, d.skorA) + '%';
-      
+
       // Kriteria B
       document.getElementById('skpmB_value').textContent = d.fail || 0;
       document.getElementById('skpmB_bar').style.width = Math.min(100, d.skorB) + '%';
-      
+
       // Kriteria C
       document.getElementById('skpmC_value').textContent = d.kk_aktiviti || 0;
       document.getElementById('skpmC_target').textContent = Math.round(d.sasaranKK);
@@ -1302,7 +1306,7 @@ function renderClusters(club) {
     if (filInCluster >= cl.total) { statusClass = 'complete'; statusText = `✅ Lengkap ${filInCluster}/${cl.total}`; }
     else if (filInCluster > 0) { statusClass = 'partial'; statusText = `⏳ ${filInCluster}/${cl.total}`; }
     else { statusText = `❌ 0/${cl.total}`; }
-    
+
     html += `
       <div class="cluster-card" onclick="openCluster('${cl.kod}')">
         <div class="cluster-badge">${cl.kod}</div>
@@ -1320,14 +1324,14 @@ function renderClusters(club) {
 async function loadGuruByKelab(kod) {
   const container = document.getElementById('guruContent');
   const counter = document.getElementById('guruCount');
-  
+
   // Papar loading
   container.innerHTML = `
     <div class="guru-empty">
       <i class="fas fa-spinner fa-spin"></i>
       <div>Memuatkan senarai guru...</div>
     </div>`;
-  
+
   try {
     const url = `${SPKB_CONFIG.API_URL}?action=guru&kod=${kod}&_t=${Date.now()}`;
     const res = await fetch(url);
@@ -1361,7 +1365,7 @@ const ahli = guruList.filter(g => !/ketua|penolong/i.test(g.peranan));
     if (ketua.length) {
       html += `<div class="guru-group">
         <div class="guru-group-label">
-          <i class="fas fa-star" style="color:var(--khs-gold);"></i> 
+          <i class="fas fa-star" style="color:var(--khs-gold);"></i>
           Ketua Guru Penasihat (${ketua.length})
         </div>
         <div class="guru-list">${ketua.map(g => guruCardHtml(g, 'ketua')).join('')}</div>
@@ -1372,7 +1376,7 @@ const ahli = guruList.filter(g => !/ketua|penolong/i.test(g.peranan));
     if (penolong.length) {
       html += `<div class="guru-group">
         <div class="guru-group-label">
-          <i class="fas fa-user-tie" style="color:var(--secondary);"></i> 
+          <i class="fas fa-user-tie" style="color:var(--secondary);"></i>
           Penolong Ketua (${penolong.length})
         </div>
         <div class="guru-list">${penolong.map(g => guruCardHtml(g, 'penolong')).join('')}</div>
@@ -1385,7 +1389,7 @@ const ahli = guruList.filter(g => !/ketua|penolong/i.test(g.peranan));
       const id = `ahli_${Date.now()}`;
       html += `<div class="guru-group">
         <div class="guru-group-label">
-          <i class="fas fa-users" style="color:#7f8c8d;"></i> 
+          <i class="fas fa-users" style="color:#7f8c8d;"></i>
           Guru Penasihat (${ahli.length})
         </div>
         <div class="guru-list" id="${id}">
@@ -1419,14 +1423,14 @@ function guruCardHtml(g, jenis) {
   // Initials dari nama (max 2 huruf)
   const words = (g.nama || '?').split(/\s+/).filter(w => w.length > 0);
   const initials = words.slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
-  
+
   // Sesi badge
   const sesiClass = String(g.sesi || '').toLowerCase().includes('petang') ? 'petang' : '';
   const sesiBadge = g.sesi ? `<span class="sesi-badge ${sesiClass}">${g.sesi}</span>` : '';
-  
+
   // Kategori sahaja jika peranan biasa
   const meta = `${g.peranan}${g.kategori ? ' · ' + g.kategori : ''}`;
-  
+
   return `
     <div class="guru-card ${jenis}">
       <div class="guru-avatar">${initials || '?'}</div>
@@ -1446,9 +1450,9 @@ function guruCardHtml(g, jenis) {
 function toggleAhliFull(containerId, allAhli) {
   const list = document.getElementById(containerId);
   if (!list) return;
-  
+
   list.innerHTML = allAhli.map(g => guruCardHtml(g, 'ahli')).join('');
-  
+
   // Sembunyikan butang
   const btn = list.parentElement.querySelector('.guru-toggle');
   if (btn) btn.style.display = 'none';
@@ -1514,7 +1518,7 @@ function openClubAction(jenis) {
 
   // Buka borang dalam tab baharu
   window.open(form.url, '_blank');
-  
+
   // Bonus: Tunjuk notifikasi
   if (typeof showToast === 'function') {
     showToast(`📋 Membuka: ${form.nama} untuk ${currentClub.kod}`);
@@ -1640,7 +1644,7 @@ function renderDokumenItem(d) {
   const isFolder = d.jenis === 'Folder';
   const isPautan = d.jenis === 'Pautan';
   const isFail = d.jenis === 'Fail';
-  
+
   let itemClass, statusIcon, actionsBtn;
 
   if (isFolder) {
@@ -1648,7 +1652,7 @@ function renderDokumenItem(d) {
     itemClass = 'folder';
     const fileCount = getFolderFileCount(d.no_dok);
     statusIcon = `<div class="dok-status-icon"><i class="fas fa-folder"></i></div>`;
-    
+
     if (fileCount > 0) {
       actionsBtn = `<button class="dok-btn dok-btn-folder" onclick="openClubFolder('${d.no_dok}')">
         <i class="fas fa-folder-open"></i> ${fileCount} fail
@@ -1662,7 +1666,7 @@ function renderDokumenItem(d) {
     // Pautan EDMS
     itemClass = 'edms';
     statusIcon = `<div class="dok-status-icon"><i class="fas fa-link"></i></div>`;
-    
+
     if (d.edms_url) {
       actionsBtn = `<a class="dok-btn dok-btn-edms" href="${d.edms_url}" target="_blank">
         <i class="fas fa-external-link-alt"></i> EDMS
@@ -1677,7 +1681,7 @@ function renderDokumenItem(d) {
     if (d.ada) {
       itemClass = 'ada';
       statusIcon = `<div class="dok-status-icon"><i class="fas fa-check"></i></div>`;
-      actionsBtn = d.drive_url 
+      actionsBtn = d.drive_url
         ? `<a class="dok-btn dok-btn-drive" href="${d.drive_url}" target="_blank">
              <i class="fas fa-external-link-alt"></i> Drive
            </a>`
@@ -1696,10 +1700,10 @@ function renderDokumenItem(d) {
   // Meta info
   let metaHtml = '';
   const metaItems = [];
-  
+
  if (isFolder) {
     metaItems.push('<span class="dok-meta-tag warn">📁 Folder Auto</span>');
-    
+
     // ⭐ BAHARU: Tag berbeza untuk 017 (kumulatif) vs 014/016 (tahun semasa)
     if (d.no_dok === '017') {
       metaItems.push(`<span class="dok-meta-tag">Semua Tahun (Kumulatif)</span>`);
@@ -1717,7 +1721,7 @@ function renderDokumenItem(d) {
     }
     if (d.oleh) metaItems.push(`<span class="dok-meta-tag">👤 ${d.oleh}</span>`);
   }
-  
+
   if (metaItems.length > 0) {
     metaHtml = `<div class="dok-meta">${metaItems.join('')}</div>`;
   }
@@ -1749,7 +1753,7 @@ function openClubFolder(no_dok) {
     alert('⚠️ ID folder Drive belum ditetapkan untuk kelab ini.');
     return;
   }
-  
+
   const folderUrl = `https://drive.google.com/drive/folders/${currentClub.drive_folder_id}`;
   window.open(folderUrl, '_blank');
 }
@@ -1870,19 +1874,19 @@ async function bukaModulSKAS() {
     p.classList.remove('active');
     p.style.display = 'none';
   });
-  
+
   // Sembunyikan elemen utama dashboard (kekalkan banner & header)
   document.querySelectorAll('.stat-row, .forms-zone, .filter-bar, #categoriesContainer').forEach(function(el) {
     el.style.display = 'none';
   });
-  
+
   // Papar halaman SK@S
   const skasPage = document.getElementById('page-skas');
   skasPage.classList.add('active');
   skasPage.style.display = 'block';
-  
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  
+
   // Load data
   await loadSKASData();
 }
@@ -1895,16 +1899,16 @@ async function loadSKASData() {
     const url = SPKB_CONFIG.API_URL + '?action=skas_dashboard&_t=' + Date.now();
     const response = await fetch(url);
     const result = await response.json();
-    
+
     if (!result.success) throw new Error(result.error);
-    
+
     skasData = result.data;
     renderSKASDashboard();
     loadStaleFiles();
-    
+
   } catch (e) {
     console.error('Gagal load SK@S:', e);
-    document.getElementById('skasAspekContainer').innerHTML = 
+    document.getElementById('skasAspekContainer').innerHTML =
       '<div style="text-align:center;padding:40px;color:var(--danger);">' +
       '<i class="fas fa-exclamation-triangle" style="font-size:32px;"></i>' +
       '<p style="margin-top:14px;">Gagal memuatkan data: ' + e.message + '</p></div>';
@@ -1916,21 +1920,21 @@ async function loadSKASData() {
  */
 function renderSKASDashboard() {
   if (!skasData) return;
-  
+
   // Update overall
   const k = skasData.keseluruhan;
   document.getElementById('skasPeratus').textContent = k.peratus;
-  document.getElementById('skasLabel').textContent = 
+  document.getElementById('skasLabel').textContent =
     'Skor SKPMg2: ' + k.skorSkpm + '/4 (' + k.label + ')';
   document.getElementById('skasTotalFolder').textContent = skasData.folders.length;
   document.getElementById('skasTotalFail').textContent = k.totalFail;
   document.getElementById('skasTotalUpdated').textContent = k.totalGreen;
   document.getElementById('skasTotalStale').textContent = k.totalStale;
-  
+
   // Render aspek cards
   const container = document.getElementById('skasAspekContainer');
   let html = '';
-  
+
   // Group folders by standard
   const foldersByStandard = {};
   skasData.folders.forEach(function(f) {
@@ -1938,18 +1942,18 @@ function renderSKASDashboard() {
     if (!foldersByStandard[std]) foldersByStandard[std] = [];
     foldersByStandard[std].push(f);
   });
-  
+
   // Render setiap standard
   ['3.2.1', '3.2.2-4', '3.2.5', '3.2.6', '3.2.7'].forEach(function(stdId) {
     const folders = foldersByStandard[stdId] || [];
     const stdInfo = SKAS_ASPEK_INFO[stdId];
     const stdData = skasData.standards.find(function(s) { return s.standard_id === stdId; });
-    
+
     if (!stdInfo) return;
-    
+
     html += renderAspekCard(stdId, stdInfo, stdData, folders);
   });
-  
+
   container.innerHTML = html;
 }
 
@@ -1960,7 +1964,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
   const peratus = stdData ? parseInt(String(stdData.peratus || '0%').replace('%','')) : 0;
   const skorSkpm = stdData ? Number(stdData.skor_skpm) || 0 : 0;
   const labelSkpm = stdData ? (stdData.label_skpm || 'N/A') : 'N/A';
-  
+
   // Special handling for linked aspek (3.2.2-4)
   if (info.linked) {
     return `
@@ -1978,7 +1982,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
             <div class="skas-skor-label">Modul Kelab</div>
           </div>
         </div>
-        
+
         <div class="skas-linked-card">
           <h4><i class="fas fa-link"></i> Sambung ke Modul Kelab Sedia Ada</h4>
           <p>Data evidens 3.2.2/3/4 diuruskan secara automatik oleh Modul Pengurusan Kelab</p>
@@ -1993,7 +1997,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
       </div>
     `;
   }
-  
+
   // Calculate stats for this aspek
   let totalFail = 0, totalGreen = 0, totalStale = 0;
   folders.forEach(function(f) {
@@ -2003,7 +2007,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
       totalStale += (f.stats.red || 0) + (f.stats.orange || 0);
     }
   });
-  
+
   // Render folder chips
   let folderChipsHtml = '';
   folders.forEach(function(f) {
@@ -2017,7 +2021,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
       </div>
     `;
   });
-  
+
   return `
     <div class="skas-aspek-card ${info.cssClass}">
       <div class="skas-aspek-header">
@@ -2034,7 +2038,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
           <div class="skas-skor-skpm skor-${skorSkpm}">${skorSkpm}/4 ${labelSkpm}</div>
         </div>
       </div>
-      
+
       <div class="skas-aspek-stats">
         <div class="skas-stat-item">
           <div class="skas-stat-num">${folders.length}</div>
@@ -2053,7 +2057,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
           <div class="skas-stat-lbl">Stale</div>
         </div>
       </div>
-      
+
       <div class="skas-folder-grid">
         ${folderChipsHtml}
       </div>
@@ -2081,19 +2085,19 @@ async function loadStaleFiles() {
     const url = SPKB_CONFIG.API_URL + '?action=skas_stale_files&_t=' + Date.now();
     const response = await fetch(url);
     const result = await response.json();
-    
+
     if (!result.success) return;
-    
+
     const stale = result.data || [];
     if (stale.length === 0) {
       document.getElementById('skasReminder').style.display = 'none';
       return;
     }
-    
+
     document.getElementById('skasReminder').style.display = 'block';
     document.getElementById('skasReminderCount').textContent = stale.length;
     document.getElementById('skasReminderYear').textContent = new Date().getFullYear();
-    
+
     // Show 5 first
     const top5 = stale.slice(0, 5);
     let html = '';
@@ -2116,14 +2120,14 @@ async function loadStaleFiles() {
         </div>
       `;
     });
-    
+
     if (stale.length > 5) {
       html += '<p style="text-align:center;font-size:11px;color:#7f8c8d;margin-top:8px;">' +
               '+ ' + (stale.length - 5) + ' fail lagi belum update</p>';
     }
-    
+
     document.getElementById('skasReminderList').innerHTML = html;
-    
+
   } catch (e) {
     console.error('Gagal load stale:', e);
   }
@@ -2137,12 +2141,12 @@ async function refreshSKASDashboard() {
   const originalHTML = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Refresh...';
   btn.disabled = true;
-  
+
   try {
     const url = SPKB_CONFIG.API_URL + '?action=skas_refresh&_t=' + Date.now();
     const response = await fetch(url);
     const result = await response.json();
-    
+
     if (result.success) {
       showToast('✅ Refresh berjaya. Memuatkan data...');
       await loadSKASData();
@@ -2178,14 +2182,29 @@ function kembaliKeKelab() {
   // Sembunyikan halaman SK@S
   document.getElementById('page-skas').classList.remove('active');
   document.getElementById('page-skas').style.display = 'none';
-  
+
   // Papar semula elemen utama
   document.querySelectorAll('.stat-row, .forms-zone, .filter-bar, #categoriesContainer').forEach(function(el) {
     el.style.display = '';
   });
-  
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+  // Detect jika dalam iframe SPKB
+  (function(){
+    try {
+      if (window !== window.top) {
+        document.body.classList.add('in-spkb');
+        // Terima parameter dari SPKB (cth tahun)
+        var params = new URLSearchParams(window.location.search);
+        var tahunParam = params.get('tahun');
+        if (tahunParam && typeof SPKB_CONFIG !== 'undefined') {
+          SPKB_CONFIG.tahunSemasa = parseInt(tahunParam) || new Date().getFullYear();
+        }
+      }
+    } catch(e) { /* cross-origin — bukan dalam SPKB */ }
+  })();
 </script>
 
 <!-- ===== MODAL: DOKUMEN KLUSTER ===== -->
