@@ -563,6 +563,7 @@ function linkEv(aspekId,fasa,idx){
 const SKAS_API = 'https://script.google.com/macros/s/AKfycbxTXUFFwssqT7Nwg5sJ6tWsVUMD_-zV2h2S35lymOgTW88iVaT1mqag2yHfBoShTWA/exec';
 let padanCache = null;       // cache fail SK@S
 let padanCurrent = null;     // padanan semasa { aspekId, items: [{evIdx, fasa, fileName, fileUrl, score}] }
+function resetPadanCache(){padanCache=null;window._padanDiag=null;alert('Cache dipadam. Klik Auto-Padan semula.');}
 
 // Levenshtein-based similarity (0-1)
 function similarity(a, b){
@@ -605,42 +606,85 @@ async function autoPadan(aspekId){
 
       const folderPromises = folders.map(f => {
         const folderNo = f.no || f.folder_no || f.standard_id;
-        if(!folderNo) return Promise.resolve({success:false, _f:f});
+        if(!folderNo) return Promise.resolve({success:false, _f:f, _reason:'no-folderNo'});
         return fetch(SKAS_API + '?action=skas_folder_detail&no=' + encodeURIComponent(folderNo) + '&_t=' + Date.now())
           .then(r => r.json())
           .then(d => { d._f = f; return d; })
-          .catch(e => ({success:false, _f:f, error:e.message}));
+          .catch(e => ({success:false, _f:f, _reason:'fetch-error', error:e.message}));
       });
 
       const details = await Promise.all(folderPromises);
 
+      // Diagnostik: simpan utk papar jika tiada fail
+      window._padanDiag = {
+        folderCount: folders.length,
+        sampleFolder: folders[0],
+        detailSuccess: details.filter(d=>d.success).length,
+        detailFailed: details.filter(d=>!d.success).length,
+        sampleDetail: details.find(d=>d.success) || details[0],
+        allDetails: details
+      };
+
       // Langkah 3: Agregat semua fail
       const files = [];
+      let totalRawFiles = 0;
+      let skippedNoName = 0;
+      let skippedFolder = 0;
       details.forEach(d => {
         if(!d.success || !d.data) return;
         const folderInfo = d.data.folder || d._f || {};
         const fList = d.data.files || [];
+        totalRawFiles += fList.length;
         fList.forEach(file => {
           // Skip jika ini sebenarnya subfolder, bukan fail
-          if(file.jenis === 'Folder' || file.jenis === 'folder') return;
-          const fileName = file.nama_fail || file.nama || file.name || '';
-          const fileUrl = file.url || file.link || '';
-          if(!fileName || !fileUrl) return;
+          if(file.jenis === 'Folder' || file.jenis === 'folder'){ skippedFolder++; return; }
+          // Cuba pelbagai field nama
+          const fileName = file.nama_fail || file.nama || file.name || file.title || file.fileName || '';
+          // Cuba pelbagai field URL
+          const fileUrl = file.url || file.link || file.fileUrl || file.webViewLink || '';
+          if(!fileName){ skippedNoName++; return; }
           files.push({
-            folderNama: folderInfo.nama_folder || folderInfo.folder_nama || '',
+            folderNama: folderInfo.nama_folder || folderInfo.folder_nama || folderInfo.nama || '',
             folderNo: folderInfo.no || '',
             standardId: folderInfo.standard_id || '',
             fileName: fileName,
-            fileUrl: fileUrl,
+            fileUrl: fileUrl || '#',
             lastUpdate: file.last_update || file.tarikh_kemaskini || ''
           });
         });
       });
+      window._padanDiag.totalRawFiles = totalRawFiles;
+      window._padanDiag.skippedFolder = skippedFolder;
+      window._padanDiag.skippedNoName = skippedNoName;
+      window._padanDiag.finalFiles = files.length;
       padanCache = files;
     }
 
     if(!padanCache.length){
-      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--err);"><i class="fas fa-exclamation-circle" style="font-size:32px;"></i><div style="margin-top:10px;">Tiada fail dijumpai dalam mana-mana folder SK@S.<br><small>Pastikan ada fail yang sudah dimuat naik ke Google Drive dan ter-sync dengan modul Pengurusan Fail.</small></div></div>';
+      const dg = window._padanDiag || {};
+      let diag = '<div style="margin-top:14px;text-align:left;background:#fdedec;border:1px solid var(--err);border-radius:8px;padding:12px;font-size:11px;font-family:monospace;color:#666;">';
+      diag += '<strong style="color:var(--err);font-family:inherit;">🔍 Diagnostik (untuk debug):</strong><br><br>';
+      diag += `• Folder dijumpai: <b>${dg.folderCount||0}</b><br>`;
+      diag += `• Detail berjaya: <b>${dg.detailSuccess||0}</b><br>`;
+      diag += `• Detail gagal: <b>${dg.detailFailed||0}</b><br>`;
+      diag += `• Jumlah item dalam files[]: <b>${dg.totalRawFiles||0}</b><br>`;
+      diag += `• Skip kerana jenis=Folder: <b>${dg.skippedFolder||0}</b><br>`;
+      diag += `• Skip kerana tiada nama: <b>${dg.skippedNoName||0}</b><br><br>`;
+      if(dg.sampleFolder){
+        diag += '<b>Sampel folder:</b><br><pre style="background:#fff;padding:6px;border-radius:4px;overflow-x:auto;max-height:120px;">'+JSON.stringify(dg.sampleFolder,null,2)+'</pre>';
+      }
+      if(dg.sampleDetail){
+        const sd = dg.sampleDetail.data || dg.sampleDetail;
+        const sample = {
+          success: dg.sampleDetail.success,
+          folder: sd.folder,
+          filesCount: (sd.files||[]).length,
+          firstFile: (sd.files||[])[0] || null
+        };
+        diag += '<b>Sampel response detail:</b><br><pre style="background:#fff;padding:6px;border-radius:4px;overflow-x:auto;max-height:200px;">'+JSON.stringify(sample,null,2)+'</pre>';
+      }
+      diag += '<br><i style="font-family:inherit;color:var(--mute);">Salin maklumat di atas dan hantar kepada pembangun untuk debug.</i></div>';
+      list.innerHTML = '<div style="text-align:center;padding:20px 30px;color:var(--err);"><i class="fas fa-exclamation-circle" style="font-size:32px;"></i><div style="margin-top:10px;font-weight:600;">Tiada fail dapat diekstrak dari folder SK@S.</div>'+diag+'</div>';
       return;
     }
 
