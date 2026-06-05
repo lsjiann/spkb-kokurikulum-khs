@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul Kehadiran Kokurikulum — SPKB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--pri:#1a3c6e;--sec:#2e86c1;--acc:#f39c12;--ok:#27ae60;--err:#e74c3c;--warn:#f1c40f;--purp:#8e44ad;--teal:#1abc9c;--bg:#f0f2f5;--card:#fff;--txt:#2c3e50;--mute:#7f8c8d;--bdr:#e0e0e0;--r:12px;--sh:0 2px 12px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;font-size:13px}
+.top{background:linear-gradient(135deg,var(--pri),#0d2240);color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.top h1{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px}
+.top h1 i{color:var(--acc)}
+.top-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top select,.top input{padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:600}
+.top select option{color:#333;background:#fff}
+.top .badge{background:var(--ok);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.btn{padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;transition:.2s;text-decoration:none}
+.btn-back{background:rgba(255,255,255,.2);color:#fff}.btn-back:hover{background:rgba(255,255,255,.35)}
+.btn-pri{background:var(--pri);color:#fff}.btn-pri:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ok{background:var(--ok);color:#fff}.btn-ok:hover{opacity:.9}
+.btn-err{background:var(--err);color:#fff}.btn-err:hover{opacity:.9}
+.btn-warn{background:var(--warn);color:#333}.btn-warn:hover{opacity:.9}
+.btn-outline{background:transparent;border:1.5px solid var(--bdr);color:var(--txt)}.btn-outline:hover{border-color:var(--pri);color:var(--pri)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+
+/* === TABS === */
+.tabs{display:flex;gap:4px;overflow-x:auto;padding:4px 0 12px;border-bottom:2px solid var(--bdr)}
+.tab{padding:9px 16px;border-radius:8px 8px 0 0;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;color:var(--mute);border:1.5px solid transparent;border-bottom:none;transition:.2s;background:transparent}
+.tab:hover{color:var(--pri);background:rgba(26,60,110,.05)}
+.tab.active{color:var(--pri);background:var(--card);border-color:var(--bdr);border-bottom:2px solid var(--card);margin-bottom:-2px}
+.panel{background:var(--card);border-radius:0 0 var(--r) var(--r);padding:18px;box-shadow:var(--sh);display:none}
+.panel.active{display:block}
+
+/* === FILTER BAR === */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px;background:#f8fafc;border-radius:8px;margin-bottom:14px;border:1px solid #eee}
+.filter-bar label{font-size:11px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.3px;margin-right:-2px}
+.filter-bar select,.filter-bar input{padding:7px 12px;border-radius:6px;border:1.5px solid var(--bdr);background:#fff;font-size:12px;color:var(--txt);min-width:120px}
+.filter-bar select:focus,.filter-bar input:focus{outline:none;border-color:var(--sec)}
+.filter-bar .stat-mini{margin-left:auto;display:flex;gap:10px;align-items:center}
+.filter-bar .stat-mini .v{font-size:18px;font-weight:800;color:var(--ok)}
+.filter-bar .stat-mini .l{font-size:10px;color:var(--mute);text-transform:uppercase}
+
+/* === STAT CARDS === */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.stat-card{padding:14px;border-radius:var(--r);border:1.5px solid var(--bdr);background:#fff;text-align:center}
+.stat-card .v{font-size:26px;font-weight:800;color:var(--pri);line-height:1}
+.stat-card .l{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.4px;margin-top:5px}
+.stat-card.ok{border-color:var(--ok);background:#eafaf1}.stat-card.ok .v{color:var(--ok)}
+.stat-card.err{border-color:var(--err);background:#fdedec}.stat-card.err .v{color:var(--err)}
+.stat-card.warn{border-color:var(--warn);background:#fef9e7}.stat-card.warn .v{color:#d4ac0d}
+
+/* === PELAJAR LIST === */
+.pelajar-table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;border:1px solid var(--bdr)}
+.pelajar-table thead{background:var(--pri);color:#fff}
+.pelajar-table th{padding:9px 11px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.pelajar-table td{padding:9px 11px;border-top:1px solid #f0f0f0;font-size:12.5px;vertical-align:middle}
+.pelajar-table tbody tr:hover{background:#f8fafc}
+.pelajar-no{color:var(--mute);font-family:monospace;font-size:11px;text-align:center;width:40px}
+.pelajar-nama{font-weight:600}
+.pelajar-tk{color:var(--mute);font-size:11px}
+
+/* === STATUS BUTTONS === */
+.status-cell{display:flex;gap:4px;justify-content:flex-end}
+.btn-status{padding:5px 10px;border:1.5px solid var(--bdr);border-radius:6px;background:#fff;cursor:pointer;font-size:11px;font-weight:700;color:var(--mute);transition:.15s;min-width:42px;text-align:center}
+.btn-status:hover{transform:scale(1.05)}
+.btn-status.active{border-color:transparent;color:#fff}
+.btn-status[data-s="H"].active{background:var(--ok);box-shadow:0 2px 6px rgba(39,174,96,.4)}
+.btn-status[data-s="TH"].active{background:var(--err);box-shadow:0 2px 6px rgba(231,76,60,.4)}
+.btn-status[data-s="MC"].active{background:var(--warn);color:#333;box-shadow:0 2px 6px rgba(241,196,15,.4)}
+.btn-status[data-s="B"].active{background:var(--sec);box-shadow:0 2px 6px rgba(46,134,193,.4)}
+
+/* === BULK ACTIONS === */
+.bulk-bar{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:10px 12px;background:linear-gradient(135deg,#fffaf0,#fef5e7);border:1.5px solid var(--acc);border-radius:8px;margin-bottom:12px}
+.bulk-bar .info{font-size:12px;color:#7d6608;font-weight:600}
+.bulk-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* === LOADING === */
+.loading{text-align:center;padding:50px 20px;color:var(--mute)}
+.spinner{width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* === ANALISIS === */
+.analisis-pelajar-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid #eee;border-radius:8px;margin-bottom:5px;font-size:12px}
+.analisis-pelajar-row .name{flex:1;font-weight:600}
+.analisis-pelajar-row .kls{color:var(--mute);font-size:11px;min-width:60px}
+.analisis-pelajar-row .bar-wrap{flex:1.5;height:8px;background:#eee;border-radius:4px;overflow:hidden;max-width:200px}
+.analisis-pelajar-row .bar{height:100%;border-radius:4px;transition:width .3s}
+.analisis-pelajar-row .pct{font-weight:800;min-width:50px;text-align:right;font-size:13px}
+.analisis-pelajar-row.danger .pct{color:var(--err)}
+.analisis-pelajar-row.warning .pct{color:#d4ac0d}
+.analisis-pelajar-row.good .pct{color:var(--ok)}
+
+/* === LAPORAN === */
+.laporan-section{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.laporan-section h3{font-size:14px;font-weight:800;color:var(--pri);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+
+/* === EMPTY === */
+.empty{text-align:center;padding:50px 20px;color:var(--mute);font-size:13px}
+.empty i{font-size:42px;color:#bdc3c7;margin-bottom:12px;display:block}
+
+/* === FLOAT BACK === */
+.spkb-back-btn{position:fixed;top:12px;left:12px;z-index:99999;background:var(--pri);color:#fff;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);display:none;align-items:center;gap:6px}
+body.in-spkb .spkb-back-btn{display:flex}
+
+/* === HELPERS === */
+.text-mute{color:var(--mute)}
+.text-ok{color:var(--ok)}
+.text-err{color:var(--err)}
+.mb-10{margin-bottom:10px}
+.mt-10{margin-top:10px}
+@media print{.top,.tabs,.btn,.filter-bar,.bulk-bar,.spkb-back-btn{display:none!important}.panel{display:block!important;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> SPKB</div>
+
+<div class="top">
+  <h1><i class="fas fa-clipboard-list"></i> Kehadiran Kokurikulum <span style="background:rgba(255,255,255,0.2);font-size:10px;padding:3px 8px;border-radius:8px;margin-left:4px;">BETA</span></h1>
+  <div class="top-r">
+    <label style="font-size:12px;">Tahun:</label>
+    <select id="yearSel" onchange="changeYear(this.value)"></select>
+    <span class="badge" id="statusBadge">—</span>
+    <button class="btn btn-back" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="rekod" onclick="switchTab('rekod')"><i class="fas fa-edit"></i> Rekod Perjumpaan</button>
+    <button class="tab" data-tab="unit" onclick="switchTab('unit')"><i class="fas fa-users"></i> Analisis Unit</button>
+    <button class="tab" data-tab="pelajar" onclick="switchTab('pelajar')"><i class="fas fa-user-graduate"></i> Analisis Pelajar</button>
+    <button class="tab" data-tab="laporan" onclick="switchTab('laporan')"><i class="fas fa-file-alt"></i> Laporan KOKUM</button>
+  </div>
+
+  <!-- TAB 1: REKOD -->
+  <div class="panel active" id="panel-rekod">
+    <div class="filter-bar">
+      <label>Unit:</label>
+      <select id="unitSel" onchange="loadPelajar()"><option value="">— Pilih Unit —</option></select>
+      <label>Tarikh:</label>
+      <input type="date" id="tarikhSel" onchange="loadPelajar()">
+      <div class="stat-mini">
+        <div><span class="v" id="miniHadir">0</span> <span class="l">Hadir</span></div>
+        <div><span class="v" id="miniTH" style="color:var(--err)">0</span> <span class="l">Tidak Hadir</span></div>
+        <div><span class="v" id="miniPct" style="color:var(--pri)">—</span> <span class="l">%</span></div>
+      </div>
+    </div>
+    <div id="rekodContent"><div class="empty"><i class="fas fa-info-circle"></i>Pilih unit dan tarikh untuk mula merekod kehadiran.</div></div>
+  </div>
+
+  <!-- TAB 2: ANALISIS UNIT -->
+  <div class="panel" id="panel-unit">
+    <div class="filter-bar">
+      <label>Unit:</label>
+      <select id="unitAnaSel" onchange="renderAnalisisUnit()"><option value="">— Semua Unit —</option></select>
+      <label>Tempoh:</label>
+      <select id="tempohSel" onchange="renderAnalisisUnit()">
+        <option value="all">Tahun Penuh</option>
+        <option value="f1">Fasa 1 (Jan-Mac)</option>
+        <option value="f2">Fasa 2 (Apr-Jul)</option>
+        <option value="f3">Fasa 3 (Ogos-Okt)</option>
+      </select>
+    </div>
+    <div id="anaUnitContent"><div class="loading"><div class="spinner"></div>Mengira analisis…</div></div>
+  </div>
+
+  <!-- TAB 3: ANALISIS PELAJAR -->
+  <div class="panel" id="panel-pelajar">
+    <div class="filter-bar">
+      <label>Tingkatan:</label>
+      <select id="tingkatanFilter" onchange="renderAnalisisPelajar()"><option value="">Semua</option></select>
+      <label>Min %:</label>
+      <select id="minPctFilter" onchange="renderAnalisisPelajar()">
+        <option value="0">Semua</option>
+        <option value="80" selected>≥ 80% (Baik)</option>
+        <option value="60">≥ 60% (Sederhana)</option>
+        <option value="-1">< 80% (Bermasalah)</option>
+      </select>
+    </div>
+    <div id="anaPelajarContent"><div class="loading"><div class="spinner"></div>Mengira analisis pelajar…</div></div>
+  </div>
+
+  <!-- TAB 4: LAPORAN KOKUM -->
+  <div class="panel" id="panel-laporan">
+    <div class="filter-bar">
+      <label>Fasa:</label>
+      <select id="lapFasaSel" onchange="renderLaporan()">
+        <option value="f1">Fasa 1 (Jan-Mac)</option>
+        <option value="f2">Fasa 2 (Apr-Jul)</option>
+        <option value="f3">Fasa 3 (Ogos-Okt)</option>
+        <option value="all">Tahun Penuh</option>
+      </select>
+      <button class="btn btn-pri" onclick="window.print()"><i class="fas fa-print"></i> Cetak / Eksport PDF</button>
+    </div>
+    <div id="laporanContent"></div>
+  </div>
+</div>
+
+<script>
+// =============================================================
+// CONFIG
+// =============================================================
+const STUDENT_API = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+const STATUS = ['H','TH','MC','B'];
+const STATUS_LABEL = {H:'Hadir',TH:'Tidak Hadir',MC:'MC',B:'Bersurat'};
+
+// =============================================================
+// STATE
+// =============================================================
+let currentYear = new Date().getFullYear();
+let pelajarAll = [];     // semua pelajar dari API
+let unitMap = {};         // {kod: {nama, kategori, ahli:[no_urut]}}
+let kehadiranData = {};   // {tarikh|unit: {pelajar_no: status}}
+
+// =============================================================
+// STORAGE
+// =============================================================
+const MEM = {};
+function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
+
+function loadKehadiran(){
+  const raw = sget('kehadiran_'+currentYear);
+  kehadiranData = raw ? JSON.parse(raw) : {};
+}
+function saveKehadiran(){
+  sset('kehadiran_'+currentYear, JSON.stringify(kehadiranData));
+}
+function getKey(unit, tarikh){return unit+'|'+tarikh}
+
+// =============================================================
+// FETCH PELAJAR
+// =============================================================
+async function fetchPelajar(){
+  try {
+    const resp = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
+    const json = await resp.json();
+    if(!json.success) throw new Error(json.error || 'Gagal');
+    pelajarAll = json.data || [];
+    buildUnitMap();
+    populateSelectors();
+    document.getElementById('statusBadge').textContent = pelajarAll.length + ' pelajar';
+    return true;
+  } catch(e){
+    // Fallback: gunakan data demo
+    console.warn('API tidak tersedia, gunakan data demo');
+    loadDemoData();
+    document.getElementById('statusBadge').textContent = 'Demo Mode';
+    document.getElementById('statusBadge').style.background = 'var(--warn)';
+    document.getElementById('statusBadge').style.color = '#333';
+    return false;
+  }
+}
+
+function loadDemoData(){
+  // Data demo jika API tidak boleh diakses
+  const tings = ['Tingkatan 1','Tingkatan 2','Tingkatan 3','Tingkatan 4','Tingkatan 5'];
+  const klsSuffix = ['Adabi','Bestari','Cemerlang','Dinamik'];
+  const unitsKelab = [{k:'K-SAINS',n:'Kelab Sains'},{k:'K-BAHASA',n:'Kelab Bahasa'},{k:'K-MATEMATIK',n:'Kelab Matematik'}];
+  const unitsUni = [{k:'M-PBSM',n:'Pengakap'},{k:'M-PUTERI',n:'Puteri Islam'},{k:'M-KRS',n:'Kadet Remaja'}];
+  const unitsSukan = [{k:'S-BOLASEPAK',n:'Bola Sepak'},{k:'S-BADMINTON',n:'Badminton'},{k:'S-PINGPONG',n:'Ping Pong'}];
+  let no = 1;
+  pelajarAll = [];
+  tings.forEach((t,ti)=>{
+    klsSuffix.forEach(k=>{
+      const kelas = (ti+1) + ' ' + k;
+      for(let i=0;i<10;i++){
+        const kelab = unitsKelab[Math.floor(Math.random()*3)].k+' - '+unitsKelab[Math.floor(Math.random()*3)].n;
+        const uni = unitsUni[Math.floor(Math.random()*3)].k+' - '+unitsUni[Math.floor(Math.random()*3)].n;
+        const suk = unitsSukan[Math.floor(Math.random()*3)].k+' - '+unitsSukan[Math.floor(Math.random()*3)].n;
+        pelajarAll.push({
+          no_urut: no++, nama:'Pelajar '+no, student_no:'2024'+String(no).padStart(4,'0'),
+          tingkatan: t, kelas: kelas,
+          kelab: kelab, uniform: uni, sukan: suk
+        });
+      }
+    });
+  });
+  buildUnitMap();
+  populateSelectors();
+}
+
+function buildUnitMap(){
+  unitMap = {};
+  pelajarAll.forEach(p=>{
+    [['kelab','Kelab/Persatuan'],['uniform','Beruniform'],['sukan','Sukan/Permainan']].forEach(([fld,kat])=>{
+      const raw = (p[fld]||'').trim();
+      if(!raw) return;
+      // Parse "KOD - Nama" format
+      const m = raw.match(/^([^-\s]+)\s*-?\s*(.*)$/);
+      const kod = m ? m[1].trim() : raw.substring(0,20);
+      const nama = m && m[2] ? m[2].trim() : raw;
+      if(!kod) return;
+      if(!unitMap[kod]) unitMap[kod] = {kod, nama, kategori:kat, ahli:[]};
+      unitMap[kod].ahli.push(p.no_urut);
+    });
+  });
+}
+
+function populateSelectors(){
+  // Year
+  const ys = document.getElementById('yearSel');
+  ys.innerHTML = '';
+  const now = new Date().getFullYear();
+  for(let y=now;y>=now-3;y--){
+    const o = document.createElement('option');
+    o.value=y;o.textContent=y;if(y===currentYear)o.selected=true;
+    ys.appendChild(o);
+  }
+  // Unit dropdowns
+  const units = Object.values(unitMap).sort((a,b)=>{
+    const ka={'Beruniform':1,'Kelab/Persatuan':2,'Sukan/Permainan':3}[a.kategori]||9;
+    const kb={'Beruniform':1,'Kelab/Persatuan':2,'Sukan/Permainan':3}[b.kategori]||9;
+    return ka-kb || a.nama.localeCompare(b.nama);
+  });
+  const grpHTML = (firstOpt)=>{
+    const groups = {};
+    units.forEach(u=>{ if(!groups[u.kategori])groups[u.kategori]=[]; groups[u.kategori].push(u); });
+    let h = firstOpt;
+    Object.keys(groups).forEach(g=>{
+      h += `<optgroup label="${g}">`;
+      groups[g].forEach(u=>{ h += `<option value="${u.kod}">${u.nama} (${u.ahli.length})</option>`; });
+      h += '</optgroup>';
+    });
+    return h;
+  };
+  document.getElementById('unitSel').innerHTML = grpHTML('<option value="">— Pilih Unit —</option>');
+  document.getElementById('unitAnaSel').innerHTML = grpHTML('<option value="">— Semua Unit —</option>');
+  // Tingkatan filter
+  const tings = [...new Set(pelajarAll.map(p=>p.tingkatan).filter(Boolean))].sort();
+  let tingHTML = '<option value="">Semua</option>';
+  tings.forEach(t=>{ tingHTML += `<option value="${t}">${t}</option>`; });
+  document.getElementById('tingkatanFilter').innerHTML = tingHTML;
+}
+
+// =============================================================
+// REKOD TAB
+// =============================================================
+function loadPelajar(){
+  const unit = document.getElementById('unitSel').value;
+  const tarikh = document.getElementById('tarikhSel').value;
+  const wrap = document.getElementById('rekodContent');
+  if(!unit || !tarikh){
+    wrap.innerHTML = '<div class="empty"><i class="fas fa-info-circle"></i>Pilih unit dan tarikh untuk mula merekod kehadiran.</div>';
+    updateMiniStats(0,0,0);
+    return;
+  }
+  const u = unitMap[unit];
+  if(!u || !u.ahli.length){
+    wrap.innerHTML = '<div class="empty"><i class="fas fa-users-slash"></i>Tiada ahli berdaftar dalam unit ini.</div>';
+    return;
+  }
+  const key = getKey(unit, tarikh);
+  if(!kehadiranData[key]) kehadiranData[key] = {};
+  const status = kehadiranData[key];
+  const ahli = u.ahli.map(no=>pelajarAll.find(p=>p.no_urut===no)).filter(Boolean)
+                .sort((a,b)=>(a.tingkatan||'').localeCompare(b.tingkatan||'') || (a.kelas||'').localeCompare(b.kelas||'') || (a.nama||'').localeCompare(b.nama||''));
+  
+  let h = '<div class="bulk-bar">';
+  h += `<div class="info"><i class="fas fa-info-circle"></i> ${ahli.length} ahli daftar | ${u.kategori} | ${u.nama}</div>`;
+  h += '<div class="bulk-actions">';
+  h += `<button class="btn btn-ok btn-sm" onclick="bulkSet('H')"><i class="fas fa-check-double"></i> Semua Hadir</button>`;
+  h += `<button class="btn btn-err btn-sm" onclick="bulkSet('TH')"><i class="fas fa-times-circle"></i> Reset (TH)</button>`;
+  h += `<button class="btn btn-outline btn-sm" onclick="exportCSV()"><i class="fas fa-file-csv"></i> CSV</button>`;
+  h += '</div></div>';
+  h += '<table class="pelajar-table"><thead><tr>';
+  h += '<th>#</th><th>Nama</th><th>Tingkatan/Kelas</th><th style="text-align:right;">Status</th>';
+  h += '</tr></thead><tbody>';
+  ahli.forEach((p,i)=>{
+    const s = status[p.no_urut] || '';
+    h += `<tr>`;
+    h += `<td class="pelajar-no">${i+1}</td>`;
+    h += `<td class="pelajar-nama">${p.nama||'?'}</td>`;
+    h += `<td class="pelajar-tk">${p.tingkatan||''} · ${p.kelas||''}</td>`;
+    h += `<td class="status-cell">`;
+    STATUS.forEach(st=>{
+      h += `<button class="btn-status ${s===st?'active':''}" data-s="${st}" onclick="setStatus(${p.no_urut},'${st}')">${st}</button>`;
+    });
+    h += `</td></tr>`;
+  });
+  h += '</tbody></table>';
+  h += '<div style="margin-top:14px;text-align:center;font-size:11px;color:var(--mute);">Disimpan secara automatik ke storan tempatan</div>';
+  wrap.innerHTML = h;
+  refreshMiniStats();
+}
+
+function setStatus(pelajarNo, st){
+  const unit = document.getElementById('unitSel').value;
+  const tarikh = document.getElementById('tarikhSel').value;
+  const key = getKey(unit, tarikh);
+  if(!kehadiranData[key]) kehadiranData[key] = {};
+  if(kehadiranData[key][pelajarNo] === st){
+    delete kehadiranData[key][pelajarNo]; // toggle off
+  } else {
+    kehadiranData[key][pelajarNo] = st;
+  }
+  saveKehadiran();
+  // Update butang ini sahaja
+  const row = event.target.closest('.status-cell');
+  row.querySelectorAll('.btn-status').forEach(b=>{
+    b.classList.toggle('active', b.dataset.s === kehadiranData[key][pelajarNo]);
+  });
+  refreshMiniStats();
+}
+
+function bulkSet(st){
+  if(!confirm(`Tetapkan SEMUA ahli ke "${STATUS_LABEL[st]}"?`)) return;
+  const unit = document.getElementById('unitSel').value;
+  const tarikh = document.getElementById('tarikhSel').value;
+  const u = unitMap[unit];
+  const key = getKey(unit, tarikh);
+  if(!kehadiranData[key]) kehadiranData[key] = {};
+  u.ahli.forEach(no=>{ kehadiranData[key][no] = st; });
+  saveKehadiran();
+  loadPelajar();
+}
+
+function refreshMiniStats(){
+  const unit = document.getElementById('unitSel').value;
+  const tarikh = document.getElementById('tarikhSel').value;
+  if(!unit || !tarikh){ updateMiniStats(0,0,0); return; }
+  const u = unitMap[unit];
+  const key = getKey(unit, tarikh);
+  const status = kehadiranData[key] || {};
+  const total = u.ahli.length;
+  const hadir = u.ahli.filter(no=>status[no]==='H').length;
+  const th = u.ahli.filter(no=>status[no]==='TH').length;
+  const pct = total ? Math.round(hadir/total*100) : 0;
+  updateMiniStats(hadir, th, pct);
+}
+function updateMiniStats(h,t,p){
+  document.getElementById('miniHadir').textContent = h;
+  document.getElementById('miniTH').textContent = t;
+  document.getElementById('miniPct').textContent = p+'%';
+}
+
+function exportCSV(){
+  const unit = document.getElementById('unitSel').value;
+  const tarikh = document.getElementById('tarikhSel').value;
+  if(!unit||!tarikh) return;
+  const u = unitMap[unit];
+  const key = getKey(unit, tarikh);
+  const status = kehadiranData[key] || {};
+  let csv = 'Bil,Student No,Nama,Tingkatan,Kelas,Status\n';
+  u.ahli.forEach((no,i)=>{
+    const p = pelajarAll.find(x=>x.no_urut===no);
+    if(!p) return;
+    csv += `${i+1},"${p.student_no||''}","${p.nama||''}","${p.tingkatan||''}","${p.kelas||''}","${status[no]||''}"\n`;
+  });
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `kehadiran_${u.nama.replace(/\s/g,'_')}_${tarikh}.csv`;
+  a.click();
+}
+
+// =============================================================
+// ANALISIS UNIT
+// =============================================================
+function getDatesInFasa(fasa){
+  if(fasa==='all') return null;
+  const ranges = {f1:[0,2],f2:[3,6],f3:[7,9]};
+  return ranges[fasa];
+}
+
+function getUnitRecords(unitKod, fasa){
+  // Pulangkan { tarikh: { hadir, th, mc, b, total } }
+  const records = {};
+  const fasaRange = getDatesInFasa(fasa);
+  Object.keys(kehadiranData).forEach(key=>{
+    const [u, tarikh] = key.split('|');
+    if(unitKod && u !== unitKod) return;
+    const dateObj = new Date(tarikh);
+    const month = dateObj.getMonth();
+    if(fasaRange && (month < fasaRange[0] || month > fasaRange[1])) return;
+    if(dateObj.getFullYear() !== currentYear) return;
+    if(!records[key]){
+      records[key] = {unit:u, tarikh, hadir:0, th:0, mc:0, b:0, total:0};
+    }
+    const status = kehadiranData[key];
+    Object.values(status).forEach(s=>{
+      records[key].total++;
+      if(s==='H') records[key].hadir++;
+      else if(s==='TH') records[key].th++;
+      else if(s==='MC') records[key].mc++;
+      else if(s==='B') records[key].b++;
+    });
+  });
+  return records;
+}
+
+function renderAnalisisUnit(){
+  const unitKod = document.getElementById('unitAnaSel').value;
+  const fasa = document.getElementById('tempohSel').value;
+  const records = getUnitRecords(unitKod, fasa);
+  const recs = Object.values(records).sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
+  
+  const wrap = document.getElementById('anaUnitContent');
+  if(!recs.length){
+    wrap.innerHTML = '<div class="empty"><i class="fas fa-chart-bar"></i>Tiada rekod kehadiran untuk tempoh ini.<br><small>Mula rekod di tab "Rekod Perjumpaan"</small></div>';
+    return;
+  }
+  
+  const totalH = recs.reduce((s,r)=>s+r.hadir,0);
+  const totalTH = recs.reduce((s,r)=>s+r.th,0);
+  const totalMC = recs.reduce((s,r)=>s+r.mc,0);
+  const totalB = recs.reduce((s,r)=>s+r.b,0);
+  const totalAll = recs.reduce((s,r)=>s+r.total,0);
+  const purata = totalAll ? Math.round(totalH/totalAll*100) : 0;
+  const target = 80; // minimum target
+  
+  let h = '<div class="stats-grid">';
+  h += `<div class="stat-card"><div class="v">${recs.length}</div><div class="l">Perjumpaan</div></div>`;
+  h += `<div class="stat-card ${purata>=target?'ok':purata>=60?'warn':'err'}"><div class="v">${purata}%</div><div class="l">Purata Kehadiran</div></div>`;
+  h += `<div class="stat-card ok"><div class="v">${totalH}</div><div class="l">Jumlah Hadir</div></div>`;
+  h += `<div class="stat-card err"><div class="v">${totalTH}</div><div class="l">Tidak Hadir</div></div>`;
+  h += `<div class="stat-card warn"><div class="v">${totalMC}</div><div class="l">MC</div></div>`;
+  h += `<div class="stat-card"><div class="v">${totalB}</div><div class="l">Bersurat</div></div>`;
+  h += '</div>';
+
+  h += '<h3 style="font-size:13px;font-weight:800;color:var(--pri);margin:14px 0 8px;"><i class="fas fa-calendar-alt"></i> Senarai Perjumpaan</h3>';
+  h += '<table class="pelajar-table"><thead><tr><th>Tarikh</th><th>Unit</th><th>Hadir</th><th>TH</th><th>MC</th><th>B</th><th>%</th></tr></thead><tbody>';
+  recs.forEach(r=>{
+    const u = unitMap[r.unit];
+    const pct = r.total ? Math.round(r.hadir/r.total*100) : 0;
+    const cls = pct>=target?'text-ok':pct>=60?'':'text-err';
+    h += `<tr><td>${r.tarikh}</td><td>${u?u.nama:r.unit}</td>`;
+    h += `<td class="text-ok">${r.hadir}</td><td class="text-err">${r.th}</td>`;
+    h += `<td>${r.mc}</td><td>${r.b}</td>`;
+    h += `<td class="${cls}" style="font-weight:800;">${pct}%</td></tr>`;
+  });
+  h += '</tbody></table>';
+  wrap.innerHTML = h;
+}
+
+// =============================================================
+// ANALISIS PELAJAR
+// =============================================================
+function getPelajarStats(){
+  // Untuk setiap pelajar: jumlah perjumpaan dia patut hadir vs yang dia hadir
+  const stats = {};
+  pelajarAll.forEach(p=>{ stats[p.no_urut] = {p, total:0, hadir:0, th:0, mc:0, b:0}; });
+  Object.keys(kehadiranData).forEach(key=>{
+    const [u, tarikh] = key.split('|');
+    if(new Date(tarikh).getFullYear() !== currentYear) return;
+    const status = kehadiranData[key];
+    Object.keys(status).forEach(no=>{
+      const s = stats[no];
+      if(!s) return;
+      s.total++;
+      if(status[no]==='H') s.hadir++;
+      else if(status[no]==='TH') s.th++;
+      else if(status[no]==='MC') s.mc++;
+      else if(status[no]==='B') s.b++;
+    });
+  });
+  return stats;
+}
+
+function renderAnalisisPelajar(){
+  const stats = getPelajarStats();
+  const ting = document.getElementById('tingkatanFilter').value;
+  const minPct = parseInt(document.getElementById('minPctFilter').value);
+  
+  const rows = Object.values(stats)
+    .filter(s=>s.total>0)
+    .filter(s=>!ting || s.p.tingkatan === ting)
+    .map(s=>({...s, pct: Math.round(s.hadir/s.total*100)}))
+    .filter(s=>{
+      if(minPct === -1) return s.pct < 80;
+      return s.pct >= minPct;
+    })
+    .sort((a,b)=>a.pct - b.pct);
+  
+  const wrap = document.getElementById('anaPelajarContent');
+  if(!rows.length){
+    wrap.innerHTML = '<div class="empty"><i class="fas fa-user-graduate"></i>Tiada pelajar yang sepadan filter.<br><small>Cuba tukar filter atau mula rekod kehadiran</small></div>';
+    return;
+  }
+  
+  // Stats ringkas
+  const total = rows.length;
+  const bermasalah = rows.filter(r=>r.pct<80).length;
+  const cemerlang = rows.filter(r=>r.pct>=95).length;
+  
+  let h = '<div class="stats-grid">';
+  h += `<div class="stat-card"><div class="v">${total}</div><div class="l">Pelajar Aktif</div></div>`;
+  h += `<div class="stat-card ${bermasalah>0?'err':''}"><div class="v">${bermasalah}</div><div class="l">Kehadiran < 80%</div></div>`;
+  h += `<div class="stat-card ok"><div class="v">${cemerlang}</div><div class="l">Cemerlang (≥95%)</div></div>`;
+  h += '</div>';
+  
+  h += '<div style="background:#f8fafc;border-radius:8px;padding:10px;max-height:540px;overflow-y:auto;">';
+  rows.forEach(r=>{
+    const cls = r.pct<80?'danger':r.pct<90?'warning':'good';
+    const barColor = r.pct<80?'var(--err)':r.pct<90?'var(--warn)':'var(--ok)';
+    h += `<div class="analisis-pelajar-row ${cls}">`;
+    h += `<span class="name">${r.p.nama}</span>`;
+    h += `<span class="kls">${r.p.kelas||''}</span>`;
+    h += `<div class="bar-wrap"><div class="bar" style="width:${r.pct}%;background:${barColor}"></div></div>`;
+    h += `<span class="pct">${r.pct}%</span>`;
+    h += `<span style="font-size:11px;color:var(--mute);min-width:60px;">${r.hadir}/${r.total}</span>`;
+    h += `</div>`;
+  });
+  h += '</div>';
+  wrap.innerHTML = h;
+}
+
+// =============================================================
+// LAPORAN KOKUM
+// =============================================================
+function renderLaporan(){
+  const fasa = document.getElementById('lapFasaSel').value;
+  const fasaLabel = {f1:'Fasa 1 (Januari – Mac)',f2:'Fasa 2 (April – Julai)',f3:'Fasa 3 (Ogos – Oktober)',all:'Tahun Penuh'}[fasa];
+  
+  // Kira per unit
+  const unitStats = {};
+  Object.values(unitMap).forEach(u=>{
+    unitStats[u.kod] = {nama:u.nama, kategori:u.kategori, perjumpaan:0, totalAhli:0, totalHadir:0};
+  });
+  
+  Object.keys(kehadiranData).forEach(key=>{
+    const [u, tarikh] = key.split('|');
+    const dateObj = new Date(tarikh);
+    if(dateObj.getFullYear() !== currentYear) return;
+    const fasaRange = getDatesInFasa(fasa);
+    if(fasaRange){
+      const month = dateObj.getMonth();
+      if(month < fasaRange[0] || month > fasaRange[1]) return;
+    }
+    if(!unitStats[u]) return;
+    unitStats[u].perjumpaan++;
+    const status = kehadiranData[key];
+    Object.values(status).forEach(s=>{
+      unitStats[u].totalAhli++;
+      if(s==='H') unitStats[u].totalHadir++;
+    });
+  });
+  
+  const stats = Object.values(unitStats).filter(s=>s.perjumpaan>0).map(s=>({
+    ...s, purata: s.totalAhli ? Math.round(s.totalHadir/s.totalAhli*100) : 0
+  })).sort((a,b)=>b.purata - a.purata);
+  
+  const totalUnit = stats.length;
+  const purataKeseluruhan = stats.length ? Math.round(stats.reduce((s,x)=>s+x.purata,0)/stats.length) : 0;
+  
+  let h = '<div class="laporan-section" style="text-align:center;">';
+  h += '<h3 style="margin:0 0 4px;font-size:16px;justify-content:center;">📋 ANALISIS BULANAN KEHADIRAN MURID</h3>';
+  h += `<p style="margin:0;color:var(--mute);font-size:12px;">${fasaLabel} · Tahun ${currentYear}</p>`;
+  h += `<p style="margin:6px 0 0;color:var(--mute);font-size:11px;font-style:italic;">Untuk Standard Kualiti @ Sekolah (SK@S) 3.2 — Evidens KOKUM</p>`;
+  h += '</div>';
+  
+  h += '<div class="stats-grid">';
+  h += `<div class="stat-card"><div class="v">${totalUnit}</div><div class="l">Unit Aktif</div></div>`;
+  h += `<div class="stat-card ${purataKeseluruhan>=80?'ok':purataKeseluruhan>=60?'warn':'err'}"><div class="v">${purataKeseluruhan}%</div><div class="l">Purata Kehadiran</div></div>`;
+  h += `<div class="stat-card"><div class="v">${stats.reduce((s,x)=>s+x.perjumpaan,0)}</div><div class="l">Jumlah Perjumpaan</div></div>`;
+  h += `<div class="stat-card"><div class="v">${stats.reduce((s,x)=>s+x.totalAhli,0)}</div><div class="l">Penyertaan</div></div>`;
+  h += '</div>';
+  
+  if(!stats.length){
+    h += '<div class="empty"><i class="fas fa-chart-pie"></i>Tiada data kehadiran untuk fasa ini.</div>';
+    document.getElementById('laporanContent').innerHTML = h;
+    return;
+  }
+  
+  // Per kategori
+  ['Beruniform','Kelab/Persatuan','Sukan/Permainan'].forEach(kat=>{
+    const grpStats = stats.filter(s=>s.kategori===kat);
+    if(!grpStats.length) return;
+    h += '<div class="laporan-section">';
+    h += `<h3><i class="fas fa-folder"></i> ${kat} (${grpStats.length} unit)</h3>`;
+    h += '<table class="pelajar-table"><thead><tr><th>#</th><th>Unit</th><th>Perjumpaan</th><th>Penyertaan</th><th>Hadir</th><th>%</th></tr></thead><tbody>';
+    grpStats.forEach((s,i)=>{
+      const cls = s.purata>=80?'text-ok':s.purata>=60?'':'text-err';
+      h += `<tr><td>${i+1}</td><td><strong>${s.nama}</strong></td>`;
+      h += `<td>${s.perjumpaan}</td><td>${s.totalAhli}</td>`;
+      h += `<td class="text-ok">${s.totalHadir}</td>`;
+      h += `<td class="${cls}" style="font-weight:800;">${s.purata}%</td></tr>`;
+    });
+    h += '</tbody></table>';
+    h += '</div>';
+  });
+  
+  // Pelajar bermasalah
+  const pelStats = getPelajarStats();
+  const bermasalah = Object.values(pelStats).map(s=>({...s, pct: s.total?Math.round(s.hadir/s.total*100):0})).filter(s=>s.total>0 && s.pct<80).sort((a,b)=>a.pct-b.pct);
+  if(bermasalah.length){
+    h += '<div class="laporan-section">';
+    h += `<h3 style="color:var(--err);"><i class="fas fa-exclamation-triangle"></i> Pelajar Kehadiran < 80% (${bermasalah.length} pelajar) — Perlu Tindakan</h3>`;
+    h += '<table class="pelajar-table"><thead><tr><th>#</th><th>Nama</th><th>Tingkatan</th><th>Kelas</th><th>Hadir/Total</th><th>%</th></tr></thead><tbody>';
+    bermasalah.slice(0,30).forEach((s,i)=>{
+      h += `<tr><td>${i+1}</td><td><strong>${s.p.nama}</strong></td><td>${s.p.tingkatan||'-'}</td><td>${s.p.kelas||'-'}</td><td>${s.hadir}/${s.total}</td><td class="text-err" style="font-weight:800;">${s.pct}%</td></tr>`;
+    });
+    h += '</tbody></table>';
+    if(bermasalah.length>30) h += `<p style="font-size:11px;color:var(--mute);margin-top:8px;">…dan ${bermasalah.length-30} pelajar lagi.</p>`;
+    h += '</div>';
+  }
+  
+  // Tindakan susulan dicadangkan
+  h += '<div class="laporan-section">';
+  h += `<h3><i class="fas fa-lightbulb"></i> Cadangan Tindakan Susulan (KOKUM)</h3>`;
+  h += '<ol style="padding-left:20px;font-size:12.5px;line-height:1.8;">';
+  if(purataKeseluruhan < 80){
+    h += `<li>Purata kehadiran <strong>${purataKeseluruhan}%</strong> — di bawah target 80%. Adakan mesyuarat dengan guru penasihat unit bermasalah.</li>`;
+  }
+  if(bermasalah.length){
+    h += `<li><strong>${bermasalah.length} pelajar</strong> dengan kehadiran < 80% perlu dipanggil untuk sesi bimbingan oleh guru penasihat / kaunselor.</li>`;
+  }
+  const unitBermasalah = stats.filter(s=>s.purata<80);
+  if(unitBermasalah.length){
+    h += `<li><strong>${unitBermasalah.length} unit</strong> dengan purata kehadiran < 80%. Tinjau sebab (jadual, lokasi, aktiviti) dan rancang penambahbaikan.</li>`;
+  }
+  h += '<li>Hantar surat kepada ibu bapa pelajar yang kerap tidak hadir untuk pemakluman dan kerjasama.</li>';
+  h += '<li>Eksport laporan ini sebagai PDF untuk evidens SK@S 3.2 (Aspek 3.2.1, 3.2.2, 3.2.3, 3.2.4).</li>';
+  h += '</ol>';
+  h += '</div>';
+  
+  // Footer / signature
+  h += '<div class="laporan-section" style="text-align:center;font-size:11px;color:var(--mute);">';
+  h += `<p>Dijana oleh SPKB Modul Kehadiran · ${new Date().toLocaleString('ms-MY')}</p>`;
+  h += `<p style="margin-top:6px;">Disediakan oleh: ____________________ &nbsp;&nbsp;&nbsp; Disemak oleh: ____________________</p>`;
+  h += '</div>';
+  
+  document.getElementById('laporanContent').innerHTML = h;
+}
+
+// =============================================================
+// NAVIGATION
+// =============================================================
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
+  if(tab==='unit') renderAnalisisUnit();
+  else if(tab==='pelajar') renderAnalisisPelajar();
+  else if(tab==='laporan') renderLaporan();
+}
+
+function changeYear(y){
+  currentYear = parseInt(y);
+  loadKehadiran();
+  // Re-render current tab
+  const active = document.querySelector('.tab.active');
+  if(active) switchTab(active.dataset.tab);
+}
+
+// =============================================================
+// INIT
+// =============================================================
+(async function init(){
+  try{if(window!==window.top) document.body.classList.add('in-spkb')}catch(e){}
+  // Set tarikh hari ini sebagai default
+  document.getElementById('tarikhSel').value = new Date().toISOString().substring(0,10);
+  // Year param dari URL
+  const p = new URLSearchParams(window.location.search);
+  if(p.get('tahun')) currentYear = parseInt(p.get('tahun'));
+  loadKehadiran();
+  await fetchPelajar();
+})();
+</script>
+</body>
+</html>
