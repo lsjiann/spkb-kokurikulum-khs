@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instrumen SKPMg2 Standard 3.2 — Pengurusan Kokurikulum</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--pri:#1a3c6e;--sec:#2e86c1;--acc:#f39c12;--ok:#27ae60;--err:#e74c3c;--warn:#f1c40f;--purp:#8e44ad;--teal:#1abc9c;--bg:#f0f2f5;--card:#fff;--txt:#2c3e50;--mute:#7f8c8d;--bdr:#e0e0e0;--r:12px;--sh:0 2px 12px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+.top{background:linear-gradient(135deg,var(--pri),#0d2240);color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.top h1{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px}
+.top h1 i{color:var(--acc)}
+.top-r{display:flex;align-items:center;gap:10px}
+.top select{padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:600}
+.top select option{color:#333;background:#fff}
+.top .badge{background:var(--ok);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.btn{padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;transition:.2s}
+.btn-back{background:rgba(255,255,255,.2);color:#fff}.btn-back:hover{background:rgba(255,255,255,.35)}
+.btn-pri{background:var(--pri);color:#fff}.btn-pri:hover{opacity:.9}
+.btn-ok{background:var(--ok);color:#fff}.btn-ok:hover{opacity:.9}
+.btn-sm{padding:4px 8px;font-size:11px}
+.btn-outline{background:transparent;border:1.5px solid var(--bdr);color:var(--txt)}.btn-outline:hover{border-color:var(--pri);color:var(--pri)}
+.wrap{max-width:1200px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding:4px 0 12px;border-bottom:2px solid var(--bdr)}
+.tab{padding:9px 14px;border-radius:8px 8px 0 0;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;color:var(--mute);border:1.5px solid transparent;border-bottom:none;transition:.2s;position:relative}
+.tab:hover{color:var(--pri);background:rgba(26,60,110,.05)}
+.tab.active{color:var(--pri);background:var(--card);border-color:var(--bdr);border-bottom:2px solid var(--card);margin-bottom:-2px}
+.tab .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:5px}
+.dot-g{background:var(--ok)}.dot-y{background:var(--warn)}.dot-o{background:#e67e22}.dot-r{background:var(--err)}.dot-x{background:#bdc3c7}
+.aspek-panel{display:none;background:var(--card);border-radius:0 0 var(--r) var(--r);padding:20px;box-shadow:var(--sh)}
+.aspek-panel.active{display:block}
+.section-title{font-size:14px;font-weight:800;color:var(--pri);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.section-title:first-child{margin-top:0}
+.section-title i{color:var(--sec)}
+.sk-box{background:linear-gradient(135deg,#f8fbff,#eef4fb);border:1px solid #d4e4f7;border-radius:var(--r);padding:16px;font-size:13px;margin-bottom:16px}
+.rubrik-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.rubrik-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left;font-weight:700}
+.rubrik-table td{padding:8px 10px;border:1px solid var(--bdr);vertical-align:top}
+.rubrik-table tr:nth-child(even) td{background:#f8fafc}
+.fasa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:900px){.fasa-grid{grid-template-columns:1fr}}
+.fasa-col{border:1.5px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+.fasa-head{padding:10px 14px;font-size:12px;font-weight:800;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.fasa-1 .fasa-head{background:#2980b9}.fasa-2 .fasa-head{background:var(--teal)}.fasa-3 .fasa-head{background:var(--purp)}
+.fasa-body{padding:8px}
+.ev-item{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:6px;font-size:12px;margin-bottom:4px;background:#f8fafc;border:1px solid #eee;transition:.15s}
+.ev-item:hover{border-color:var(--sec);background:#f0f7ff}
+.ev-item input[type=checkbox]{margin-top:2px;accent-color:var(--ok);width:15px;height:15px;cursor:pointer}
+.ev-item .ev-text{flex:1;line-height:1.4}
+.ev-item .ev-text.done{text-decoration:line-through;color:var(--mute)}
+.ev-actions{display:flex;gap:3px;flex-shrink:0}
+.ev-actions button{width:22px;height:22px;border:none;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.ev-link{background:#eaf0fb;color:var(--sec)}.ev-link:hover{background:var(--sec);color:#fff}
+.ev-del{background:#fde;color:var(--err)}.ev-del:hover{background:var(--err);color:#fff}
+.add-row{display:flex;gap:6px;padding:8px}
+.add-row input{flex:1;padding:6px 10px;border:1.5px solid var(--bdr);border-radius:6px;font-size:12px}
+.add-row input:focus{outline:none;border-color:var(--sec)}
+.skor-card{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0}
+.skor-box{text-align:center;padding:14px;border-radius:var(--r);border:1.5px solid var(--bdr)}
+.skor-box .skor-val{font-size:28px;font-weight:800;margin-bottom:2px}
+.skor-box .skor-lbl{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px}
+.skor-ok{border-color:var(--ok);background:#eafaf1}.skor-ok .skor-val{color:var(--ok)}
+.skor-warn{border-color:var(--warn);background:#fef9e7}.skor-warn .skor-val{color:#d4ac0d}
+.skor-err{border-color:var(--err);background:#fdedec}.skor-err .skor-val{color:var(--err)}
+.progress-bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;margin:6px 0}
+.progress-bar .fill{height:100%;border-radius:4px;transition:width .4s}
+.summary-strip{display:flex;gap:10px;overflow-x:auto;padding:8px 0;margin-bottom:4px}
+.sum-chip{padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;border:1.5px solid var(--bdr);background:var(--card)}
+.sum-chip.hi{border-color:var(--ok);color:var(--ok)}.sum-chip.mid{border-color:var(--warn);color:#d4ac0d}.sum-chip.lo{border-color:var(--err);color:var(--err)}
+.spkb-back-btn{position:fixed;top:12px;left:12px;z-index:99999;background:var(--pri);color:#fff;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);display:none;align-items:center;gap:6px}
+body.in-spkb .spkb-back-btn{display:flex}
+.print-only{display:none}
+@media print{.top,.tabs,.btn,.add-row,.ev-actions,.spkb-back-btn{display:none!important}.aspek-panel{display:block!important;break-inside:avoid;page-break-inside:avoid}.print-only{display:block}}
+</style>
+</head>
+<body>
+<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> SPKB</div>
+<div class="top">
+  <h1><i class="fas fa-clipboard-check"></i> Instrumen SKPMg2 Standard 3.2</h1>
+  <div class="top-r">
+    <label style="font-size:12px;font-weight:600;">Tahun Sesi:</label>
+    <select id="yearSelect" onchange="switchYear(this.value)"></select>
+    <span class="badge" id="skorBadge">—</span>
+    <button class="btn btn-back" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="summary-strip" id="summaryStrip"></div>
+  <div class="tabs" id="tabBar"></div>
+  <div id="panels"></div>
+</div>
+<script>
+// ============================================================
+// DATA: 7 Aspek SKPMg2 Standard 3.2
+// Evidens dipertingkatkan berdasarkan keperluan audit KPM
+// ============================================================
+const ASPEK_DATA = [
+{
+  id:'321', kod:'3.2.1', nama:'Ketetapan Pelaksanaan Kokurikulum',
+  sk:'Sekolah merancang dan mengurus pelaksanaan kokurikulum mengikut ketetapan KPM melalui penubuhan jawatankuasa, penyediaan prosedur kerja, jadual pelaksanaan, dan pemantauan berkala.',
+  rubrik:[
+    {tahap:1,penerangan:'Tiada perancangan dan pengurusan kokurikulum.'},
+    {tahap:2,penerangan:'Perancangan kokurikulum ada tetapi tidak menyeluruh dan tidak dilaksanakan dengan sistematik.'},
+    {tahap:3,penerangan:'Perancangan kokurikulum menyeluruh, dilaksanakan secara sistematik, tetapi pemantauan minima.'},
+    {tahap:4,penerangan:'Perancangan menyeluruh, dilaksanakan sistematik, dipantau secara berkala, dan tindakan susulan diambil.'},
+    {tahap:5,penerangan:'Perancangan menyeluruh, dilaksanakan sistematik, pemantauan konsisten, tindakan susulan berkesan, dan budaya kecemerlangan kokurikulum terbentuk.'}
+  ],
+  evidens:{
+    fasa1:[
+      'Carta organisasi Unit Kokurikulum Sekolah',
+      'Carta organisasi Jawatankuasa Kokurikulum',
+      'Manual Prosedur Kerja Unit Kokurikulum Sekolah',
+      'Pekeliling-pekeliling berkaitan kokurikulum (SPI Bil 1/1985, SPI Bil 2/1986, SPI Bil 24/1998)',
+      'Dasar Kokurikulum Sekolah',
+      'Surat pelantikan guru penasihat',
+      'Senarai nama guru penasihat & ahli Unit SeMaNiS',
+      'Takwim Kokurikulum Sekolah/PPD/JPN',
+      'Jadual Pertemuan Kokurikulum (Kelab/Persatuan)',
+      'Jadual Pertemuan Badan Beruniform',
+      'Jadual Pertemuan Sukan/Permainan',
+      'Scheme of Work (SOW) Kelab/Persatuan',
+      'Scheme of Work (SOW) Badan Beruniform',
+      'Scheme of Work (SOW) Sukan/Permainan',
+      'Buku Pengurusan Sekolah — Bab Kokurikulum',
+      'Perancangan Strategik Kokurikulum (3 Tahun)',
+      'Pelan Taktikal & Pelan Operasi Kokurikulum',
+      'KPI Kokurikulum Sekolah',
+      'Analisis SWOT Kokurikulum',
+      'Minit Mesyuarat JK Kokurikulum Bil 01',
+      'Laporan SKPMg2 Standard 3 (3.2.2.1) Fasa Sebelumnya',
+      'Piagam Kejayaan Unit Kokurikulum'
+    ],
+    fasa2:[
+      'Analisis Learning Walk (LW) Apr-Jul',
+      'Analisis Bulanan Kehadiran Murid Apr-Jul',
+      'Minit Mesyuarat JK Kokurikulum Bil 02 (Agenda: LW, Kehadiran, Perancangan)',
+      'Laporan KOKUM Apr-Jul (Kelab/Persatuan)',
+      'Laporan KOKUM Apr-Jul (Beruniform)',
+      'Laporan KOKUM Apr-Jul (Sukan/Permainan)',
+      'Laporan SKPMg2 Standard 3 (3.2.2.1) Fasa 1',
+      'Laporan Pemantauan Aktiviti Kokurikulum Sem 1'
+    ],
+    fasa3:[
+      'Analisis Learning Walk (LW) Ogos-Oktober',
+      'Analisis Bulanan Kehadiran Murid Ogos-Oktober',
+      'Minit Mesyuarat JK Kokurikulum Bil 03 (Agenda: Analisis LW, Pencapaian KPI & Kelab)',
+      'Laporan KOKUM Ogos-Oktober (Kelab/Persatuan)',
+      'Laporan KOKUM Ogos-Oktober (Beruniform)',
+      'Laporan KOKUM Ogos-Oktober (Sukan/Permainan)',
+      'Laporan SKPMg2 Standard 3 (3.2.2.1) Fasa 2',
+      'Laporan Akhir Tahun Kokurikulum',
+      'Laporan Pencapaian KPI Kokurikulum',
+      'Cadangan Penambahbaikan Tahun Hadapan'
+    ]
+  }
+},
+{
+  id:'322', kod:'3.2.2', nama:'Pengurusan Kelab & Persatuan',
+  sk:'Sekolah mengurus kelab dan persatuan secara sistematik melalui perancangan aktiviti, pelaksanaan berkala, pemantauan kehadiran, dan penilaian keberkesanan.',
+  rubrik:[
+    {tahap:1,penerangan:'Tiada pengurusan kelab dan persatuan.'},
+    {tahap:2,penerangan:'Pengurusan kelab dan persatuan ada tetapi tidak sistematik.'},
+    {tahap:3,penerangan:'Pengurusan kelab dan persatuan sistematik dengan aktiviti berkala.'},
+    {tahap:4,penerangan:'Pengurusan sistematik, dipantau, dan tindakan susulan diambil untuk penambahbaikan.'},
+    {tahap:5,penerangan:'Pengurusan cemerlang dengan inovasi, penglibatan luas, dan impak jelas kepada pelajar.'}
+  ],
+  evidens:{
+    fasa1:[
+      'Carta organisasi Unit Kokurikulum Sekolah',
+      'Manual Prosedur Kerja Kelab dan Persatuan',
+      'Pekeliling berkaitan pelaksanaan kokurikulum',
+      'Dasar Kokurikulum Sekolah',
+      'Surat lantikan guru penasihat Kelab & Persatuan',
+      'Senarai nama guru penasihat & ahli Kelab/Persatuan',
+      'Takwim Kelab/Persatuan',
+      'Jadual Pelaksanaan Kelab/Persatuan',
+      'Scheme of Work (SOW) Kelab/Persatuan',
+      'Analisis Learning Walk (LW) Jan-Mac',
+      'Analisis Bulanan Kehadiran Murid (Jan-Mac)',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 01',
+      'Fail Pengurusan KOKUM (Kelab/Persatuan)',
+      'Laporan KOKUM Jan-Mac (Kelab/Persatuan)',
+      'Laporan SKPMg2 Standard 3 (3.2.2.1) Fasa Sebelumnya',
+      'Rekod Kehadiran Perjumpaan Mingguan Kelab'
+    ],
+    fasa2:[
+      'Analisis Learning Walk (LW) Apr-Jul (Kelab/Persatuan)',
+      'Analisis Bulanan Kehadiran Murid Apr-Jul',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 02',
+      'Laporan KOKUM Apr-Jul (Kelab/Persatuan)',
+      'Laporan SKPMg2 Standard 3 (3.2.2.1) Fasa 1',
+      'Laporan Aktiviti/Program Kelab Sem 1'
+    ],
+    fasa3:[
+      'Analisis Learning Walk (LW) Ogos-Okt (Kelab/Persatuan)',
+      'Analisis Bulanan Kehadiran Murid Ogos-Okt',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 03',
+      'Laporan KOKUM Ogos-Okt (Kelab/Persatuan)',
+      'Laporan SKPMg2 Standard 3 (3.2.2.1) Fasa 2',
+      'Laporan Akhir Tahun Kelab & Persatuan'
+    ]
+  }
+},
+{
+  id:'323', kod:'3.2.3', nama:'Pengurusan Badan Beruniform',
+  sk:'Sekolah mengurus badan beruniform secara sistematik melalui perancangan aktiviti, pelaksanaan berkala, pemantauan kehadiran, dan penilaian keberkesanan.',
+  rubrik:[
+    {tahap:1,penerangan:'Tiada pengurusan badan beruniform.'},
+    {tahap:2,penerangan:'Pengurusan badan beruniform ada tetapi tidak sistematik.'},
+    {tahap:3,penerangan:'Pengurusan badan beruniform sistematik dengan aktiviti berkala.'},
+    {tahap:4,penerangan:'Pengurusan sistematik, dipantau, dan tindakan susulan diambil.'},
+    {tahap:5,penerangan:'Pengurusan cemerlang dengan inovasi, penglibatan luas, dan impak jelas.'}
+  ],
+  evidens:{
+    fasa1:[
+      'Carta organisasi Unit Kokurikulum Sekolah',
+      'Manual Prosedur Kerja Unit Beruniform',
+      'Pekeliling berkaitan kokurikulum',
+      'Dasar Kokurikulum Sekolah',
+      'Surat lantikan guru penasihat Unit Beruniform',
+      'Senarai nama guru penasihat & ahli Unit Beruniform',
+      'Takwim Unit Beruniform',
+      'Jadual Pelaksanaan Unit Beruniform',
+      'Scheme of Work (SOW) Unit Beruniform',
+      'Analisis Learning Walk (LW) Jan-Mac',
+      'Analisis Bulanan Kehadiran Murid (Jan-Mac)',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 01',
+      'Fail Pengurusan KOKUM (Unit Beruniform)',
+      'Laporan KOKUM Jan-Mac (Unit Beruniform)',
+      'Laporan SKPMg2 Standard 3 Fasa Sebelumnya',
+      'Rekod Kehadiran Perjumpaan Mingguan Beruniform',
+      'Rekod Pencapaian & Anugerah Unit Beruniform'
+    ],
+    fasa2:[
+      'Analisis Learning Walk (LW) Apr-Jul (Unit Beruniform)',
+      'Analisis Bulanan Kehadiran Murid Apr-Jul',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 02',
+      'Laporan KOKUM Apr-Jul (Unit Beruniform)',
+      'Laporan SKPMg2 Standard 3 Fasa 1',
+      'Laporan Aktiviti/Perkhemahan Unit Beruniform Sem 1'
+    ],
+    fasa3:[
+      'Analisis Learning Walk (LW) Ogos-Okt (Unit Beruniform)',
+      'Analisis Bulanan Kehadiran Murid Ogos-Okt',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 03',
+      'Laporan KOKUM Ogos-Okt (Unit Beruniform)',
+      'Laporan SKPMg2 Standard 3 Fasa 2',
+      'Laporan Akhir Tahun Unit Beruniform'
+    ]
+  }
+},
+{
+  id:'324', kod:'3.2.4', nama:'Pengurusan Sukan & Permainan',
+  sk:'Sekolah mengurus sukan dan permainan secara sistematik melalui perancangan aktiviti, pelaksanaan berkala, pemantauan kehadiran, dan penilaian keberkesanan.',
+  rubrik:[
+    {tahap:1,penerangan:'Tiada pengurusan sukan dan permainan.'},
+    {tahap:2,penerangan:'Pengurusan sukan dan permainan ada tetapi tidak sistematik.'},
+    {tahap:3,penerangan:'Pengurusan sukan dan permainan sistematik dengan aktiviti berkala.'},
+    {tahap:4,penerangan:'Pengurusan sistematik, dipantau, dan tindakan susulan diambil.'},
+    {tahap:5,penerangan:'Pengurusan cemerlang dengan inovasi, penglibatan luas, dan impak jelas.'}
+  ],
+  evidens:{
+    fasa1:[
+      'Carta organisasi Unit Kokurikulum Sekolah',
+      'Manual Prosedur Kerja Sukan/Permainan',
+      'Pekeliling berkaitan pelaksanaan kokurikulum',
+      'Dasar Kokurikulum Sekolah',
+      'Surat lantikan guru penasihat Sukan/Permainan',
+      'Senarai nama guru penasihat & ahli Sukan/Permainan',
+      'Takwim Sukan/Permainan',
+      'Jadual Pelaksanaan Sukan/Permainan',
+      'Scheme of Work (SOW) Sukan/Permainan',
+      'Analisis Learning Walk (LW) Jan-Mac',
+      'Analisis Bulanan Kehadiran Murid (Jan-Mac)',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 01',
+      'Fail Pengurusan KOKUM (Sukan/Permainan)',
+      'Laporan KOKUM Jan-Mac (Sukan/Permainan)',
+      'Laporan SKPMg2 Standard 3 Fasa Sebelumnya',
+      'Rekod Kehadiran Latihan Sukan'
+    ],
+    fasa2:[
+      'Analisis Learning Walk (LW) Apr-Jul (Sukan/Permainan)',
+      'Analisis Bulanan Kehadiran Murid Apr-Jul',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 02',
+      'Laporan KOKUM Apr-Jul (Sukan/Permainan)',
+      'Laporan SKPMg2 Standard 3 Fasa 1',
+      'Laporan Kejohanan/Pertandingan Sukan Sem 1'
+    ],
+    fasa3:[
+      'Analisis Learning Walk (LW) Ogos-Okt (Sukan/Permainan)',
+      'Analisis Bulanan Kehadiran Murid Ogos-Okt',
+      'Minit Mesyuarat Pengurusan Kokurikulum Bil 03',
+      'Laporan KOKUM Ogos-Okt (Sukan/Permainan)',
+      'Laporan SKPMg2 Standard 3 Fasa 2',
+      'Laporan Akhir Tahun Sukan & Permainan'
+    ]
+  }
+},
+{
+  id:'325', kod:'3.2.5', nama:'Program Kecemerlangan Kokurikulum',
+  sk:'Sekolah melaksanakan program kecemerlangan kokurikulum untuk meningkatkan kemahiran guru dan penglibatan pelajar melalui latihan, pemantauan, dan program inovasi.',
+  rubrik:[
+    {tahap:1,penerangan:'Tiada program kecemerlangan kokurikulum.'},
+    {tahap:2,penerangan:'Program kecemerlangan ada tetapi terhad dan tidak berkesan.'},
+    {tahap:3,penerangan:'Program kecemerlangan dilaksanakan secara berkala dengan penglibatan sederhana.'},
+    {tahap:4,penerangan:'Program kecemerlangan sistematik dengan impak positif yang jelas.'},
+    {tahap:5,penerangan:'Program kecemerlangan inovatif, berimpak tinggi, dan menjadi model untuk sekolah lain.'}
+  ],
+  evidens:{
+    fasa1:[
+      'Borang Pelan Kecemerlangan Kokurikulum Guru',
+      'Analisis Data Kemahiran Kokurikulum Guru',
+      'Takwim Induk Kokurikulum Sekolah',
+      'Kertas Kerja Latihan Peningkatan Kemahiran Guru',
+      'Kertas Kerja Program Pemantapan Kokurikulum Guru',
+      'Borang Pengesahan Kemahiran Guru Penasihat',
+      'Kertas Kerja Program Inovasi Kokurikulum',
+      'Program Penglibatan Ibu Bapa dalam Kokurikulum',
+      'Senarai Program Kecemerlangan Tahunan'
+    ],
+    fasa2:[
+      'Laporan Latihan Peningkatan Kemahiran Guru (Apr-Jul)',
+      'Laporan Program Pemantapan Kokurikulum (Apr-Jul)',
+      'Laporan Pelaksanaan Program Inovasi Sem 1',
+      'Analisis Penglibatan Pelajar dalam Program'
+    ],
+    fasa3:[
+      'Laporan Latihan Peningkatan Kemahiran Guru (Ogos-Okt)',
+      'Laporan Program Pemantapan Kokurikulum (Ogos-Okt)',
+      'Laporan Akhir Tahun Program Kecemerlangan',
+      'Laporan Impak & Keberkesanan Program',
+      'Cadangan Penambahbaikan Program Tahun Hadapan'
+    ]
+  }
+},
+{
+  id:'326', kod:'3.2.6', nama:'Sukan Untuk Semua',
+  sk:'Sekolah melaksanakan program sukan untuk semua pelajar melalui kejohanan dalaman, merentas desa, sukan tara, dan pertandingan antara kelas/tingkatan.',
+  rubrik:[
+    {tahap:1,penerangan:'Tiada program sukan untuk semua.'},
+    {tahap:2,penerangan:'Program sukan untuk semua ada tetapi penglibatan terhad.'},
+    {tahap:3,penerangan:'Program sukan untuk semua dilaksanakan dengan penglibatan sederhana.'},
+    {tahap:4,penerangan:'Program sukan untuk semua dilaksanakan secara menyeluruh dengan penglibatan tinggi.'},
+    {tahap:5,penerangan:'Program sukan untuk semua menjadi budaya sekolah dengan penglibatan 100% dan impak positif.'}
+  ],
+  evidens:{
+    fasa1:[
+      'Takwim Induk Kokurikulum (bahagian Sukan)',
+      'Kertas Kerja Kejohanan Merentas Desa / Larian KPM',
+      'Kertas Kerja Sukan Tara',
+      'Kertas Kerja Kejohanan Tahunan Olahraga Sekolah',
+      'Kertas Kerja Pertandingan Antara Tingkatan/Kelas/Rumah',
+      'Laporan Kejohanan Merentas Desa / Larian KPM',
+      'Senarai Peserta Semua Program Sukan'
+    ],
+    fasa2:[
+      'Laporan Sukan Tara',
+      'Laporan Kejohanan Tahunan Olahraga',
+      'Analisis Penglibatan Pelajar dalam Sukan',
+      'Gambar/Video Dokumentasi Aktiviti Sukan'
+    ],
+    fasa3:[
+      'Laporan Pertandingan Antara Tingkatan/Kelas/Rumah',
+      'Laporan Akhir Tahun Sukan Untuk Semua',
+      'Analisis Keberkesanan Program Sukan',
+      'Statistik Penglibatan Pelajar (% penyertaan)'
+    ]
+  }
+},
+{
+  id:'327', kod:'3.2.7', nama:'Pentaksiran Kokurikulum (SEGAK & PAJSK)',
+  sk:'Sekolah melaksanakan pentaksiran kokurikulum (SEGAK dan PAJSK) mengikut prosedur KPM dengan tepat, sistematik, dan bermakna.',
+  rubrik:[
+    {tahap:1,penerangan:'Tiada pelaksanaan SEGAK dan PAJSK.'},
+    {tahap:2,penerangan:'SEGAK dan PAJSK dilaksanakan tetapi tidak mengikut prosedur.'},
+    {tahap:3,penerangan:'SEGAK dan PAJSK dilaksanakan mengikut prosedur tetapi analisis minima.'},
+    {tahap:4,penerangan:'SEGAK dan PAJSK dilaksanakan mengikut prosedur, dianalisis, dan tindakan susulan diambil.'},
+    {tahap:5,penerangan:'SEGAK dan PAJSK dilaksanakan cemerlang, dianalisis mendalam, tindakan susulan berkesan, dan menjadi asas perancangan.'}
+  ],
+  evidens:{
+    fasa1:[
+      'Buku Panduan Pentaksiran SEGAK (GKPM 2016)',
+      'Panduan PAJSK',
+      'Laporan Taklimat PAJSK kepada Guru Kelas',
+      'Takwim Induk Kokurikulum (SEGAK)',
+      'Laporan Pelaksanaan SEGAK Fasa 1 (Mac)',
+      'Borang Rumusan PAJSK Tingkatan 1-5',
+      'Dashboard PAJSK (dari SPKB)',
+      'Analisis GPS PAJSK Trend 5 Tahun'
+    ],
+    fasa2:[
+      'Memo/Minit Mesyuarat Kokurikulum Bil 02 (Agenda: SEGAK & PAJSK)',
+      'Laporan Pelaksanaan SEGAK Fasa 2 (Jun)',
+      'Analisis SEGAK Fasa 1 & 2',
+      'Laporan PAJSK Pertengahan Tahun',
+      'Analisis GPS PAJSK per Tingkatan & Kategori'
+    ],
+    fasa3:[
+      'Memo/Minit Mesyuarat Kokurikulum Bil 03 (Agenda: SEGAK & PAJSK)',
+      'Laporan Pelaksanaan SEGAK Fasa 3 (Sept)',
+      'Analisis SEGAK Fasa 1, 2 & 3',
+      'Laporan Akhir Tahun PAJSK',
+      'Laporan Akhir Tahun YER SKPMg2 3.2',
+      'Cadangan Penambahbaikan Pentaksiran'
+    ]
+  }
+}
+];
+
+// ============================================================
+// STORAGE: localStorage dgn fallback memori
+// ============================================================
+const MEM={};
+function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
+
+// ============================================================
+// STATE
+// ============================================================
+let currentYear = new Date().getFullYear();
+let currentTab = 0;
+
+function storageKey(aspekId, fasa){return `skas32_${currentYear}_${aspekId}_f${fasa}`}
+
+function getEvidens(aspekId, fasa){
+  const key = storageKey(aspekId, fasa);
+  const saved = sget(key);
+  if(saved) return JSON.parse(saved);
+  const aspek = ASPEK_DATA.find(a=>a.id===aspekId);
+  const fasaKey = 'fasa'+fasa;
+  const defaults = (aspek && aspek.evidens[fasaKey]) || [];
+  return defaults.map((txt,i)=>({id:'d'+i, text:txt, done:false, link:''}));
+}
+
+function saveEvidens(aspekId, fasa, items){
+  sset(storageKey(aspekId,fasa), JSON.stringify(items));
+}
+
+function getStatusKey(aspekId){return `skas32_${currentYear}_${aspekId}_status`}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render(){
+  renderTabs();
+  renderSummary();
+  renderPanel(currentTab);
+  updateSkorBadge();
+}
+
+function renderTabs(){
+  const bar=document.getElementById('tabBar');
+  bar.innerHTML = ASPEK_DATA.map((a,i)=>{
+    const pct = calcAspekPct(a.id);
+    const dotClass = pct>=80?'dot-g':pct>=60?'dot-y':pct>=40?'dot-o':pct>0?'dot-r':'dot-x';
+    return `<div class="tab${i===currentTab?' active':''}" onclick="switchTab(${i})">${a.kod}<span class="dot ${dotClass}"></span></div>`;
+  }).join('');
+}
+
+function renderSummary(){
+  const strip=document.getElementById('summaryStrip');
+  strip.innerHTML = ASPEK_DATA.map(a=>{
+    const pct = calcAspekPct(a.id);
+    const cls = pct>=80?'hi':pct>=40?'mid':'lo';
+    return `<div class="sum-chip ${cls}">${a.kod}: ${pct}%</div>`;
+  }).join('');
+}
+
+function renderPanel(idx){
+  const panels=document.getElementById('panels');
+  const a=ASPEK_DATA[idx];
+  let h='';
+  // Standard Kualiti
+  h+=`<div class="section-title"><i class="fas fa-bullseye"></i> Standard Kualiti</div>`;
+  h+=`<div class="sk-box">${a.sk}</div>`;
+  // Rubrik
+  h+=`<div class="section-title"><i class="fas fa-list-ol"></i> Rubrik Penskoran</div>`;
+  h+=`<table class="rubrik-table"><tr><th style="width:60px">Tahap</th><th>Penerangan</th></tr>`;
+  a.rubrik.forEach(r=>{h+=`<tr><td style="text-align:center;font-weight:800">${r.tahap}</td><td>${r.penerangan}</td></tr>`});
+  h+=`</table>`;
+  // Skor
+  h+=`<div class="section-title"><i class="fas fa-chart-bar"></i> Skor Automatik</div>`;
+  h+=renderSkor(a.id);
+  // Evidens
+  h+=`<div class="section-title"><i class="fas fa-folder-open"></i> Evidens Pelaksanaan — ${currentYear}</div>`;
+  h+=`<div class="fasa-grid">`;
+  [1,2,3].forEach(f=>{
+    const labels=['','Fasa 1 (Jan–Mac)','Fasa 2 (Apr–Jul)','Fasa 3 (Ogos–Okt)'];
+    const items=getEvidens(a.id,f);
+    const done=items.filter(x=>x.done).length;
+    h+=`<div class="fasa-col fasa-${f}">`;
+    h+=`<div class="fasa-head">${labels[f]}<span>${done}/${items.length}</span></div>`;
+    h+=`<div class="fasa-body" id="fb-${a.id}-${f}">`;
+    items.forEach((it,i)=>{
+      h+=`<div class="ev-item">`;
+      h+=`<input type="checkbox" ${it.done?'checked':''} onchange="toggleEv('${a.id}',${f},${i})">`;
+      h+=`<span class="ev-text${it.done?' done':''}">${it.text}</span>`;
+      h+=`<div class="ev-actions">`;
+      h+=`<button class="ev-link" title="Pautan fail" onclick="linkEv('${a.id}',${f},${i})"><i class="fas fa-link"></i></button>`;
+      h+=`<button class="ev-del" title="Padam" onclick="delEv('${a.id}',${f},${i})"><i class="fas fa-times"></i></button>`;
+      h+=`</div></div>`;
+    });
+    h+=`</div>`;
+    h+=`<div class="add-row"><input placeholder="Tambah evidens…" id="add-${a.id}-${f}" onkeydown="if(event.key==='Enter')addEv('${a.id}',${f})"><button class="btn btn-ok btn-sm" onclick="addEv('${a.id}',${f})"><i class="fas fa-plus"></i></button></div>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panels.innerHTML=`<div class="aspek-panel active">${h}</div>`;
+}
+
+function renderSkor(aspekId){
+  const totals=[1,2,3].map(f=>{const items=getEvidens(aspekId,f);return{total:items.length,done:items.filter(x=>x.done).length}});
+  const allDone=totals.reduce((s,t)=>s+t.done,0);
+  const allTotal=totals.reduce((s,t)=>s+t.total,0);
+  const pct=allTotal?Math.round(allDone/allTotal*100):0;
+  const tahap=pct>=90?5:pct>=75?4:pct>=60?3:pct>=40?2:pct>0?1:0;
+  const cls=tahap>=4?'skor-ok':tahap>=3?'skor-warn':'skor-err';
+  let h=`<div class="skor-card">`;
+  h+=`<div class="skor-box ${cls}"><div class="skor-val">${tahap}/5</div><div class="skor-lbl">Tahap SKPMg2</div></div>`;
+  h+=`<div class="skor-box"><div class="skor-val">${pct}%</div><div class="skor-lbl">Kelengkapan</div></div>`;
+  totals.forEach((t,i)=>{
+    const fp=t.total?Math.round(t.done/t.total*100):0;
+    h+=`<div class="skor-box"><div class="skor-val">${fp}%</div><div class="skor-lbl">Fasa ${i+1}</div></div>`;
+  });
+  h+=`</div>`;
+  const barColor=tahap>=4?'var(--ok)':tahap>=3?'var(--warn)':'var(--err)';
+  h+=`<div class="progress-bar"><div class="fill" style="width:${pct}%;background:${barColor}"></div></div>`;
+  return h;
+}
+
+function calcAspekPct(aspekId){
+  let done=0,total=0;
+  [1,2,3].forEach(f=>{const items=getEvidens(aspekId,f);total+=items.length;done+=items.filter(x=>x.done).length});
+  return total?Math.round(done/total*100):0;
+}
+
+function updateSkorBadge(){
+  const avg=Math.round(ASPEK_DATA.reduce((s,a)=>s+calcAspekPct(a.id),0)/ASPEK_DATA.length);
+  const badge=document.getElementById('skorBadge');
+  badge.textContent=avg+'%';
+  badge.style.background=avg>=80?'var(--ok)':avg>=60?'var(--warn)':'var(--err)';
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function switchTab(idx){currentTab=idx;render()}
+function switchYear(y){currentYear=parseInt(y);render()}
+
+function toggleEv(aspekId,fasa,idx){
+  const items=getEvidens(aspekId,fasa);
+  items[idx].done=!items[idx].done;
+  saveEvidens(aspekId,fasa,items);
+  render();
+}
+
+function addEv(aspekId,fasa){
+  const input=document.getElementById(`add-${aspekId}-${fasa}`);
+  const txt=input.value.trim();
+  if(!txt)return;
+  const items=getEvidens(aspekId,fasa);
+  items.push({id:'u'+Date.now(),text:txt,done:false,link:''});
+  saveEvidens(aspekId,fasa,items);
+  input.value='';
+  render();
+}
+
+function delEv(aspekId,fasa,idx){
+  if(!confirm('Padam evidens ini?'))return;
+  const items=getEvidens(aspekId,fasa);
+  items.splice(idx,1);
+  saveEvidens(aspekId,fasa,items);
+  render();
+}
+
+function linkEv(aspekId,fasa,idx){
+  const items=getEvidens(aspekId,fasa);
+  const url=prompt('Masukkan URL fail/Drive:',items[idx].link||'');
+  if(url===null)return;
+  items[idx].link=url;
+  saveEvidens(aspekId,fasa,items);
+  if(url)window.open(url,'_blank');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(function init(){
+  // Year selector (5 tahun lepas + semasa)
+  const sel=document.getElementById('yearSelect');
+  const now=new Date().getFullYear();
+  for(let y=now;y>=now-5;y--){
+    const opt=document.createElement('option');
+    opt.value=y;opt.textContent=y;
+    if(y===currentYear)opt.selected=true;
+    sel.appendChild(opt);
+  }
+  // Detect iframe
+  try{if(window!==window.top)document.body.classList.add('in-spkb')}catch(e){}
+  // URL param tahun
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('tahun'))currentYear=parseInt(p.get('tahun'));
+  render();
+})();
+</script>
+</body>
+</html>
