@@ -567,8 +567,8 @@ function resetPadanCache(){padanCache=null;window._padanDiag=null;alert('Cache d
 
 // Levenshtein-based similarity (0-1)
 function similarity(a, b){
-  a = a.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
-  b = b.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  a = String(a == null ? '' : a).toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  b = String(b == null ? '' : b).toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
   if(!a || !b) return 0;
   // Token-based: jumlah token sepadan / token tertinggi
   const ta = a.split(' ').filter(x=>x.length>=3);
@@ -638,18 +638,18 @@ async function autoPadan(aspekId){
         fList.forEach(file => {
           // Skip jika ini sebenarnya subfolder, bukan fail
           if(file.jenis === 'Folder' || file.jenis === 'folder'){ skippedFolder++; return; }
-          // Cuba pelbagai field nama
-          const fileName = file.nama_fail || file.nama || file.name || file.title || file.fileName || '';
-          // Cuba pelbagai field URL
-          const fileUrl = file.url || file.link || file.fileUrl || file.webViewLink || '';
+          // Cuba pelbagai field nama (coerce ke string)
+          const fileName = String(file.nama_fail || file.nama || file.name || file.title || file.fileName || '').trim();
+          // Cuba pelbagai field URL (coerce ke string)
+          const fileUrl = String(file.url || file.link || file.fileUrl || file.webViewLink || '').trim();
           if(!fileName){ skippedNoName++; return; }
           files.push({
-            folderNama: folderInfo.nama_folder || folderInfo.folder_nama || folderInfo.nama || '',
-            folderNo: folderInfo.no || '',
-            standardId: folderInfo.standard_id || '',
+            folderNama: String(folderInfo.nama_folder || folderInfo.folder_nama || folderInfo.nama || '').trim(),
+            folderNo: String(folderInfo.no || '').trim(),
+            standardId: String(folderInfo.standard_id || '').trim(),
             fileName: fileName,
             fileUrl: fileUrl || '#',
-            lastUpdate: file.last_update || file.tarikh_kemaskini || ''
+            lastUpdate: String(file.last_update || file.tarikh_kemaskini || '').trim()
           });
         });
       });
