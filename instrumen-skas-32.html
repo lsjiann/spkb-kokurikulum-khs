@@ -587,21 +587,52 @@ async function autoPadan(aspekId){
   modal.classList.add('show');
 
   try {
-    // Muatkan data SK@S sekali sahaja
+    // Muatkan data SK@S sekali sahaja (cache)
     if(!padanCache){
-      const resp = await fetch(SKAS_API + '?action=skas_dashboard&_t=' + Date.now());
-      const json = await resp.json();
-      if(!json.success) throw new Error(json.error || 'Gagal muat data SK@S');
-      // Kumpulkan semua fail dari folders
+      // Langkah 1: Ambil senarai folder dari skas_dashboard
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mute);"><div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--ok);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;"></div>Mendapatkan senarai folder SK@S…</div>';
+      const respDash = await fetch(SKAS_API + '?action=skas_dashboard&_t=' + Date.now());
+      const jsonDash = await respDash.json();
+      if(!jsonDash.success) throw new Error(jsonDash.error || 'Gagal muat dashboard SK@S');
+      const folders = (jsonDash.data && jsonDash.data.folders) || [];
+      if(!folders.length){
+        list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--err);"><i class="fas fa-exclamation-circle" style="font-size:32px;"></i><div style="margin-top:10px;">Tiada folder SK@S dijumpai dalam dashboard.<br><small>Pastikan modul Pengurusan Fail SK@S diaktifkan dan ada data.</small></div></div>';
+        return;
+      }
+
+      // Langkah 2: Ambil fail dari setiap folder (selari)
+      list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--mute);"><div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--ok);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;"></div>Memuatkan fail dari ${folders.length} folder SK@S…<div style="font-size:11px;margin-top:6px;color:#bdc3c7;">Sila tunggu, ini mungkin ambil masa beberapa saat</div></div>`;
+
+      const folderPromises = folders.map(f => {
+        const folderNo = f.no || f.folder_no || f.standard_id;
+        if(!folderNo) return Promise.resolve({success:false, _f:f});
+        return fetch(SKAS_API + '?action=skas_folder_detail&no=' + encodeURIComponent(folderNo) + '&_t=' + Date.now())
+          .then(r => r.json())
+          .then(d => { d._f = f; return d; })
+          .catch(e => ({success:false, _f:f, error:e.message}));
+      });
+
+      const details = await Promise.all(folderPromises);
+
+      // Langkah 3: Agregat semua fail
       const files = [];
-      (json.data.folders || []).forEach(f => {
-        (f.files || []).forEach(file => {
+      details.forEach(d => {
+        if(!d.success || !d.data) return;
+        const folderInfo = d.data.folder || d._f || {};
+        const fList = d.data.files || [];
+        fList.forEach(file => {
+          // Skip jika ini sebenarnya subfolder, bukan fail
+          if(file.jenis === 'Folder' || file.jenis === 'folder') return;
+          const fileName = file.nama_fail || file.nama || file.name || '';
+          const fileUrl = file.url || file.link || '';
+          if(!fileName || !fileUrl) return;
           files.push({
-            folderNama: f.folder_nama || f.nama || '',
-            standardId: f.standard_id || '',
-            fileName: file.nama || file.name || '',
-            fileUrl: file.url || file.link || '',
-            lastUpdate: file.last_update || file.updated || ''
+            folderNama: folderInfo.nama_folder || folderInfo.folder_nama || '',
+            folderNo: folderInfo.no || '',
+            standardId: folderInfo.standard_id || '',
+            fileName: fileName,
+            fileUrl: fileUrl,
+            lastUpdate: file.last_update || file.tarikh_kemaskini || ''
           });
         });
       });
@@ -609,12 +640,13 @@ async function autoPadan(aspekId){
     }
 
     if(!padanCache.length){
-      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--err);"><i class="fas fa-exclamation-circle" style="font-size:32px;"></i><div style="margin-top:10px;">Tiada fail SK@S dijumpai. Pastikan modul Pengurusan Fail aktif.</div></div>';
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--err);"><i class="fas fa-exclamation-circle" style="font-size:32px;"></i><div style="margin-top:10px;">Tiada fail dijumpai dalam mana-mana folder SK@S.<br><small>Pastikan ada fail yang sudah dimuat naik ke Google Drive dan ter-sync dengan modul Pengurusan Fail.</small></div></div>';
       return;
     }
 
     // Padan setiap evidens dengan fail SK@S
     const aspek = ASPEK_DATA.find(a=>a.id===aspekId);
+    const aspekStd = aspek.kod; // contoh "3.2.1"
     const padanan = [];
     [1,2,3].forEach(f=>{
       const evidens = getEvidens(aspekId, f);
@@ -622,7 +654,11 @@ async function autoPadan(aspekId){
         if(ev.link) return; // skip jika sudah ada link
         let best = null;
         padanCache.forEach(file=>{
-          const score = similarity(ev.text, file.fileName);
+          let score = similarity(ev.text, file.fileName);
+          // Bonus jika fail dari folder dgn standard_id yang sama dgn aspek
+          if(file.standardId && file.standardId.indexOf(aspekStd) !== -1){
+            score = Math.min(1, score + 0.15);
+          }
           if(score > 0.4 && (!best || score > best.score)){
             best = { file: file, score: score };
           }
@@ -634,6 +670,9 @@ async function autoPadan(aspekId){
             evText: ev.text,
             fileName: best.file.fileName,
             fileUrl: best.file.fileUrl,
+            folderNama: best.file.folderNama,
+            folderNo: best.file.folderNo,
+            standardId: best.file.standardId,
             score: best.score
           });
         }
@@ -643,20 +682,24 @@ async function autoPadan(aspekId){
     padanCurrent = { aspekId: aspekId, items: padanan };
 
     if(!padanan.length){
-      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mute);"><i class="fas fa-info-circle" style="font-size:32px;"></i><div style="margin-top:10px;">Tiada padanan dijumpai. Cuba semak nama fail dalam SK@S.</div></div>';
+      list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--mute);"><i class="fas fa-info-circle" style="font-size:32px;"></i><div style="margin-top:10px;">Tiada padanan dijumpai dengan ${padanCache.length} fail dalam SK@S.<br><small>Cuba semak format nama fail di Google Drive — perlu lebih dekat dengan nama evidens.</small></div></div>`;
       applyBtn.disabled = true;
       return;
     }
 
     // Papar cadangan
-    document.getElementById('padanSub').textContent = `${padanan.length} cadangan padanan dijumpai untuk Aspek ${aspek.kod}. Pilih yang anda mahu terima.`;
+    document.getElementById('padanSub').innerHTML = `<strong>${padanan.length}</strong> cadangan padanan dijumpai untuk Aspek <strong>${aspek.kod}</strong> daripada ${padanCache.length} fail SK@S. Pilih yang sesuai.`;
     list.innerHTML = padanan.map((p,i)=>{
       const cls = p.score >= 0.7 ? 'match-hi' : 'match-mid';
       const pct = Math.round(p.score*100);
+      const folderTag = p.folderNama ? `<div style="font-size:10px;color:var(--mute);margin-top:2px;"><i class="fas fa-folder" style="color:var(--acc);"></i> ${p.folderNama}${p.standardId?' · '+p.standardId:''}</div>` : '';
       return `<div class="padan-row ${cls}">
         <input type="checkbox" class="ev-check" id="pd-${i}" ${p.score>=0.7?'checked':''}>
         <label for="pd-${i}" class="ev-name" style="cursor:pointer;">${p.evText}</label>
-        <span class="ev-match">→ ${p.fileName}</span>
+        <div class="ev-match" style="display:flex;flex-direction:column;">
+          <span>→ ${p.fileName}</span>
+          ${folderTag}
+        </div>
         <span class="ev-score">${pct}%</span>
       </div>`;
     }).join('');
