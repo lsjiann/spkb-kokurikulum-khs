@@ -239,20 +239,139 @@ async function fetchPelajar(){
     const resp = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
     const json = await resp.json();
     if(!json.success) throw new Error(json.error || 'Gagal');
-    pelajarAll = json.data || [];
+    let rawData = json.data || [];
+    // Simpan sampel mentah utk diagnostik
+    window._kehadiranDiag = {
+      apiSuccess: true,
+      rawCount: rawData.length,
+      rawSampleKeys: rawData.length ? Object.keys(rawData[0]) : [],
+      rawSampleObj: rawData[0] || null
+    };
+
+    // Cuba parse dgn nama field standard
+    pelajarAll = rawData.map(p => normalizeStudent(p));
     buildUnitMap();
+    let unitCount = Object.keys(unitMap).length;
+
+    // FALLBACK: jika kosong, cuba position-based parsing
+    // (sheet tanpa baris header — baris 1 adalah data, jadi key adalah nilai baris 1)
+    if(pelajarAll.length && unitCount === 0){
+      console.warn('Standard field names tidak dijumpai. Cuba position-based parsing...');
+      pelajarAll = rawData.map(p => normalizeByPosition(p));
+      buildUnitMap();
+      unitCount = Object.keys(unitMap).length;
+      window._kehadiranDiag.usedPositionFallback = true;
+      window._kehadiranDiag.positionUnitCount = unitCount;
+    }
+
+    if(!pelajarAll.length || unitCount === 0){
+      throw new Error(pelajarAll.length === 0 ? 'API balas kosong (tiada pelajar)' : 'Tiada medan kelab/uniform/sukan dapat dikesan');
+    }
     populateSelectors();
-    document.getElementById('statusBadge').textContent = pelajarAll.length + ' pelajar';
+    document.getElementById('statusBadge').textContent = pelajarAll.length + ' pelajar · ' + unitCount + ' unit';
+    document.getElementById('statusBadge').style.background = 'var(--ok)';
+    showDataNotice('live', pelajarAll.length, unitCount);
     return true;
   } catch(e){
     // Fallback: gunakan data demo
-    console.warn('API tidak tersedia, gunakan data demo');
+    console.warn('API tidak tersedia atau kosong:', e.message);
+    if(!window._kehadiranDiag) window._kehadiranDiag = {};
+    window._kehadiranDiag.error = e.message;
     loadDemoData();
-    document.getElementById('statusBadge').textContent = 'Demo Mode';
+    const unitCount = Object.keys(unitMap).length;
+    document.getElementById('statusBadge').textContent = 'DEMO · ' + pelajarAll.length + ' pelajar';
     document.getElementById('statusBadge').style.background = 'var(--warn)';
     document.getElementById('statusBadge').style.color = '#333';
+    showDataNotice('demo', pelajarAll.length, unitCount, e.message);
     return false;
   }
+}
+
+// Normalize pelajar fields - cuba pelbagai variasi nama field dari API
+function normalizeStudent(p){
+  if(!p || typeof p !== 'object') return p;
+  return {
+    no_urut: p.no_urut || p.no || p.id || 0,
+    nama: String(p.nama || p.name || p.nama_pelajar || '').trim(),
+    student_no: String(p.student_no || p.studentno || p.no_pelajar || '').trim(),
+    tingkatan: String(p.tingkatan || p.form || '').trim(),
+    kelas: String(p.kelas || p.class || '').trim(),
+    kelab: String(p.kelab || p.club || p.persatuan || '').trim(),
+    uniform: String(p.uniform || p.beruniform || p.unit_beruniform || '').trim(),
+    sukan: String(p.sukan || p.sport || p.sukan_permainan || '').trim()
+  };
+}
+
+// Position-based fallback - bila sheet TIADA baris header (key adalah nilai baris 1)
+// Ikut struktur SPKB_Data_Pelajar:
+// A:no_urut B:nama C:student_no D:ic E:tahun F:gender G:kelas H:dob I:agama J:alamat
+// K-L:kosong M:bangsa N:rumah_sukan O:tingkatan P:uniform Q-R:kosong S:uniform_status
+// T:kelab U-V:kosong W:kelab_status X:sukan Y-Z:kosong AA:sukan_status
+function normalizeByPosition(p){
+  if(!p || typeof p !== 'object') return p;
+  const vals = Object.values(p);
+  return {
+    no_urut: vals[0] || 0,
+    nama: String(vals[1] || '').trim(),
+    student_no: String(vals[2] || '').trim(),
+    tingkatan: String(vals[14] || '').trim(),  // col O (index 14)
+    kelas: String(vals[6] || '').trim(),       // col G (index 6)
+    uniform: String(vals[15] || '').trim(),    // col P (index 15)
+    kelab: String(vals[19] || '').trim(),      // col T (index 19)
+    sukan: String(vals[23] || '').trim()       // col X (index 23)
+  };
+}
+
+// Papar notis status data di atas tab kandungan
+function showDataNotice(mode, pelajarCount, unitCount, errMsg){
+  let notice = document.getElementById('dataNotice');
+  if(!notice){
+    notice = document.createElement('div');
+    notice.id = 'dataNotice';
+    notice.style.cssText = 'padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;';
+    const wrap = document.querySelector('.wrap');
+    wrap.insertBefore(notice, wrap.firstChild.nextSibling);
+  }
+  if(mode === 'live'){
+    notice.style.background = '#eafaf1';
+    notice.style.border = '1px solid var(--ok)';
+    notice.style.color = '#0e6251';
+    const note = (window._kehadiranDiag && window._kehadiranDiag.usedPositionFallback) ? ' <small>(guna position-based parsing — pertimbangkan tambah baris header ke sheet)</small>' : '';
+    notice.innerHTML = `<div><i class="fas fa-cloud" style="color:var(--ok);"></i> <strong>Data Live</strong> — ${pelajarCount} pelajar dimuatkan dari API · ${unitCount} unit aktif${note}</div><button class="btn btn-outline btn-sm" onclick="forceDemo()" style="font-size:11px;">Tukar ke Demo</button>`;
+  } else {
+    notice.style.background = '#fef9e7';
+    notice.style.border = '1px solid var(--warn)';
+    notice.style.color = '#7d6608';
+    const dg = window._kehadiranDiag || {};
+    let diagHtml = '';
+    if(dg.apiSuccess){
+      diagHtml = `<details style="margin-top:8px;font-size:11px;"><summary style="cursor:pointer;font-weight:700;">🔍 Klik untuk lihat diagnostik API</summary>
+        <div style="background:#fff;border-radius:6px;padding:8px;margin-top:6px;font-family:monospace;font-size:10px;line-height:1.5;">
+          API berjaya: ✅ &nbsp; | Pelajar mentah: ${dg.rawCount||0} &nbsp; | Position fallback: ${dg.usedPositionFallback?'cuba (gagal)':'tidak'}<br>
+          <strong>Key sampel rekod pertama:</strong><br>
+          ${(dg.rawSampleKeys||[]).slice(0,12).map(k=>`<code style="background:#f0f0f0;padding:1px 4px;border-radius:3px;margin-right:3px;">${k}</code>`).join('')}
+          ${(dg.rawSampleKeys||[]).length>12?'... +'+((dg.rawSampleKeys||[]).length-12)+' lagi':''}
+          <br><br><em>Masalah:</em> nama field tidak padan (nama / kelab / uniform / sukan). Sheet anda mungkin tiada baris header. Penyelesaian: tambah baris header di baris 1 sheet SPKB_Data_Pelajar.
+        </div>
+      </details>`;
+    }
+    notice.innerHTML = `<div style="flex:1;min-width:0;"><i class="fas fa-flask" style="color:var(--warn);"></i> <strong>Mod Demo</strong> — Data sebenar tidak tersedia (${errMsg||'API gagal'}). Menggunakan ${pelajarCount} pelajar simulasi dengan ${unitCount} unit.${diagHtml}</div><button class="btn btn-pri btn-sm" onclick="retryFetch()" style="font-size:11px;flex-shrink:0;"><i class="fas fa-redo"></i> Cuba Live</button>`;
+  }
+}
+
+function forceDemo(){
+  loadDemoData();
+  const unitCount = Object.keys(unitMap).length;
+  document.getElementById('statusBadge').textContent = 'DEMO · ' + pelajarAll.length + ' pelajar';
+  document.getElementById('statusBadge').style.background = 'var(--warn)';
+  document.getElementById('statusBadge').style.color = '#333';
+  showDataNotice('demo', pelajarAll.length, unitCount, 'manual');
+  // Reset semua tab
+  document.getElementById('rekodContent').innerHTML = '<div class="empty"><i class="fas fa-info-circle"></i>Pilih unit dan tarikh untuk mula merekod kehadiran.</div>';
+}
+async function retryFetch(){
+  document.getElementById('statusBadge').textContent = 'Memuat…';
+  await fetchPelajar();
 }
 
 function loadDemoData(){
