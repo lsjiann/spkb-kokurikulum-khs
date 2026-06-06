@@ -1911,6 +1911,11 @@ body.demo-active .main { margin-top: 98px; }
       <span class="nav-text">Kehadiran</span>
       <span style="background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;margin-left:auto;">BARU</span>
     </a>
+    <a class="nav-item" data-page="buku-kk">
+      <i class="fas fa-book-open nav-icon"></i>
+      <span class="nav-text">Buku Pengurusan KK</span>
+      <span style="background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;margin-left:auto;">BARU</span>
+    </a>
     <a class="nav-item" data-page="pajsk">
       <i class="fas fa-clipboard-list"></i>
       <span class="nav-text">Penilaian PAJSK</span>
@@ -2655,7 +2660,68 @@ body.demo-active .main { margin-top: 98px; }
   </section>
 
   <!-- ============================================================
-       END PAGE 2: KELAB
+       PAGE: BUKU PENGURUSAN KOKURIKULUM
+       ============================================================ -->
+  <section class="page" id="page-buku-kk">
+
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Buku Pengurusan Kokurikulum</span>
+    </div>
+
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <h2><i class="fas fa-book-open"></i> Buku Pengurusan Kokurikulum SK@S 3.2</h2>
+        <p>Rujukan rasmi · 20 seksyen · Auto-jana evidens 7 aspek SK@S 3.2 · Data live dari SPKB</p>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.open(BUKU_KK_URL,'_blank')" title="Buka dalam tab baharu">
+          <i class="fas fa-external-link-alt"></i> Tab Baru
+        </button>
+      </div>
+    </div>
+
+    <!-- Kad ringkas -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--primary);">20</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Seksyen (5 BAB)</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--success);">5</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Data Live</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--purple);">7</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Aspek SK@S 3.2</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">PDF</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Eksport per Seksyen</div>
+      </div>
+    </div>
+
+    <!-- Iframe modul -->
+    <div id="buku-kk-iframe-wrap" style="width:100%;height:calc(100vh - 280px);min-height:600px;border-radius:12px;overflow:hidden;position:relative;background:#f8fafc;border:1px solid #e0e0e0;">
+      <div id="buku-kk-iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;background:#f8fafc;">
+        <div style="text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">📖</div>
+          <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:6px;">Buku Pengurusan Kokurikulum SK@S 3.2</h3>
+          <p style="font-size:12px;color:#7f8c8d;max-width:400px;margin:0 auto 16px;line-height:1.5;">
+            20 seksyen · Falsafah · Akta · Carta Org · Tanggungjawab · Data Live (Guru, Statistik, Takwim, SK@S)
+          </p>
+          <div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+          <p style="font-size:11px;color:#bdc3c7;">Memuatkan buku…</p>
+        </div>
+      </div>
+      <iframe id="buku-kk-iframe" src="" style="width:100%;height:100%;border:none;" onload="this.previousElementSibling.style.display='none';" allow="clipboard-write"></iframe>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       END PAGE: BUKU PENGURUSAN KK
        ============================================================ -->
 
 
@@ -5644,6 +5710,7 @@ const SKAS_API_URL = 'https://script.google.com/macros/s/AKfycbxTXUFFwssqT7Nwg5s
 const KELAB_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-kelab-v3.html';
 const INSTRUMEN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/instrumen-skas-32.html';
 const KEHADIRAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-kehadiran.html';
+const BUKU_KK_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/buku-pengurusan-kk.html';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
 /* ============================================================
@@ -5752,6 +5819,15 @@ function navigateTo(pageId) {
       if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
         var tahun = new Date().getFullYear();
         iframe.src = KEHADIRAN_URL + '?tahun=' + tahun;
+      }
+    }, 100);
+  }
+  if (pageId === 'buku-kk') {
+    setTimeout(function () {
+      var iframe = document.getElementById('buku-kk-iframe');
+      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+        var tahun = new Date().getFullYear();
+        iframe.src = BUKU_KK_URL + '?tahun=' + tahun;
       }
     }, 100);
   }
