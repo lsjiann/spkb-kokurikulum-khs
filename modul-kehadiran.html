@@ -56,6 +56,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .pelajar-table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;border:1px solid var(--bdr)}
 .pelajar-table thead{background:var(--pri);color:#fff}
 .pelajar-table th{padding:9px 11px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.pelajar-table th.sortable:hover{background:rgba(255,255,255,0.08)}
+.pelajar-table th.sortable{transition:background 0.15s}
 .pelajar-table td{padding:9px 11px;border-top:1px solid #f0f0f0;font-size:12.5px;vertical-align:middle}
 .pelajar-table tbody tr:hover{background:#f8fafc}
 .pelajar-no{color:var(--mute);font-family:monospace;font-size:11px;text-align:center;width:40px}
@@ -130,6 +132,7 @@ body.in-spkb .spkb-back-btn{display:flex}
 <div class="wrap">
   <div class="tabs">
     <button class="tab active" data-tab="rekod" onclick="switchTab('rekod')"><i class="fas fa-edit"></i> Rekod Perjumpaan</button>
+    <button class="tab" data-tab="takwim" onclick="switchTab('takwim')"><i class="fas fa-calendar-alt"></i> Takwim</button>
     <button class="tab" data-tab="unit" onclick="switchTab('unit')"><i class="fas fa-users"></i> Analisis Unit</button>
     <button class="tab" data-tab="pelajar" onclick="switchTab('pelajar')"><i class="fas fa-user-graduate"></i> Analisis Pelajar</button>
     <button class="tab" data-tab="laporan" onclick="switchTab('laporan')"><i class="fas fa-file-alt"></i> Laporan KOKUM</button>
@@ -151,6 +154,50 @@ body.in-spkb .spkb-back-btn{display:flex}
     <div id="rekodContent"><div class="empty"><i class="fas fa-info-circle"></i>Pilih unit dan tarikh untuk mula merekod kehadiran.</div></div>
   </div>
 
+  <!-- TAB TAKWIM: Pratetap jadual perjumpaan per kategori -->
+  <div class="panel" id="panel-takwim">
+    <div style="background:linear-gradient(135deg,#fffaf0,#fef5e7);border:1px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:12.5px;color:#7d6608;">
+      <strong><i class="fas fa-lightbulb"></i> Cara Takwim Berfungsi:</strong>
+      Tetapkan jadual perjumpaan untuk <strong>setiap kategori</strong> (Beruniform / Kelab / Sukan).
+      Setiap pelajar perlu hadir minimum <strong>12 perjumpaan dan 36 jam</strong> setiap tahun (keperluan PAJSK).
+      Sistem akan kira jam automatik berdasarkan tetapan durasi anda.
+    </div>
+
+    <!-- TETAPAN GLOBAL -->
+    <h3 style="font-size:13px;font-weight:800;color:var(--pri);margin:0 0 10px;"><i class="fas fa-cog"></i> Tetapan Global</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:18px;">
+      <div class="card" style="padding:12px;">
+        <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Durasi Setiap Perjumpaan</label>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+          <input type="number" id="tkDurasi" min="30" max="240" step="15" value="90" style="flex:1;padding:8px;border-radius:6px;border:1.5px solid var(--bdr);font-size:13px;font-weight:600;">
+          <span style="font-size:11px;color:var(--mute);">minit</span>
+        </div>
+        <div style="font-size:10px;color:var(--mute);margin-top:4px;" id="tkDurasiHelper">= 1 jam 30 minit</div>
+      </div>
+      <div class="card" style="padding:12px;">
+        <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Minimum Perjumpaan</label>
+        <input type="number" id="tkMinJumpa" min="1" max="50" value="12" style="width:100%;padding:8px;margin-top:6px;border-radius:6px;border:1.5px solid var(--bdr);font-size:13px;font-weight:600;">
+        <div style="font-size:10px;color:var(--mute);margin-top:4px;">PAJSK syarat: 12 kali</div>
+      </div>
+      <div class="card" style="padding:12px;">
+        <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Minimum Jumlah Jam</label>
+        <input type="number" id="tkMinJam" min="1" max="100" value="36" style="width:100%;padding:8px;margin-top:6px;border-radius:6px;border:1.5px solid var(--bdr);font-size:13px;font-weight:600;">
+        <div style="font-size:10px;color:var(--mute);margin-top:4px;">PAJSK syarat: 36 jam</div>
+      </div>
+    </div>
+
+    <!-- JADUAL PER KATEGORI -->
+    <h3 style="font-size:13px;font-weight:800;color:var(--pri);margin:0 0 10px;"><i class="fas fa-calendar-alt"></i> Jadual Per Kategori</h3>
+    <div id="takwimKategoriContainer"></div>
+
+    <div style="text-align:center;margin:18px 0;">
+      <button class="btn btn-pri" onclick="saveTakwim()" style="padding:9px 22px;font-size:13px;"><i class="fas fa-save"></i> Simpan & Jana Semua Takwim</button>
+      <button class="btn btn-outline" onclick="resetTakwim()" style="padding:9px 18px;font-size:13px;margin-left:8px;"><i class="fas fa-trash"></i> Padam Takwim</button>
+    </div>
+
+    <div id="takwimPreview"></div>
+  </div>
+
   <!-- TAB 2: ANALISIS UNIT -->
   <div class="panel" id="panel-unit">
     <div class="filter-bar">
@@ -163,6 +210,10 @@ body.in-spkb .spkb-back-btn{display:flex}
         <option value="f2">Fasa 2 (Apr-Jul)</option>
         <option value="f3">Fasa 3 (Ogos-Okt)</option>
       </select>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+        <input type="checkbox" id="ikutTakwim" onchange="renderAnalisisUnit()" style="accent-color:var(--acc);">
+        <span>Ikut Takwim sahaja</span>
+      </label>
     </div>
     <div id="anaUnitContent"><div class="loading"><div class="spinner"></div>Mengira analisis…</div></div>
   </div>
@@ -215,6 +266,13 @@ let pelajarAll = [];     // semua pelajar dari API
 let unitMap = {};         // {kod: {nama, kategori, ahli:[no_urut]}}
 let kehadiranData = {};   // {tarikh|unit: {pelajar_no: status}}
 
+// ID unik pelajar — utamakan student_no (yg benar unik), fallback no_urut
+function pid(p){return p && (p.student_no || p.no_urut) || ''}
+
+// State untuk sort jadual rekod: {col: 'nama'|'kelas'|'status', dir: 1|-1}
+let sortState = { col: 'kelas', dir: 1 };
+
+
 // =============================================================
 // STORAGE
 // =============================================================
@@ -239,10 +297,12 @@ async function fetchPelajar(){
     const resp = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
     const json = await resp.json();
     if(!json.success) throw new Error(json.error || 'Gagal');
-    let rawData = json.data || [];
+    // ⭐ Backend pulangkan json.students (bukan json.data)
+    let rawData = json.students || json.data || [];
     // Simpan sampel mentah utk diagnostik
     window._kehadiranDiag = {
       apiSuccess: true,
+      apiKeys: Object.keys(json),
       rawCount: rawData.length,
       rawSampleKeys: rawData.length ? Object.keys(rawData[0]) : [],
       rawSampleObj: rawData[0] || null
@@ -250,8 +310,25 @@ async function fetchPelajar(){
 
     // Cuba parse dgn nama field standard
     pelajarAll = rawData.map(p => normalizeStudent(p));
+
+    // ⭐ DEDUPLIKASI — API kadang pulangkan rekod berganda per pelajar
+    // (sebab JOIN backend dengan jadual lain). Kumpul ikut student_no.
+    const beforeDedup = pelajarAll.length;
+    pelajarAll = dedupePelajar(pelajarAll);
+    const afterDedup = pelajarAll.length;
+    window._kehadiranDiag.duplicatesRemoved = beforeDedup - afterDedup;
+
     buildUnitMap();
     let unitCount = Object.keys(unitMap).length;
+
+    // Diagnostik: tingkatan yg ada dlm data
+    const tingkatanCount = {};
+    pelajarAll.forEach(p => {
+      const t = String(p.tingkatan||'').trim();
+      if(t) tingkatanCount[t] = (tingkatanCount[t]||0) + 1;
+    });
+    window._kehadiranDiag.tingkatanCount = tingkatanCount;
+    window._kehadiranDiag.tingkatanCount_keys = Object.keys(tingkatanCount).sort();
 
     // FALLBACK: jika kosong, cuba position-based parsing
     // (sheet tanpa baris header — baris 1 adalah data, jadi key adalah nilai baris 1)
@@ -322,6 +399,29 @@ function normalizeByPosition(p){
   };
 }
 
+// Deduplicate pelajar — kumpul ikut student_no, gabung field kosong
+// Backend kadang JOIN dgn jadual lain (jawatan, pencapaian) menyebabkan pelajar muncul 2-3 kali.
+function dedupePelajar(arr){
+  const seen = new Map();
+  arr.forEach(p => {
+    // Key keutamaan: student_no > no_urut > nama+kelas
+    const key = String(p.student_no || '').trim() ||
+                String(p.no_urut || '').trim() ||
+                (String(p.nama||'').trim() + '|' + String(p.kelas||'').trim());
+    if(!key) return;
+    if(!seen.has(key)){
+      seen.set(key, {...p});
+    } else {
+      // Gabung: ambil nilai non-kosong dari rekod ini jika asal kosong
+      const existing = seen.get(key);
+      ['nama','student_no','tingkatan','kelas','uniform','kelab','sukan'].forEach(f => {
+        if((!existing[f] || existing[f] === '') && p[f]) existing[f] = p[f];
+      });
+    }
+  });
+  return Array.from(seen.values());
+}
+
 // Papar notis status data di atas tab kandungan
 function showDataNotice(mode, pelajarCount, unitCount, errMsg){
   let notice = document.getElementById('dataNotice');
@@ -336,8 +436,43 @@ function showDataNotice(mode, pelajarCount, unitCount, errMsg){
     notice.style.background = '#eafaf1';
     notice.style.border = '1px solid var(--ok)';
     notice.style.color = '#0e6251';
-    const note = (window._kehadiranDiag && window._kehadiranDiag.usedPositionFallback) ? ' <small>(guna position-based parsing — pertimbangkan tambah baris header ke sheet)</small>' : '';
-    notice.innerHTML = `<div><i class="fas fa-cloud" style="color:var(--ok);"></i> <strong>Data Live</strong> — ${pelajarCount} pelajar dimuatkan dari API · ${unitCount} unit aktif${note}</div><button class="btn btn-outline btn-sm" onclick="forceDemo()" style="font-size:11px;">Tukar ke Demo</button>`;
+    const dg = window._kehadiranDiag || {};
+    let badges = '';
+    if(dg.duplicatesRemoved > 0){
+      badges += ` <span style="background:#fef9e7;color:#7d6608;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;">−${dg.duplicatesRemoved} duplikat</span>`;
+    }
+    if(dg.policyViolations){
+      const totalPolicy = (dg.policyViolations['Beruniform']||0) + (dg.policyViolations['Kelab/Persatuan']||0) + (dg.policyViolations['Sukan/Permainan']||0);
+      if(totalPolicy > 0){
+        badges += ` <span style="background:#fdedec;color:#922b21;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;" title="Polisi sekolah: 1 unit per kategori. Rekod tambahan diabaikan.">${totalPolicy} polisi dilanggar</span>`;
+      }
+    }
+    if(dg.usedPositionFallback){
+      badges += ` <span style="background:#fef9e7;color:#7d6608;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;">position-based</span>`;
+    }
+    // Amaran tingkatan tidak lengkap
+    let tingkatanWarn = '';
+    const tks = dg.tingkatanCount_keys || [];
+    const expectedTk = ['Tingkatan Satu','Tingkatan Dua','Tingkatan Tiga','Tingkatan Empat','Tingkatan Lima'];
+    const missingTk = expectedTk.filter(e => !tks.some(k => k.indexOf(e) !== -1 || e.indexOf(k) !== -1));
+    if(missingTk.length > 0 && tks.length > 0){
+      const breakdown = expectedTk.map(e => {
+        const found = tks.find(k => k.indexOf(e.split(' ')[1]) !== -1);
+        const c = found ? dg.tingkatanCount[found] : 0;
+        return `${e.replace('Tingkatan ','T')}: <strong>${c}</strong>`;
+      }).join(' · ');
+      tingkatanWarn = `<details style="margin-top:8px;font-size:11px;cursor:pointer;">
+        <summary style="color:#922b21;font-weight:700;">⚠️ ${missingTk.length} tingkatan tiada (${missingTk.map(t=>t.replace('Tingkatan ','T')).join(', ')}) — klik untuk butiran</summary>
+        <div style="background:#fff;border-radius:6px;padding:8px;margin-top:6px;font-family:monospace;font-size:11px;">
+          ${breakdown}<br><br>
+          <em style="font-family:inherit;">Punca berkemungkinan: backend Apps Script anda filter ikut <code>tahun</code> column. T${missingTk[0].replace('Tingkatan ','')}-T${missingTk[missingTk.length-1].replace('Tingkatan ','')} mungkin ada nilai <code>tahun</code> yang berbeza dari ${new Date().getFullYear()}.</em><br><br>
+          <strong>Penyelesaian:</strong><br>
+          1. Pastikan semua 1716 pelajar dalam sheet ada <code>tahun = ${new Date().getFullYear()}</code><br>
+          2. ATAU ubah backend Apps Script: buang filter <code>tahun</code> atau ubah kepada include semua tahun
+        </div>
+      </details>`;
+    }
+    notice.innerHTML = `<div style="flex:1;"><i class="fas fa-cloud" style="color:var(--ok);"></i> <strong>Data Live</strong> — ${pelajarCount} pelajar unik · ${unitCount} unit aktif${badges}${tingkatanWarn}</div><button class="btn btn-outline btn-sm" onclick="forceDemo()" style="font-size:11px;flex-shrink:0;">Tukar ke Demo</button>`;
   } else {
     notice.style.background = '#fef9e7';
     notice.style.border = '1px solid var(--warn)';
@@ -404,19 +539,45 @@ function loadDemoData(){
 
 function buildUnitMap(){
   unitMap = {};
+  // Polisi sekolah: setiap pelajar HANYA 1 unit per kategori
+  // Track nama+student_no yg sudah dimasukkan dlm setiap kategori
+  const seenInCat = { 'Beruniform': new Set(), 'Kelab/Persatuan': new Set(), 'Sukan/Permainan': new Set() };
+  let policyViolations = { 'Beruniform':0, 'Kelab/Persatuan':0, 'Sukan/Permainan':0 };
+
   pelajarAll.forEach(p=>{
+    // Kunci unik pelajar (utamakan student_no, fallback nama+kelas)
+    const pKey = String(p.student_no || '').trim() ||
+                 (String(p.nama||'').trim().toLowerCase() + '|' + String(p.kelas||'').trim());
+    if(!pKey || pKey === '|') return;
+
     [['kelab','Kelab/Persatuan'],['uniform','Beruniform'],['sukan','Sukan/Permainan']].forEach(([fld,kat])=>{
+      // SKIP jika pelajar ini sudah ada dalam kategori ini
+      if(seenInCat[kat].has(pKey)){
+        policyViolations[kat]++;
+        return;
+      }
       const raw = (p[fld]||'').trim();
       if(!raw) return;
-      // Parse "KOD - Nama" format
+      // Parse "KOD - Nama" format atau "KOD Nama" format
       const m = raw.match(/^([^-\s]+)\s*-?\s*(.*)$/);
       const kod = m ? m[1].trim() : raw.substring(0,20);
       const nama = m && m[2] ? m[2].trim() : raw;
       if(!kod) return;
       if(!unitMap[kod]) unitMap[kod] = {kod, nama, kategori:kat, ahli:[]};
-      unitMap[kod].ahli.push(p.no_urut);
+      // Safety net: cegah pelajar yg sama dimasukkan dua kali dlm unit yg sama
+      // Guna student_no (BENAR unik) — NO column bukan unik kerana restart per kelas
+      const sid = pid(p);
+      if(sid && unitMap[kod].ahli.indexOf(sid) === -1){
+        unitMap[kod].ahli.push(sid);
+      }
+      seenInCat[kat].add(pKey);
     });
   });
+
+  // Simpan utk diagnostik
+  if(window._kehadiranDiag){
+    window._kehadiranDiag.policyViolations = policyViolations;
+  }
 }
 
 function populateSelectors(){
@@ -475,9 +636,36 @@ function loadPelajar(){
   const key = getKey(unit, tarikh);
   if(!kehadiranData[key]) kehadiranData[key] = {};
   const status = kehadiranData[key];
-  const ahli = u.ahli.map(no=>pelajarAll.find(p=>p.no_urut===no)).filter(Boolean)
-                .sort((a,b)=>(a.tingkatan||'').localeCompare(b.tingkatan||'') || (a.kelas||'').localeCompare(b.kelas||'') || (a.nama||'').localeCompare(b.nama||''));
-  
+
+  // Susun ikut sortState semasa
+  const ahli = u.ahli.map(sid=>pelajarAll.find(p=>pid(p)===sid)).filter(Boolean);
+  const STATUS_ORDER = {H:1, TH:2, MC:3, B:4, '':5}; // utk sort status
+  ahli.sort((a,b)=>{
+    let cmp = 0;
+    if(sortState.col === 'nama'){
+      cmp = (a.nama||'').localeCompare(b.nama||'');
+    } else if(sortState.col === 'kelas'){
+      // Susun ikut tingkatan dulu (T1 < T2 < T3 < T4 < T5), kemudian kelas
+      const TK_ORDER = {'Tingkatan Peralihan':0,'Tingkatan Satu':1,'Tingkatan Dua':2,'Tingkatan Tiga':3,'Tingkatan Empat':4,'Tingkatan Lima':5};
+      const ta = TK_ORDER[a.tingkatan] !== undefined ? TK_ORDER[a.tingkatan] : 9;
+      const tb = TK_ORDER[b.tingkatan] !== undefined ? TK_ORDER[b.tingkatan] : 9;
+      cmp = ta - tb || (a.kelas||'').localeCompare(b.kelas||'') || (a.nama||'').localeCompare(b.nama||'');
+    } else if(sortState.col === 'status'){
+      const sa = STATUS_ORDER[status[pid(a)]||''] || 9;
+      const sb = STATUS_ORDER[status[pid(b)]||''] || 9;
+      cmp = sa - sb || (a.nama||'').localeCompare(b.nama||'');
+    }
+    return cmp * sortState.dir;
+  });
+
+  // Header dgn ikon sort
+  const sortIcon = (col)=>{
+    if(sortState.col !== col) return '<i class="fas fa-sort" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>';
+    return sortState.dir === 1
+      ? '<i class="fas fa-sort-up" style="font-size:10px;margin-left:4px;color:var(--acc);"></i>'
+      : '<i class="fas fa-sort-down" style="font-size:10px;margin-left:4px;color:var(--acc);"></i>';
+  };
+
   let h = '<div class="bulk-bar">';
   h += `<div class="info"><i class="fas fa-info-circle"></i> ${ahli.length} ahli daftar | ${u.kategori} | ${u.nama}</div>`;
   h += '<div class="bulk-actions">';
@@ -486,27 +674,42 @@ function loadPelajar(){
   h += `<button class="btn btn-outline btn-sm" onclick="exportCSV()"><i class="fas fa-file-csv"></i> CSV</button>`;
   h += '</div></div>';
   h += '<table class="pelajar-table"><thead><tr>';
-  h += '<th>#</th><th>Nama</th><th>Tingkatan/Kelas</th><th style="text-align:right;">Status</th>';
+  h += '<th>#</th>';
+  h += `<th class="sortable" onclick="sortBy('nama')" style="cursor:pointer;user-select:none;">Nama${sortIcon('nama')}</th>`;
+  h += `<th class="sortable" onclick="sortBy('kelas')" style="cursor:pointer;user-select:none;">Tingkatan/Kelas${sortIcon('kelas')}</th>`;
+  h += `<th class="sortable" onclick="sortBy('status')" style="text-align:right;cursor:pointer;user-select:none;">Status${sortIcon('status')}</th>`;
   h += '</tr></thead><tbody>';
   ahli.forEach((p,i)=>{
-    const s = status[p.no_urut] || '';
+    const s = status[pid(p)] || '';
     h += `<tr>`;
     h += `<td class="pelajar-no">${i+1}</td>`;
     h += `<td class="pelajar-nama">${p.nama||'?'}</td>`;
     h += `<td class="pelajar-tk">${p.tingkatan||''} · ${p.kelas||''}</td>`;
     h += `<td class="status-cell">`;
     STATUS.forEach(st=>{
-      h += `<button class="btn-status ${s===st?'active':''}" data-s="${st}" onclick="setStatus(${p.no_urut},'${st}')">${st}</button>`;
+      h += `<button class="btn-status ${s===st?'active':''}" data-s="${st}" onclick="setStatus('${pid(p)}','${st}')">${st}</button>`;
     });
     h += `</td></tr>`;
   });
   h += '</tbody></table>';
-  h += '<div style="margin-top:14px;text-align:center;font-size:11px;color:var(--mute);">Disimpan secara automatik ke storan tempatan</div>';
+  h += '<div style="margin-top:14px;text-align:center;font-size:11px;color:var(--mute);">Disimpan secara automatik ke storan tempatan · Klik tajuk lajur untuk susun</div>';
   wrap.innerHTML = h;
   refreshMiniStats();
 }
 
+// Klik header → toggle sort
+function sortBy(col){
+  if(sortState.col === col){
+    sortState.dir = -sortState.dir; // toggle direction
+  } else {
+    sortState.col = col;
+    sortState.dir = 1;
+  }
+  loadPelajar();
+}
+
 function setStatus(pelajarNo, st){
+  pelajarNo = String(pelajarNo);
   const unit = document.getElementById('unitSel').value;
   const tarikh = document.getElementById('tarikhSel').value;
   const key = getKey(unit, tarikh);
@@ -532,7 +735,7 @@ function bulkSet(st){
   const u = unitMap[unit];
   const key = getKey(unit, tarikh);
   if(!kehadiranData[key]) kehadiranData[key] = {};
-  u.ahli.forEach(no=>{ kehadiranData[key][no] = st; });
+  u.ahli.forEach(sid=>{ kehadiranData[key][String(sid)] = st; });
   saveKehadiran();
   loadPelajar();
 }
@@ -545,8 +748,8 @@ function refreshMiniStats(){
   const key = getKey(unit, tarikh);
   const status = kehadiranData[key] || {};
   const total = u.ahli.length;
-  const hadir = u.ahli.filter(no=>status[no]==='H').length;
-  const th = u.ahli.filter(no=>status[no]==='TH').length;
+  const hadir = u.ahli.filter(sid=>status[String(sid)]==='H').length;
+  const th = u.ahli.filter(sid=>status[String(sid)]==='TH').length;
   const pct = total ? Math.round(hadir/total*100) : 0;
   updateMiniStats(hadir, th, pct);
 }
@@ -565,7 +768,7 @@ function exportCSV(){
   const status = kehadiranData[key] || {};
   let csv = 'Bil,Student No,Nama,Tingkatan,Kelas,Status\n';
   u.ahli.forEach((no,i)=>{
-    const p = pelajarAll.find(x=>x.no_urut===no);
+    const p = pelajarAll.find(x=>pid(x)===no);
     if(!p) return;
     csv += `${i+1},"${p.student_no||''}","${p.nama||''}","${p.tingkatan||''}","${p.kelas||''}","${status[no]||''}"\n`;
   });
@@ -614,15 +817,67 @@ function getUnitRecords(unitKod, fasa){
 function renderAnalisisUnit(){
   const unitKod = document.getElementById('unitAnaSel').value;
   const fasa = document.getElementById('tempohSel').value;
+  const ikutTakwim = document.getElementById('ikutTakwim').checked;
   const records = getUnitRecords(unitKod, fasa);
-  const recs = Object.values(records).sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
-  
+  let recs = Object.values(records);
+
+  // Jika "Ikut Takwim", tambah tarikh takwim yg belum direkod sebagai placeholder
+  let takwimDates = [];
+  if(ikutTakwim){
+    // Dapatkan takwim ikut kategori unit yang dipilih
+    if(unitKod){
+      takwimDates = getTakwimForUnit(unitKod);
+    } else {
+      // Semua unit: gabungkan takwim dari semua kategori yg digunakan
+      const usedCats = new Set();
+      Object.values(unitMap).forEach(u => usedCats.add(u.kategori));
+      const all = new Set();
+      ['Beruniform','Kelab/Persatuan','Sukan/Permainan'].forEach(kat => {
+        if(usedCats.has(kat)){
+          const kKey = KAT_TO_KEY[kat];
+          if(kKey) generateTakwimDates(kKey).forEach(d => all.add(d));
+        }
+      });
+      takwimDates = Array.from(all).sort();
+    }
+    const fasaRange = getDatesInFasa(fasa);
+    // Filter takwim dates ikut fasa
+    takwimDates = takwimDates.filter(d => {
+      const dObj = new Date(d);
+      if(dObj.getFullYear() !== currentYear) return false;
+      if(fasaRange && (dObj.getMonth() < fasaRange[0] || dObj.getMonth() > fasaRange[1])) return false;
+      return true;
+    });
+
+    if(unitKod){
+      // Untuk unit khusus: pastikan setiap tarikh takwim ada entry (kosong jika belum direkod)
+      const existingDates = new Set(recs.map(r=>r.tarikh));
+      takwimDates.forEach(d => {
+        if(!existingDates.has(d)){
+          recs.push({unit: unitKod, tarikh: d, hadir:0, th:0, mc:0, b:0, total:0, _belumRekod: true});
+        }
+      });
+      // Buang rekod yg tarikhnya bukan dalam takwim
+      const takwimSet = new Set(takwimDates);
+      recs = recs.filter(r => takwimSet.has(r.tarikh));
+    } else {
+      // Semua unit: tapis hanya tarikh dlm takwim
+      const takwimSet = new Set(takwimDates);
+      recs = recs.filter(r => takwimSet.has(r.tarikh));
+    }
+  }
+
+  recs.sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
+
   const wrap = document.getElementById('anaUnitContent');
   if(!recs.length){
-    wrap.innerHTML = '<div class="empty"><i class="fas fa-chart-bar"></i>Tiada rekod kehadiran untuk tempoh ini.<br><small>Mula rekod di tab "Rekod Perjumpaan"</small></div>';
+    const msg = ikutTakwim
+      ? 'Tiada tarikh dalam takwim untuk tempoh ini. Sila tetapkan takwim di tab "Takwim" dulu.'
+      : 'Tiada rekod kehadiran untuk tempoh ini.<br><small>Mula rekod di tab "Rekod Perjumpaan"</small>';
+    wrap.innerHTML = '<div class="empty"><i class="fas fa-chart-bar"></i>'+msg+'</div>';
     return;
   }
-  
+
   const totalH = recs.reduce((s,r)=>s+r.hadir,0);
   const totalTH = recs.reduce((s,r)=>s+r.th,0);
   const totalMC = recs.reduce((s,r)=>s+r.mc,0);
@@ -630,29 +885,48 @@ function renderAnalisisUnit(){
   const totalAll = recs.reduce((s,r)=>s+r.total,0);
   const purata = totalAll ? Math.round(totalH/totalAll*100) : 0;
   const target = 80; // minimum target
-  
+  const direkodCount = recs.filter(r=>!r._belumRekod && r.total>0).length;
+
   let h = '<div class="stats-grid">';
-  h += `<div class="stat-card"><div class="v">${recs.length}</div><div class="l">Perjumpaan</div></div>`;
+  h += `<div class="stat-card"><div class="v">${recs.length}</div><div class="l">Jumlah ${ikutTakwim?'Takwim':'Perjumpaan'}</div></div>`;
+  if(ikutTakwim){
+    h += `<div class="stat-card ${direkodCount===recs.length?'ok':direkodCount>0?'warn':'err'}"><div class="v">${direkodCount}/${recs.length}</div><div class="l">Sudah Direkod</div></div>`;
+  }
   h += `<div class="stat-card ${purata>=target?'ok':purata>=60?'warn':'err'}"><div class="v">${purata}%</div><div class="l">Purata Kehadiran</div></div>`;
   h += `<div class="stat-card ok"><div class="v">${totalH}</div><div class="l">Jumlah Hadir</div></div>`;
   h += `<div class="stat-card err"><div class="v">${totalTH}</div><div class="l">Tidak Hadir</div></div>`;
   h += `<div class="stat-card warn"><div class="v">${totalMC}</div><div class="l">MC</div></div>`;
-  h += `<div class="stat-card"><div class="v">${totalB}</div><div class="l">Bersurat</div></div>`;
   h += '</div>';
 
   h += '<h3 style="font-size:13px;font-weight:800;color:var(--pri);margin:14px 0 8px;"><i class="fas fa-calendar-alt"></i> Senarai Perjumpaan</h3>';
-  h += '<table class="pelajar-table"><thead><tr><th>Tarikh</th><th>Unit</th><th>Hadir</th><th>TH</th><th>MC</th><th>B</th><th>%</th></tr></thead><tbody>';
+  h += '<table class="pelajar-table"><thead><tr><th>Tarikh</th><th>Unit</th><th>Hadir</th><th>TH</th><th>MC</th><th>B</th><th>%</th><th></th></tr></thead><tbody>';
   recs.forEach(r=>{
     const u = unitMap[r.unit];
     const pct = r.total ? Math.round(r.hadir/r.total*100) : 0;
     const cls = pct>=target?'text-ok':pct>=60?'':'text-err';
-    h += `<tr><td>${r.tarikh}</td><td>${u?u.nama:r.unit}</td>`;
-    h += `<td class="text-ok">${r.hadir}</td><td class="text-err">${r.th}</td>`;
-    h += `<td>${r.mc}</td><td>${r.b}</td>`;
-    h += `<td class="${cls}" style="font-weight:800;">${pct}%</td></tr>`;
+    if(r._belumRekod){
+      h += `<tr style="opacity:0.55;background:#fafafa;"><td>${r.tarikh}</td><td>${u?u.nama:r.unit}</td>`;
+      h += `<td colspan="4" style="text-align:center;font-style:italic;color:var(--mute);">Belum Direkod</td>`;
+      h += `<td style="color:var(--mute);">—</td><td></td></tr>`;
+    } else {
+      h += `<tr><td>${r.tarikh}</td><td>${u?u.nama:r.unit}</td>`;
+      h += `<td class="text-ok">${r.hadir}</td><td class="text-err">${r.th}</td>`;
+      h += `<td>${r.mc}</td><td>${r.b}</td>`;
+      h += `<td class="${cls}" style="font-weight:800;">${pct}%</td>`;
+      h += `<td><button onclick="deleteRekod('${r.unit}','${r.tarikh}')" title="Padam rekod ini" style="background:#fde;color:var(--err);border:none;border-radius:4px;padding:3px 7px;cursor:pointer;font-size:11px;"><i class="fas fa-trash"></i></button></td></tr>`;
+    }
   });
   h += '</tbody></table>';
   wrap.innerHTML = h;
+}
+
+// Padam rekod perjumpaan tertentu
+function deleteRekod(unitKod, tarikh){
+  if(!confirm(`Padam rekod perjumpaan ${tarikh} untuk unit ini?\n\nSemua status kehadiran pelajar untuk tarikh tersebut akan hilang.`)) return;
+  const key = getKey(unitKod, tarikh);
+  delete kehadiranData[key];
+  saveKehadiran();
+  renderAnalisisUnit();
 }
 
 // =============================================================
@@ -661,7 +935,7 @@ function renderAnalisisUnit(){
 function getPelajarStats(){
   // Untuk setiap pelajar: jumlah perjumpaan dia patut hadir vs yang dia hadir
   const stats = {};
-  pelajarAll.forEach(p=>{ stats[p.no_urut] = {p, total:0, hadir:0, th:0, mc:0, b:0}; });
+  pelajarAll.forEach(p=>{ const sid=pid(p); if(sid) stats[sid] = {p, total:0, hadir:0, th:0, mc:0, b:0}; });
   Object.keys(kehadiranData).forEach(key=>{
     const [u, tarikh] = key.split('|');
     if(new Date(tarikh).getFullYear() !== currentYear) return;
@@ -683,44 +957,65 @@ function renderAnalisisPelajar(){
   const stats = getPelajarStats();
   const ting = document.getElementById('tingkatanFilter').value;
   const minPct = parseInt(document.getElementById('minPctFilter').value);
-  
+
+  // Kira jumlah jam per pelajar berdasarkan tetapan takwim
+  const durasi = (takwimData && takwimData.durasi_minit) || 90;
+  const minJumpa = (takwimData && takwimData.min_jumpa) || 12;
+  const minJam = (takwimData && takwimData.min_jam) || 36;
+
   const rows = Object.values(stats)
     .filter(s=>s.total>0)
     .filter(s=>!ting || s.p.tingkatan === ting)
-    .map(s=>({...s, pct: Math.round(s.hadir/s.total*100)}))
+    .map(s=>{
+      const pct = Math.round(s.hadir/s.total*100);
+      // Kira jam terkumpul: H + B dianggap memenuhi kehadiran berkesan
+      const jamTerkumpul = ((s.hadir + s.b) * durasi) / 60;
+      const okJumpa = (s.hadir + s.b) >= minJumpa;
+      const okJam = jamTerkumpul >= minJam;
+      return {...s, pct, jamTerkumpul, okJumpa, okJam};
+    })
     .filter(s=>{
       if(minPct === -1) return s.pct < 80;
       return s.pct >= minPct;
     })
     .sort((a,b)=>a.pct - b.pct);
-  
+
   const wrap = document.getElementById('anaPelajarContent');
   if(!rows.length){
     wrap.innerHTML = '<div class="empty"><i class="fas fa-user-graduate"></i>Tiada pelajar yang sepadan filter.<br><small>Cuba tukar filter atau mula rekod kehadiran</small></div>';
     return;
   }
-  
+
   // Stats ringkas
   const total = rows.length;
   const bermasalah = rows.filter(r=>r.pct<80).length;
   const cemerlang = rows.filter(r=>r.pct>=95).length;
-  
+  const bawahPAJSK = rows.filter(r=>!r.okJumpa || !r.okJam).length;
+
   let h = '<div class="stats-grid">';
   h += `<div class="stat-card"><div class="v">${total}</div><div class="l">Pelajar Aktif</div></div>`;
+  h += `<div class="stat-card ${bawahPAJSK>0?'err':'ok'}"><div class="v">${bawahPAJSK}</div><div class="l">Bawah PAJSK<br><small>(< ${minJumpa} jumpa / ${minJam}j)</small></div></div>`;
   h += `<div class="stat-card ${bermasalah>0?'err':''}"><div class="v">${bermasalah}</div><div class="l">Kehadiran < 80%</div></div>`;
   h += `<div class="stat-card ok"><div class="v">${cemerlang}</div><div class="l">Cemerlang (≥95%)</div></div>`;
   h += '</div>';
-  
+
+  h += `<div style="margin:10px 0;padding:8px 12px;background:#eef4fb;border-radius:6px;font-size:11px;color:var(--mute);">
+    <strong>Pengiraan Jam:</strong> (H + B) × ${durasi} minit. Minimum PAJSK: ${minJumpa} perjumpaan & ${minJam} jam setahun.
+  </div>`;
+
   h += '<div style="background:#f8fafc;border-radius:8px;padding:10px;max-height:540px;overflow-y:auto;">';
   rows.forEach(r=>{
     const cls = r.pct<80?'danger':r.pct<90?'warning':'good';
     const barColor = r.pct<80?'var(--err)':r.pct<90?'var(--warn)':'var(--ok)';
+    const flagPAJSK = (!r.okJumpa || !r.okJam)
+      ? `<span title="Bawah minimum PAJSK" style="background:#fdedec;color:var(--err);font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;margin-right:6px;">⚠ PAJSK</span>`
+      : '';
     h += `<div class="analisis-pelajar-row ${cls}">`;
-    h += `<span class="name">${r.p.nama}</span>`;
+    h += `<span class="name">${flagPAJSK}${r.p.nama}</span>`;
     h += `<span class="kls">${r.p.kelas||''}</span>`;
     h += `<div class="bar-wrap"><div class="bar" style="width:${r.pct}%;background:${barColor}"></div></div>`;
     h += `<span class="pct">${r.pct}%</span>`;
-    h += `<span style="font-size:11px;color:var(--mute);min-width:60px;">${r.hadir}/${r.total}</span>`;
+    h += `<span style="font-size:11px;color:var(--mute);min-width:55px;text-align:right;">${r.hadir}/${r.total}<br><span style="font-size:10px;color:${r.okJam?'var(--ok)':'var(--err)'};font-weight:700;">${r.jamTerkumpul.toFixed(1)}j</span></span>`;
     h += `</div>`;
   });
   h += '</div>';
@@ -784,30 +1079,78 @@ function renderLaporan(){
     return;
   }
   
-  // Per kategori
+  // Per kategori — tambah info takwim & jam
+  const durasi = (takwimData && takwimData.durasi_minit) || 90;
+  const minJumpa = (takwimData && takwimData.min_jumpa) || 12;
+  const minJam = (takwimData && takwimData.min_jam) || 36;
+
   ['Beruniform','Kelab/Persatuan','Sukan/Permainan'].forEach(kat=>{
     const grpStats = stats.filter(s=>s.kategori===kat);
     if(!grpStats.length) return;
+    const kKey = KAT_TO_KEY[kat];
+    const takwimDates = kKey ? generateTakwimDates(kKey) : [];
+    const takwimJam = (takwimDates.length * durasi) / 60;
+    const totalPerjumpaanKat = grpStats.reduce((s,x)=>s+x.perjumpaan,0);
+    const totalJamKat = (totalPerjumpaanKat * durasi) / 60;
+
     h += '<div class="laporan-section">';
     h += `<h3><i class="fas fa-folder"></i> ${kat} (${grpStats.length} unit)</h3>`;
-    h += '<table class="pelajar-table"><thead><tr><th>#</th><th>Unit</th><th>Perjumpaan</th><th>Penyertaan</th><th>Hadir</th><th>%</th></tr></thead><tbody>';
+    if(takwimDates.length){
+      h += `<div style="background:#eef4fb;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:11.5px;color:var(--pri);">
+        <strong>Takwim:</strong> ${takwimDates.length} perjumpaan dirancang · ${takwimJam.toFixed(1)} jam · Durasi: ${durasi} minit setiap satu
+        ${takwimDates.length>=minJumpa && takwimJam>=minJam ? '<span style="background:var(--ok);color:#fff;padding:1px 8px;border-radius:8px;font-size:10px;font-weight:700;margin-left:6px;">✓ Cukup PAJSK</span>' : '<span style="background:var(--err);color:#fff;padding:1px 8px;border-radius:8px;font-size:10px;font-weight:700;margin-left:6px;">⚠ Bawah Minimum</span>'}
+      </div>`;
+    }
+    h += '<table class="pelajar-table"><thead><tr><th>#</th><th>Unit</th><th>Perjumpaan</th><th>Jam</th><th>Penyertaan</th><th>Hadir</th><th>%</th></tr></thead><tbody>';
     grpStats.forEach((s,i)=>{
       const cls = s.purata>=80?'text-ok':s.purata>=60?'':'text-err';
+      const unitJam = (s.perjumpaan * durasi) / 60;
       h += `<tr><td>${i+1}</td><td><strong>${s.nama}</strong></td>`;
-      h += `<td>${s.perjumpaan}</td><td>${s.totalAhli}</td>`;
+      h += `<td>${s.perjumpaan}</td>`;
+      h += `<td><strong>${unitJam.toFixed(1)}j</strong></td>`;
+      h += `<td>${s.totalAhli}</td>`;
       h += `<td class="text-ok">${s.totalHadir}</td>`;
       h += `<td class="${cls}" style="font-weight:800;">${s.purata}%</td></tr>`;
     });
+    // Ringkasan kategori
+    h += `<tr style="background:#f8fafc;font-weight:700;"><td colspan="2" style="text-align:right;">JUMLAH KATEGORI →</td><td>${totalPerjumpaanKat}</td><td>${totalJamKat.toFixed(1)}j</td><td colspan="3"></td></tr>`;
     h += '</tbody></table>';
     h += '</div>';
   });
-  
-  // Pelajar bermasalah
+
+  // Pelajar bermasalah — guna kriteria PAJSK (jumpa + jam)
   const pelStats = getPelajarStats();
-  const bermasalah = Object.values(pelStats).map(s=>({...s, pct: s.total?Math.round(s.hadir/s.total*100):0})).filter(s=>s.total>0 && s.pct<80).sort((a,b)=>a.pct-b.pct);
+  const pelAll = Object.values(pelStats).map(s=>{
+    const pct = s.total?Math.round(s.hadir/s.total*100):0;
+    const jamTerkumpul = ((s.hadir + s.b) * durasi) / 60;
+    const okJumpa = (s.hadir + s.b) >= minJumpa;
+    const okJam = jamTerkumpul >= minJam;
+    return {...s, pct, jamTerkumpul, okJumpa, okJam};
+  });
+  const bawahPAJSK = pelAll.filter(s => s.total>0 && (!s.okJumpa || !s.okJam)).sort((a,b)=>a.jamTerkumpul - b.jamTerkumpul);
+  const bermasalah = pelAll.filter(s=>s.total>0 && s.pct<80).sort((a,b)=>a.pct-b.pct);
+
+  if(bawahPAJSK.length){
+    h += '<div class="laporan-section">';
+    h += `<h3 style="color:var(--err);"><i class="fas fa-exclamation-triangle"></i> Pelajar Bawah Minimum PAJSK (${bawahPAJSK.length} pelajar)</h3>`;
+    h += `<p style="font-size:11.5px;color:var(--mute);margin:0 0 8px;">Syarat: minimum <strong>${minJumpa} perjumpaan</strong> & <strong>${minJam} jam</strong> setahun.</p>`;
+    h += '<table class="pelajar-table"><thead><tr><th>#</th><th>Nama</th><th>Tingkatan</th><th>Kelas</th><th>Hadir+B</th><th>Jam Terkumpul</th><th>Status</th></tr></thead><tbody>';
+    bawahPAJSK.slice(0,30).forEach((s,i)=>{
+      const masalah = [];
+      if(!s.okJumpa) masalah.push(`< ${minJumpa} jumpa`);
+      if(!s.okJam) masalah.push(`< ${minJam}j`);
+      h += `<tr><td>${i+1}</td><td><strong>${s.p.nama}</strong></td><td>${s.p.tingkatan||'-'}</td><td>${s.p.kelas||'-'}</td>`;
+      h += `<td>${s.hadir+s.b}</td><td class="${s.okJam?'text-ok':'text-err'}" style="font-weight:700;">${s.jamTerkumpul.toFixed(1)}j</td>`;
+      h += `<td class="text-err" style="font-size:10.5px;">${masalah.join(' · ')}</td></tr>`;
+    });
+    h += '</tbody></table>';
+    if(bawahPAJSK.length>30) h += `<p style="font-size:11px;color:var(--mute);margin-top:8px;">…dan ${bawahPAJSK.length-30} pelajar lagi.</p>`;
+    h += '</div>';
+  }
+
   if(bermasalah.length){
     h += '<div class="laporan-section">';
-    h += `<h3 style="color:var(--err);"><i class="fas fa-exclamation-triangle"></i> Pelajar Kehadiran < 80% (${bermasalah.length} pelajar) — Perlu Tindakan</h3>`;
+    h += `<h3 style="color:var(--warn);"><i class="fas fa-chart-line"></i> Pelajar Kehadiran < 80% (${bermasalah.length} pelajar)</h3>`;
     h += '<table class="pelajar-table"><thead><tr><th>#</th><th>Nama</th><th>Tingkatan</th><th>Kelas</th><th>Hadir/Total</th><th>%</th></tr></thead><tbody>';
     bermasalah.slice(0,30).forEach((s,i)=>{
       h += `<tr><td>${i+1}</td><td><strong>${s.p.nama}</strong></td><td>${s.p.tingkatan||'-'}</td><td>${s.p.kelas||'-'}</td><td>${s.hadir}/${s.total}</td><td class="text-err" style="font-weight:800;">${s.pct}%</td></tr>`;
@@ -816,11 +1159,14 @@ function renderLaporan(){
     if(bermasalah.length>30) h += `<p style="font-size:11px;color:var(--mute);margin-top:8px;">…dan ${bermasalah.length-30} pelajar lagi.</p>`;
     h += '</div>';
   }
-  
+
   // Tindakan susulan dicadangkan
   h += '<div class="laporan-section">';
   h += `<h3><i class="fas fa-lightbulb"></i> Cadangan Tindakan Susulan (KOKUM)</h3>`;
   h += '<ol style="padding-left:20px;font-size:12.5px;line-height:1.8;">';
+  if(bawahPAJSK.length){
+    h += `<li><strong>${bawahPAJSK.length} pelajar</strong> di bawah minimum PAJSK (${minJumpa} jumpa & ${minJam}j). Wajib dipanggil untuk sesi penjelasan & rancangan susulan.</li>`;
+  }
   if(purataKeseluruhan < 80){
     h += `<li>Purata kehadiran <strong>${purataKeseluruhan}%</strong> — di bawah target 80%. Adakan mesyuarat dengan guru penasihat unit bermasalah.</li>`;
   }
@@ -851,7 +1197,8 @@ function renderLaporan(){
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
-  if(tab==='unit') renderAnalisisUnit();
+  if(tab==='takwim'){ populateTakwimForm(); renderTakwimPreview(); }
+  else if(tab==='unit') renderAnalisisUnit();
   else if(tab==='pelajar') renderAnalisisPelajar();
   else if(tab==='laporan') renderLaporan();
 }
@@ -859,9 +1206,321 @@ function switchTab(tab){
 function changeYear(y){
   currentYear = parseInt(y);
   loadKehadiran();
+  loadTakwim();
   // Re-render current tab
   const active = document.querySelector('.tab.active');
   if(active) switchTab(active.dataset.tab);
+}
+
+// =============================================================
+// TAKWIM PERJUMPAAN — 3 kategori (Beruniform/Kelab/Sukan) + jam
+// =============================================================
+const KAT_CONFIG = [
+  { key:'beruniform', label:'Beruniform', icon:'fa-shield-alt', color:'#2980b9', defaultHari:3 },
+  { key:'kelab',      label:'Kelab/Persatuan', icon:'fa-book', color:'#16a085', defaultHari:4 },
+  { key:'sukan',      label:'Sukan/Permainan', icon:'fa-futbol', color:'#e67e22', defaultHari:6 }
+];
+const KAT_TO_KEY = { 'Beruniform':'beruniform', 'Kelab/Persatuan':'kelab', 'Sukan/Permainan':'sukan' };
+const HARI_LABEL = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+
+let takwimData = null;
+
+function defaultTakwim(){
+  const obj = { durasi_minit:90, min_jumpa:12, min_jam:36 };
+  KAT_CONFIG.forEach(k => {
+    obj[k.key] = { hari:k.defaultHari, mula:currentYear+'-01-15', tamat:currentYear+'-10-31', kecuali:[], tambahan:[] };
+  });
+  return obj;
+}
+
+function loadTakwim(){
+  const raw = sget('takwim_'+currentYear);
+  if(raw){
+    try {
+      const old = JSON.parse(raw);
+      // Migrasi dari skema lama (single category)
+      if(old.hari !== undefined && !old.beruniform){
+        const migrated = defaultTakwim();
+        // Anggap takwim lama untuk Beruniform jika hari=3 (Rabu)
+        const matchKat = KAT_CONFIG.find(k => k.defaultHari === old.hari) || KAT_CONFIG[0];
+        migrated[matchKat.key] = { hari:old.hari, mula:old.mula, tamat:old.tamat, kecuali:old.kecuali||[], tambahan:old.tambahan||[] };
+        takwimData = migrated;
+      } else {
+        // Pastikan semua kategori wujud
+        takwimData = Object.assign(defaultTakwim(), old);
+        KAT_CONFIG.forEach(k => {
+          if(!takwimData[k.key]) takwimData[k.key] = defaultTakwim()[k.key];
+        });
+      }
+    } catch(e) { takwimData = defaultTakwim(); }
+  } else {
+    takwimData = defaultTakwim();
+  }
+  renderTakwimUI();
+}
+
+function renderTakwimUI(){
+  if(!document.getElementById('takwimKategoriContainer')) return;
+  // Global
+  document.getElementById('tkDurasi').value = takwimData.durasi_minit;
+  document.getElementById('tkMinJumpa').value = takwimData.min_jumpa;
+  document.getElementById('tkMinJam').value = takwimData.min_jam;
+  updateDurasiHelper();
+
+  // 3 kad per kategori
+  const cont = document.getElementById('takwimKategoriContainer');
+  cont.innerHTML = KAT_CONFIG.map(k => {
+    const t = takwimData[k.key];
+    return `<div class="card" style="padding:14px;margin-bottom:12px;border-left:4px solid ${k.color};">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <h4 style="font-size:13px;font-weight:800;color:${k.color};margin:0;"><i class="fas ${k.icon}"></i> ${k.label}</h4>
+        <span id="tkCount-${k.key}" style="font-size:11px;color:var(--mute);">— perjumpaan</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Hari</label>
+          <select id="tk-${k.key}-hari" onchange="onTakwimFieldChange()" style="width:100%;padding:6px;margin-top:3px;border-radius:5px;border:1.5px solid var(--bdr);font-size:12px;">
+            <option value="1"${t.hari==1?' selected':''}>Isnin</option>
+            <option value="2"${t.hari==2?' selected':''}>Selasa</option>
+            <option value="3"${t.hari==3?' selected':''}>Rabu</option>
+            <option value="4"${t.hari==4?' selected':''}>Khamis</option>
+            <option value="5"${t.hari==5?' selected':''}>Jumaat</option>
+            <option value="6"${t.hari==6?' selected':''}>Sabtu</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Mula</label>
+          <input type="date" id="tk-${k.key}-mula" value="${t.mula||''}" onchange="onTakwimFieldChange()" style="width:100%;padding:6px;margin-top:3px;border-radius:5px;border:1.5px solid var(--bdr);font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Tamat</label>
+          <input type="date" id="tk-${k.key}-tamat" value="${t.tamat||''}" onchange="onTakwimFieldChange()" style="width:100%;padding:6px;margin-top:3px;border-radius:5px;border:1.5px solid var(--bdr);font-size:12px;">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--err);text-transform:uppercase;margin-bottom:4px;"><i class="fas fa-ban"></i> Cuti / Kecuali</div>
+          <div id="tk-${k.key}-kecuali-list" style="margin-bottom:5px;max-height:120px;overflow-y:auto;"></div>
+          <div style="display:flex;gap:3px;">
+            <input type="date" id="tk-${k.key}-kecuali-input" style="flex:1;padding:5px 8px;border:1.5px solid var(--bdr);border-radius:5px;font-size:11px;">
+            <button class="btn btn-outline btn-sm" onclick="addKecuali('${k.key}')" style="padding:4px 8px;"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ok);text-transform:uppercase;margin-bottom:4px;"><i class="fas fa-plus-circle"></i> Ad-hoc</div>
+          <div id="tk-${k.key}-tambahan-list" style="margin-bottom:5px;max-height:120px;overflow-y:auto;"></div>
+          <div style="display:flex;gap:3px;">
+            <input type="date" id="tk-${k.key}-tambahan-input" style="flex:1;padding:5px 8px;border:1.5px solid var(--bdr);border-radius:5px;font-size:11px;">
+            <button class="btn btn-outline btn-sm" onclick="addTambahan('${k.key}')" style="padding:4px 8px;"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Render list kecuali/tambahan untuk setiap kategori
+  KAT_CONFIG.forEach(k => renderKategoriLists(k.key));
+  updateAllCounts();
+}
+
+function renderKategoriLists(kKey){
+  const t = takwimData[kKey];
+  const kList = document.getElementById('tk-'+kKey+'-kecuali-list');
+  const tList = document.getElementById('tk-'+kKey+'-tambahan-list');
+  if(kList){
+    kList.innerHTML = t.kecuali.length ? t.kecuali.map((d,i)=>
+      `<div style="display:flex;justify-content:space-between;align-items:center;background:#fdedec;padding:3px 7px;border-radius:4px;font-size:10.5px;margin-bottom:2px;"><span>${d}</span><button onclick="removeKecuali('${kKey}',${i})" style="background:transparent;border:none;color:var(--err);cursor:pointer;font-size:12px;line-height:1;">×</button></div>`
+    ).join('') : '<div style="font-size:10px;color:var(--mute);font-style:italic;">Tiada</div>';
+  }
+  if(tList){
+    tList.innerHTML = t.tambahan.length ? t.tambahan.map((d,i)=>
+      `<div style="display:flex;justify-content:space-between;align-items:center;background:#eafaf1;padding:3px 7px;border-radius:4px;font-size:10.5px;margin-bottom:2px;"><span>${d}</span><button onclick="removeTambahan('${kKey}',${i})" style="background:transparent;border:none;color:var(--err);cursor:pointer;font-size:12px;line-height:1;">×</button></div>`
+    ).join('') : '<div style="font-size:10px;color:var(--mute);font-style:italic;">Tiada</div>';
+  }
+}
+
+function onTakwimFieldChange(){
+  // Update takwimData dari form
+  takwimData.durasi_minit = parseInt(document.getElementById('tkDurasi').value)||90;
+  takwimData.min_jumpa = parseInt(document.getElementById('tkMinJumpa').value)||12;
+  takwimData.min_jam = parseInt(document.getElementById('tkMinJam').value)||36;
+  KAT_CONFIG.forEach(k => {
+    const hari = document.getElementById('tk-'+k.key+'-hari');
+    const mula = document.getElementById('tk-'+k.key+'-mula');
+    const tamat = document.getElementById('tk-'+k.key+'-tamat');
+    if(hari) takwimData[k.key].hari = parseInt(hari.value);
+    if(mula) takwimData[k.key].mula = mula.value;
+    if(tamat) takwimData[k.key].tamat = tamat.value;
+  });
+  updateDurasiHelper();
+  updateAllCounts();
+}
+
+function updateDurasiHelper(){
+  const d = parseInt(document.getElementById('tkDurasi').value)||90;
+  const jam = Math.floor(d/60);
+  const min = d%60;
+  let txt = '';
+  if(jam>0) txt += jam+' jam';
+  if(min>0) txt += (txt?' ':'') + min+' minit';
+  document.getElementById('tkDurasiHelper').textContent = '= ' + (txt || '0');
+}
+
+function updateAllCounts(){
+  KAT_CONFIG.forEach(k => {
+    const dates = generateTakwimDates(k.key);
+    const totalJam = (dates.length * takwimData.durasi_minit) / 60;
+    const minJumpa = takwimData.min_jumpa;
+    const minJam = takwimData.min_jam;
+    const okJumpa = dates.length >= minJumpa;
+    const okJam = totalJam >= minJam;
+    const colorClass = (okJumpa && okJam) ? 'var(--ok)' : 'var(--err)';
+    const lbl = document.getElementById('tkCount-'+k.key);
+    if(lbl){
+      lbl.innerHTML = `<strong style="color:${colorClass};font-size:12px;">${dates.length} perjumpaan · ${totalJam.toFixed(1)} jam</strong>` +
+        (okJumpa && okJam ? ' <i class="fas fa-check-circle" style="color:var(--ok);"></i>' : ' <i class="fas fa-exclamation-triangle" style="color:var(--err);" title="Bawah minimum PAJSK"></i>');
+    }
+  });
+}
+
+function addKecuali(kKey){
+  const inp = document.getElementById('tk-'+kKey+'-kecuali-input');
+  const d = inp.value;
+  if(!d) return;
+  if(takwimData[kKey].kecuali.indexOf(d) === -1) takwimData[kKey].kecuali.push(d);
+  takwimData[kKey].kecuali.sort();
+  inp.value = '';
+  renderKategoriLists(kKey);
+  updateAllCounts();
+}
+function removeKecuali(kKey, i){
+  takwimData[kKey].kecuali.splice(i,1);
+  renderKategoriLists(kKey);
+  updateAllCounts();
+}
+function addTambahan(kKey){
+  const inp = document.getElementById('tk-'+kKey+'-tambahan-input');
+  const d = inp.value;
+  if(!d) return;
+  if(takwimData[kKey].tambahan.indexOf(d) === -1) takwimData[kKey].tambahan.push(d);
+  takwimData[kKey].tambahan.sort();
+  inp.value = '';
+  renderKategoriLists(kKey);
+  updateAllCounts();
+}
+function removeTambahan(kKey, i){
+  takwimData[kKey].tambahan.splice(i,1);
+  renderKategoriLists(kKey);
+  updateAllCounts();
+}
+
+function saveTakwim(){
+  onTakwimFieldChange();
+  // Sahkan asas
+  for(const k of KAT_CONFIG){
+    if(!takwimData[k.key].mula || !takwimData[k.key].tamat){
+      alert('Sila isi tarikh mula dan tamat untuk '+k.label+'.');
+      return;
+    }
+  }
+  sset('takwim_'+currentYear, JSON.stringify(takwimData));
+  renderTakwimPreview();
+  alert('✅ Takwim disimpan untuk 3 kategori.');
+}
+
+function resetTakwim(){
+  if(!confirm('Padam takwim untuk tahun '+currentYear+'?')) return;
+  try { localStorage.removeItem('takwim_'+currentYear); } catch(e) {}
+  loadTakwim();
+  renderTakwimPreview();
+}
+
+// Jana tarikh perjumpaan untuk satu kategori
+function generateTakwimDates(kKey){
+  if(!takwimData || !takwimData[kKey]) return [];
+  const t = takwimData[kKey];
+  if(!t.mula || !t.tamat) return [];
+  const dates = new Set();
+  const start = new Date(t.mula);
+  const end = new Date(t.tamat);
+  const targetDay = t.hari;
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    const jsDay = targetDay === 7 ? 0 : targetDay;
+    if(d.getDay() === jsDay){
+      const isoStr = d.toISOString().substring(0,10);
+      if(t.kecuali.indexOf(isoStr) === -1) dates.add(isoStr);
+    }
+  }
+  (t.tambahan||[]).forEach(d => {
+    if(d >= t.mula && d <= t.tamat) dates.add(d);
+  });
+  return Array.from(dates).sort();
+}
+
+// Cari takwim yg sesuai utk unit (ikut kategori)
+function getTakwimForUnit(unitKod){
+  const u = unitMap[unitKod];
+  if(!u) return [];
+  const kKey = KAT_TO_KEY[u.kategori];
+  return kKey ? generateTakwimDates(kKey) : [];
+}
+
+function renderTakwimPreview(){
+  const wrap = document.getElementById('takwimPreview');
+  if(!wrap) return;
+  const durasi = takwimData.durasi_minit;
+  const minJumpa = takwimData.min_jumpa;
+  const minJam = takwimData.min_jam;
+
+  let h = `<h3 style="font-size:13px;font-weight:800;color:var(--pri);margin:18px 0 8px;"><i class="fas fa-calendar-check"></i> Senarai Tarikh Dijana</h3>`;
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">';
+
+  KAT_CONFIG.forEach(k => {
+    const dates = generateTakwimDates(k.key);
+    const totalJam = (dates.length * durasi) / 60;
+    const okJumpa = dates.length >= minJumpa;
+    const okJam = totalJam >= minJam;
+    const status = (okJumpa && okJam)
+      ? '<span style="background:var(--ok);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;"><i class="fas fa-check"></i> Cukup PAJSK</span>'
+      : '<span style="background:var(--err);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;"><i class="fas fa-exclamation-triangle"></i> Bawah Minimum</span>';
+
+    h += `<div class="card" style="padding:12px;border-top:3px solid ${k.color};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong style="color:${k.color};font-size:12px;"><i class="fas ${k.icon}"></i> ${k.label}</strong>
+        ${status}
+      </div>
+      <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;">
+        <div><strong style="color:var(--pri);font-size:18px;">${dates.length}</strong> <span style="color:var(--mute);">perjumpaan</span></div>
+        <div><strong style="color:var(--pri);font-size:18px;">${totalJam.toFixed(1)}</strong> <span style="color:var(--mute);">jam</span></div>
+      </div>`;
+
+    if(dates.length){
+      h += '<div style="max-height:200px;overflow-y:auto;background:#f8fafc;border-radius:6px;padding:6px;">';
+      h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:4px;">';
+      dates.forEach((d,i)=>{
+        const dateObj = new Date(d);
+        const day = HARI_LABEL[dateObj.getDay()];
+        const isAdhoc = (takwimData[k.key].tambahan||[]).indexOf(d) !== -1;
+        h += `<div style="background:${isAdhoc?'#eafaf1':'#fff'};border:1px solid ${isAdhoc?'var(--ok)':'#eee'};border-radius:4px;padding:4px 6px;font-size:10px;">
+          <strong>${i+1}.</strong> ${d.substring(5)}<br><span style="color:var(--mute);font-size:9px;">${day}${isAdhoc?' · *':''}</span>
+        </div>`;
+      });
+      h += '</div></div>';
+    } else {
+      h += '<div style="text-align:center;color:var(--mute);font-size:11px;padding:10px;font-style:italic;">Tetapkan tarikh mula & tamat untuk jana</div>';
+    }
+    h += `</div>`;
+  });
+  h += '</div>';
+
+  // Ringkasan
+  const totalDates = KAT_CONFIG.reduce((s,k)=>s+generateTakwimDates(k.key).length,0);
+  const totalJamAll = (totalDates * durasi) / 60;
+  h += `<div style="margin-top:14px;padding:10px 14px;background:#eef4fb;border:1px solid var(--sec);border-radius:8px;font-size:12px;text-align:center;">
+    <strong>Jumlah keseluruhan:</strong> ${totalDates} perjumpaan · ${totalJamAll.toFixed(1)} jam · Durasi: ${durasi} minit setiap satu
+  </div>`;
+
+  wrap.innerHTML = h;
 }
 
 // =============================================================
@@ -875,6 +1534,7 @@ function changeYear(y){
   const p = new URLSearchParams(window.location.search);
   if(p.get('tahun')) currentYear = parseInt(p.get('tahun'));
   loadKehadiran();
+  loadTakwim();
   await fetchPelajar();
 })();
 </script>
