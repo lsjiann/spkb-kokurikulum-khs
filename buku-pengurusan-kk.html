@@ -821,11 +821,20 @@ async function fetchPelajarData(){
   return json.students || json.data || [];
 }
 
+// Pulangkan {data: {guru:[], tugasan:[], unit_lookup:{}}, sekolah: {pengetua, pk_kokurikulum, ...}}
 async function fetchGuruData(){
-  const resp = await fetch(GURU_API + '?action=guru_penasihat_all&_t=' + Date.now());
-  const json = await resp.json();
-  if(!json.success) throw new Error(json.error||'Gagal');
-  return json.guru || json.data || json.guru_penasihat || [];
+  // (1) guru_penasihat_all — senarai guru + tugasan unit
+  const r1 = await fetch(GURU_API + '?action=guru_penasihat_all&_t=' + Date.now());
+  const j1 = await r1.json();
+  // (2) maklumat_sekolah — pengetua, GPK, dll
+  let sekolah = {};
+  try {
+    const r2 = await fetch(GURU_API + '?action=maklumat_sekolah&_t=' + Date.now());
+    const j2 = await r2.json();
+    if(j2.success && j2.data) sekolah = j2.data;
+  } catch(e){}
+  if(!j1.success || !j1.data) throw new Error(j1.error||'Gagal muat guru');
+  return { ...j1.data, _sekolah: sekolah };
 }
 
 // Dedup pelajar by student_no
@@ -853,59 +862,67 @@ function renderOrganisasi(guruData){
   const wrap = document.getElementById('body-organisasi');
   if(!wrap) return;
 
-  if(!guruData || !guruData.length){
-    wrap.innerHTML = '<div class="note"><i class="fas fa-exclamation-circle"></i>Data guru tidak tersedia. Pastikan Data Guru aktif dalam SPKB.</div>' + getCartaOrgFallback();
+  // Maklumat sekolah (Pengetua, GPK)
+  const sek = (guruData && guruData._sekolah) || {};
+  const guru = (guruData && guruData.guru) || [];
+  const tugasan = (guruData && guruData.tugasan) || [];
+  const unitLookup = (guruData && guruData.unit_lookup) || {};
+
+  if(!guru.length && !sek.pengetua){
+    wrap.innerHTML = '<div class="note"><i class="fas fa-exclamation-circle"></i>Data guru tidak tersedia. Pastikan API Data Guru berfungsi.</div>' + getCartaOrgFallback();
     return;
   }
 
-  // Cari jawatan utama
-  const findJawatan = (key) => guruData.find(g => {
-    const j = String(g.jawatan || g.position || '').toLowerCase();
-    return j.indexOf(key) !== -1;
+  // Ambil dari maklumat_sekolah
+  const namaPengetua = (sek.pengetua && sek.pengetua.trim()) ? sek.pengetua.trim() : '— Belum diisi —';
+  const namaGPK = (sek.pk_kokurikulum && sek.pk_kokurikulum.trim()) ? sek.pk_kokurikulum.trim() : '— Belum diisi —';
+
+  // Kira bilangan penyelaras per kategori dari tugasan
+  // tugasan[].kt = kategori_short: B=Beruniform, K=Kelab, S=Sukan
+  const KAT_FROM = {'B':'Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  const penyelarasByKat = {};
+  tugasan.forEach(t => {
+    if(t.j === 'KG' || t.j === 'PK'){ // Ketua/Penolong Ketua
+      const kat = KAT_FROM[t.kt] || 'Kelab/Persatuan';
+      if(!penyelarasByKat[kat]) penyelarasByKat[kat] = new Set();
+      penyelarasByKat[kat].add(t.g);
+    }
   });
 
-  const pengetua = findJawatan('pengetua');
-  const gpkKoku = findJawatan('kokurikulum') || findJawatan('koku');
-  const suuKoku = findJawatan('setiausaha kokurikulum') || findJawatan('s/u koku');
+  // Map guru id → nama
+  const guruById = {};
+  guru.forEach(g => { guruById[g.id] = g.n; });
+
+  // Total guru penasihat unik
+  const advisorIds = new Set();
+  tugasan.forEach(t => { if(t.g) advisorIds.add(t.g); });
 
   let h = `<h3>Carta Organisasi Kokurikulum ${currentYear}</h3>
     <div style="background:#f8fafc;border-radius:10px;padding:18px;text-align:center;border:1px solid var(--bdr);">`;
 
   // Pengetua
-  h += `<div style="display:inline-block;background:var(--pri);color:#fff;padding:10px 22px;border-radius:8px;margin-bottom:8px;">
+  h += `<div style="display:inline-block;background:var(--pri);color:#fff;padding:10px 22px;border-radius:8px;margin-bottom:8px;min-width:240px;">
     <div style="font-size:10px;opacity:0.8;text-transform:uppercase;letter-spacing:.5px;">Pengetua</div>
-    <div style="font-weight:800;font-size:13px;margin-top:2px;">${pengetua ? (pengetua.nama || pengetua.name || '?') : '— belum dilantik —'}</div>
+    <div style="font-weight:800;font-size:13px;margin-top:2px;">${namaPengetua}</div>
   </div><br>`;
   h += `<div style="font-size:14px;color:var(--mute);margin:2px 0;">↓</div>`;
   // GPK Kokurikulum
-  h += `<div style="display:inline-block;background:var(--pri2);color:#fff;padding:9px 18px;border-radius:8px;margin:6px 0;">
+  h += `<div style="display:inline-block;background:var(--pri2);color:#fff;padding:9px 18px;border-radius:8px;margin:6px 0;min-width:240px;">
     <div style="font-size:10px;opacity:0.8;text-transform:uppercase;letter-spacing:.5px;">GPK Kokurikulum</div>
-    <div style="font-weight:800;font-size:13px;margin-top:2px;">${gpkKoku ? (gpkKoku.nama || gpkKoku.name || '?') : '— belum dilantik —'}</div>
-  </div><br>`;
-  h += `<div style="font-size:14px;color:var(--mute);margin:2px 0;">↓</div>`;
-  // S/U Kokurikulum
-  h += `<div style="display:inline-block;background:var(--acc);color:#fff;padding:8px 16px;border-radius:8px;margin:6px 0;">
-    <div style="font-size:10px;opacity:0.9;text-transform:uppercase;letter-spacing:.5px;">Setiausaha Kokurikulum</div>
-    <div style="font-weight:800;font-size:12px;margin-top:2px;">${suuKoku ? (suuKoku.nama || suuKoku.name || '?') : '— belum dilantik —'}</div>
+    <div style="font-weight:800;font-size:13px;margin-top:2px;">${namaGPK}</div>
   </div><br>`;
   h += `<div style="font-size:14px;color:var(--mute);margin:2px 0;">↓</div>`;
   // 3 penyelaras
   h += `<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:8px;">`;
   ['Beruniform','Kelab/Persatuan','Sukan/Permainan'].forEach(kat => {
-    h += `<div style="background:var(--ok);color:#fff;padding:7px 14px;border-radius:7px;font-size:11px;">
-      <div style="font-size:9px;opacity:0.9;text-transform:uppercase;">Penyelaras</div>
+    const bil = (penyelarasByKat[kat] && penyelarasByKat[kat].size) || 0;
+    h += `<div style="background:var(--ok);color:#fff;padding:7px 14px;border-radius:7px;font-size:11px;min-width:140px;">
+      <div style="font-size:9px;opacity:0.9;text-transform:uppercase;">Penyelaras (${bil})</div>
       <strong>${kat}</strong>
     </div>`;
   });
   h += `</div>`;
-
-  // Ahli JK Pengurusan KK
-  const ahliJK = guruData.filter(g => {
-    const j = String(g.jawatan || g.position || '').toLowerCase();
-    return j.indexOf('penasihat') !== -1 || j.indexOf('penyelaras') !== -1 || j.indexOf('ahli jk') !== -1 || j.indexOf('s/u') !== -1;
-  });
-
-  h += `<div style="font-size:11px;color:var(--mute);margin-top:14px;"><i class="fas fa-info-circle"></i> ${guruData.length} guru direkod · ${ahliJK.length} terlibat dalam pengurusan KK</div>`;
+  h += `<div style="font-size:11px;color:var(--mute);margin-top:14px;"><i class="fas fa-info-circle"></i> <strong>${guru.length}</strong> guru direkod · <strong>${advisorIds.size}</strong> guru menjawat jawatan dalam unit kokurikulum · <strong>${Object.keys(unitLookup).length}</strong> unit aktif</div>`;
   h += `</div>`;
 
   wrap.innerHTML = h;
@@ -930,30 +947,79 @@ function getCartaOrgFallback(){
 }
 
 // ========================================================
-// LIVE: GURU PENASIHAT
+// LIVE: GURU PENASIHAT — JOIN guru × tugasan × unit_lookup
 // ========================================================
 function renderGuruPenasihat(guruData){
   const wrap = document.getElementById('body-guru-penasihat');
   if(!wrap) return;
 
-  if(!guruData || !guruData.length){
-    wrap.innerHTML = '<div class="note"><i class="fas fa-exclamation-circle"></i>Data guru tidak tersedia. Sila pastikan modul Data Guru aktif dalam SPKB.</div>';
+  const guru = (guruData && guruData.guru) || [];
+  const tugasan = (guruData && guruData.tugasan) || [];
+  const UL = (guruData && guruData.unit_lookup) || {};
+
+  if(!guru.length){
+    wrap.innerHTML = '<div class="note"><i class="fas fa-exclamation-circle"></i>Data guru tidak tersedia. Pastikan API guru_penasihat_all berfungsi.</div>';
     return;
   }
 
-  // Sort ikut jawatan
-  const sorted = [...guruData].sort((a,b)=>String(a.nama||'').localeCompare(String(b.nama||'')));
+  // Bina lookup
+  const guruById = {};
+  guru.forEach(g => { guruById[g.id] = g; });
 
-  let h = `<p>Senarai ${guruData.length} guru penasihat unit kokurikulum bagi tahun <strong>${currentYear}</strong> dimuatkan secara langsung dari Data Guru SPKB.</p>`;
-  h += `<table><thead><tr><th>Bil</th><th>Nama Guru</th><th>Jawatan</th><th>Unit / Tugasan</th></tr></thead><tbody>`;
-  sorted.forEach((g,i) => {
-    const nama = g.nama || g.name || '—';
-    const jawatan = g.jawatan || g.position || g.tugas || '—';
-    const unit = g.unit || g.persatuan || g.kelab || g.tugasan_kk || '—';
-    h += `<tr><td>${i+1}</td><td><strong>${nama}</strong></td><td>${jawatan}</td><td>${unit}</td></tr>`;
+  // Group tugasan ikut kategori
+  const KAT_FROM = {'B':'Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  const KAT_COLOR = {'Beruniform':'#2980b9','Kelab/Persatuan':'#16a085','Sukan/Permainan':'#e67e22'};
+  const KAT_ICON = {'Beruniform':'fa-shield-alt','Kelab/Persatuan':'fa-book','Sukan/Permainan':'fa-futbol'};
+  const JAWATAN_LABEL = {'KG':'Ketua Guru','PK':'Penolong Ketua','GP':'Guru Penasihat'};
+
+  const tugasanByKat = {'Beruniform':[],'Kelab/Persatuan':[],'Sukan/Permainan':[]};
+  tugasan.forEach(t => {
+    const kat = KAT_FROM[t.kt] || 'Kelab/Persatuan';
+    const ul = UL[t.kod] || [t.kt, t.kod];
+    tugasanByKat[kat].push({
+      guru_id: t.g,
+      guru_nama: (guruById[t.g] && guruById[t.g].n) || '— Guru tiada rekod —',
+      unit_kod: t.kod,
+      unit_nama: ul[1] || t.kod,
+      jawatan: t.j || 'GP',
+      jawatan_label: JAWATAN_LABEL[t.j] || 'Guru Penasihat'
+    });
   });
-  h += `</tbody></table>`;
-  h += `<div class="note"><i class="fas fa-sync"></i><strong>Auto-update:</strong> Senarai ini akan auto-update bila anda kemaskini sheet Data Guru di Google Sheets.</div>`;
+
+  // Bilangan unik per kategori
+  const advisorIds = new Set();
+  tugasan.forEach(t => { if(t.g) advisorIds.add(t.g); });
+
+  let h = `<p>Senarai <strong>${advisorIds.size} guru penasihat</strong> yang menjawat dalam <strong>${Object.keys(UL).length} unit kokurikulum</strong> bagi sesi ${currentYear}. Data diambil secara langsung dari modul Data Guru SPKB.</p>`;
+
+  h += `<div class="info-grid">
+    <div class="info-card"><div class="lbl">Jumlah Guru Direkod</div><div class="val">${guru.length}</div></div>
+    <div class="info-card"><div class="lbl">Guru Penasihat Aktif</div><div class="val" style="color:var(--ok)">${advisorIds.size}</div></div>
+    <div class="info-card"><div class="lbl">Jumlah Jawatan KK</div><div class="val" style="color:var(--pri)">${tugasan.length}</div></div>
+  </div>`;
+
+  // 3 jadual per kategori
+  ['Beruniform','Kelab/Persatuan','Sukan/Permainan'].forEach(kat => {
+    const items = tugasanByKat[kat];
+    if(!items.length) return;
+    // Susun: Ketua dulu, kemudian abjad nama
+    items.sort((a,b) => {
+      const ja = {'KG':1,'PK':2,'GP':3}[a.jawatan] || 4;
+      const jb = {'KG':1,'PK':2,'GP':3}[b.jawatan] || 4;
+      return ja - jb || a.unit_nama.localeCompare(b.unit_nama) || a.guru_nama.localeCompare(b.guru_nama);
+    });
+    h += `<h3 style="color:${KAT_COLOR[kat]};margin-top:18px;"><i class="fas ${KAT_ICON[kat]}"></i> ${kat} (${items.length} jawatan)</h3>`;
+    h += `<table><thead><tr><th>Bil</th><th>Nama Guru</th><th>Unit</th><th>Jawatan</th></tr></thead><tbody>`;
+    items.forEach((t,i)=>{
+      const badge = t.jawatan === 'KG' ? '<span style="background:var(--err);color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:4px;">KG</span>'
+                  : t.jawatan === 'PK' ? '<span style="background:var(--warn);color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:4px;">PK</span>'
+                  : '';
+      h += `<tr><td>${i+1}</td><td><strong>${t.guru_nama}</strong></td><td>${t.unit_kod} · ${t.unit_nama}</td><td>${t.jawatan_label}${badge}</td></tr>`;
+    });
+    h += `</tbody></table>`;
+  });
+
+  h += `<div class="note" style="margin-top:14px;"><i class="fas fa-sync"></i><strong>Auto-update:</strong> Senarai ini auto-update apabila anda kemaskini sheet Data Guru di Google Sheets. <strong>KG</strong> = Ketua Guru, <strong>PK</strong> = Penolong Ketua, <strong>GP</strong> = Guru Penasihat.</div>`;
   wrap.innerHTML = h;
 }
 
