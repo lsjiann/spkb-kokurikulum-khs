@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generator Dokumen Kokurikulum — SPKB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60; --warn:#f39c12; --err:#c0392b;
+  --bg:#f4f6f9; --card:#fff; --bdr:#e1e4e8; --mute:#6c7383; --tx:#2c3e50; --sk:#3498db;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+
+/* TOP */
+.top{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.top h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.top-r{display:flex;align-items:center;gap:10px}
+.btn-top{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px}
+.btn-top:hover{background:rgba(255,255,255,0.25)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:#fff;border-right:1px solid var(--bdr);padding:14px 0;overflow-y:auto;position:sticky;top:0;height:calc(100vh - 60px);max-height:calc(100vh - 60px)}
+.sidebar h3{font-size:10px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.6px;padding:8px 16px 4px;margin-top:8px}
+.sidebar h3:first-child{margin-top:0}
+.sidebar .tpl-item{display:flex;align-items:flex-start;padding:9px 16px;font-size:12.5px;color:var(--tx);cursor:pointer;border-left:3px solid transparent;transition:all .15s;gap:8px}
+.sidebar .tpl-item:hover{background:#f4f6f9;border-left-color:var(--acc)}
+.sidebar .tpl-item.active{background:#eef4fb;border-left-color:var(--pri);font-weight:700;color:var(--pri)}
+.sidebar .tpl-item i{color:var(--pri);font-size:12px;margin-top:1px;flex-shrink:0;width:14px;text-align:center}
+.sidebar .tpl-item .desc{display:block;font-size:10.5px;color:var(--mute);font-weight:400;margin-top:1px;line-height:1.4}
+
+.main{padding:20px 22px;max-width:1400px;margin:0 auto;width:100%}
+
+/* WELCOME */
+.welcome{text-align:center;padding:30px 20px;color:var(--mute)}
+.welcome .icon{font-size:56px;color:var(--pri);margin-bottom:14px;opacity:0.85}
+.welcome h2{font-size:20px;color:var(--pri);margin-bottom:8px}
+.welcome p{font-size:13px;max-width:550px;margin:0 auto 8px}
+
+/* WORKSPACE */
+.workspace{display:grid;grid-template-columns:380px 1fr;gap:14px}
+@media (max-width:1100px){.workspace{grid-template-columns:1fr}}
+.panel-form{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:16px 18px;align-self:start}
+.panel-preview{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:0;overflow:hidden}
+
+.tpl-header{margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f0f0f0}
+.tpl-header h2{font-size:16px;color:var(--pri);margin-bottom:4px}
+.tpl-header p{font-size:11.5px;color:var(--mute);line-height:1.5}
+
+/* EVIDENS TAG */
+.ev-tag{background:#eef4fb;border:1px solid var(--sk);border-radius:6px;padding:6px 10px;margin-top:8px;font-size:11px;color:var(--pri2)}
+.ev-tag i{color:var(--sk);margin-right:4px}
+.ev-tag .ev-code{display:inline-block;background:var(--sk);color:#fff;font-weight:700;padding:1px 6px;border-radius:8px;font-size:10px;margin:0 2px;font-family:monospace}
+
+/* FORM */
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.fld label .req{color:var(--err);margin-left:2px}
+.fld label .auto{display:inline-block;background:var(--ok);color:#fff;font-size:8px;padding:1px 5px;border-radius:6px;margin-left:5px;font-weight:700;text-transform:none;letter-spacing:0}
+.fld input,.fld select,.fld textarea{width:100%;padding:7px 9px;border:1.5px solid var(--bdr);border-radius:5px;font-size:12.5px;font-family:inherit;color:var(--tx)}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--pri)}
+.fld textarea{min-height:60px;resize:vertical;line-height:1.5}
+.fld .hint{font-size:10px;color:var(--mute);margin-top:3px;font-style:italic}
+
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;font-size:12.5px;cursor:pointer;border:1.5px solid transparent;font-weight:600;transition:all .15s}
+.btn-pri{background:var(--pri);color:#fff}
+.btn-pri:hover{background:var(--pri2)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-ok:hover{background:#229954}
+.btn-outline{background:#fff;color:var(--tx);border-color:var(--bdr)}
+.btn-outline:hover{background:#f4f6f9;border-color:var(--pri)}
+.btn-full{width:100%;justify-content:center}
+.btn-sm{padding:5px 9px;font-size:11px}
+.btn-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0}
+
+/* PREVIEW */
+.preview-toolbar{background:#f8fafc;border-bottom:1px solid var(--bdr);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.preview-toolbar .info{font-size:11px;color:var(--mute);display:flex;align-items:center;gap:6px}
+.preview-toolbar .actions{display:flex;gap:5px}
+
+.preview-content{padding:20px;max-height:calc(100vh - 220px);overflow-y:auto;background:#e8eaed}
+.doc{background:#fff;max-width:850px;margin:0 auto;padding:55px 65px;box-shadow:0 2px 12px rgba(0,0,0,0.08);min-height:700px;font-family:'Times New Roman',serif;font-size:12pt;line-height:1.55;color:#000}
+.doc.bulk-page{page-break-after:always;margin-bottom:30px}
+.doc-kop{text-align:center;border-bottom:2px solid #000;padding-bottom:14px;margin-bottom:24px}
+.doc-kop h1{font-size:13pt;font-weight:700;margin:2px 0}
+.doc-kop p{font-size:10pt;margin:1px 0}
+.doc-ref{display:flex;justify-content:space-between;margin:18px 0;font-size:11pt}
+.doc h2.title{font-size:12pt;font-weight:700;text-align:center;margin:20px 0;text-decoration:underline;text-transform:uppercase}
+.doc p{margin-bottom:10px;text-align:justify}
+.doc .indent{padding-left:30px}
+.doc table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11pt}
+.doc table th,.doc table td{border:1px solid #000;padding:5px 8px;text-align:left;vertical-align:top}
+.doc table th{background:#e8eaed;font-weight:700;text-align:center}
+.doc .sig-block{margin-top:35px;display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.doc .sig-line{border-top:1px solid #000;padding-top:4px;margin-top:55px;font-size:10.5pt}
+.doc ol{padding-left:25px;margin:8px 0}
+.doc ol li{margin-bottom:5px}
+
+/* PRINT */
+@media print{
+  body{background:#fff}
+  .top,.sidebar,.panel-form,.preview-toolbar,.no-print{display:none !important}
+  .layout{display:block}
+  .main{padding:0;max-width:100%}
+  .workspace{display:block}
+  .panel-preview{border:none;box-shadow:none}
+  .preview-content{padding:0;max-height:none;overflow:visible;background:#fff}
+  .doc{box-shadow:none;max-width:100%;padding:25mm 25mm;min-height:auto;margin:0}
+  .doc.bulk-page{page-break-after:always;margin-bottom:0}
+  @page{size:A4;margin:0}
+}
+
+/* LOADING */
+.loading{text-align:center;padding:24px;color:var(--mute);font-size:12px}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid #e0e0e0;border-top-color:var(--pri);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pri);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:1000;display:none}
+
+/* RESPONSIVE */
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto;max-height:none;border-right:none;border-bottom:1px solid var(--bdr)}
+}
+
+body.in-spkb .top{display:none}
+body.in-spkb .layout{min-height:auto}
+body.in-spkb .sidebar{height:calc(100vh - 20px)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1><i class="fas fa-file-signature"></i> Generator Dokumen Kokurikulum</h1>
+  <div class="top-r">
+    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main" id="mainContent">
+    <div class="welcome">
+      <div class="icon">📄</div>
+      <h2>Generator Dokumen Kokurikulum</h2>
+      <p>Auto-jana surat, minit, kertas kerja, dan laporan dengan data live dari SPKB. Pilih template dari sidebar untuk mula.</p>
+      <p style="font-size:11px;color:var(--mute);margin-top:14px;"><i class="fas fa-info-circle"></i> Semua dokumen akan ada tag evidens SK@S 3.2 untuk audit.</p>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================================================
+// API & DATA
+// ========================================================
+const STUDENT_API = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+const GURU_API = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+
+let currentYear = new Date().getFullYear();
+let SEKOLAH = {};      // maklumat_sekolah cache
+let GURU_DATA = null;  // {guru, tugasan, unit_lookup}
+let PELAJAR_DATA = []; // senarai pelajar
+let currentTemplate = null;
+let currentFormData = {};
+
+const MEM = {};
+function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'err' ? 'var(--err)' : type === 'ok' ? 'var(--ok)' : 'var(--pri)';
+  t.style.display = 'block';
+  setTimeout(()=>{ t.style.display = 'none'; }, 2500);
+}
+
+// ========================================================
+// FETCH DATA
+// ========================================================
+async function fetchAll(){
+  await Promise.all([fetchSekolah(), fetchGuru(), fetchPelajar()]);
+}
+async function fetchSekolah(){
+  try {
+    const r = await fetch(GURU_API + '?action=maklumat_sekolah&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success && j.data) SEKOLAH = j.data;
+  } catch(e){}
+}
+async function fetchGuru(){
+  try {
+    const r = await fetch(GURU_API + '?action=guru_penasihat_all&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success && j.data) GURU_DATA = j.data;
+  } catch(e){}
+}
+async function fetchPelajar(){
+  try {
+    const r = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success){
+      const raw = j.students || j.data || [];
+      // Dedupe
+      const seen = new Map();
+      raw.forEach(p => {
+        const k = String(p.student_no||p.no_urut||'').trim();
+        if(k && !seen.has(k)) seen.set(k, p);
+      });
+      PELAJAR_DATA = Array.from(seen.values());
+    }
+  } catch(e){}
+}
+
+// Helper: senarai unit dari unit_lookup
+function getUnitList(){
+  if(!GURU_DATA || !GURU_DATA.unit_lookup) return [];
+  const KAT = {'B':'Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  return Object.entries(GURU_DATA.unit_lookup).map(([kod, [kt, nama]]) => ({
+    kod, nama, kategori: KAT[kt] || 'Kelab/Persatuan'
+  })).sort((a,b)=>a.kod.localeCompare(b.kod));
+}
+
+// Helper: senarai guru
+function getGuruList(){
+  if(!GURU_DATA || !GURU_DATA.guru) return [];
+  return GURU_DATA.guru.map(g => ({ id: g.id, nama: g.n }));
+}
+
+// Helper: cari tugasan guru
+function getTugasanForGuru(guruId){
+  if(!GURU_DATA || !GURU_DATA.tugasan) return [];
+  const UL = GURU_DATA.unit_lookup || {};
+  const KAT = {'B':'Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  const J_LBL = {'KG':'Ketua Guru Penasihat','PK':'Penolong Ketua Guru Penasihat','GP':'Guru Penasihat'};
+  return GURU_DATA.tugasan
+    .filter(t => t.g === guruId)
+    .map(t => {
+      const ul = UL[t.kod] || [t.kt, t.kod];
+      return {
+        kod: t.kod,
+        nama: ul[1] || t.kod,
+        kategori: KAT[t.kt] || 'Kelab/Persatuan',
+        jawatan: t.j || 'GP',
+        jawatan_label: J_LBL[t.j] || 'Guru Penasihat'
+      };
+    });
+}
+
+// Format tarikh: 2026-01-15 → "15 Januari 2026"
+const BULAN = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+function fmtTarikh(iso){
+  if(!iso) return '...........................';
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+// Sekolah maklumat dgn fallback
+function S(field, fallback){
+  return (SEKOLAH && SEKOLAH[field] && String(SEKOLAH[field]).trim()) || fallback || '— ' + field.replace(/_/g,' ').toUpperCase() + ' —';
+}
+
+// Kop sekolah HTML
+function kopSekolah(){
+  const nama = S('nama_penuh','SEKOLAH MENENGAH KEBANGSAAN');
+  const alamat = S('alamat','') || [S('poskod',''), S('bandar',''), S('negeri','')].filter(Boolean).join(', ');
+  const tel = S('telefon','');
+  const fax = S('faks','');
+  return `<div class="doc-kop">
+    <h1>${nama.toUpperCase()}</h1>
+    ${alamat ? `<p>${alamat}</p>` : ''}
+    ${tel ? `<p>Tel: ${tel}${fax ? ' &nbsp;|&nbsp; Faks: ' + fax : ''}</p>` : ''}
+  </div>`;
+}
+
+// ========================================================
+// TEMPLATES
+// ========================================================
+const TEMPLATES = [
+  {
+    id: 'surat-lantikan', cat: 'Surat',
+    title: 'Surat Lantikan Guru Penasihat', icon: 'fa-user-tie',
+    desc: 'Surat pelantikan rasmi guru penasihat unit kokurikulum',
+    evidens: ['3.2.1 a','3.2.2 a','3.2.3 a','3.2.4 a'],
+    fields: [
+      { id:'guru_id', label:'Nama Guru', type:'select-guru', required:true },
+      { id:'unit_kod', label:'Unit Kokurikulum', type:'select-unit', required:true },
+      { id:'jawatan', label:'Jawatan', type:'select', required:true,
+        options:[{v:'Guru Penasihat',l:'Guru Penasihat'},{v:'Penolong Ketua Guru Penasihat',l:'Penolong Ketua Guru Penasihat'},{v:'Ketua Guru Penasihat',l:'Ketua Guru Penasihat'}] },
+      { id:'tarikh_kuatkuasa', label:'Tarikh Kuat Kuasa', type:'date', required:true, default:currentYear+'-01-02' },
+      { id:'tarikh_tamat', label:'Tarikh Tamat', type:'date', required:true, default:currentYear+'-11-30' },
+      { id:'rujukan', label:'Rujukan Surat', type:'text', auto:'Auto', default:'' },
+      { id:'tarikh_surat', label:'Tarikh Surat', type:'date', auto:'Auto', default:new Date().toISOString().substring(0,10) },
+    ],
+    bulk: true, bulkLabel: 'Jana untuk SEMUA Guru Penasihat',
+    render: renderSuratLantikan
+  },
+  {
+    id: 'minit-mesyuarat', cat: 'Minit',
+    title: 'Minit Mesyuarat JK Kokurikulum', icon: 'fa-clipboard-list',
+    desc: 'Template minit mesyuarat JK Pengurusan Kokurikulum',
+    evidens: ['3.2.1 c','3.2.7 d'],
+    fields: [
+      { id:'bil_mesyuarat', label:'Bil. Mesyuarat', type:'text', required:true, default:'01' },
+      { id:'tarikh_mesyuarat', label:'Tarikh Mesyuarat', type:'date', required:true },
+      { id:'masa_mula', label:'Masa Mula', type:'time', required:true, default:'14:30' },
+      { id:'masa_tamat', label:'Masa Tamat', type:'time', default:'16:00' },
+      { id:'tempat', label:'Tempat', type:'text', required:true, default:'Bilik Mesyuarat Utama' },
+      { id:'pengerusi_id', label:'Pengerusi', type:'select-guru' },
+      { id:'setiausaha_id', label:'Setiausaha', type:'select-guru' },
+      { id:'agenda_tambahan', label:'Agenda Khas', type:'textarea',
+        hint:'Satu agenda per baris (contoh: "Persiapan Hari Kokurikulum", "Pemilihan AJK Pertandingan")' },
+    ],
+    render: renderMinit
+  },
+  {
+    id: 'kertas-kerja', cat: 'Kertas Kerja',
+    title: 'Kertas Kerja Aktiviti', icon: 'fa-file-contract',
+    desc: 'Template kertas kerja untuk aktiviti kokurikulum (lawatan, pertandingan, karnival)',
+    evidens: ['3.2.5 b','3.2.6 e'],
+    fields: [
+      { id:'nama_program', label:'Nama Program', type:'text', required:true },
+      { id:'unit_kod', label:'Unit Penganjur', type:'select-unit', required:true },
+      { id:'tarikh_program', label:'Tarikh Program', type:'date', required:true },
+      { id:'tempat_program', label:'Tempat', type:'text', required:true },
+      { id:'sasaran', label:'Sasaran Peserta', type:'text', required:true, default:'Ahli Unit' },
+      { id:'bil_peserta', label:'Bilangan Peserta', type:'number', default:'30' },
+      { id:'tujuan', label:'Tujuan / Objektif', type:'textarea', required:true,
+        hint:'Satu objektif per baris' },
+      { id:'kos_anggaran', label:'Anggaran Kos (RM)', type:'number', default:'500' },
+      { id:'sumber_dana', label:'Sumber Dana', type:'text', default:'Yuran Unit / Tabung KK' },
+    ],
+    render: renderKertasKerja
+  },
+  {
+    id: 'surat-ibu-bapa', cat: 'Surat',
+    title: 'Surat Kebenaran Ibu Bapa', icon: 'fa-envelope',
+    desc: 'Surat permohonan kebenaran ibu bapa untuk aktiviti / lawatan',
+    evidens: ['3.2.1 a'],
+    fields: [
+      { id:'nama_aktiviti', label:'Nama Aktiviti', type:'text', required:true },
+      { id:'unit_kod', label:'Unit Penganjur', type:'select-unit' },
+      { id:'tarikh_aktiviti', label:'Tarikh Aktiviti', type:'date', required:true },
+      { id:'masa_aktiviti', label:'Masa', type:'text', required:true, default:'8:00 pagi – 5:00 petang' },
+      { id:'tempat_aktiviti', label:'Tempat', type:'text', required:true },
+      { id:'pengangkutan', label:'Pengangkutan', type:'text', default:'Bas sekolah' },
+      { id:'yuran', label:'Yuran (RM)', type:'text', default:'Tiada' },
+      { id:'guru_pengiring', label:'Guru Pengiring', type:'text', required:true },
+      { id:'tarikh_balas', label:'Tarikh Akhir Pulangkan Borang', type:'date', required:true },
+    ],
+    render: renderSuratIbuBapa
+  },
+  {
+    id: 'laporan-kokum', cat: 'Laporan',
+    title: 'Laporan KOKUM Bulanan', icon: 'fa-file-alt',
+    desc: 'Laporan aktiviti kokurikulum bulanan per unit (auto-isi dari modul Kehadiran)',
+    evidens: ['3.2.2 b','3.2.3 b','3.2.4 b'],
+    fields: [
+      { id:'unit_kod', label:'Unit', type:'select-unit', required:true },
+      { id:'bulan', label:'Bulan', type:'select', required:true,
+        options: BULAN.map((b,i)=>({v:String(i+1).padStart(2,'0'), l:b})) },
+      { id:'tahun', label:'Tahun', type:'number', required:true, default:String(currentYear) },
+      { id:'guru_id', label:'Guru Penasihat', type:'select-guru' },
+      { id:'aktiviti_dilaksana', label:'Aktiviti Yang Dilaksanakan', type:'textarea',
+        hint:'Satu aktiviti per baris (cth: "Latihan asas - 5 Mac")' },
+      { id:'pencapaian', label:'Pencapaian / Anugerah', type:'textarea',
+        hint:'Pertandingan, anugerah diterima' },
+      { id:'masalah', label:'Masalah & Cadangan', type:'textarea',
+        hint:'Isu yang dihadapi dan cadangan penyelesaian' },
+    ],
+    render: renderLaporanKokum
+  },
+];
+
+// ========================================================
+// SIDEBAR
+// ========================================================
+function renderSidebar(){
+  const groups = {};
+  TEMPLATES.forEach(t => { (groups[t.cat] ||= []).push(t); });
+  let h = '';
+  Object.entries(groups).forEach(([cat, tpls]) => {
+    h += `<h3>${cat}</h3>`;
+    tpls.forEach(t => {
+      h += `<div class="tpl-item" data-id="${t.id}" onclick="selectTemplate('${t.id}')">
+        <i class="fas ${t.icon}"></i>
+        <div><strong>${t.title}</strong><span class="desc">${t.desc}</span></div>
+      </div>`;
+    });
+  });
+  document.getElementById('sidebar').innerHTML = h;
+}
+
+// ========================================================
+// SELECT TEMPLATE
+// ========================================================
+function selectTemplate(id){
+  currentTemplate = TEMPLATES.find(t => t.id === id);
+  if(!currentTemplate) return;
+  currentFormData = {};
+  // Default values
+  currentTemplate.fields.forEach(f => {
+    if(f.default !== undefined) currentFormData[f.id] = f.default;
+  });
+  // UI active
+  document.querySelectorAll('.tpl-item').forEach(el => el.classList.toggle('active', el.dataset.id === id));
+  renderWorkspace();
+}
+
+function renderWorkspace(){
+  const t = currentTemplate;
+  const evCodes = t.evidens.map(e => `<span class="ev-code">${e}</span>`).join(' ');
+  const bulkBtn = t.bulk ? `<button class="btn btn-ok btn-full btn-sm" onclick="generateBulk()" style="margin-top:6px;"><i class="fas fa-layer-group"></i> ${t.bulkLabel||'Jana Pukal'}</button>` : '';
+
+  let h = `<div class="workspace">
+    <div class="panel-form">
+      <div class="tpl-header">
+        <h2><i class="fas ${t.icon}"></i> ${t.title}</h2>
+        <p>${t.desc}</p>
+        <div class="ev-tag"><i class="fas fa-stamp"></i><strong>Evidens SK@S 3.2:</strong> ${evCodes}</div>
+      </div>
+      <form id="tplForm" onsubmit="event.preventDefault();updatePreview();">
+        ${t.fields.map(f => renderField(f)).join('')}
+        <div class="btn-actions">
+          <button type="button" class="btn btn-pri btn-full" onclick="updatePreview()"><i class="fas fa-sync"></i> Kemaskini Pratonton</button>
+        </div>
+        ${bulkBtn}
+      </form>
+    </div>
+    <div class="panel-preview">
+      <div class="preview-toolbar">
+        <div class="info"><i class="fas fa-eye"></i> Pratonton Dokumen</div>
+        <div class="actions">
+          <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Cetak / Simpan PDF</button>
+        </div>
+      </div>
+      <div class="preview-content" id="previewContent">
+        <div class="loading"><div class="spinner"></div>Isikan borang untuk lihat pratonton…</div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('mainContent').innerHTML = h;
+  // Initial preview
+  setTimeout(updatePreview, 100);
+}
+
+function renderField(f){
+  const val = currentFormData[f.id] || '';
+  const req = f.required ? '<span class="req">*</span>' : '';
+  const auto = f.auto ? `<span class="auto">${f.auto}</span>` : '';
+  const hint = f.hint ? `<div class="hint">${f.hint}</div>` : '';
+  let input = '';
+  if(f.type === 'select-guru'){
+    const guru = getGuruList();
+    input = `<select id="f_${f.id}" onchange="onFieldChange('${f.id}',this.value);updatePreview()">
+      <option value="">— Pilih guru —</option>
+      ${guru.map(g => `<option value="${g.id}" ${val===g.id?'selected':''}>${g.nama}</option>`).join('')}
+    </select>`;
+  } else if(f.type === 'select-unit'){
+    const units = getUnitList();
+    const byKat = { 'Beruniform':[], 'Kelab/Persatuan':[], 'Sukan/Permainan':[] };
+    units.forEach(u => { (byKat[u.kategori] ||= []).push(u); });
+    input = `<select id="f_${f.id}" onchange="onFieldChange('${f.id}',this.value);updatePreview()">
+      <option value="">— Pilih unit —</option>
+      ${Object.entries(byKat).map(([k,arr]) => arr.length?`<optgroup label="${k}">${arr.map(u=>`<option value="${u.kod}" ${val===u.kod?'selected':''}>${u.kod} · ${u.nama}</option>`).join('')}</optgroup>`:'').join('')}
+    </select>`;
+  } else if(f.type === 'select'){
+    input = `<select id="f_${f.id}" onchange="onFieldChange('${f.id}',this.value);updatePreview()">
+      <option value="">— Pilih —</option>
+      ${(f.options||[]).map(o => `<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('')}
+    </select>`;
+  } else if(f.type === 'textarea'){
+    input = `<textarea id="f_${f.id}" oninput="onFieldChange('${f.id}',this.value)" onchange="updatePreview()">${val}</textarea>`;
+  } else {
+    input = `<input type="${f.type}" id="f_${f.id}" value="${val}" oninput="onFieldChange('${f.id}',this.value)" onchange="updatePreview()">`;
+  }
+  return `<div class="fld"><label>${f.label}${req}${auto}</label>${input}${hint}</div>`;
+}
+
+function onFieldChange(id, val){
+  currentFormData[id] = val;
+}
+
+// ========================================================
+// UPDATE PREVIEW
+// ========================================================
+function updatePreview(){
+  if(!currentTemplate) return;
+  // Validate required
+  const t = currentTemplate;
+  const missing = t.fields.filter(f => f.required && !currentFormData[f.id]);
+  const wrap = document.getElementById('previewContent');
+  if(missing.length){
+    wrap.innerHTML = `<div class="loading" style="color:var(--warn);"><i class="fas fa-exclamation-triangle" style="font-size:24px;margin-bottom:8px;display:block;"></i>Sila isi medan wajib (*): <br><br>${missing.map(f=>'• '+f.label).join('<br>')}</div>`;
+    return;
+  }
+  try {
+    wrap.innerHTML = t.render(currentFormData);
+  } catch(e){
+    wrap.innerHTML = '<div class="loading" style="color:var(--err);">Ralat: ' + e.message + '</div>';
+  }
+}
+
+// ========================================================
+// BULK GENERATE (utk surat lantikan)
+// ========================================================
+function generateBulk(){
+  const t = currentTemplate;
+  if(!t.bulk) return;
+  if(t.id === 'surat-lantikan'){
+    if(!GURU_DATA || !GURU_DATA.tugasan){
+      toast('Data guru belum dimuat', 'err');
+      return;
+    }
+    if(!confirm(`Jana surat lantikan untuk SEMUA ${GURU_DATA.tugasan.length} pelantikan? Setiap surat akan dipaparkan sebagai page break untuk cetak.`)) return;
+    // Generate untuk setiap tugasan
+    const J_LBL = {'KG':'Ketua Guru Penasihat','PK':'Penolong Ketua Guru Penasihat','GP':'Guru Penasihat'};
+    let bulkHtml = '';
+    GURU_DATA.tugasan.forEach((tug, idx) => {
+      const data = {
+        ...currentFormData,
+        guru_id: tug.g,
+        unit_kod: tug.kod,
+        jawatan: J_LBL[tug.j] || 'Guru Penasihat',
+        rujukan: (currentFormData.rujukan || ('KK/' + currentYear + '/')) + String(idx+1).padStart(3,'0')
+      };
+      bulkHtml += `<div class="doc bulk-page">${renderSuratLantikan(data, true)}</div>`;
+    });
+    document.getElementById('previewContent').innerHTML = bulkHtml;
+    toast(`✅ Dijana ${GURU_DATA.tugasan.length} surat lantikan`, 'ok');
+  }
+}
+
+// ========================================================
+// TEMPLATE RENDERERS
+// ========================================================
+
+function renderSuratLantikan(d, bulkMode){
+  const guru = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.guru_id);
+  const namaGuru = guru ? guru.n : '— Nama Guru —';
+  const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
+  const ul = UL[d.unit_kod] || ['','— Unit —'];
+  const namaUnit = ul[1] || d.unit_kod;
+  const KAT = {'B':'Badan Beruniform','K':'Kelab / Persatuan','S':'Sukan / Permainan'};
+  const kategori = KAT[ul[0]] || 'Unit Kokurikulum';
+  const tahun = (d.tarikh_kuatkuasa || '').substring(0,4) || currentYear;
+  const ruj = d.rujukan || ('KK/'+tahun+'/001');
+
+  const inner = `
+    ${kopSekolah()}
+    <div class="doc-ref">
+      <div><strong>Ruj. Kami:</strong> ${ruj}</div>
+      <div><strong>Tarikh:</strong> ${fmtTarikh(d.tarikh_surat)}</div>
+    </div>
+    <p><strong>${namaGuru}</strong><br>
+    ${S('nama_penuh','Sekolah')}<br>
+    ${S('alamat','')}</p>
+
+    <p>Tuan/Puan,</p>
+
+    <h2 class="title">SURAT PELANTIKAN SEBAGAI<br>${(d.jawatan||'').toUpperCase()} ${namaUnit.toUpperCase()}<br>SESI ${tahun}</h2>
+
+    <p>Adalah saya merujuk perkara di atas dan dengan ini ingin memaklumkan bahawa <strong>tuan/puan telah dilantik</strong> sebagai <strong>${d.jawatan}</strong> bagi <strong>${namaUnit}</strong> (Kategori: ${kategori}) di ${S('nama_penuh','sekolah ini')} bagi sesi persekolahan tahun <strong>${tahun}</strong>.</p>
+
+    <p>2. Pelantikan ini berkuat kuasa mulai <strong>${fmtTarikh(d.tarikh_kuatkuasa)}</strong> sehingga <strong>${fmtTarikh(d.tarikh_tamat)}</strong>.</p>
+
+    <p>3. Tugas dan tanggungjawab utama tuan/puan adalah seperti berikut:</p>
+    <ol>
+      <li>Merancang dan menyediakan <em>Rancangan Aktiviti Tahunan</em> (RAT) unit;</li>
+      <li>Melaksanakan perjumpaan mingguan mengikut takwim sekolah yang ditetapkan;</li>
+      <li>Merekod kehadiran murid setiap perjumpaan untuk evidens PAJSK dan SKPMg2 Standard 3.2;</li>
+      <li>Menyimpan dan menyelenggara <em>Fail Pengurusan KOKUM</em> unit dengan kemas kini;</li>
+      <li>Melaporkan pencapaian unit setiap fasa kepada GPK Kokurikulum;</li>
+      <li>Memastikan keselamatan murid sepanjang aktiviti dijalankan; dan</li>
+      <li>Menyertakan unit dalam pertandingan rasmi mengikut kesesuaian.</li>
+    </ol>
+
+    <p>4. Sehubungan dengan itu, tuan/puan diminta untuk melaksanakan tugas yang diamanahkan dengan penuh dedikasi, sebaik mungkin, dan berlandaskan prinsip <em>Pendidikan untuk Pembangunan Insan Holistik</em>.</p>
+
+    <p>5. Kerjasama dan komitmen tuan/puan dalam menjayakan agenda kokurikulum sekolah amat dihargai. Sekian, terima kasih.</p>
+
+    <p style="text-align:center;font-weight:700;margin:18px 0;">"BERKHIDMAT UNTUK NEGARA"</p>
+
+    <p>Saya yang menjalankan amanah,</p>
+
+    <div class="sig-block">
+      <div>
+        <div class="sig-line"><strong>(${S('pengetua','Nama Pengetua').toUpperCase()})</strong><br>
+        Pengetua<br>${S('nama_penuh','Sekolah')}</div>
+      </div>
+    </div>
+
+    <p style="font-size:10pt;color:#555;margin-top:30px;border-top:1px solid #ccc;padding-top:8px;"><strong>s.k.:</strong> Fail Pelantikan Guru Penasihat Sesi ${tahun} · Fail Induk Kokurikulum (Folder 1)</p>
+  `;
+  return bulkMode ? inner : `<div class="doc">${inner}</div>`;
+}
+
+function renderMinit(d){
+  const peng = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.pengerusi_id);
+  const setu = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.setiausaha_id);
+  const namaPeng = peng ? peng.n : '— Nama Pengerusi —';
+  const namaSetu = setu ? setu.n : '— Nama Setiausaha —';
+  const masaTotal = d.masa_mula + (d.masa_tamat?' – ' + d.masa_tamat:'');
+  const tahun = (d.tarikh_mesyuarat||'').substring(0,4) || currentYear;
+  const agendaTambahan = (d.agenda_tambahan||'').split('\n').filter(x=>x.trim());
+
+  let agendaList = `
+    <li>Ucapan Aluan Pengerusi</li>
+    <li>Pengesahan Minit Mesyuarat Yang Lepas</li>
+    <li>Perkara Berbangkit</li>`;
+  agendaTambahan.forEach((a,i) => { agendaList += `<li>${a.trim()}</li>`; });
+  agendaList += `
+    <li>Laporan Pencapaian Unit (Beruniform, Kelab, Sukan)</li>
+    <li>Status Pelaksanaan SKPMg2 Standard 3.2</li>
+    <li>Hal-hal Lain</li>
+    <li>Ucapan Penangguhan</li>`;
+
+  return `<div class="doc">
+    ${kopSekolah()}
+    <h2 class="title">MINIT MESYUARAT<br>JAWATANKUASA PENGURUSAN KOKURIKULUM<br>BIL. ${d.bil_mesyuarat}/${tahun}</h2>
+
+    <table style="width:auto;border:none;margin:14px 0;">
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tarikh</strong></td><td style="border:none;padding:2px 8px;">: ${fmtTarikh(d.tarikh_mesyuarat)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Masa</strong></td><td style="border:none;padding:2px 8px;">: ${masaTotal}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${d.tempat}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Pengerusi</strong></td><td style="border:none;padding:2px 8px;">: ${namaPeng}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Setiausaha</strong></td><td style="border:none;padding:2px 8px;">: ${namaSetu}</td></tr>
+    </table>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">KEHADIRAN</h3>
+    <table>
+      <thead><tr><th style="width:8%;">Bil</th><th>Nama</th><th style="width:30%;">Jawatan</th><th style="width:20%;">Tandatangan</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>${S('pengetua','Pengetua')}</td><td>Pengetua</td><td></td></tr>
+        <tr><td>2</td><td>${S('pk_kokurikulum','GPK Kokurikulum')}</td><td>GPK Kokurikulum</td><td></td></tr>
+        <tr><td>3</td><td>${namaSetu}</td><td>Setiausaha Kokurikulum</td><td></td></tr>
+        <tr><td>4</td><td></td><td>Penyelaras Beruniform</td><td></td></tr>
+        <tr><td>5</td><td></td><td>Penyelaras Kelab/Persatuan</td><td></td></tr>
+        <tr><td>6</td><td></td><td>Penyelaras Sukan/Permainan</td><td></td></tr>
+        <tr><td>7</td><td></td><td>Ahli JK</td><td></td></tr>
+        <tr><td>8</td><td></td><td>Ahli JK</td><td></td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">AGENDA MESYUARAT</h3>
+    <ol>${agendaList}</ol>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">PERBINCANGAN</h3>
+    <p style="min-height:200px;border:1px dashed #999;padding:10px;background:#fafafa;font-style:italic;color:#666;">[Ruangan ini untuk dilengkapkan secara manual semasa mesyuarat berlangsung]</p>
+
+    <div class="sig-block" style="margin-top:50px;">
+      <div>
+        <div class="sig-line"><strong>(${namaSetu.toUpperCase()})</strong><br>
+        Setiausaha,<br>Jawatankuasa Pengurusan Kokurikulum<br>${S('nama_penuh','Sekolah')}</div>
+      </div>
+      <div>
+        <div class="sig-line"><strong>(${namaPeng.toUpperCase()})</strong><br>
+        Pengerusi,<br>Jawatankuasa Pengurusan Kokurikulum<br>${S('nama_penuh','Sekolah')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderKertasKerja(d){
+  const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
+  const ul = UL[d.unit_kod] || ['','— Unit —'];
+  const namaUnit = ul[1] || d.unit_kod;
+  const tujuanList = (d.tujuan||'').split('\n').filter(x=>x.trim()).map(t => `<li>${t.trim()}</li>`).join('') || '<li>—</li>';
+  const tahun = (d.tarikh_program||'').substring(0,4) || currentYear;
+
+  return `<div class="doc">
+    ${kopSekolah()}
+    <h2 class="title">KERTAS KERJA<br>${(d.nama_program||'').toUpperCase()}<br>SESI ${tahun}</h2>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">1.0 PENGENALAN</h3>
+    <p>Kertas kerja ini disediakan bagi melaksanakan program <strong>${d.nama_program}</strong> oleh unit ${namaUnit} di ${S('nama_penuh','sekolah ini')}. Program ini adalah selaras dengan objektif pendidikan kokurikulum yang berasaskan <em>Falsafah Pendidikan Kebangsaan</em> dan keperluan PAJSK serta SKPMg2 Standard 3.2.</p>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">2.0 OBJEKTIF</h3>
+    <ol>${tujuanList}</ol>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">3.0 BUTIRAN PROGRAM</h3>
+    <table style="width:auto;border:none;">
+      <tr><td style="border:none;padding:2px 8px;"><strong>Nama Program</strong></td><td style="border:none;padding:2px 8px;">: ${d.nama_program}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Unit Penganjur</strong></td><td style="border:none;padding:2px 8px;">: ${namaUnit}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tarikh</strong></td><td style="border:none;padding:2px 8px;">: ${fmtTarikh(d.tarikh_program)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${d.tempat_program}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Sasaran</strong></td><td style="border:none;padding:2px 8px;">: ${d.sasaran}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Bilangan Peserta</strong></td><td style="border:none;padding:2px 8px;">: ${d.bil_peserta||'—'} orang</td></tr>
+    </table>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">4.0 AHLI JAWATANKUASA</h3>
+    <table>
+      <thead><tr><th>Jawatan</th><th>Nama</th></tr></thead>
+      <tbody>
+        <tr><td>Penaung</td><td>${S('pengetua','— Pengetua —')}</td></tr>
+        <tr><td>Penasihat</td><td>${S('pk_kokurikulum','— GPK Kokurikulum —')}</td></tr>
+        <tr><td>Pengerusi</td><td>____________________</td></tr>
+        <tr><td>Naib Pengerusi</td><td>____________________</td></tr>
+        <tr><td>Setiausaha</td><td>____________________</td></tr>
+        <tr><td>Bendahari</td><td>____________________</td></tr>
+        <tr><td>Ahli Jawatankuasa</td><td>____________________</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">5.0 ANGGARAN PERBELANJAAN</h3>
+    <table>
+      <thead><tr><th style="width:60%;">Perkara</th><th style="width:20%;">Kuantiti</th><th style="width:20%;">Jumlah (RM)</th></tr></thead>
+      <tbody>
+        <tr><td>____________________</td><td></td><td></td></tr>
+        <tr><td>____________________</td><td></td><td></td></tr>
+        <tr><td>____________________</td><td></td><td></td></tr>
+        <tr style="background:#e8eaed;"><td colspan="2" style="text-align:right;font-weight:700;">JUMLAH KESELURUHAN</td><td style="font-weight:700;">RM ${d.kos_anggaran||'500.00'}</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Sumber Dana:</strong> ${d.sumber_dana}</p>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">6.0 IMPLIKASI</h3>
+    <ol>
+      <li><strong>Kewangan:</strong> Anggaran RM ${d.kos_anggaran||'500.00'} dari ${d.sumber_dana}</li>
+      <li><strong>Tenaga Manusia:</strong> ${d.bil_peserta||'30'} peserta dan AJK</li>
+      <li><strong>Masa:</strong> ${fmtTarikh(d.tarikh_program)}</li>
+    </ol>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">7.0 PENUTUP</h3>
+    <p>Diharap kerjasama dan sokongan padu daripada semua pihak akan dapat menjayakan program ini. Kelulusan dan sokongan tuan/puan dialu-alukan.</p>
+
+    <div class="sig-block" style="margin-top:40px;">
+      <div>
+        <p style="font-size:10pt;">Disediakan oleh:</p>
+        <div class="sig-line"><strong>(____________________)</strong><br>
+        Setiausaha Program<br>${namaUnit}</div>
+      </div>
+      <div>
+        <p style="font-size:10pt;">Disahkan oleh:</p>
+        <div class="sig-line"><strong>(${S('pengetua','Nama Pengetua').toUpperCase()})</strong><br>
+        Pengetua<br>${S('nama_penuh','Sekolah')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSuratIbuBapa(d){
+  const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
+  const ul = UL[d.unit_kod] || ['',''];
+  const namaUnit = ul[1] || '';
+
+  return `<div class="doc">
+    ${kopSekolah()}
+    <div class="doc-ref">
+      <div><strong>Ruj. Kami:</strong> KK/${currentYear}/IB-___</div>
+      <div><strong>Tarikh:</strong> ${fmtTarikh(new Date().toISOString().substring(0,10))}</div>
+    </div>
+
+    <p><strong>KEPADA SEMUA IBU BAPA / PENJAGA</strong></p>
+
+    <p>Tuan/Puan,</p>
+
+    <h2 class="title">PERMOHONAN KEBENARAN PENYERTAAN MURID DALAM<br>${(d.nama_aktiviti||'').toUpperCase()}</h2>
+
+    <p>Dengan segala hormatnya saya merujuk kepada perkara di atas.</p>
+
+    <p>2. Pihak sekolah akan menganjurkan aktiviti <strong>${d.nama_aktiviti}</strong>${namaUnit?' anjuran '+namaUnit:''}. Penyertaan murid dalam aktiviti ini adalah <em>sebahagian daripada penilaian PAJSK</em> dan boleh memberi pendedahan yang bermanfaat kepada perkembangan kemahiran insaniah serta jaringan sosial murid.</p>
+
+    <p>3. Butiran aktiviti adalah seperti berikut:</p>
+    <table style="width:auto;border:none;">
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tarikh</strong></td><td style="border:none;padding:2px 8px;">: ${fmtTarikh(d.tarikh_aktiviti)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Masa</strong></td><td style="border:none;padding:2px 8px;">: ${d.masa_aktiviti}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${d.tempat_aktiviti}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Pengangkutan</strong></td><td style="border:none;padding:2px 8px;">: ${d.pengangkutan}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Yuran</strong></td><td style="border:none;padding:2px 8px;">: ${d.yuran}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Guru Pengiring</strong></td><td style="border:none;padding:2px 8px;">: ${d.guru_pengiring}</td></tr>
+    </table>
+
+    <p>4. Sehubungan dengan itu, pihak sekolah memohon kebenaran tuan/puan untuk anak jagaan tuan/puan menyertai aktiviti ini. Sila lengkapkan dan pulangkan borang kebenaran di bawah <strong>sebelum atau pada tarikh ${fmtTarikh(d.tarikh_balas)}</strong> kepada Guru Pengiring.</p>
+
+    <p>5. Kerjasama tuan/puan amat dihargai dan didahulukan dengan ucapan terima kasih.</p>
+
+    <p style="text-align:center;font-weight:700;margin:18px 0;">"BERKHIDMAT UNTUK NEGARA"</p>
+
+    <p>Saya yang menjalankan amanah,</p>
+    <div class="sig-line" style="width:50%;margin-top:50px;"><strong>(${S('pengetua','Nama Pengetua').toUpperCase()})</strong><br>
+    Pengetua<br>${S('nama_penuh','Sekolah')}</div>
+
+    <hr style="border:none;border-top:2px dashed #000;margin:30px 0;">
+
+    <h3 style="font-size:11pt;font-weight:700;text-align:center;text-transform:uppercase;">— BORANG KEBENARAN IBU BAPA / PENJAGA —</h3>
+    <p style="font-size:11pt;color:#555;text-align:center;font-style:italic;">[Sila lengkap, gunting dan kembalikan kepada Guru Pengiring]</p>
+
+    <p style="margin-top:14px;">Kepada Pengetua,<br>${S('nama_penuh','Sekolah')}</p>
+
+    <p>Saya, ........................................................................ (Nama Ibu Bapa / Penjaga)<br>
+    No. K.P.: ............................................................... &nbsp; No. Tel: ................................</p>
+
+    <p>Membenarkan/Tidak membenarkan*** anak jagaan saya:</p>
+    <p>Nama Murid: ........................................................ Kelas: ................. No. K.P.: ...........................</p>
+    <p>Menyertai aktiviti <strong>${d.nama_aktiviti}</strong> pada ${fmtTarikh(d.tarikh_aktiviti)} di ${d.tempat_aktiviti}.</p>
+
+    <p style="margin-top:20px;">Saya juga memahami bahawa pihak sekolah akan mengambil langkah keselamatan sewajarnya, tetapi sebarang kemalangan / kecederaan yang berlaku adalah di luar tanggungjawab pihak sekolah.</p>
+
+    <div class="sig-block">
+      <div>
+        <div class="sig-line" style="margin-top:60px;">Tandatangan Ibu Bapa/Penjaga<br>Tarikh: ......................</div>
+      </div>
+      <div>
+        <p style="font-size:10pt;color:#555;font-style:italic;margin-top:50px;">*** Potong yang tidak berkenaan</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderLaporanKokum(d){
+  const guru = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.guru_id);
+  const namaGuru = guru ? guru.n : '____________________';
+  const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
+  const ul = UL[d.unit_kod] || ['','— Unit —'];
+  const namaUnit = ul[1] || d.unit_kod;
+  const KAT = {'B':'Badan Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  const kategori = KAT[ul[0]] || 'Kokurikulum';
+  const bulanIdx = parseInt(d.bulan)-1;
+  const bulanLabel = BULAN[bulanIdx] || d.bulan;
+
+  // Ambil data dari modul Kehadiran (localStorage)
+  let perjumpaan = 0, totalH = 0, totalTH = 0, totalMC = 0, totalB = 0, totalAll = 0;
+  let kehadiranList = [];
+  try {
+    const kehadiranRaw = sget('kehadiran_'+d.tahun);
+    if(kehadiranRaw){
+      const kData = JSON.parse(kehadiranRaw);
+      Object.entries(kData).forEach(([key, statuses]) => {
+        // key format: "tarikh|unit_kod" atau "unit_kod|tarikh"
+        const parts = key.split('|');
+        const tarikh = parts.find(p => /^\d{4}-\d{2}-\d{2}$/.test(p));
+        const unitK = parts.find(p => p !== tarikh);
+        if(unitK !== d.unit_kod || !tarikh) return;
+        if(tarikh.substring(0,7) !== d.tahun+'-'+d.bulan) return;
+        perjumpaan++;
+        const stats = Object.values(statuses);
+        kehadiranList.push({ tarikh, total: stats.length });
+        stats.forEach(s => {
+          totalAll++;
+          if(s === 'H') totalH++;
+          else if(s === 'TH') totalTH++;
+          else if(s === 'MC') totalMC++;
+          else if(s === 'B') totalB++;
+        });
+      });
+    }
+  } catch(e){}
+
+  const puratHadirPct = totalAll ? Math.round(totalH/totalAll*100) : 0;
+  const aktivitiList = (d.aktiviti_dilaksana||'').split('\n').filter(x=>x.trim()).map(a => `<li>${a.trim()}</li>`).join('') || '<li>—</li>';
+  const pencapaianList = (d.pencapaian||'').split('\n').filter(x=>x.trim()).map(a => `<li>${a.trim()}</li>`).join('') || '<li>Tiada pencapaian dicatat untuk bulan ini</li>';
+  const masalahText = d.masalah || 'Tiada masalah yang dicatat.';
+
+  return `<div class="doc">
+    ${kopSekolah()}
+    <h2 class="title">LAPORAN AKTIVITI KOKURIKULUM BULANAN<br>${bulanLabel.toUpperCase()} ${d.tahun}</h2>
+
+    <table style="width:auto;border:none;margin:14px 0;">
+      <tr><td style="border:none;padding:2px 8px;"><strong>Unit</strong></td><td style="border:none;padding:2px 8px;">: ${d.unit_kod} · ${namaUnit}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Kategori</strong></td><td style="border:none;padding:2px 8px;">: ${kategori}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Guru Penasihat</strong></td><td style="border:none;padding:2px 8px;">: ${namaGuru}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempoh Laporan</strong></td><td style="border:none;padding:2px 8px;">: ${bulanLabel} ${d.tahun}</td></tr>
+    </table>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">1.0 RINGKASAN KEHADIRAN ${(perjumpaan===0)?' (Tiada Rekod)':''}</h3>
+    <table>
+      <thead><tr><th>Bilangan Perjumpaan</th><th>Hadir (H)</th><th>Tidak Hadir (TH)</th><th>MC</th><th>Bersurat (B)</th><th>Purata %</th></tr></thead>
+      <tbody>
+        <tr style="text-align:center;font-weight:700;">
+          <td>${perjumpaan}</td><td>${totalH}</td><td>${totalTH}</td><td>${totalMC}</td><td>${totalB}</td><td>${puratHadirPct}%</td>
+        </tr>
+      </tbody>
+    </table>
+    ${perjumpaan ? `<p style="font-size:10pt;color:#555;font-style:italic;">Data diambil daripada modul Kehadiran SPKB.</p>` : `<p style="font-size:10pt;color:#a00;font-style:italic;">⚠ Belum ada rekod kehadiran direkod untuk bulan ini. Sila kemaskini dalam modul Kehadiran SPKB.</p>`}
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">2.0 AKTIVITI YANG DILAKSANAKAN</h3>
+    <ol>${aktivitiList}</ol>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">3.0 PENCAPAIAN / ANUGERAH</h3>
+    <ol>${pencapaianList}</ol>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">4.0 MASALAH & CADANGAN</h3>
+    <p style="white-space:pre-wrap;">${masalahText}</p>
+
+    <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">5.0 PENUTUP</h3>
+    <p>Laporan ini disediakan sebagai evidens pelaksanaan aktiviti kokurikulum bulanan untuk rujukan Jawatankuasa Pengurusan Kokurikulum dan auditor SKPMg2 Standard 3.2.</p>
+
+    <div class="sig-block" style="margin-top:40px;">
+      <div>
+        <p style="font-size:10pt;">Disediakan oleh:</p>
+        <div class="sig-line"><strong>(${namaGuru.toUpperCase()})</strong><br>
+        Guru Penasihat<br>${namaUnit}</div>
+      </div>
+      <div>
+        <p style="font-size:10pt;">Disahkan oleh:</p>
+        <div class="sig-line"><strong>(${S('pk_kokurikulum','Nama GPK Kokurikulum').toUpperCase()})</strong><br>
+        GPK Kokurikulum<br>${S('nama_penuh','Sekolah')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ========================================================
+// INIT
+// ========================================================
+(async function init(){
+  try{ if(window!==window.top) document.body.classList.add('in-spkb') }catch(e){}
+  renderSidebar();
+  await fetchAll();
+  // Re-render sidebar if guru tersedia (to refresh data)
+  toast('✅ Data SPKB dimuatkan', 'ok');
+})();
+</script>
+</body>
+</html>
