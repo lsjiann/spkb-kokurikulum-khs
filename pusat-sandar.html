@@ -253,14 +253,22 @@ body.in-spkb .sidebar{height:calc(100vh - 20px)}
         </div>
       </div>
 
+      <div class="card" style="border-color:#e74c3c;background:#fef5f5;">
+        <h3 style="color:var(--err)"><i class="fas fa-exclamation-triangle"></i> AMARAN PENTING — Baca Dahulu!</h3>
+        <p style="color:#922b21;font-weight:600;">JANGAN paste fail <code>cloud-sync.gs</code> ke projek Apps Script SPKB sedia ada!</p>
+        <p>Apps Script peraturan: <strong>setiap projek hanya boleh ada SATU <code>doGet()</code></strong>. Fail cloud-sync.gs ada <code>doGet()</code> sendiri — jika anda paste ke projek SPKB, ia akan <strong>mengatasi (override)</strong> doGet asal dan menyebabkan SEMUA modul SPKB gagal (Pengurusan SK@S, PAJSK, Generator Dokumen, dll).</p>
+        <p style="margin-top:8px;"><strong>Penyelesaian yang BETUL:</strong> Cipta projek Apps Script <em>BERASINGAN</em> khas untuk Cloud Sync. Ikuti langkah-langkah di bawah.</p>
+        <div class="note" style="background:#fff;border-color:var(--ok);color:#0e6251;margin-top:10px;"><i class="fas fa-check-circle" style="color:var(--ok)"></i><strong>Jika sudah berlaku:</strong> Buka Apps Script SPKB → padam fail cloud-sync → Deploy → New version. Data SPKB di Google Sheets TIDAK terjejas.</div>
+      </div>
+
       <div class="card">
         <h3><i class="fas fa-info-circle"></i> Status Setup</h3>
         <div id="cloudStatus" class="note info"><i class="fas fa-info-circle"></i><strong>Belum disetup.</strong> Ikuti langkah di bawah untuk aktifkan cloud sync.</div>
 
         <div class="fld">
-          <label>URL Endpoint Sync (Apps Script Web App)</label>
+          <label>URL Endpoint Sync (Apps Script Web App BARU)</label>
           <input type="text" id="syncEndpoint" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveSyncEndpoint()">
-          <div class="hint" style="font-size:11px;color:var(--mute);margin-top:4px;">Salin tampal URL deployment Apps Script yang anda buat (langkah 3 di bawah)</div>
+          <div class="hint" style="font-size:11px;color:var(--mute);margin-top:4px;">Salin tampal URL projek Apps Script BARU yang anda cipta khas (langkah 1 di bawah)</div>
         </div>
 
         <div class="row-btns">
@@ -271,14 +279,14 @@ body.in-spkb .sidebar{height:calc(100vh - 20px)}
       </div>
 
       <div class="card">
-        <h3><i class="fas fa-code"></i> Langkah Setup Backend</h3>
+        <h3><i class="fas fa-code"></i> Langkah Setup Backend (PROJEK BERASINGAN)</h3>
         <ol class="step-list">
-          <li>Buka projek <strong>Google Apps Script</strong> yang menjalankan SPKB (yang ada Code.gs sedia ada).</li>
-          <li>Tambah <strong>fail baharu</strong> dengan nama <code>cloud-sync.gs</code> (File → New → Script File).</li>
-          <li>Salin kod di bawah ke fail itu, kemudian klik <strong>Save (Ctrl+S)</strong>.</li>
-          <li>Klik <strong>Deploy → New deployment</strong> → Pilih <em>"Web app"</em> → Execute as: <em>"Me"</em> → Access: <em>"Anyone"</em> → Deploy.</li>
-          <li>Salin <strong>URL Web App</strong> yang dipaparkan dan tampal ke kotak <em>"URL Endpoint Sync"</em> di atas.</li>
-          <li>Klik <strong>Uji Sambungan</strong> untuk pastikan ia berfungsi.</li>
+          <li>Buka <a href="https://script.google.com" target="_blank">script.google.com</a> → klik <strong>"New project"</strong> (BUKAN buka projek SPKB sedia ada!).</li>
+          <li>Beri nama: <code>SPKB Cloud Sync</code>.</li>
+          <li>Padam kod default dalam <code>Code.gs</code> → salin SEMUA kod di bawah ke fail itu.</li>
+          <li>Klik <strong>Save</strong> (Ctrl+S) → kemudian klik <strong>Run</strong> → pilih <code>testInit</code> → authorize bila diminta (auto-cipta spreadsheet sandar).</li>
+          <li>Klik <strong>Deploy → New deployment → Web app</strong> → Execute as: <em>Me</em>, Access: <em>Anyone</em> → Deploy.</li>
+          <li>Salin <strong>Web app URL</strong> → tampal ke kotak "URL Endpoint Sync" di atas → Uji Sambungan.</li>
         </ol>
 
         <div class="code-block">
@@ -410,10 +418,12 @@ function _resp(obj) {
       <div class="card">
         <h3><i class="fas fa-code"></i> Langkah Setup Backend Email</h3>
         <ol class="step-list">
-          <li>Dalam projek Apps Script SPKB, tambah fail baharu <code>email-reminder.gs</code>.</li>
-          <li>Salin kod di bawah ke fail itu.</li>
-          <li>Klik <strong>Triggers</strong> (jam icon) → Add Trigger → Function: <code>sendDailyReminders</code> → Time-driven → Day timer → 7am to 8am.</li>
-          <li>Reminder akan dihantar secara automatik setiap hari pagi.</li>
+          <li>Buka projek <strong>"SPKB Cloud Sync"</strong> (yang anda cipta di tab Cloud Sync — BUKAN projek SPKB utama).</li>
+          <li>Klik <strong>"+ Add a file → Script"</strong> → nama: <code>email-reminder</code>.</li>
+          <li>Salin SEMUA kod di bawah ke fail itu → Save.</li>
+          <li>Klik icon <strong>Triggers</strong> ⏰ (jam pasir di sidebar kiri).</li>
+          <li>Add Trigger → Function: <code>sendDailyReminders</code> → Event source: <em>Time-driven</em> → Type: <em>Day timer</em> → Time: <em>7am to 8am</em> → Save.</li>
+          <li>Authorize bila diminta. Sistem akan auto-hantar email setiap pagi.</li>
         </ol>
 
         <div class="code-block">
