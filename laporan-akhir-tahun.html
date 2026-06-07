@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laporan Akhir Tahun Kokurikulum — SPKB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60; --warn:#f39c12; --err:#c0392b;
+  --bg:#e8eaed; --card:#fff; --bdr:#e1e4e8; --mute:#6c7383; --tx:#2c3e50; --sk:#3498db;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+
+/* TOP */
+.top{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.1);position:sticky;top:0;z-index:50}
+.top h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.top-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.year-sel{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;outline:none;cursor:pointer}
+.btn-top{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-top:hover{background:rgba(255,255,255,0.25)}
+.btn-top.primary{background:var(--acc);border-color:var(--acc)}
+.btn-top.primary:hover{background:#d35400}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:#fff;border-right:1px solid var(--bdr);padding:14px 0;overflow-y:auto;position:sticky;top:60px;height:calc(100vh - 60px);max-height:calc(100vh - 60px)}
+.sidebar h3{font-size:10px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.6px;padding:10px 16px 4px;margin-top:6px}
+.sidebar h3:first-child{margin-top:0}
+.sidebar .sec-item{display:flex;align-items:center;padding:7px 16px;font-size:12.5px;color:var(--tx);cursor:pointer;border-left:3px solid transparent;transition:all .15s;gap:8px}
+.sidebar .sec-item:hover{background:#f4f6f9;border-left-color:var(--acc)}
+.sidebar .sec-item .num{display:inline-block;background:#eef4fb;color:var(--pri);font-weight:700;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;font-size:10px;flex-shrink:0}
+.sidebar .sec-item input[type=checkbox]{margin-right:4px;accent-color:var(--pri);flex-shrink:0}
+.sidebar .sec-item .lbl{flex:1;min-width:0}
+.sidebar .sec-item.data-ok .lbl::after{content:' ●';color:var(--ok);font-size:8px}
+.sidebar .sec-item.data-warn .lbl::after{content:' ●';color:var(--warn);font-size:8px}
+.sidebar .sec-item.data-err .lbl::after{content:' ●';color:var(--err);font-size:8px}
+
+.sidebar-action{padding:10px 14px;border-top:1px solid var(--bdr);margin-top:6px}
+.sidebar-info{background:#eef4fb;border:1px solid #d4e1f0;border-radius:6px;padding:8px 10px;margin:10px 14px;font-size:11px;color:var(--pri2);line-height:1.5}
+.sidebar-info i{color:var(--pri);margin-right:4px}
+
+.main{padding:20px;overflow-x:auto}
+
+/* DOC */
+.doc-wrap{max-width:880px;margin:0 auto}
+.doc-page{background:#fff;width:210mm;min-height:297mm;margin:0 auto 20px;padding:25mm 25mm;box-shadow:0 4px 16px rgba(0,0,0,0.1);font-family:'Times New Roman',serif;font-size:12pt;line-height:1.6;color:#000;position:relative}
+.doc-page.cover{display:flex;flex-direction:column;justify-content:space-between;text-align:center}
+
+/* COVER */
+.cover-top{margin-top:20mm}
+.cover-school{font-size:14pt;font-weight:700;letter-spacing:1px;margin-bottom:8px}
+.cover-school-sub{font-size:11pt;line-height:1.5}
+.cover-mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding:30mm 0}
+.cover-mid h1{font-size:24pt;font-weight:700;letter-spacing:2px;margin:0;color:var(--pri)}
+.cover-mid h2{font-size:18pt;font-weight:700;margin:4px 0;color:var(--pri)}
+.cover-mid .tahun{font-size:36pt;font-weight:800;margin:18mm 0 8mm;color:var(--acc);letter-spacing:3px}
+.cover-mid .sub{font-size:13pt;color:#555;font-style:italic;margin-top:8px}
+.cover-bot{font-size:11pt;line-height:1.8}
+.cover-bot .label{font-weight:700;color:var(--pri)}
+
+/* SECTION */
+.sec{margin-bottom:25px}
+.sec-title{font-size:16pt;font-weight:700;color:var(--pri);border-bottom:2px solid var(--pri);padding-bottom:6px;margin-bottom:14px}
+.sec-title .num{display:inline-block;background:var(--pri);color:#fff;width:32px;height:32px;border-radius:50%;text-align:center;line-height:32px;margin-right:8px;font-size:13pt}
+.subsec-title{font-size:13pt;font-weight:700;color:var(--pri2);margin:16px 0 8px}
+
+.doc-page p{margin-bottom:10px;text-align:justify;text-indent:0}
+.doc-page table{width:100%;border-collapse:collapse;margin:8px 0;font-size:10pt}
+.doc-page th{background:var(--pri);color:#fff;padding:6px 9px;text-align:left;font-weight:700;font-size:9pt;border:1px solid var(--pri)}
+.doc-page td{padding:5px 9px;border:1px solid #ccc;vertical-align:top}
+.doc-page tr.total{background:#eef4fb;font-weight:700}
+.doc-page tr.warning td{background:#fdedec;color:var(--err)}
+.doc-page tr.success td{background:#eafaf1;color:#0e6251}
+
+.kpi-row{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.kpi-card{flex:1;min-width:120px;background:#f8fafc;border:1px solid #ddd;border-radius:6px;padding:8px 10px;text-align:center}
+.kpi-card .v{font-size:18pt;font-weight:700;color:var(--pri);line-height:1.1}
+.kpi-card .l{font-size:9pt;color:#666;text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
+.kpi-card.ok .v{color:var(--ok)}
+.kpi-card.warn .v{color:var(--warn)}
+.kpi-card.err .v{color:var(--err)}
+
+.editable{background:#fffef0;border:1px dashed #d4ac0d;padding:10px;border-radius:4px;min-height:50px}
+.editable:hover{background:#fffbe0}
+.editable:focus{outline:2px solid var(--acc);background:#fff}
+.editable::before{content:'✏ ';opacity:0.4;font-size:10pt}
+
+.no-data{padding:14px;background:#fdedec;color:var(--err);border-left:4px solid var(--err);font-style:italic;font-size:10pt;border-radius:3px;margin:8px 0}
+.no-data i{margin-right:6px}
+
+.sec-meta{font-size:9pt;color:#888;font-style:italic;margin-top:6px}
+
+/* OrgChart */
+.org-chart{text-align:center;padding:20px;background:#f8fafc;border-radius:6px;margin:10px 0}
+.org-box{display:inline-block;background:var(--pri);color:#fff;padding:8px 18px;border-radius:6px;margin-bottom:6px;min-width:200px}
+.org-box.l2{background:var(--pri2)}
+.org-box.l3{background:var(--acc)}
+.org-box.l4{background:var(--ok);padding:6px 12px;font-size:10pt}
+.org-box .role{font-size:8pt;opacity:0.85;text-transform:uppercase;letter-spacing:.5px}
+.org-box .name{font-weight:700;font-size:11pt;margin-top:1px}
+.org-arrow{color:#666;margin:2px 0}
+
+/* TOC */
+.toc-list{list-style:none;padding:0}
+.toc-list li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dotted #ccc;font-size:11pt}
+.toc-list li .num-l{display:flex;align-items:center;gap:8px}
+.toc-list li .num-l span{background:var(--pri);color:#fff;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:10pt}
+
+.sig-block{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.sig-line{border-top:1px solid #000;padding-top:4px;margin-top:55px;font-size:10pt}
+
+/* PRINT */
+@media print{
+  body{background:#fff}
+  .top,.sidebar,.no-print{display:none !important}
+  .layout{display:block}
+  .main{padding:0;overflow:visible}
+  .doc-wrap{max-width:100%}
+  .doc-page{box-shadow:none;margin:0;width:auto;min-height:auto;padding:20mm;page-break-after:always}
+  .doc-page:last-child{page-break-after:auto}
+  .editable{background:#fff;border:none;padding:0}
+  .editable::before{content:''}
+  .kpi-card{border:1px solid #aaa}
+  @page{size:A4;margin:0}
+}
+
+/* LOADING */
+.loading{text-align:center;padding:30px;color:var(--mute)}
+.spinner{width:36px;height:36px;border:4px solid #e0e0e0;border-top-color:var(--pri);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pri);color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:1000;display:none}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:relative;top:auto;height:auto;max-height:none}
+  .doc-page{width:auto;min-height:auto}
+}
+
+body.in-spkb .top{display:none}
+body.in-spkb .layout{min-height:auto}
+body.in-spkb .sidebar{height:calc(100vh - 20px);top:0}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1><i class="fas fa-file-pdf"></i> Laporan Akhir Tahun Kokurikulum</h1>
+  <div class="top-r">
+    <select class="year-sel" id="yearSel" onchange="changeYear(this.value)"></select>
+    <button class="btn-top" onclick="reloadAll()" title="Muat semula data"><i class="fas fa-sync"></i> Refresh</button>
+    <button class="btn-top primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> Cetak / Save PDF</button>
+    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-info"><i class="fas fa-info-circle"></i> Tick untuk include/exclude bahagian dalam laporan. Editor warna kuning boleh diedit terus.</div>
+    <h3>Senarai Bahagian</h3>
+    <div id="secListContainer"></div>
+    <div class="sidebar-action">
+      <button class="btn-top" style="background:var(--pri);width:100%;justify-content:center;" onclick="saveDraft()"><i class="fas fa-save"></i> Simpan Draf</button>
+      <button class="btn-top" style="background:#fff;color:var(--err);border-color:var(--err);width:100%;margin-top:8px;justify-content:center;" onclick="resetDraft()"><i class="fas fa-undo"></i> Reset Draf</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="doc-wrap" id="docWrap">
+      <div class="loading"><div class="spinner"></div>Memuat data SPKB…</div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================================================
+// API & STATE
+// ========================================================
+const STUDENT_API = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+const GURU_API = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+
+let currentYear = new Date().getFullYear();
+let SEKOLAH = {};
+let GURU_DATA = null;
+let PELAJAR_DATA = [];
+let TAKWIM_DATA = null;
+let KEHADIRAN_DATA = {};
+let INSTRUMEN_DATA = {};
+
+const MEM = {};
+function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'err' ? 'var(--err)' : type === 'ok' ? 'var(--ok)' : 'var(--pri)';
+  t.style.display = 'block';
+  setTimeout(()=>{ t.style.display = 'none'; }, 2500);
+}
+
+// ========================================================
+// SECTIONS DEFINITION
+// ========================================================
+const SECTIONS = [
+  { id:'cover', num:'C', title:'Halaman Hadapan', render:renderCover, hasData:()=>true },
+  { id:'toc', num:'T', title:'Senarai Kandungan', render:renderTOC, hasData:()=>true },
+  { id:'pengantar', num:'1', title:'Kata Pengantar', render:renderPengantar, editable:true, hasData:()=>true },
+  { id:'organisasi', num:'2', title:'Carta Organisasi', render:renderOrganisasi, hasData:()=>GURU_DATA && (GURU_DATA.guru||[]).length },
+  { id:'guru-list', num:'3', title:'Senarai Guru Penasihat', render:renderGuruList, hasData:()=>GURU_DATA && (GURU_DATA.tugasan||[]).length },
+  { id:'statistik', num:'4', title:'Statistik Penyertaan Murid', render:renderStatistik, hasData:()=>PELAJAR_DATA.length },
+  { id:'takwim', num:'5', title:'Takwim & Jadual Perjumpaan', render:renderTakwim, hasData:()=>TAKWIM_DATA },
+  { id:'kehadiran', num:'6', title:'Analisis Kehadiran Murid', render:renderKehadiran, hasData:()=>Object.keys(KEHADIRAN_DATA).length },
+  { id:'pajsk', num:'7', title:'Pelajar Bawah Minimum PAJSK', render:renderPAJSK, hasData:()=>Object.keys(KEHADIRAN_DATA).length },
+  { id:'skas', num:'8', title:'Status SKPMg2 Standard 3.2', render:renderSKAS, hasData:()=>Object.keys(INSTRUMEN_DATA).length },
+  { id:'pencapaian', num:'9', title:'Pencapaian Murid', render:renderPencapaian, editable:true, hasData:()=>true },
+  { id:'refleksi', num:'10', title:'Refleksi & Cabaran', render:renderRefleksi, editable:true, hasData:()=>true },
+  { id:'cadangan', num:'11', title:'Cadangan Penambahbaikan', render:renderCadangan, editable:true, hasData:()=>true },
+  { id:'penutup', num:'12', title:'Penutup', render:renderPenutup, editable:true, hasData:()=>true },
+];
+
+let sectionEnabled = {};
+SECTIONS.forEach(s => sectionEnabled[s.id] = true);
+
+// ========================================================
+// FETCH ALL DATA
+// ========================================================
+async function fetchAll(){
+  document.getElementById('docWrap').innerHTML = '<div class="loading"><div class="spinner"></div>Memuat data SPKB…</div>';
+  try {
+    await Promise.all([fetchSekolah(), fetchGuru(), fetchPelajar()]);
+    loadLocalData();
+    renderSidebar();
+    renderAllSections();
+    toast('✅ Data dimuat berjaya', 'ok');
+  } catch(e){
+    toast('Ralat memuat data', 'err');
+    document.getElementById('docWrap').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i> Tidak dapat memuat data dari SPKB. Sila refresh.</div>';
+  }
+}
+
+async function fetchSekolah(){
+  try {
+    const r = await fetch(GURU_API + '?action=maklumat_sekolah&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success && j.data) SEKOLAH = j.data;
+  } catch(e){}
+}
+
+async function fetchGuru(){
+  try {
+    const r = await fetch(GURU_API + '?action=guru_penasihat_all&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success && j.data) GURU_DATA = j.data;
+  } catch(e){}
+}
+
+async function fetchPelajar(){
+  try {
+    const r = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success){
+      const raw = j.students || j.data || [];
+      const seen = new Map();
+      raw.forEach(p => {
+        const k = String(p.student_no||p.no_urut||'').trim();
+        if(k && !seen.has(k)) seen.set(k, p);
+      });
+      PELAJAR_DATA = Array.from(seen.values());
+    }
+  } catch(e){}
+}
+
+function loadLocalData(){
+  // Takwim
+  try {
+    const raw = sget('takwim_'+currentYear);
+    TAKWIM_DATA = raw ? JSON.parse(raw) : null;
+  } catch(e){ TAKWIM_DATA = null; }
+  // Kehadiran
+  try {
+    const raw = sget('kehadiran_'+currentYear);
+    KEHADIRAN_DATA = raw ? JSON.parse(raw) : {};
+  } catch(e){ KEHADIRAN_DATA = {}; }
+  // Instrumen 3.2
+  INSTRUMEN_DATA = {};
+  const aspekIds = ['3.2.1','3.2.2','3.2.3','3.2.4','3.2.5','3.2.6','3.2.7'];
+  aspekIds.forEach(kod => {
+    [1,2,3].forEach(fasa => {
+      const k = 'instrumen32_'+kod+'_f'+fasa;
+      try {
+        const raw = sget(k);
+        if(raw){
+          const items = JSON.parse(raw);
+          if(Array.isArray(items)){
+            INSTRUMEN_DATA[kod] = INSTRUMEN_DATA[kod] || { evidens:[], adaLink:0, total:0 };
+            INSTRUMEN_DATA[kod].evidens.push(...items);
+            INSTRUMEN_DATA[kod].total += items.length;
+            INSTRUMEN_DATA[kod].adaLink += items.filter(x=>x.link).length;
+          }
+        }
+      } catch(e){}
+    });
+  });
+}
+
+// ========================================================
+// SIDEBAR RENDER
+// ========================================================
+function renderSidebar(){
+  const cont = document.getElementById('secListContainer');
+  let h = '';
+  SECTIONS.forEach(s => {
+    const has = s.hasData();
+    const cls = !has ? 'data-err' : (s.editable ? 'data-warn' : 'data-ok');
+    const title = !has ? 'Data tidak tersedia' : (s.editable ? 'Bahagian editable' : 'Data live tersedia');
+    h += `<div class="sec-item ${cls}" title="${title}" onclick="document.getElementById('sec-${s.id}').scrollIntoView({behavior:'smooth',block:'start'})">
+      <input type="checkbox" id="chk-${s.id}" ${sectionEnabled[s.id]?'checked':''} onclick="event.stopPropagation()" onchange="toggleSection('${s.id}',this.checked)">
+      <span class="num">${s.num}</span>
+      <span class="lbl">${s.title}</span>
+    </div>`;
+  });
+  cont.innerHTML = h;
+}
+
+function toggleSection(id, on){
+  sectionEnabled[id] = on;
+  renderAllSections();
+}
+
+// ========================================================
+// RENDER ALL SECTIONS
+// ========================================================
+function renderAllSections(){
+  const wrap = document.getElementById('docWrap');
+  let h = '';
+  SECTIONS.forEach(s => {
+    if(!sectionEnabled[s.id]) return;
+    const isCover = s.id === 'cover';
+    h += `<div class="doc-page ${isCover?'cover':''}" id="sec-${s.id}">${s.render()}</div>`;
+  });
+  wrap.innerHTML = h;
+  // Wire-up editable sections
+  document.querySelectorAll('.editable').forEach(el => {
+    el.addEventListener('blur', () => { saveEditable(el); });
+  });
+}
+
+function saveEditable(el){
+  const key = 'lat_'+currentYear+'_'+el.dataset.key;
+  sset(key, el.innerHTML);
+}
+
+function getEditable(defaultKey, defaultContent){
+  const k = 'lat_'+currentYear+'_'+defaultKey;
+  const saved = sget(k);
+  return saved || defaultContent;
+}
+
+// ========================================================
+// HELPERS
+// ========================================================
+const BULAN = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+function fmtTarikh(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear();
+}
+function S(field, fb){
+  return (SEKOLAH && SEKOLAH[field] && String(SEKOLAH[field]).trim()) || fb || '—';
+}
+
+// ========================================================
+// RENDERERS
+// ========================================================
+
+function renderCover(){
+  return `
+    <div class="cover-top">
+      <div class="cover-school">${S('nama_penuh','SEKOLAH MENENGAH KEBANGSAAN').toUpperCase()}</div>
+      <div class="cover-school-sub">${S('alamat','')}<br>${S('telefon','')?'Tel: '+S('telefon','')+' &nbsp;|&nbsp; ':''}${S('faks','')?'Faks: '+S('faks',''):''}</div>
+    </div>
+    <div class="cover-mid">
+      <h1>LAPORAN AKHIR TAHUN</h1>
+      <h2>PENGURUSAN KOKURIKULUM</h2>
+      <div class="tahun">${currentYear}</div>
+      <div class="sub">Berdasarkan Instrumen SKPMg2 Standard 3.2 Edisi 2026<br>dan Pentaksiran PAJSK Kebangsaan</div>
+    </div>
+    <div class="cover-bot">
+      <p><span class="label">Disediakan oleh:</span><br>${S('pk_kokurikulum','GPK Kokurikulum')}<br>Guru Penolong Kanan Kokurikulum</p>
+      <p style="margin-top:10mm;"><span class="label">Disahkan oleh:</span><br>${S('pengetua','Pengetua')}<br>Pengetua</p>
+      <p style="margin-top:10mm;font-size:10pt;color:#666;font-style:italic;">Laporan ini dijana oleh SPKB pada ${fmtTarikh(new Date().toISOString().substring(0,10))}</p>
+    </div>
+  `;
+}
+
+function renderTOC(){
+  let h = '<h2 class="sec-title">SENARAI KANDUNGAN</h2><ul class="toc-list">';
+  let pageNum = 3; // Cover=1, TOC=2
+  SECTIONS.forEach(s => {
+    if(s.id === 'cover' || s.id === 'toc') return;
+    if(!sectionEnabled[s.id]) return;
+    h += `<li><div class="num-l"><span>${s.num}</span> ${s.title}</div><span>${pageNum}</span></li>`;
+    pageNum++;
+  });
+  h += '</ul>';
+  return h;
+}
+
+function renderPengantar(){
+  const defaultText = `<p>Bismillahirrahmanirrahim. Alhamdulillah, syukur ke hadrat Ilahi kerana dengan limpah kurnia-Nya, kami berjaya menerbitkan <strong>Laporan Akhir Tahun Pengurusan Kokurikulum ${currentYear}</strong> bagi ${S('nama_penuh','sekolah ini')}.</p>
+<p>Laporan ini menyediakan rumusan pelaksanaan aktiviti kokurikulum sepanjang tahun ${currentYear} yang merangkumi badan beruniform, kelab/persatuan, dan sukan/permainan. Ia disusun berasaskan keperluan <strong>Instrumen SKPMg2 Standard 3.2 Edisi 2026</strong> dan <strong>Pentaksiran PAJSK Kebangsaan</strong>.</p>
+<p>Saya merakamkan setinggi-tinggi penghargaan kepada semua warga pendidik, guru penasihat, AJK pelajar, dan ibu bapa yang telah berganding bahu menjayakan agenda kokurikulum tahun ini. Semoga laporan ini menjadi rujukan bermakna untuk penambahbaikan berterusan tahun-tahun mendatang.</p>
+<p>"BERKHIDMAT UNTUK NEGARA"</p>`;
+  return `<h2 class="sec-title"><span class="num">1</span> KATA PENGANTAR</h2>
+    <div class="editable" contenteditable="true" data-key="pengantar">${getEditable('pengantar', defaultText)}</div>
+    <p class="sec-meta">Boleh diedit langsung. Auto-save apabila keluar dari kotak.</p>`;
+}
+
+function renderOrganisasi(){
+  const guru = (GURU_DATA && GURU_DATA.guru) || [];
+  const tugasan = (GURU_DATA && GURU_DATA.tugasan) || [];
+  const advisorIds = new Set();
+  tugasan.forEach(t => { if(t.g) advisorIds.add(t.g); });
+
+  const KAT_FROM = {'B':'Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  const penyelarasByKat = {};
+  tugasan.forEach(t => {
+    if(t.j === 'KG' || t.j === 'PK'){
+      const kat = KAT_FROM[t.kt] || 'Kelab/Persatuan';
+      if(!penyelarasByKat[kat]) penyelarasByKat[kat] = new Set();
+      penyelarasByKat[kat].add(t.g);
+    }
+  });
+
+  let h = `<h2 class="sec-title"><span class="num">2</span> CARTA ORGANISASI KOKURIKULUM</h2>
+    <p>Struktur pengurusan kokurikulum ${S('nama_penuh','sekolah')} bagi sesi ${currentYear} adalah seperti berikut:</p>
+    <div class="org-chart">
+      <div class="org-box">
+        <div class="role">Pengetua</div>
+        <div class="name">${S('pengetua','— Pengetua —')}</div>
+      </div>
+      <div class="org-arrow">↓</div>
+      <div class="org-box l2">
+        <div class="role">GPK Kokurikulum</div>
+        <div class="name">${S('pk_kokurikulum','— GPK Kokurikulum —')}</div>
+      </div>
+      <div class="org-arrow">↓</div>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px;">`;
+  ['Beruniform','Kelab/Persatuan','Sukan/Permainan'].forEach(kat => {
+    const bil = (penyelarasByKat[kat] && penyelarasByKat[kat].size) || 0;
+    h += `<div class="org-box l4">
+      <div class="role">Penyelaras (${bil})</div>
+      <strong>${kat}</strong>
+    </div>`;
+  });
+  h += `</div></div>
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="v">${guru.length}</div><div class="l">Jumlah Guru</div></div>
+      <div class="kpi-card ok"><div class="v">${advisorIds.size}</div><div class="l">Guru Penasihat Aktif</div></div>
+      <div class="kpi-card"><div class="v">${tugasan.length}</div><div class="l">Jumlah Jawatan KK</div></div>
+      <div class="kpi-card"><div class="v">${Object.keys((GURU_DATA&&GURU_DATA.unit_lookup)||{}).length}</div><div class="l">Unit Berdaftar</div></div>
+    </div>`;
+  return h;
+}
+
+function renderGuruList(){
+  const guru = (GURU_DATA && GURU_DATA.guru) || [];
+  const tugasan = (GURU_DATA && GURU_DATA.tugasan) || [];
+  const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
+  const KAT_FROM = {'B':'Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  const J_LBL = {'KG':'Ketua Guru Penasihat','PK':'Penolong Ketua','GP':'Guru Penasihat'};
+
+  const guruById = {};
+  guru.forEach(g => { guruById[g.id] = g.n; });
+
+  const byKat = {'Beruniform':[],'Kelab/Persatuan':[],'Sukan/Permainan':[]};
+  tugasan.forEach(t => {
+    const kat = KAT_FROM[t.kt] || 'Kelab/Persatuan';
+    const ul = UL[t.kod] || ['','—'];
+    byKat[kat].push({
+      nama: guruById[t.g] || '—',
+      unit: ul[1] || t.kod,
+      kod: t.kod,
+      jawatan: J_LBL[t.j] || 'Guru Penasihat'
+    });
+  });
+
+  let h = `<h2 class="sec-title"><span class="num">3</span> SENARAI GURU PENASIHAT</h2>
+    <p>Senarai guru penasihat yang dilantik untuk setiap unit kokurikulum bagi sesi ${currentYear}:</p>`;
+
+  ['Beruniform','Kelab/Persatuan','Sukan/Permainan'].forEach(kat => {
+    const items = byKat[kat];
+    if(!items.length) return;
+    items.sort((a,b) => {
+      const ja = {'Ketua Guru Penasihat':1,'Penolong Ketua':2}[a.jawatan] || 3;
+      const jb = {'Ketua Guru Penasihat':1,'Penolong Ketua':2}[b.jawatan] || 3;
+      return ja - jb || a.unit.localeCompare(b.unit) || a.nama.localeCompare(b.nama);
+    });
+    h += `<h3 class="subsec-title">${kat} (${items.length} jawatan)</h3>
+      <table>
+        <thead><tr><th style="width:8%;">Bil</th><th>Nama Guru</th><th>Unit</th><th>Jawatan</th></tr></thead>
+        <tbody>`;
+    items.forEach((it,i) => {
+      h += `<tr><td>${i+1}</td><td><strong>${it.nama}</strong></td><td>${it.kod} · ${it.unit}</td><td>${it.jawatan}</td></tr>`;
+    });
+    h += `</tbody></table>`;
+  });
+  return h;
+}
+
+function renderStatistik(){
+  const tingkatanCount = {};
+  let totalDgnUniform = 0, totalDgnKelab = 0, totalDgnSukan = 0;
+  let totalDgnSemua3 = 0;
+
+  PELAJAR_DATA.forEach(p => {
+    const t = String(p.tingkatan||'').trim();
+    if(t) tingkatanCount[t] = (tingkatanCount[t]||0) + 1;
+    const adaU = String(p.uniform||'').trim();
+    const adaK = String(p.kelab||'').trim();
+    const adaS = String(p.sukan||'').trim();
+    if(adaU) totalDgnUniform++;
+    if(adaK) totalDgnKelab++;
+    if(adaS) totalDgnSukan++;
+    if(adaU && adaK && adaS) totalDgnSemua3++;
+  });
+
+  const total = PELAJAR_DATA.length;
+  const pctSemua = total ? Math.round(totalDgnSemua3/total*100) : 0;
+
+  // Unit count per kategori
+  const unitsByKat = { uniform:{}, kelab:{}, sukan:{} };
+  PELAJAR_DATA.forEach(p => {
+    [['uniform',unitsByKat.uniform],['kelab',unitsByKat.kelab],['sukan',unitsByKat.sukan]].forEach(([fld,map]) => {
+      const raw = String(p[fld]||'').trim();
+      if(!raw) return;
+      const m = raw.match(/^([^-\s]+)\s*-?\s*(.*)$/);
+      const nama = m && m[2] ? m[2].trim() : raw;
+      map[nama] = (map[nama]||0) + 1;
+    });
+  });
+
+  let h = `<h2 class="sec-title"><span class="num">4</span> STATISTIK PENYERTAAN MURID</h2>
+    <h3 class="subsec-title">4.1 Ringkasan Keseluruhan</h3>
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="v">${total.toLocaleString()}</div><div class="l">Jumlah Murid</div></div>
+      <div class="kpi-card ${totalDgnUniform/total>=0.9?'ok':'warn'}"><div class="v">${totalDgnUniform.toLocaleString()}</div><div class="l">Sertai Beruniform</div></div>
+      <div class="kpi-card ${totalDgnKelab/total>=0.9?'ok':'warn'}"><div class="v">${totalDgnKelab.toLocaleString()}</div><div class="l">Sertai Kelab</div></div>
+      <div class="kpi-card ${totalDgnSukan/total>=0.9?'ok':'warn'}"><div class="v">${totalDgnSukan.toLocaleString()}</div><div class="l">Sertai Sukan</div></div>
+      <div class="kpi-card ${pctSemua>=95?'ok':pctSemua>=80?'warn':'err'}"><div class="v">${pctSemua}%</div><div class="l">Daftar 3 Kategori</div></div>
+    </div>`;
+
+  // Per tingkatan
+  const TK_ORDER = ['Tingkatan Peralihan','Tingkatan Satu','Tingkatan Dua','Tingkatan Tiga','Tingkatan Empat','Tingkatan Lima'];
+  const tks = Object.keys(tingkatanCount).sort((a,b) => {
+    const oa = TK_ORDER.indexOf(a), ob = TK_ORDER.indexOf(b);
+    return (oa===-1?99:oa) - (ob===-1?99:ob);
+  });
+  h += `<h3 class="subsec-title">4.2 Taburan Murid Mengikut Tingkatan</h3>
+    <table>
+      <thead><tr><th>Tingkatan</th><th style="width:25%;">Bilangan Murid</th><th style="width:25%;">% dari Jumlah</th></tr></thead>
+      <tbody>`;
+  tks.forEach(t => {
+    const c = tingkatanCount[t];
+    const pct = total ? (c/total*100).toFixed(1) : 0;
+    h += `<tr><td>${t}</td><td>${c.toLocaleString()}</td><td>${pct}%</td></tr>`;
+  });
+  h += `<tr class="total"><td>JUMLAH</td><td>${total.toLocaleString()}</td><td>100%</td></tr></tbody></table>`;
+
+  // Per unit
+  const renderUnitTable = (title, map) => {
+    const arr = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+    if(!arr.length) return '';
+    let t = `<h3 class="subsec-title">${title} (${arr.length} unit · ${arr.reduce((s,[,c])=>s+c,0)} ahli)</h3>
+      <table><thead><tr><th style="width:8%;">Bil</th><th>Nama Unit</th><th style="width:20%;">Bil. Ahli</th></tr></thead><tbody>`;
+    arr.forEach(([nama,c],i)=>{
+      t += `<tr><td>${i+1}</td><td>${nama}</td><td>${c}</td></tr>`;
+    });
+    t += `</tbody></table>`;
+    return t;
+  };
+  h += `<h3 class="subsec-title">4.3 Pendaftaran Mengikut Unit</h3>`;
+  h += renderUnitTable('Badan Beruniform', unitsByKat.uniform);
+  h += renderUnitTable('Kelab / Persatuan', unitsByKat.kelab);
+  h += renderUnitTable('Sukan / Permainan', unitsByKat.sukan);
+  return h;
+}
+
+function renderTakwim(){
+  let h = `<h2 class="sec-title"><span class="num">5</span> TAKWIM & JADUAL PERJUMPAAN</h2>`;
+  if(!TAKWIM_DATA){
+    h += `<div class="no-data"><i class="fas fa-exclamation-triangle"></i>Takwim belum ditetapkan. Sila pergi ke <strong>Modul Kehadiran → Tab Takwim</strong> untuk menetapkan jadual ${currentYear}.</div>`;
+    return h;
+  }
+  const t = TAKWIM_DATA;
+  const durasi = t.durasi_minit || 90;
+  const minJumpa = t.min_jumpa || 12;
+  const minJam = t.min_jam || 36;
+  const HARI = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+
+  const generateDates = (k) => {
+    if(!t[k] || !t[k].mula || !t[k].tamat) return [];
+    const dates = new Set();
+    const start = new Date(t[k].mula), end = new Date(t[k].tamat);
+    const jsDay = t[k].hari === 7 ? 0 : t[k].hari;
+    for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+      if(d.getDay() === jsDay){
+        const iso = d.toISOString().substring(0,10);
+        if((t[k].kecuali||[]).indexOf(iso) === -1) dates.add(iso);
+      }
+    }
+    (t[k].tambahan||[]).forEach(d => { if(d>=t[k].mula && d<=t[k].tamat) dates.add(d); });
+    return Array.from(dates).sort();
+  };
+
+  h += `<p>Takwim perjumpaan yang ditetapkan bagi sesi ${currentYear} dengan target minimum PAJSK <strong>${minJumpa} perjumpaan</strong> dan <strong>${minJam} jam</strong> per pelajar.</p>`;
+  h += `<table>
+    <thead><tr><th>Kategori</th><th>Hari</th><th>Tempoh</th><th>Bil. Perjumpaan</th><th>Jumlah Jam</th><th>Status</th></tr></thead>
+    <tbody>`;
+  const KAT_LBL = { beruniform:'Beruniform', kelab:'Kelab/Persatuan', sukan:'Sukan/Permainan' };
+  Object.keys(KAT_LBL).forEach(k => {
+    const data = t[k];
+    if(!data){ h += `<tr><td>${KAT_LBL[k]}</td><td colspan="5" style="color:#a00;font-style:italic;">Belum ditetapkan</td></tr>`; return; }
+    const dates = generateDates(k);
+    const jam = (dates.length * durasi) / 60;
+    const cukup = dates.length >= minJumpa && jam >= minJam;
+    h += `<tr class="${cukup?'success':'warning'}">
+      <td><strong>${KAT_LBL[k]}</strong></td>
+      <td>${HARI[data.hari === 7 ? 0 : data.hari]}</td>
+      <td>${data.mula} – ${data.tamat}</td>
+      <td>${dates.length}</td>
+      <td>${jam.toFixed(1)} jam</td>
+      <td>${cukup?'✓ Cukup PAJSK':'⚠ Bawah Minimum'}</td>
+    </tr>`;
+  });
+  h += `</tbody></table>`;
+  h += `<p class="sec-meta">Durasi perjumpaan ditetapkan ${durasi} minit setiap satu.</p>`;
+  return h;
+}
+
+function renderKehadiran(){
+  let h = `<h2 class="sec-title"><span class="num">6</span> ANALISIS KEHADIRAN MURID</h2>`;
+  const keys = Object.keys(KEHADIRAN_DATA);
+  if(!keys.length){
+    h += `<div class="no-data"><i class="fas fa-exclamation-triangle"></i>Belum ada rekod kehadiran. Sila gunakan Modul Kehadiran untuk merekod kehadiran murid sepanjang tahun.</div>`;
+    return h;
+  }
+
+  // Aggregate per unit
+  const perUnit = {};
+  let totalAll = 0, totalH = 0, totalTH = 0, totalMC = 0, totalB = 0;
+  keys.forEach(key => {
+    const parts = key.split('|');
+    const tarikh = parts.find(p => /^\d{4}-\d{2}-\d{2}$/.test(p));
+    const unit = parts.find(p => p !== tarikh);
+    if(!unit || !tarikh) return;
+    if(!perUnit[unit]) perUnit[unit] = { perjumpaan:0, H:0, TH:0, MC:0, B:0, total:0 };
+    perUnit[unit].perjumpaan++;
+    Object.values(KEHADIRAN_DATA[key]).forEach(s => {
+      perUnit[unit].total++; totalAll++;
+      if(s === 'H'){ perUnit[unit].H++; totalH++; }
+      else if(s === 'TH'){ perUnit[unit].TH++; totalTH++; }
+      else if(s === 'MC'){ perUnit[unit].MC++; totalMC++; }
+      else if(s === 'B'){ perUnit[unit].B++; totalB++; }
+    });
+  });
+
+  const purata = totalAll ? Math.round(totalH/totalAll*100) : 0;
+  h += `<div class="kpi-row">
+    <div class="kpi-card"><div class="v">${keys.length}</div><div class="l">Total Perjumpaan</div></div>
+    <div class="kpi-card ok"><div class="v">${totalH.toLocaleString()}</div><div class="l">Hadir</div></div>
+    <div class="kpi-card err"><div class="v">${totalTH.toLocaleString()}</div><div class="l">Tidak Hadir</div></div>
+    <div class="kpi-card warn"><div class="v">${totalMC.toLocaleString()}</div><div class="l">MC</div></div>
+    <div class="kpi-card ${purata>=80?'ok':purata>=60?'warn':'err'}"><div class="v">${purata}%</div><div class="l">Purata Kehadiran</div></div>
+  </div>`;
+
+  // Per unit table
+  const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
+  const arr = Object.entries(perUnit).map(([kod,d])=>{
+    const ul = UL[kod] || ['','—'];
+    const pct = d.total ? Math.round(d.H/d.total*100) : 0;
+    return { kod, nama:ul[1]||kod, ...d, pct };
+  }).sort((a,b)=>a.pct-b.pct);
+
+  h += `<h3 class="subsec-title">6.1 Kehadiran Per Unit (${arr.length} unit aktif)</h3>
+    <table>
+      <thead><tr><th>Bil</th><th>Unit</th><th>Perjumpaan</th><th>H</th><th>TH</th><th>MC</th><th>%</th></tr></thead><tbody>`;
+  arr.forEach((u,i) => {
+    const cls = u.pct >= 80 ? 'success' : u.pct < 60 ? 'warning' : '';
+    h += `<tr class="${cls}"><td>${i+1}</td><td><strong>${u.kod}</strong> · ${u.nama}</td><td>${u.perjumpaan}</td><td>${u.H}</td><td>${u.TH}</td><td>${u.MC}</td><td><strong>${u.pct}%</strong></td></tr>`;
+  });
+  h += `</tbody></table>`;
+  return h;
+}
+
+function renderPAJSK(){
+  let h = `<h2 class="sec-title"><span class="num">7</span> PELAJAR BAWAH MINIMUM PAJSK</h2>`;
+  const keys = Object.keys(KEHADIRAN_DATA);
+  if(!keys.length){
+    h += `<div class="no-data"><i class="fas fa-exclamation-triangle"></i>Belum ada rekod kehadiran. Analisis PAJSK tidak dapat dijana.</div>`;
+    return h;
+  }
+
+  const durasi = (TAKWIM_DATA && TAKWIM_DATA.durasi_minit) || 90;
+  const minJumpa = (TAKWIM_DATA && TAKWIM_DATA.min_jumpa) || 12;
+  const minJam = (TAKWIM_DATA && TAKWIM_DATA.min_jam) || 36;
+
+  // Aggregate per pelajar (by student_no)
+  const perPelajar = {};
+  keys.forEach(key => {
+    const statuses = KEHADIRAN_DATA[key];
+    Object.entries(statuses).forEach(([sid, st]) => {
+      if(!perPelajar[sid]) perPelajar[sid] = { total:0, H:0, TH:0, MC:0, B:0 };
+      perPelajar[sid].total++;
+      perPelajar[sid][st] = (perPelajar[sid][st] || 0) + 1;
+    });
+  });
+
+  // Lookup pelajar
+  const pelById = {};
+  PELAJAR_DATA.forEach(p => {
+    const k = String(p.student_no || p.no_urut || '').trim();
+    if(k) pelById[k] = p;
+  });
+
+  // Kira jam terkumpul + flag bawah PAJSK
+  const bawahPAJSK = [];
+  Object.entries(perPelajar).forEach(([sid, d]) => {
+    const hadirEfektif = (d.H||0) + (d.B||0);
+    const jam = (hadirEfektif * durasi) / 60;
+    const okJumpa = hadirEfektif >= minJumpa;
+    const okJam = jam >= minJam;
+    if(!okJumpa || !okJam){
+      const p = pelById[sid] || { nama:'(Tiada rekod)', tingkatan:'—', kelas:'—' };
+      bawahPAJSK.push({
+        sid, nama:p.nama, tingkatan:p.tingkatan, kelas:p.kelas,
+        hadirEfektif, jam, okJumpa, okJam
+      });
+    }
+  });
+  bawahPAJSK.sort((a,b) => a.jam - b.jam);
+
+  h += `<p>Syarat minimum PAJSK: <strong>${minJumpa} perjumpaan</strong> dan <strong>${minJam} jam</strong> aktiviti setahun (kira H + B × ${durasi} minit).</p>`;
+
+  if(!bawahPAJSK.length){
+    h += `<div class="no-data" style="background:#eafaf1;color:#0e6251;border-left-color:var(--ok);"><i class="fas fa-check-circle"></i>Semua pelajar memenuhi minimum PAJSK. Tahniah!</div>`;
+    return h;
+  }
+
+  h += `<div class="kpi-row">
+    <div class="kpi-card err"><div class="v">${bawahPAJSK.length}</div><div class="l">Pelajar Bawah PAJSK</div></div>
+    <div class="kpi-card"><div class="v">${bawahPAJSK.filter(p=>!p.okJumpa).length}</div><div class="l">Bawah ${minJumpa} Jumpa</div></div>
+    <div class="kpi-card"><div class="v">${bawahPAJSK.filter(p=>!p.okJam).length}</div><div class="l">Bawah ${minJam}j</div></div>
+  </div>`;
+
+  h += `<table>
+    <thead><tr><th>#</th><th>Nama</th><th>Tingkatan</th><th>Kelas</th><th>H+B</th><th>Jam</th><th>Sebab</th></tr></thead><tbody>`;
+  bawahPAJSK.slice(0,50).forEach((p,i) => {
+    const sebab = [];
+    if(!p.okJumpa) sebab.push(`< ${minJumpa} jumpa`);
+    if(!p.okJam) sebab.push(`< ${minJam}j`);
+    h += `<tr class="warning"><td>${i+1}</td><td><strong>${p.nama}</strong></td><td>${p.tingkatan||'—'}</td><td>${p.kelas||'—'}</td><td>${p.hadirEfektif}</td><td>${p.jam.toFixed(1)}j</td><td>${sebab.join(' · ')}</td></tr>`;
+  });
+  h += `</tbody></table>`;
+  if(bawahPAJSK.length > 50) h += `<p class="sec-meta">…dan ${bawahPAJSK.length-50} pelajar lagi.</p>`;
+  return h;
+}
+
+function renderSKAS(){
+  let h = `<h2 class="sec-title"><span class="num">8</span> STATUS SKPMg2 STANDARD 3.2</h2>`;
+  const ASPEK = [
+    {kod:'3.2.1', nama:'KETETAPAN PELAKSANAAN KOKURIKULUM'},
+    {kod:'3.2.2', nama:'PENGURUSAN KELAB/PERSATUAN'},
+    {kod:'3.2.3', nama:'PENGURUSAN BADAN BERUNIFORM'},
+    {kod:'3.2.4', nama:'PENGURUSAN SUKAN/PERMAINAN'},
+    {kod:'3.2.5', nama:'PENGURUSAN PROGRAM KECEMERLANGAN KOKURIKULUM'},
+    {kod:'3.2.6', nama:'PENGURUSAN SUKAN UNTUK SEMUA'},
+    {kod:'3.2.7', nama:'PENGURUSAN PENTAKSIRAN KOKURIKULUM'},
+  ];
+
+  let totalEv = 0, totalLink = 0;
+  ASPEK.forEach(a => {
+    if(INSTRUMEN_DATA[a.kod]){
+      totalEv += INSTRUMEN_DATA[a.kod].total;
+      totalLink += INSTRUMEN_DATA[a.kod].adaLink;
+    }
+  });
+  const pctTotal = totalEv ? Math.round(totalLink/totalEv*100) : 0;
+
+  if(!totalEv){
+    h += `<div class="no-data"><i class="fas fa-exclamation-triangle"></i>Belum ada evidens direkod dalam Modul Instrumen SKPMg2 3.2. Sila ke modul Instrumen untuk mula merekod evidens.</div>`;
+    return h;
+  }
+
+  h += `<div class="kpi-row">
+    <div class="kpi-card"><div class="v">${totalEv}</div><div class="l">Total Evidens</div></div>
+    <div class="kpi-card ok"><div class="v">${totalLink}</div><div class="l">Berstatus Link</div></div>
+    <div class="kpi-card ${pctTotal>=80?'ok':pctTotal>=50?'warn':'err'}"><div class="v">${pctTotal}%</div><div class="l">Kelengkapan</div></div>
+    <div class="kpi-card"><div class="v">7</div><div class="l">Aspek Standard 3.2</div></div>
+  </div>`;
+
+  h += `<table>
+    <thead><tr><th style="width:10%;">Aspek</th><th>Nama Aspek</th><th>Evidens</th><th>Berlink</th><th>%</th></tr></thead><tbody>`;
+  ASPEK.forEach(a => {
+    const d = INSTRUMEN_DATA[a.kod] || { total:0, adaLink:0 };
+    const pct = d.total ? Math.round(d.adaLink/d.total*100) : 0;
+    const cls = pct >= 80 ? 'success' : pct < 50 ? 'warning' : '';
+    h += `<tr class="${cls}"><td><strong>${a.kod}</strong></td><td>${a.nama}</td><td>${d.total}</td><td>${d.adaLink}</td><td><strong>${pct}%</strong></td></tr>`;
+  });
+  h += `<tr class="total"><td>JUMLAH</td><td></td><td>${totalEv}</td><td>${totalLink}</td><td><strong>${pctTotal}%</strong></td></tr></tbody></table>`;
+  return h;
+}
+
+function renderPencapaian(){
+  const defaultText = `<p>Sila lengkapkan senarai pencapaian unit kokurikulum tahun ${currentYear}, contohnya:</p>
+<ul>
+<li><strong>[Unit ABC]</strong> – Johan Pertandingan XYZ Peringkat Daerah, dianjurkan oleh PPD pada [tarikh]</li>
+<li><strong>[Unit DEF]</strong> – Tempat ke-3 Kejohanan Sukan ABC Peringkat Negeri, [tarikh]</li>
+<li>... (tambah lagi)</li>
+</ul>
+<p style="font-style:italic;color:#666;">Anda boleh edit dan tambah pencapaian secara manual. Auto-save akan berlaku.</p>`;
+  return `<h2 class="sec-title"><span class="num">9</span> PENCAPAIAN MURID</h2>
+    <p>Senarai pencapaian dan anugerah yang diterima oleh murid-murid ${S('nama_penuh','sekolah ini')} sepanjang tahun ${currentYear}:</p>
+    <div class="editable" contenteditable="true" data-key="pencapaian" style="min-height:200px;">${getEditable('pencapaian', defaultText)}</div>`;
+}
+
+function renderRefleksi(){
+  const defaultText = `<h4 style="color:var(--pri);margin-bottom:6px;">Cabaran Yang Dihadapi:</h4>
+<ul>
+<li>(Sila lengkapkan – cth: pengurangan masa latihan disebabkan oleh peperiksaan)</li>
+<li>(Cabaran kewangan untuk kemudahan dan peralatan)</li>
+<li>(Cabaran lain yang dihadapi sepanjang tahun)</li>
+</ul>
+<h4 style="color:var(--pri);margin:14px 0 6px;">Pengajaran Dipelajari:</h4>
+<ul>
+<li>(Pengajaran 1)</li>
+<li>(Pengajaran 2)</li>
+</ul>`;
+  return `<h2 class="sec-title"><span class="num">10</span> REFLEKSI & CABARAN</h2>
+    <div class="editable" contenteditable="true" data-key="refleksi" style="min-height:200px;">${getEditable('refleksi', defaultText)}</div>`;
+}
+
+function renderCadangan(){
+  // Auto-suggest berdasarkan data
+  const suggestions = [];
+
+  // Cek takwim
+  if(!TAKWIM_DATA){
+    suggestions.push('Tetapkan takwim perjumpaan 3 kategori (Beruniform/Kelab/Sukan) pada awal tahun untuk memudahkan pelaksanaan.');
+  } else {
+    const dura = (TAKWIM_DATA.durasi_minit || 90);
+    const min = (TAKWIM_DATA.min_jumpa || 12);
+    ['beruniform','kelab','sukan'].forEach(k => {
+      const t = TAKWIM_DATA[k];
+      if(!t || !t.mula) return;
+      const start = new Date(t.mula), end = new Date(t.tamat);
+      let count = 0;
+      for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+        if(d.getDay() === (t.hari===7?0:t.hari) && (t.kecuali||[]).indexOf(d.toISOString().substring(0,10))===-1) count++;
+      }
+      count += (t.tambahan||[]).length;
+      if(count < min){
+        const kat = {beruniform:'Beruniform',kelab:'Kelab/Persatuan',sukan:'Sukan/Permainan'}[k];
+        suggestions.push(`Kategori ${kat} hanya merancang ${count} perjumpaan — di bawah minimum PAJSK ${min} kali. Tambah perjumpaan ad-hoc atau panjangkan tempoh.`);
+      }
+    });
+  }
+
+  // Cek instrumen
+  let totalEv = 0, totalLink = 0;
+  Object.values(INSTRUMEN_DATA).forEach(a => { totalEv += a.total; totalLink += a.adaLink; });
+  if(!totalEv){
+    suggestions.push('Mula merekod evidens dalam Modul Instrumen SKPMg2 3.2 — wajib untuk audit SK@S.');
+  } else if(totalLink/totalEv < 0.8){
+    const pct = Math.round(totalLink/totalEv*100);
+    suggestions.push(`Kelengkapan evidens SK@S 3.2 hanya ${pct}%. Gunakan butang "Auto-Padan SK@S" dalam Modul Instrumen untuk pautkan fail ke evidens.`);
+  }
+
+  // Cek pelajar bawah PAJSK
+  let bawahPajsk = 0;
+  if(Object.keys(KEHADIRAN_DATA).length && PELAJAR_DATA.length){
+    const dura = (TAKWIM_DATA && TAKWIM_DATA.durasi_minit) || 90;
+    const minJ = (TAKWIM_DATA && TAKWIM_DATA.min_jumpa) || 12;
+    const minH = (TAKWIM_DATA && TAKWIM_DATA.min_jam) || 36;
+    const perPel = {};
+    Object.values(KEHADIRAN_DATA).forEach(statuses => {
+      Object.entries(statuses).forEach(([sid, st]) => {
+        if(!perPel[sid]) perPel[sid] = { H:0, B:0 };
+        if(st==='H'||st==='B') perPel[sid][st]++;
+      });
+    });
+    Object.values(perPel).forEach(d => {
+      const eff = d.H + d.B;
+      const jam = eff * dura / 60;
+      if(eff < minJ || jam < minH) bawahPajsk++;
+    });
+  }
+  if(bawahPajsk > 0){
+    suggestions.push(`${bawahPajsk} pelajar bawah minimum PAJSK. Adakan sesi penjelasan + susulan dengan ibu bapa & guru penasihat awal tahun hadapan.`);
+  }
+
+  const autoText = suggestions.length
+    ? `<h4 style="color:var(--pri);margin-bottom:6px;">📊 Cadangan Auto (Berdasarkan Data Tahun ${currentYear}):</h4><ul>${suggestions.map(s=>`<li>${s}</li>`).join('')}</ul><h4 style="color:var(--pri);margin:14px 0 6px;">📝 Cadangan Tambahan:</h4>`
+    : '<h4 style="color:var(--pri);margin-bottom:6px;">📝 Cadangan Penambahbaikan:</h4>';
+
+  const defaultEditable = `<ul>
+<li>(Cadangan 1 – cth: tingkatkan kerjasama dengan ibu bapa)</li>
+<li>(Cadangan 2 – cth: latihan tambahan untuk guru penasihat baharu)</li>
+<li>(Cadangan 3 – cth: belanjawan tambahan untuk peralatan sukan)</li>
+</ul>`;
+
+  return `<h2 class="sec-title"><span class="num">11</span> CADANGAN PENAMBAHBAIKAN</h2>
+    <div>${autoText}</div>
+    <div class="editable" contenteditable="true" data-key="cadangan" style="min-height:120px;">${getEditable('cadangan', defaultEditable)}</div>`;
+}
+
+function renderPenutup(){
+  const defaultText = `<p>Laporan ini menggambarkan keseluruhan pelaksanaan aktiviti kokurikulum di ${S('nama_penuh','sekolah ini')} bagi tahun ${currentYear}. Pelbagai pencapaian dan cabaran telah dilalui sepanjang tahun, dan keseluruhannya membentuk asas yang kukuh untuk penambahbaikan tahun-tahun akan datang.</p>
+<p>Kami merakamkan ucapan setinggi-tinggi penghargaan kepada:</p>
+<ul>
+<li>${S('pengetua','Pengetua')} – atas sokongan dan kepimpinan yang berterusan</li>
+<li>Semua guru penasihat – atas dedikasi dan komitmen sepanjang tahun</li>
+<li>Pelajar – atas penyertaan aktif dan semangat sukan yang ditunjukkan</li>
+<li>Ibu bapa & penjaga – atas kerjasama dalam menjayakan agenda kokurikulum</li>
+</ul>
+<p>Semoga laporan ini menjadi rujukan dan asas perancangan tahun ${currentYear + 1} yang lebih cemerlang.</p>
+<p style="text-align:center;font-weight:700;margin:14px 0;">"BERKHIDMAT UNTUK NEGARA"</p>`;
+  return `<h2 class="sec-title"><span class="num">12</span> PENUTUP</h2>
+    <div class="editable" contenteditable="true" data-key="penutup">${getEditable('penutup', defaultText)}</div>
+    <div class="sig-block">
+      <div>
+        <p style="font-size:10pt;">Disediakan oleh:</p>
+        <div class="sig-line"><strong>(${S('pk_kokurikulum','Nama GPK Kokurikulum').toUpperCase()})</strong><br>
+        GPK Kokurikulum<br>${S('nama_penuh','Sekolah')}</div>
+      </div>
+      <div>
+        <p style="font-size:10pt;">Disahkan oleh:</p>
+        <div class="sig-line"><strong>(${S('pengetua','Nama Pengetua').toUpperCase()})</strong><br>
+        Pengetua<br>${S('nama_penuh','Sekolah')}</div>
+      </div>
+    </div>`;
+}
+
+// ========================================================
+// YEAR + ACTIONS
+// ========================================================
+function populateYearSelector(){
+  const sel = document.getElementById('yearSel');
+  const now = new Date().getFullYear();
+  let h = '';
+  for(let y = now-2; y <= now+1; y++){
+    h += `<option value="${y}" ${y===currentYear?'selected':''}>Tahun ${y}</option>`;
+  }
+  sel.innerHTML = h;
+}
+
+function changeYear(y){
+  currentYear = parseInt(y);
+  fetchAll();
+}
+
+function reloadAll(){
+  fetchAll();
+}
+
+function saveDraft(){
+  // Editable sections auto-save dah berlaku on blur. Ini untuk explicit feedback.
+  document.querySelectorAll('.editable').forEach(el => saveEditable(el));
+  toast('✅ Draf disimpan ke storan tempatan', 'ok');
+}
+
+function resetDraft(){
+  if(!confirm('Padam semua editan untuk tahun ' + currentYear + '? Bahagian editable akan kembali ke teks asal.')) return;
+  ['pengantar','pencapaian','refleksi','cadangan','penutup'].forEach(k => {
+    try { localStorage.removeItem('lat_'+currentYear+'_'+k); } catch(e){}
+  });
+  renderAllSections();
+  toast('Draf dipadam', 'ok');
+}
+
+// ========================================================
+// INIT
+// ========================================================
+(async function init(){
+  try{ if(window!==window.top) document.body.classList.add('in-spkb') }catch(e){}
+  populateYearSelector();
+  await fetchAll();
+})();
+</script>
+</body>
+</html>
