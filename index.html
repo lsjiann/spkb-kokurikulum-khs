@@ -1931,6 +1931,11 @@ body.demo-active .main { margin-top: 98px; }
       <span class="nav-text">Kewangan & Inventori</span>
       <span style="background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;margin-left:auto;">BARU</span>
     </a>
+    <a class="nav-item" data-page="pusat-sandar">
+      <i class="fas fa-cogs nav-icon"></i>
+      <span class="nav-text">Pusat Sandar & Tetapan</span>
+      <span style="background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;margin-left:auto;">BARU</span>
+    </a>
     <a class="nav-item" data-page="pajsk">
       <i class="fas fa-clipboard-list"></i>
       <span class="nav-text">Penilaian PAJSK</span>
@@ -2932,6 +2937,71 @@ body.demo-active .main { margin-top: 98px; }
 
   <!-- ============================================================
        END PAGE: KEWANGAN & INVENTORI
+       ============================================================ -->
+
+  <!-- ============================================================
+       PAGE: PUSAT SANDAR & TETAPAN (Final Polish - 10%)
+       ============================================================ -->
+  <section class="page" id="page-pusat-sandar">
+
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Pusat Sandar & Tetapan</span>
+    </div>
+
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <h2><i class="fas fa-cogs"></i> Pusat Sandar & Tetapan SPKB</h2>
+        <p>Health check · Sandar JSON · Cloud Sync · Email Reminder · Profil pengguna · Bantuan</p>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.open(PUSAT_URL,'_blank')" title="Buka dalam tab baharu">
+          <i class="fas fa-external-link-alt"></i> Tab Baru
+        </button>
+      </div>
+    </div>
+
+    <!-- Kad ringkas -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--primary);">6</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Tab Utama</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--success);">JSON</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Backup/Restore</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--purple);">☁</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Cloud Sync Ready</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">📧</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Email Reminder</div>
+      </div>
+    </div>
+
+    <!-- Iframe -->
+    <div id="pusat-iframe-wrap" style="width:100%;height:calc(100vh - 280px);min-height:600px;border-radius:12px;overflow:hidden;position:relative;background:#f8fafc;border:1px solid #e0e0e0;">
+      <div id="pusat-iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;background:#f8fafc;">
+        <div style="text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">⚙️</div>
+          <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:6px;">Pusat Sandar & Tetapan</h3>
+          <p style="font-size:12px;color:#7f8c8d;max-width:400px;margin:0 auto 16px;line-height:1.5;">
+            Status Sistem · Sandar JSON · Cloud Sync · Email Reminder · Profil · Bantuan
+          </p>
+          <div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+          <p style="font-size:11px;color:#bdc3c7;">Memuatkan…</p>
+        </div>
+      </div>
+      <iframe id="pusat-iframe" src="" style="width:100%;height:100%;border:none;" onload="this.previousElementSibling.style.display='none';" allow="clipboard-write"></iframe>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       END PAGE: PUSAT SANDAR
        ============================================================ -->
 
 
@@ -5924,6 +5994,7 @@ const BUKU_KK_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/buku-penguru
 const GENERATOR_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/generator-dokumen.html';
 const LAPORAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/laporan-akhir-tahun.html';
 const KEWANGAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/kewangan-inventori.html';
+const PUSAT_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pusat-sandar.html';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
 /* ============================================================
@@ -6068,6 +6139,14 @@ function navigateTo(pageId) {
       if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
         var tahun = new Date().getFullYear();
         iframe.src = KEWANGAN_URL + '?tahun=' + tahun;
+      }
+    }, 100);
+  }
+  if (pageId === 'pusat-sandar') {
+    setTimeout(function () {
+      var iframe = document.getElementById('pusat-iframe');
+      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+        iframe.src = PUSAT_URL;
       }
     }, 100);
   }
