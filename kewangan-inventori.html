@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kewangan & Inventori Unit — SPKB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60; --warn:#f39c12; --err:#c0392b;
+  --bg:#f4f6f9; --card:#fff; --bdr:#e1e4e8; --mute:#6c7383; --tx:#2c3e50; --sk:#3498db;
+  --in:#27ae60; --out:#c0392b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5}
+
+/* TOP */
+.top{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.1);position:sticky;top:0;z-index:30}
+.top h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.top-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.year-sel{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;outline:none;cursor:pointer}
+.btn-top{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn-top:hover{background:rgba(255,255,255,0.25)}
+.btn-top.primary{background:var(--acc);border-color:var(--acc)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:#fff;border-right:1px solid var(--bdr);overflow-y:auto;position:sticky;top:60px;height:calc(100vh - 60px);max-height:calc(100vh - 60px)}
+.sb-search{padding:12px 14px;border-bottom:1px solid var(--bdr);position:sticky;top:0;background:#fff;z-index:5}
+.sb-search input{width:100%;padding:7px 9px 7px 28px;border:1.5px solid var(--bdr);border-radius:5px;font-size:12px;background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%236c7383" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>') no-repeat 8px center}
+.sb-info{padding:10px 14px;background:#eef4fb;font-size:11px;color:var(--pri2);border-bottom:1px solid var(--bdr)}
+.sb-info i{margin-right:4px;color:var(--pri)}
+.sb-section{padding:6px 0}
+.sb-section h3{font-size:10px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.6px;padding:10px 14px 4px}
+.sb-section .unit-item{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;font-size:12px;color:var(--tx);cursor:pointer;border-left:3px solid transparent}
+.sb-section .unit-item:hover{background:#f4f6f9;border-left-color:var(--acc)}
+.sb-section .unit-item.active{background:#eef4fb;border-left-color:var(--pri);font-weight:700;color:var(--pri)}
+.sb-section .unit-item .badge{background:#e0e6ed;color:var(--mute);font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600}
+.sb-section .unit-item.has-data .badge{background:var(--ok);color:#fff}
+
+/* MAIN */
+.main{padding:18px 22px;overflow-x:hidden}
+.welcome{text-align:center;padding:40px 20px;color:var(--mute)}
+.welcome .icon{font-size:56px;color:var(--pri);opacity:0.85;margin-bottom:14px}
+.welcome h2{font-size:22px;color:var(--pri);margin-bottom:8px}
+.welcome p{font-size:13px;max-width:600px;margin:0 auto 8px}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:4px;margin-bottom:14px}
+.tab{flex:1;padding:8px 14px;border-radius:6px;background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--mute);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab.active{background:var(--pri);color:#fff}
+.tab:not(.active):hover{background:#f4f6f9;color:var(--pri)}
+
+/* UNIT HEADER */
+.unit-header{background:linear-gradient(135deg,#fff,#f8fafc);border:1px solid var(--bdr);border-radius:8px;padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:start;gap:14px;flex-wrap:wrap}
+.unit-info h2{font-size:16px;color:var(--pri);margin-bottom:3px}
+.unit-info .meta{font-size:11px;color:var(--mute)}
+.unit-info .meta i{margin-right:3px}
+.unit-info .meta .ev-tag{display:inline-block;background:var(--sk);color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:6px;font-family:monospace}
+
+/* KPI CARDS */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--bdr);border-radius:7px;padding:10px 12px;text-align:center}
+.kpi .v{font-size:20px;font-weight:800;color:var(--pri);line-height:1.1}
+.kpi .l{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
+.kpi.in .v{color:var(--in)}
+.kpi.out .v{color:var(--out)}
+.kpi.baki .v{color:var(--acc)}
+.kpi.warn{border-color:var(--warn)}
+.kpi.warn .v{color:var(--warn)}
+
+/* ACTION BAR */
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:5px;font-size:12px;cursor:pointer;border:1.5px solid transparent;font-weight:600}
+.btn-pri{background:var(--pri);color:#fff}
+.btn-pri:hover{background:var(--pri2)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-outline{background:#fff;color:var(--tx);border-color:var(--bdr)}
+.btn-outline:hover{background:#f4f6f9;border-color:var(--pri)}
+.btn-err{background:var(--err);color:#fff}
+.btn-sm{padding:4px 8px;font-size:11px}
+
+/* TABLE */
+.tbl-wrap{background:#fff;border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
+table.data{width:100%;border-collapse:collapse;font-size:12px}
+table.data thead{background:var(--pri);color:#fff;position:sticky;top:0;z-index:2}
+table.data th{padding:8px 9px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+table.data td{padding:7px 9px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+table.data tbody tr:hover{background:#f8fafc}
+table.data tbody tr.in td{background:#eafaf1}
+table.data tbody tr.out td{background:#fdedec}
+table.data .tx-num{font-family:monospace;font-weight:600}
+table.data .tx-num.in{color:var(--in)}
+table.data .tx-num.out{color:var(--out)}
+table.data .tx-num.baki{color:var(--acc);font-weight:700}
+table.data .actions{display:flex;gap:3px}
+table.data .ico-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:3px 5px;color:var(--mute);border-radius:3px}
+table.data .ico-btn:hover{background:#eef4fb;color:var(--pri)}
+table.data .ico-btn.del:hover{background:#fdedec;color:var(--err)}
+
+.empty{text-align:center;padding:30px 20px;color:var(--mute);font-style:italic;font-size:12px}
+.empty i{display:block;font-size:28px;margin-bottom:6px;opacity:0.5}
+
+/* BADGES */
+.badge-kead{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700}
+.kead-Baik{background:#eafaf1;color:#0e6251}
+.kead-Servis{background:#fef9e7;color:#7d6608}
+.kead-Rosak{background:#fdedec;color:#922b21}
+.kead-Hilang{background:#e8e8e8;color:#555}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:10px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+.modal-h{padding:14px 18px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center}
+.modal-h h3{font-size:15px;color:var(--pri);display:flex;align-items:center;gap:8px}
+.modal-h .close{background:none;border:none;font-size:22px;color:var(--mute);cursor:pointer;line-height:1}
+.modal-b{padding:16px 18px}
+.modal-f{padding:12px 18px;border-top:1px solid var(--bdr);display:flex;gap:8px;justify-content:flex-end}
+
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.fld label .req{color:var(--err)}
+.fld input,.fld select,.fld textarea{width:100%;padding:7px 9px;border:1.5px solid var(--bdr);border-radius:5px;font-size:12.5px;font-family:inherit}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--pri)}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fld .hint{font-size:10px;color:var(--mute);margin-top:3px}
+
+.radio-group{display:flex;gap:8px}
+.radio-group label{display:flex;flex:1;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border:1.5px solid var(--bdr);border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;background:#f8fafc;transition:all .15s}
+.radio-group label:hover{border-color:var(--pri)}
+.radio-group input{display:none}
+.radio-group input:checked + .lbl-content{}
+.radio-group label:has(input:checked){background:var(--pri);color:#fff;border-color:var(--pri)}
+.radio-group label[data-type="in"]:has(input:checked){background:var(--in);border-color:var(--in)}
+.radio-group label[data-type="out"]:has(input:checked){background:var(--out);border-color:var(--out)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pri);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:200;display:none}
+
+/* LOADING */
+.loading{text-align:center;padding:30px;color:var(--mute)}
+.spinner{width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--pri);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PRINT */
+@media print{
+  body{background:#fff}
+  .top,.sidebar,.action-bar,.no-print,.tabs,.unit-header .badge-actions{display:none !important}
+  .layout{display:block}
+  .main{padding:0}
+  .unit-header{box-shadow:none;border:none;border-bottom:2px solid #000;page-break-after:avoid}
+  .tbl-wrap{border:none}
+  table.data thead{position:static}
+  table.data{font-size:10pt}
+  .kpis{margin-bottom:8px}
+  .kpi{border:1px solid #aaa;box-shadow:none}
+  @page{size:A4;margin:15mm}
+}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:relative;top:auto;height:auto;max-height:none;border-right:none;border-bottom:1px solid var(--bdr)}
+}
+
+body.in-spkb .top{display:none}
+body.in-spkb .layout{min-height:auto}
+body.in-spkb .sidebar{height:calc(100vh - 20px);top:0}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1><i class="fas fa-money-check-alt"></i> Kewangan & Inventori Unit</h1>
+  <div class="top-r">
+    <select class="year-sel" id="yearSel" onchange="changeYear(this.value)"></select>
+    <button class="btn-top" onclick="window.print()"><i class="fas fa-print"></i> Cetak</button>
+    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-search">
+      <input type="text" id="unitSearch" placeholder="Cari unit…" oninput="filterUnits(this.value)">
+    </div>
+    <div class="sb-info"><i class="fas fa-info-circle"></i>Pilih unit untuk urus kewangan/inventori. Data disimpan tempatan per unit.</div>
+    <div id="unitList"></div>
+  </aside>
+
+  <main class="main" id="mainContent">
+    <div class="welcome">
+      <div class="icon">💰</div>
+      <h2>Kewangan & Inventori Unit Kokurikulum</h2>
+      <p>Rekod transaksi kewangan dan senarai inventori untuk setiap unit. Data disimpan secara tempatan dalam pelayar anda dan boleh dicetak sebagai PDF rasmi untuk audit SK@S.</p>
+      <p style="margin-top:14px;"><i class="fas fa-arrow-left"></i> Pilih unit dari panel kiri untuk mula.</p>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Tambah/Edit Transaksi -->
+<div class="modal-bg" id="modalTransaksi">
+  <div class="modal">
+    <div class="modal-h">
+      <h3><i class="fas fa-receipt"></i> <span id="modalTxTitle">Tambah Transaksi</span></h3>
+      <button class="close" onclick="closeTransModal()">&times;</button>
+    </div>
+    <div class="modal-b">
+      <div class="fld">
+        <label>Jenis Transaksi<span class="req">*</span></label>
+        <div class="radio-group">
+          <label data-type="in"><input type="radio" name="txJenis" value="in" checked><span><i class="fas fa-plus-circle"></i> Terima (Pendapatan)</span></label>
+          <label data-type="out"><input type="radio" name="txJenis" value="out"><span><i class="fas fa-minus-circle"></i> Bayar (Perbelanjaan)</span></label>
+        </div>
+      </div>
+      <div class="fld-row">
+        <div class="fld">
+          <label>Tarikh<span class="req">*</span></label>
+          <input type="date" id="txTarikh">
+        </div>
+        <div class="fld">
+          <label>No. Resit / Baucar</label>
+          <input type="text" id="txResit" placeholder="cth: R001">
+        </div>
+      </div>
+      <div class="fld">
+        <label>Butiran<span class="req">*</span></label>
+        <input type="text" id="txButiran" placeholder="cth: Yuran kokurikulum dari 100 ahli">
+      </div>
+      <div class="fld">
+        <label>Jumlah (RM)<span class="req">*</span></label>
+        <input type="number" id="txJumlah" step="0.01" min="0" placeholder="0.00">
+      </div>
+      <div class="fld">
+        <label>Catatan (Opsyen)</label>
+        <textarea id="txCatatan" rows="2" placeholder="Maklumat tambahan..."></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" onclick="closeTransModal()">Batal</button>
+      <button class="btn btn-pri" onclick="saveTransaksi()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Tambah/Edit Inventori -->
+<div class="modal-bg" id="modalInventori">
+  <div class="modal">
+    <div class="modal-h">
+      <h3><i class="fas fa-box"></i> <span id="modalInvTitle">Tambah Item Inventori</span></h3>
+      <button class="close" onclick="closeInvModal()">&times;</button>
+    </div>
+    <div class="modal-b">
+      <div class="fld">
+        <label>Nama Item<span class="req">*</span></label>
+        <input type="text" id="invNama" placeholder="cth: Gendang Besar / Bola Sepak / Sijil Penyertaan">
+      </div>
+      <div class="fld-row">
+        <div class="fld">
+          <label>Kategori<span class="req">*</span></label>
+          <select id="invKategori">
+            <option value="Peralatan">Peralatan (Aset Tetap)</option>
+            <option value="Bekalan">Bekalan (Habis Pakai)</option>
+            <option value="Pakaian">Pakaian Seragam</option>
+            <option value="Buku">Buku & Bahan Rujukan</option>
+            <option value="Lain">Lain-lain</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Tarikh Perolehan</label>
+          <input type="date" id="invTarikh">
+        </div>
+      </div>
+      <div class="fld-row">
+        <div class="fld">
+          <label>Kuantiti<span class="req">*</span></label>
+          <input type="number" id="invKuantiti" min="1" value="1">
+        </div>
+        <div class="fld">
+          <label>Unit Sukatan</label>
+          <input type="text" id="invUnit" value="unit" placeholder="unit/biji/set/pasang">
+        </div>
+      </div>
+      <div class="fld-row">
+        <div class="fld">
+          <label>Nilai Seunit (RM)</label>
+          <input type="number" id="invNilai" step="0.01" min="0" placeholder="0.00">
+        </div>
+        <div class="fld">
+          <label>Lokasi Simpanan</label>
+          <input type="text" id="invLokasi" placeholder="cth: Stor Unit / Bilik Sukan">
+        </div>
+      </div>
+      <div class="fld">
+        <label>Keadaan<span class="req">*</span></label>
+        <select id="invKeadaan">
+          <option value="Baik">Baik</option>
+          <option value="Servis">Perlu Servis</option>
+          <option value="Rosak">Rosak</option>
+          <option value="Hilang">Hilang</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Tindakan / Catatan</label>
+        <textarea id="invTindakan" rows="2" placeholder="cth: Perlu dihantar untuk servis / Diganti tahun hadapan"></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" onclick="closeInvModal()">Batal</button>
+      <button class="btn btn-pri" onclick="saveInventori()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================================================
+// API & STATE
+// ========================================================
+const STUDENT_API = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+const GURU_API = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+
+let currentYear = new Date().getFullYear();
+let SEKOLAH = {};
+let GURU_DATA = null;
+let UNIT_MAP = {}; // {kod: {kod, nama, kategori}}
+let currentUnit = null;
+let currentTab = 'kewangan'; // 'kewangan' or 'inventori'
+let editingTxId = null;
+let editingInvId = null;
+
+const MEM = {};
+function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).substring(2,7); }
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'err' ? 'var(--err)' : type === 'ok' ? 'var(--ok)' : 'var(--pri)';
+  t.style.display = 'block';
+  setTimeout(()=>{ t.style.display = 'none'; }, 2500);
+}
+
+function rm(n){ return 'RM ' + Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+const BULAN = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+function fmtTarikh(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
+}
+
+// ========================================================
+// FETCH DATA UNIT
+// ========================================================
+async function fetchData(){
+  try {
+    const [s1, s2] = await Promise.all([
+      fetch(GURU_API + '?action=guru_penasihat_all&_t=' + Date.now()).then(r => r.json()).catch(() => null),
+      fetch(GURU_API + '?action=maklumat_sekolah&_t=' + Date.now()).then(r => r.json()).catch(() => null),
+    ]);
+    if(s1 && s1.success && s1.data) GURU_DATA = s1.data;
+    if(s2 && s2.success && s2.data) SEKOLAH = s2.data;
+  } catch(e){}
+
+  // Bina UNIT_MAP
+  UNIT_MAP = {};
+  const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
+  const KAT = {'B':'Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
+  Object.entries(UL).forEach(([kod, [kt, nama]]) => {
+    UNIT_MAP[kod] = { kod, nama, kategori: KAT[kt] || 'Kelab/Persatuan' };
+  });
+  renderSidebar();
+}
+
+// ========================================================
+// SIDEBAR
+// ========================================================
+function renderSidebar(){
+  const units = Object.values(UNIT_MAP).sort((a,b)=>a.kod.localeCompare(b.kod));
+  if(!units.length){
+    document.getElementById('unitList').innerHTML = '<div class="empty" style="padding:20px 14px;"><i class="fas fa-info-circle"></i>Tiada unit dijumpai. Pastikan Data Guru aktif dalam SPKB.</div>';
+    return;
+  }
+  const byKat = { 'Beruniform':[], 'Kelab/Persatuan':[], 'Sukan/Permainan':[] };
+  units.forEach(u => { (byKat[u.kategori] ||= []).push(u); });
+  const ICON = { 'Beruniform':'fa-shield-alt', 'Kelab/Persatuan':'fa-book', 'Sukan/Permainan':'fa-futbol' };
+  let h = '';
+  Object.entries(byKat).forEach(([kat, arr]) => {
+    if(!arr.length) return;
+    h += `<div class="sb-section"><h3><i class="fas ${ICON[kat]}"></i> ${kat} (${arr.length})</h3>`;
+    arr.forEach(u => {
+      const hasData = hasUnitData(u.kod);
+      h += `<div class="unit-item ${hasData?'has-data':''} ${currentUnit===u.kod?'active':''}" data-kod="${u.kod}" data-nama="${u.nama.toLowerCase()}" onclick="selectUnit('${u.kod}')">
+        <span><strong>${u.kod}</strong> · ${u.nama}</span>
+        ${hasData ? '<span class="badge">●</span>' : ''}
+      </div>`;
+    });
+    h += `</div>`;
+  });
+  document.getElementById('unitList').innerHTML = h;
+}
+
+function hasUnitData(kod){
+  const kew = getKewangan(kod);
+  const inv = getInventori(kod);
+  return (kew.length + inv.length) > 0;
+}
+
+function filterUnits(q){
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('.unit-item').forEach(el => {
+    const t = el.dataset.kod.toLowerCase() + ' ' + el.dataset.nama;
+    el.style.display = !q || t.indexOf(q) !== -1 ? 'flex' : 'none';
+  });
+}
+
+// ========================================================
+// STORAGE
+// ========================================================
+function getKewangan(kod){
+  const k = 'kewangan_' + currentYear;
+  try { const all = JSON.parse(sget(k) || '{}'); return all[kod] || []; }
+  catch(e){ return []; }
+}
+function setKewangan(kod, arr){
+  const k = 'kewangan_' + currentYear;
+  try {
+    const all = JSON.parse(sget(k) || '{}');
+    all[kod] = arr;
+    sset(k, JSON.stringify(all));
+  } catch(e){}
+}
+function getInventori(kod){
+  const k = 'inventori_' + currentYear;
+  try { const all = JSON.parse(sget(k) || '{}'); return all[kod] || []; }
+  catch(e){ return []; }
+}
+function setInventori(kod, arr){
+  const k = 'inventori_' + currentYear;
+  try {
+    const all = JSON.parse(sget(k) || '{}');
+    all[kod] = arr;
+    sset(k, JSON.stringify(all));
+  } catch(e){}
+}
+
+// ========================================================
+// SELECT UNIT
+// ========================================================
+function selectUnit(kod){
+  currentUnit = kod;
+  document.querySelectorAll('.unit-item').forEach(el => el.classList.toggle('active', el.dataset.kod === kod));
+  renderMain();
+}
+
+function renderMain(){
+  if(!currentUnit){
+    document.getElementById('mainContent').innerHTML = '<div class="welcome"><div class="icon">💰</div><h2>Pilih unit untuk mula</h2></div>';
+    return;
+  }
+  const u = UNIT_MAP[currentUnit];
+  if(!u) return;
+
+  const kew = getKewangan(currentUnit);
+  const inv = getInventori(currentUnit);
+
+  // Stats kewangan
+  let totIn = 0, totOut = 0;
+  kew.forEach(t => { if(t.jenis === 'in') totIn += t.jumlah; else totOut += t.jumlah; });
+  const baki = totIn - totOut;
+
+  // Stats inventori
+  let totItem = inv.length;
+  let totNilai = inv.reduce((s,i)=>s + (i.kuantiti * i.nilai_seunit), 0);
+  let totRosak = inv.filter(i => ['Rosak','Hilang','Servis'].indexOf(i.keadaan) !== -1).length;
+
+  let h = `<div class="unit-header">
+    <div class="unit-info">
+      <h2><i class="fas fa-${u.kategori==='Beruniform'?'shield-alt':u.kategori==='Sukan/Permainan'?'futbol':'book'}"></i> ${u.kod} · ${u.nama}</h2>
+      <div class="meta">
+        <span><i class="fas fa-tags"></i>${u.kategori}</span> &nbsp;&middot;&nbsp;
+        <span><i class="fas fa-calendar"></i>Sesi ${currentYear}</span>
+        <span class="ev-tag" title="Evidens SK@S 3.2 - Buku Tunai & Inventori">3.2.1 b</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab ${currentTab==='kewangan'?'active':''}" onclick="switchTab('kewangan')"><i class="fas fa-money-bill-wave"></i> Kewangan / Buku Tunai</button>
+    <button class="tab ${currentTab==='inventori'?'active':''}" onclick="switchTab('inventori')"><i class="fas fa-boxes"></i> Inventori</button>
+  </div>`;
+
+  if(currentTab === 'kewangan'){
+    h += `<div class="kpis">
+      <div class="kpi in"><div class="v">${rm(totIn)}</div><div class="l">Jumlah Terima</div></div>
+      <div class="kpi out"><div class="v">${rm(totOut)}</div><div class="l">Jumlah Bayar</div></div>
+      <div class="kpi baki ${baki<0?'warn':''}"><div class="v">${rm(baki)}</div><div class="l">Baki Semasa</div></div>
+      <div class="kpi"><div class="v">${kew.length}</div><div class="l">Rekod Transaksi</div></div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-pri" onclick="openTransModal()"><i class="fas fa-plus"></i> Tambah Transaksi</button>
+      <button class="btn btn-outline btn-sm" onclick="exportKewanganCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+      <span style="margin-left:auto;font-size:11px;color:var(--mute);"><i class="fas fa-shield-alt"></i> Evidens SK@S 3.2.1 (Buku Tunai Unit)</span>
+    </div>
+
+    <div class="tbl-wrap">${renderKewanganTable(kew)}</div>`;
+  } else {
+    h += `<div class="kpis">
+      <div class="kpi"><div class="v">${totItem}</div><div class="l">Jumlah Item</div></div>
+      <div class="kpi"><div class="v">${rm(totNilai)}</div><div class="l">Total Nilai</div></div>
+      <div class="kpi ${totRosak>0?'warn':''}"><div class="v">${totRosak}</div><div class="l">Rosak/Servis/Hilang</div></div>
+      <div class="kpi"><div class="v">${inv.filter(i=>i.keadaan==='Baik').length}</div><div class="l">Keadaan Baik</div></div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-pri" onclick="openInvModal()"><i class="fas fa-plus"></i> Tambah Item</button>
+      <button class="btn btn-outline btn-sm" onclick="exportInventoriCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+      <span style="margin-left:auto;font-size:11px;color:var(--mute);"><i class="fas fa-shield-alt"></i> Evidens SK@S 3.2.1 (Senarai Inventori Unit)</span>
+    </div>
+
+    <div class="tbl-wrap">${renderInventoriTable(inv)}</div>`;
+  }
+
+  document.getElementById('mainContent').innerHTML = h;
+}
+
+function switchTab(t){
+  currentTab = t;
+  renderMain();
+}
+
+// ========================================================
+// RENDER TABLES
+// ========================================================
+function renderKewanganTable(kew){
+  if(!kew.length){
+    return '<div class="empty"><i class="fas fa-receipt"></i>Tiada transaksi direkod.<br><small>Klik "Tambah Transaksi" untuk mula merekod.</small></div>';
+  }
+  // Sort by tarikh
+  const sorted = [...kew].sort((a,b) => a.tarikh.localeCompare(b.tarikh));
+  let runBaki = 0;
+  let h = `<table class="data"><thead><tr>
+    <th style="width:5%;">#</th>
+    <th style="width:12%;">Tarikh</th>
+    <th>Butiran</th>
+    <th style="width:10%;">Resit#</th>
+    <th style="width:12%;text-align:right;">Terima (RM)</th>
+    <th style="width:12%;text-align:right;">Bayar (RM)</th>
+    <th style="width:13%;text-align:right;">Baki (RM)</th>
+    <th style="width:8%;" class="no-print">Aksi</th>
+  </tr></thead><tbody>`;
+  sorted.forEach((t, i) => {
+    if(t.jenis === 'in') runBaki += t.jumlah;
+    else runBaki -= t.jumlah;
+    h += `<tr class="${t.jenis}">
+      <td>${i+1}</td>
+      <td>${fmtTarikh(t.tarikh)}</td>
+      <td><strong>${t.butiran}</strong>${t.catatan?'<br><small style="color:#666;">'+t.catatan+'</small>':''}</td>
+      <td>${t.resit||'—'}</td>
+      <td class="tx-num in" style="text-align:right;">${t.jenis==='in'?rm(t.jumlah):'—'}</td>
+      <td class="tx-num out" style="text-align:right;">${t.jenis==='out'?rm(t.jumlah):'—'}</td>
+      <td class="tx-num baki" style="text-align:right;">${rm(runBaki)}</td>
+      <td class="no-print"><div class="actions">
+        <button class="ico-btn" onclick="editTrans('${t.id}')" title="Edit"><i class="fas fa-pen"></i></button>
+        <button class="ico-btn del" onclick="deleteTrans('${t.id}')" title="Padam"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`;
+  });
+  h += `</tbody></table>`;
+  return h;
+}
+
+function renderInventoriTable(inv){
+  if(!inv.length){
+    return '<div class="empty"><i class="fas fa-box-open"></i>Tiada item dalam inventori.<br><small>Klik "Tambah Item" untuk mula merekod.</small></div>';
+  }
+  const sorted = [...inv].sort((a,b) => (a.kategori||'').localeCompare(b.kategori||'') || (a.nama||'').localeCompare(b.nama||''));
+  let h = `<table class="data"><thead><tr>
+    <th style="width:5%;">#</th>
+    <th>Nama Item</th>
+    <th style="width:10%;">Kategori</th>
+    <th style="width:8%;text-align:center;">Kuantiti</th>
+    <th style="width:11%;text-align:right;">Nilai (RM)</th>
+    <th style="width:11%;text-align:right;">Jumlah (RM)</th>
+    <th style="width:10%;">Lokasi</th>
+    <th style="width:10%;">Keadaan</th>
+    <th style="width:8%;" class="no-print">Aksi</th>
+  </tr></thead><tbody>`;
+  sorted.forEach((it, i) => {
+    const jumlah = (it.kuantiti||0) * (it.nilai_seunit||0);
+    h += `<tr>
+      <td>${i+1}</td>
+      <td><strong>${it.nama}</strong>${it.tindakan?'<br><small style="color:#666;">'+it.tindakan+'</small>':''}${it.tarikh_perolehan?'<br><small style="color:#888;">Perolehan: '+fmtTarikh(it.tarikh_perolehan)+'</small>':''}</td>
+      <td>${it.kategori}</td>
+      <td style="text-align:center;">${it.kuantiti} ${it.unit||''}</td>
+      <td style="text-align:right;">${rm(it.nilai_seunit)}</td>
+      <td style="text-align:right;font-weight:700;">${rm(jumlah)}</td>
+      <td>${it.lokasi||'—'}</td>
+      <td><span class="badge-kead kead-${it.keadaan}">${it.keadaan}</span></td>
+      <td class="no-print"><div class="actions">
+        <button class="ico-btn" onclick="editInv('${it.id}')" title="Edit"><i class="fas fa-pen"></i></button>
+        <button class="ico-btn del" onclick="deleteInv('${it.id}')" title="Padam"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`;
+  });
+  h += `</tbody></table>`;
+  return h;
+}
+
+// ========================================================
+// MODAL TRANSAKSI
+// ========================================================
+function openTransModal(){
+  editingTxId = null;
+  document.getElementById('modalTxTitle').textContent = 'Tambah Transaksi';
+  document.querySelector('input[name=txJenis][value=in]').checked = true;
+  document.getElementById('txTarikh').value = new Date().toISOString().substring(0,10);
+  document.getElementById('txResit').value = '';
+  document.getElementById('txButiran').value = '';
+  document.getElementById('txJumlah').value = '';
+  document.getElementById('txCatatan').value = '';
+  document.getElementById('modalTransaksi').classList.add('show');
+}
+
+function editTrans(id){
+  const kew = getKewangan(currentUnit);
+  const t = kew.find(x => x.id === id);
+  if(!t) return;
+  editingTxId = id;
+  document.getElementById('modalTxTitle').textContent = 'Edit Transaksi';
+  document.querySelector('input[name=txJenis][value="'+t.jenis+'"]').checked = true;
+  document.getElementById('txTarikh').value = t.tarikh;
+  document.getElementById('txResit').value = t.resit || '';
+  document.getElementById('txButiran').value = t.butiran;
+  document.getElementById('txJumlah').value = t.jumlah;
+  document.getElementById('txCatatan').value = t.catatan || '';
+  document.getElementById('modalTransaksi').classList.add('show');
+}
+
+function closeTransModal(){ document.getElementById('modalTransaksi').classList.remove('show'); }
+
+function saveTransaksi(){
+  const jenis = document.querySelector('input[name=txJenis]:checked').value;
+  const tarikh = document.getElementById('txTarikh').value;
+  const butiran = document.getElementById('txButiran').value.trim();
+  const jumlah = parseFloat(document.getElementById('txJumlah').value);
+
+  if(!tarikh || !butiran || !jumlah || jumlah <= 0){
+    toast('Sila isi tarikh, butiran dan jumlah (>0).', 'err');
+    return;
+  }
+
+  const tx = {
+    id: editingTxId || uid(),
+    jenis, tarikh, butiran,
+    resit: document.getElementById('txResit').value.trim(),
+    jumlah,
+    catatan: document.getElementById('txCatatan').value.trim()
+  };
+
+  const kew = getKewangan(currentUnit);
+  if(editingTxId){
+    const idx = kew.findIndex(x => x.id === editingTxId);
+    if(idx >= 0) kew[idx] = tx;
+  } else {
+    kew.push(tx);
+  }
+  setKewangan(currentUnit, kew);
+  closeTransModal();
+  renderMain();
+  renderSidebar();
+  toast(editingTxId ? '✅ Transaksi dikemaskini' : '✅ Transaksi ditambah', 'ok');
+}
+
+function deleteTrans(id){
+  if(!confirm('Padam transaksi ini?')) return;
+  const kew = getKewangan(currentUnit).filter(x => x.id !== id);
+  setKewangan(currentUnit, kew);
+  renderMain();
+  renderSidebar();
+  toast('Transaksi dipadam');
+}
+
+// ========================================================
+// MODAL INVENTORI
+// ========================================================
+function openInvModal(){
+  editingInvId = null;
+  document.getElementById('modalInvTitle').textContent = 'Tambah Item Inventori';
+  document.getElementById('invNama').value = '';
+  document.getElementById('invKategori').value = 'Peralatan';
+  document.getElementById('invTarikh').value = new Date().toISOString().substring(0,10);
+  document.getElementById('invKuantiti').value = 1;
+  document.getElementById('invUnit').value = 'unit';
+  document.getElementById('invNilai').value = '';
+  document.getElementById('invLokasi').value = '';
+  document.getElementById('invKeadaan').value = 'Baik';
+  document.getElementById('invTindakan').value = '';
+  document.getElementById('modalInventori').classList.add('show');
+}
+
+function editInv(id){
+  const inv = getInventori(currentUnit);
+  const it = inv.find(x => x.id === id);
+  if(!it) return;
+  editingInvId = id;
+  document.getElementById('modalInvTitle').textContent = 'Edit Item Inventori';
+  document.getElementById('invNama').value = it.nama;
+  document.getElementById('invKategori').value = it.kategori;
+  document.getElementById('invTarikh').value = it.tarikh_perolehan || '';
+  document.getElementById('invKuantiti').value = it.kuantiti;
+  document.getElementById('invUnit').value = it.unit || 'unit';
+  document.getElementById('invNilai').value = it.nilai_seunit;
+  document.getElementById('invLokasi').value = it.lokasi || '';
+  document.getElementById('invKeadaan').value = it.keadaan;
+  document.getElementById('invTindakan').value = it.tindakan || '';
+  document.getElementById('modalInventori').classList.add('show');
+}
+
+function closeInvModal(){ document.getElementById('modalInventori').classList.remove('show'); }
+
+function saveInventori(){
+  const nama = document.getElementById('invNama').value.trim();
+  const kuantiti = parseInt(document.getElementById('invKuantiti').value) || 1;
+
+  if(!nama){
+    toast('Sila isi nama item.', 'err');
+    return;
+  }
+
+  const it = {
+    id: editingInvId || uid(),
+    nama,
+    kategori: document.getElementById('invKategori').value,
+    tarikh_perolehan: document.getElementById('invTarikh').value,
+    kuantiti,
+    unit: document.getElementById('invUnit').value.trim() || 'unit',
+    nilai_seunit: parseFloat(document.getElementById('invNilai').value) || 0,
+    lokasi: document.getElementById('invLokasi').value.trim(),
+    keadaan: document.getElementById('invKeadaan').value,
+    tindakan: document.getElementById('invTindakan').value.trim()
+  };
+
+  const inv = getInventori(currentUnit);
+  if(editingInvId){
+    const idx = inv.findIndex(x => x.id === editingInvId);
+    if(idx >= 0) inv[idx] = it;
+  } else {
+    inv.push(it);
+  }
+  setInventori(currentUnit, inv);
+  closeInvModal();
+  renderMain();
+  renderSidebar();
+  toast(editingInvId ? '✅ Item dikemaskini' : '✅ Item ditambah', 'ok');
+}
+
+function deleteInv(id){
+  if(!confirm('Padam item ini dari inventori?')) return;
+  const inv = getInventori(currentUnit).filter(x => x.id !== id);
+  setInventori(currentUnit, inv);
+  renderMain();
+  renderSidebar();
+  toast('Item dipadam');
+}
+
+// ========================================================
+// EXPORT CSV
+// ========================================================
+function exportKewanganCSV(){
+  const u = UNIT_MAP[currentUnit];
+  const kew = getKewangan(currentUnit);
+  if(!kew.length){ toast('Tiada data untuk eksport', 'err'); return; }
+  const sorted = [...kew].sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
+  let runBaki = 0;
+  let csv = 'Bil,Tarikh,Butiran,Resit#,Terima (RM),Bayar (RM),Baki (RM),Catatan\n';
+  sorted.forEach((t,i) => {
+    if(t.jenis==='in') runBaki+=t.jumlah; else runBaki-=t.jumlah;
+    csv += `${i+1},"${t.tarikh}","${(t.butiran||'').replace(/"/g,'""')}","${t.resit||''}",${t.jenis==='in'?t.jumlah:''},${t.jenis==='out'?t.jumlah:''},${runBaki},"${(t.catatan||'').replace(/"/g,'""')}"\n`;
+  });
+  downloadCSV(`Kewangan_${u.kod}_${currentYear}.csv`, csv);
+}
+
+function exportInventoriCSV(){
+  const u = UNIT_MAP[currentUnit];
+  const inv = getInventori(currentUnit);
+  if(!inv.length){ toast('Tiada data untuk eksport', 'err'); return; }
+  let csv = 'Bil,Nama Item,Kategori,Tarikh Perolehan,Kuantiti,Unit,Nilai Seunit (RM),Jumlah (RM),Lokasi,Keadaan,Tindakan\n';
+  inv.forEach((it,i) => {
+    const jumlah = (it.kuantiti||0)*(it.nilai_seunit||0);
+    csv += `${i+1},"${(it.nama||'').replace(/"/g,'""')}","${it.kategori}","${it.tarikh_perolehan||''}",${it.kuantiti||0},"${it.unit||''}",${it.nilai_seunit||0},${jumlah},"${(it.lokasi||'').replace(/"/g,'""')}","${it.keadaan}","${(it.tindakan||'').replace(/"/g,'""')}"\n`;
+  });
+  downloadCSV(`Inventori_${u.kod}_${currentYear}.csv`, csv);
+}
+
+function downloadCSV(filename, content){
+  const blob = new Blob([content], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('✅ Dieksport ke ' + filename, 'ok');
+}
+
+// ========================================================
+// YEAR SELECTOR
+// ========================================================
+function populateYearSelector(){
+  const sel = document.getElementById('yearSel');
+  const now = new Date().getFullYear();
+  let h = '';
+  for(let y = now-2; y <= now+1; y++){
+    h += `<option value="${y}" ${y===currentYear?'selected':''}>Tahun ${y}</option>`;
+  }
+  sel.innerHTML = h;
+}
+
+function changeYear(y){
+  currentYear = parseInt(y);
+  if(currentUnit) renderMain();
+  renderSidebar();
+}
+
+// ========================================================
+// INIT
+// ========================================================
+(async function init(){
+  try{ if(window!==window.top) document.body.classList.add('in-spkb') }catch(e){}
+  populateYearSelector();
+  await fetchData();
+
+  // Close modal on background click
+  document.querySelectorAll('.modal-bg').forEach(bg => {
+    bg.addEventListener('click', e => { if(e.target === bg) bg.classList.remove('show'); });
+  });
+})();
+</script>
+</body>
+</html>
