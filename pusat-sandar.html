@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pusat Sandar & Tetapan — SPKB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60; --warn:#f39c12; --err:#c0392b;
+  --bg:#f4f6f9; --card:#fff; --bdr:#e1e4e8; --mute:#6c7383; --tx:#2c3e50; --sk:#3498db;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+
+.top{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.top h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.top-r{display:flex;align-items:center;gap:10px}
+.btn-top{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-top:hover{background:rgba(255,255,255,0.25)}
+
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:#fff;border-right:1px solid var(--bdr);padding:14px 0;overflow-y:auto;position:sticky;top:0;height:calc(100vh - 60px);max-height:calc(100vh - 60px)}
+.sb-tab{display:flex;align-items:center;gap:9px;padding:10px 18px;font-size:13px;color:var(--tx);cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.sb-tab:hover{background:#f4f6f9;border-left-color:var(--acc)}
+.sb-tab.active{background:#eef4fb;border-left-color:var(--pri);font-weight:700;color:var(--pri)}
+.sb-tab i{width:18px;text-align:center;font-size:14px;color:var(--pri)}
+
+.main{padding:22px 28px;max-width:1100px;margin:0 auto;width:100%}
+.tab-page{display:none}
+.tab-page.active{display:block}
+
+.tab-h{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #f0f0f0}
+.tab-h h2{font-size:20px;color:var(--pri);display:flex;align-items:center;gap:10px}
+.tab-h p{font-size:12px;color:var(--mute);margin-top:4px}
+
+.card{background:#fff;border:1px solid var(--bdr);border-radius:10px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.card h3{font-size:14px;color:var(--pri);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card h3 i{color:var(--acc)}
+.card p{font-size:12.5px;color:#555;line-height:1.6;margin-bottom:8px}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.kpi{background:#f8fafc;border:1px solid var(--bdr);border-radius:7px;padding:12px 14px;text-align:center}
+.kpi .v{font-size:22px;font-weight:800;color:var(--pri);line-height:1.1}
+.kpi .l{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.3px;margin-top:4px}
+.kpi.ok .v{color:var(--ok)}
+.kpi.warn .v{color:var(--warn)}
+.kpi.err .v{color:var(--err)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;font-size:12.5px;cursor:pointer;border:1.5px solid transparent;font-weight:600;text-decoration:none}
+.btn-pri{background:var(--pri);color:#fff}
+.btn-pri:hover{background:var(--pri2)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-ok:hover{background:#229954}
+.btn-acc{background:var(--acc);color:#fff}
+.btn-acc:hover{background:#d35400}
+.btn-err{background:var(--err);color:#fff}
+.btn-outline{background:#fff;color:var(--tx);border-color:var(--bdr)}
+.btn-outline:hover{background:#f4f6f9;border-color:var(--pri)}
+.btn-sm{padding:5px 9px;font-size:11px}
+
+.row-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* HEALTH CHECK */
+.health-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.health-item{background:#f8fafc;border:1px solid var(--bdr);border-radius:6px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.health-item .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#ccc}
+.health-item.ok .status-dot{background:var(--ok)}
+.health-item.err .status-dot{background:var(--err)}
+.health-item.checking .status-dot{background:var(--warn);animation:pulse 1s infinite}
+.health-item .info{flex:1;min-width:0}
+.health-item .name{font-weight:700;font-size:12px}
+.health-item .status{font-size:10.5px;color:var(--mute)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* DATA TABLE */
+table.data-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+table.data-tbl th{background:var(--pri);color:#fff;padding:7px 10px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+table.data-tbl td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
+table.data-tbl tbody tr:hover{background:#f8fafc}
+table.data-tbl .sz{font-family:monospace;color:var(--mute);font-size:11px}
+table.data-tbl .badge-yes{background:var(--ok);color:#fff;font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700}
+table.data-tbl .badge-no{background:#ccc;color:#666;font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700}
+
+/* DROP ZONE */
+.drop-zone{border:2px dashed var(--bdr);border-radius:10px;padding:24px;text-align:center;color:var(--mute);cursor:pointer;transition:all .15s;margin-top:10px}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--pri);background:#f4f6f9;color:var(--pri)}
+.drop-zone i{font-size:32px;color:var(--pri);display:block;margin-bottom:8px;opacity:0.6}
+.drop-zone .main-text{font-weight:700;font-size:14px;color:var(--tx);margin-bottom:3px}
+
+/* TOGGLE */
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row .info{flex:1;min-width:0}
+.toggle-row .info .name{font-weight:700;font-size:13px}
+.toggle-row .info .desc{font-size:11px;color:var(--mute);margin-top:2px}
+.toggle{position:relative;display:inline-block;width:40px;height:22px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;cursor:pointer;inset:0;background:#ccc;transition:.2s;border-radius:34px}
+.toggle .slider:before{position:absolute;content:'';height:16px;width:16px;left:3px;bottom:3px;background:#fff;transition:.2s;border-radius:50%}
+.toggle input:checked + .slider{background:var(--ok)}
+.toggle input:checked + .slider:before{transform:translateX(18px)}
+
+/* CODE BLOCK */
+.code-block{background:#1e2a3a;color:#e0e6ed;padding:14px;border-radius:6px;font-family:'Consolas','Monaco',monospace;font-size:11.5px;line-height:1.6;overflow-x:auto;max-height:400px;overflow-y:auto;position:relative;margin:10px 0}
+.code-block .copy-btn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:4px 10px;font-size:11px;border-radius:4px;cursor:pointer}
+.code-block .copy-btn:hover{background:rgba(255,255,255,0.2)}
+.code-block .kw{color:#e67e22;font-weight:700}
+.code-block .str{color:#27ae60}
+.code-block .com{color:#7f8c8d;font-style:italic}
+
+/* FORM */
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;padding:8px 11px;border:1.5px solid var(--bdr);border-radius:6px;font-size:13px;font-family:inherit}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--pri)}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Step list */
+.step-list{counter-reset:step;padding:0;margin:8px 0}
+.step-list li{list-style:none;counter-increment:step;padding:8px 0 8px 38px;position:relative;font-size:12.5px;line-height:1.6}
+.step-list li::before{content:counter(step);position:absolute;left:0;top:8px;background:var(--pri);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+.note{background:#fff8f1;border:1px solid #ffe4b3;border-radius:6px;padding:10px 14px;font-size:12px;color:#7d6608;margin:10px 0}
+.note i{color:var(--acc);margin-right:5px}
+.note.info{background:#eef4fb;border-color:#d4e1f0;color:var(--pri2)}
+.note.info i{color:var(--pri)}
+.note.ok{background:#eafaf1;border-color:#a3e4c4;color:#0e6251}
+.note.ok i{color:var(--ok)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pri);color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:1000;display:none}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:relative;top:auto;height:auto;max-height:none;border-right:none;border-bottom:1px solid var(--bdr)}
+}
+
+body.in-spkb .top{display:none}
+body.in-spkb .layout{min-height:auto}
+body.in-spkb .sidebar{height:calc(100vh - 20px)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1><i class="fas fa-cogs"></i> Pusat Sandar & Tetapan SPKB</h1>
+  <div class="top-r">
+    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-tab active" data-tab="status" onclick="showTab('status')"><i class="fas fa-heart-pulse"></i>Status Sistem</div>
+    <div class="sb-tab" data-tab="sandar" onclick="showTab('sandar')"><i class="fas fa-database"></i>Sandar & Pulihkan</div>
+    <div class="sb-tab" data-tab="cloud" onclick="showTab('cloud')"><i class="fas fa-cloud"></i>Cloud Sync</div>
+    <div class="sb-tab" data-tab="email" onclick="showTab('email')"><i class="fas fa-bell"></i>Notifikasi Email</div>
+    <div class="sb-tab" data-tab="profile" onclick="showTab('profile')"><i class="fas fa-user-cog"></i>Profil & Tetapan</div>
+    <div class="sb-tab" data-tab="bantuan" onclick="showTab('bantuan')"><i class="fas fa-circle-info"></i>Bantuan</div>
+  </aside>
+
+  <main class="main">
+    <!-- TAB: STATUS SISTEM -->
+    <div class="tab-page active" id="tab-status">
+      <div class="tab-h">
+        <div>
+          <h2><i class="fas fa-heart-pulse"></i> Status Sistem SPKB</h2>
+          <p>Pantau kesihatan API, saiz data tempatan, dan aktiviti modul</p>
+        </div>
+        <button class="btn btn-pri btn-sm" onclick="runHealthCheck()"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-server"></i> Status API Backend</h3>
+        <p>Sambungan ke Google Apps Script endpoints SPKB.</p>
+        <div class="health-grid" id="apiHealth">
+          <div class="health-item checking"><div class="status-dot"></div><div class="info"><div class="name">STUDENT_API</div><div class="status">Memeriksa…</div></div></div>
+          <div class="health-item checking"><div class="status-dot"></div><div class="info"><div class="name">GURU_API</div><div class="status">Memeriksa…</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-database"></i> Saiz Data Tempatan (localStorage)</h3>
+        <p>Data SPKB yang disimpan dalam pelayar anda. Kuota maksimum biasanya 5–10 MB.</p>
+        <div class="kpis">
+          <div class="kpi" id="kpi-totalKeys"><div class="v">—</div><div class="l">Total Items</div></div>
+          <div class="kpi" id="kpi-totalSize"><div class="v">—</div><div class="l">Saiz Penggunaan</div></div>
+          <div class="kpi ok" id="kpi-spkbKeys"><div class="v">—</div><div class="l">Item SPKB</div></div>
+        </div>
+        <table class="data-tbl" id="storageTable"><thead><tr><th>Modul</th><th>Kunci Storan</th><th>Saiz</th><th>Status</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- TAB: SANDAR -->
+    <div class="tab-page" id="tab-sandar">
+      <div class="tab-h">
+        <div>
+          <h2><i class="fas fa-database"></i> Sandar & Pulihkan Data</h2>
+          <p>Eksport semua data SPKB ke fail JSON · Import dari fail JSON · Auto-backup tempatan</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-download"></i> Eksport Sandaran</h3>
+        <p>Muat turun semua data SPKB (takwim, kehadiran, instrumen, kewangan, inventori, draf laporan) sebagai satu fail JSON. Simpan fail ini sebagai sandaran luar talian.</p>
+        <div class="row-btns">
+          <button class="btn btn-ok" onclick="exportAllData()"><i class="fas fa-file-export"></i> Eksport Semua Data → JSON</button>
+          <button class="btn btn-outline" onclick="exportSelective()"><i class="fas fa-filter"></i> Eksport Pilihan…</button>
+        </div>
+        <div class="note ok"><i class="fas fa-shield-alt"></i><strong>Disarankan:</strong> Buat sandaran setiap akhir minggu atau sebelum perubahan besar.</div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-upload"></i> Pulihkan dari Fail JSON</h3>
+        <p>Drag-drop atau pilih fail sandaran JSON SPKB untuk pulihkan data.</p>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('jsonFile').click()">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <div class="main-text">Drag fail JSON ke sini, atau klik untuk pilih</div>
+          <div style="font-size:11px;">Hanya fail .json sandaran SPKB diterima</div>
+          <input type="file" id="jsonFile" accept=".json" style="display:none;" onchange="handleFileImport(this.files[0])">
+        </div>
+        <div class="note"><i class="fas fa-exclamation-triangle"></i><strong>Perhatian:</strong> Pulihan akan <em>ganti</em> data sedia ada untuk kunci-kunci yang sama. Sandar dahulu jika ragu-ragu.</div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-history"></i> Auto-Backup Tempatan</h3>
+        <p>Aktifkan auto-backup ke "slot kedua" localStorage. Jika data utama hilang, anda boleh pulihkan dari snapshot terkini.</p>
+        <div class="toggle-row">
+          <div class="info"><div class="name">Aktif Auto-Backup</div><div class="desc">Setiap 30 minit, snapshot data ke <code>spkb_backup_*</code></div></div>
+          <label class="toggle"><input type="checkbox" id="autoBackupToggle" onchange="toggleAutoBackup(this.checked)"><span class="slider"></span></label>
+        </div>
+        <div id="lastBackupInfo" style="font-size:11.5px;color:var(--mute);margin-top:8px;"></div>
+        <div class="row-btns">
+          <button class="btn btn-outline btn-sm" onclick="manualBackup()"><i class="fas fa-camera"></i> Snapshot Sekarang</button>
+          <button class="btn btn-outline btn-sm" onclick="restoreLastBackup()"><i class="fas fa-undo"></i> Pulih dari Snapshot</button>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:#fadbd8;">
+        <h3 style="color:var(--err)"><i class="fas fa-trash"></i> Padam Data</h3>
+        <p>Padam data tempatan per modul (TIDAK BOLEH UNDO). Eksport sandaran dahulu.</p>
+        <div id="moduleResetList"></div>
+      </div>
+    </div>
+
+    <!-- TAB: CLOUD SYNC -->
+    <div class="tab-page" id="tab-cloud">
+      <div class="tab-h">
+        <div>
+          <h2><i class="fas fa-cloud"></i> Cloud Sync (Sync Antara Peranti)</h2>
+          <p>Sync data SPKB ke Google Sheets supaya boleh akses dari mana-mana peranti</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-info-circle"></i> Status Setup</h3>
+        <div id="cloudStatus" class="note info"><i class="fas fa-info-circle"></i><strong>Belum disetup.</strong> Ikuti langkah di bawah untuk aktifkan cloud sync.</div>
+
+        <div class="fld">
+          <label>URL Endpoint Sync (Apps Script Web App)</label>
+          <input type="text" id="syncEndpoint" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveSyncEndpoint()">
+          <div class="hint" style="font-size:11px;color:var(--mute);margin-top:4px;">Salin tampal URL deployment Apps Script yang anda buat (langkah 3 di bawah)</div>
+        </div>
+
+        <div class="row-btns">
+          <button class="btn btn-pri" onclick="testCloudConnection()"><i class="fas fa-wifi"></i> Uji Sambungan</button>
+          <button class="btn btn-ok" onclick="syncPush()" id="syncPushBtn" disabled><i class="fas fa-cloud-upload-alt"></i> Push Semua ke Cloud</button>
+          <button class="btn btn-acc" onclick="syncPull()" id="syncPullBtn" disabled><i class="fas fa-cloud-download-alt"></i> Pull dari Cloud</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-code"></i> Langkah Setup Backend</h3>
+        <ol class="step-list">
+          <li>Buka projek <strong>Google Apps Script</strong> yang menjalankan SPKB (yang ada Code.gs sedia ada).</li>
+          <li>Tambah <strong>fail baharu</strong> dengan nama <code>cloud-sync.gs</code> (File → New → Script File).</li>
+          <li>Salin kod di bawah ke fail itu, kemudian klik <strong>Save (Ctrl+S)</strong>.</li>
+          <li>Klik <strong>Deploy → New deployment</strong> → Pilih <em>"Web app"</em> → Execute as: <em>"Me"</em> → Access: <em>"Anyone"</em> → Deploy.</li>
+          <li>Salin <strong>URL Web App</strong> yang dipaparkan dan tampal ke kotak <em>"URL Endpoint Sync"</em> di atas.</li>
+          <li>Klik <strong>Uji Sambungan</strong> untuk pastikan ia berfungsi.</li>
+        </ol>
+
+        <div class="code-block">
+<button class="copy-btn" onclick="copyToClipboard('cloudSyncCode')"><i class="fas fa-copy"></i> Salin</button>
+<pre id="cloudSyncCode">// ====================================================
+// SPKB CLOUD SYNC — Backend Module
+// Letak fail ini sebagai 'cloud-sync.gs' dalam projek Apps Script
+// ====================================================
+const SYNC_SHEET_NAME = 'spkb_sync';
+
+function doGet(e) {
+  const action = e.parameter.action || '';
+  if (action === 'sync_get_all') return _resp({ success: true, data: _getAllSyncData(e.parameter.user || 'default') });
+  if (action === 'sync_get')     return _resp({ success: true, value: _getSyncValue(e.parameter.user || 'default', e.parameter.key) });
+  if (action === 'sync_ping')    return _resp({ success: true, ts: new Date().toISOString() });
+  return _resp({ success: false, error: 'Unknown action' });
+}
+
+function doPost(e) {
+  try {
+    const body = JSON.parse(e.postData.contents);
+    if (body.action === 'sync_set') {
+      _setSyncValue(body.user || 'default', body.key, body.value);
+      return _resp({ success: true });
+    }
+    if (body.action === 'sync_set_bulk') {
+      const items = body.items || {};
+      Object.keys(items).forEach(k => _setSyncValue(body.user || 'default', k, items[k]));
+      return _resp({ success: true, count: Object.keys(items).length });
+    }
+    return _resp({ success: false, error: 'Unknown action' });
+  } catch (err) {
+    return _resp({ success: false, error: String(err) });
+  }
+}
+
+function _sheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SYNC_SHEET_NAME);
+  if (!sh) {
+    sh = ss.insertSheet(SYNC_SHEET_NAME);
+    sh.appendRow(['user', 'key', 'value', 'updated_at']);
+    sh.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#1e3a5f').setFontColor('#fff');
+  }
+  return sh;
+}
+
+function _getSyncValue(user, key) {
+  const sh = _sheet();
+  const data = sh.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === user && data[i][1] === key) return data[i][2];
+  }
+  return null;
+}
+
+function _getAllSyncData(user) {
+  const sh = _sheet();
+  const data = sh.getDataRange().getValues();
+  const out = {};
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === user) out[data[i][1]] = data[i][2];
+  }
+  return out;
+}
+
+function _setSyncValue(user, key, value) {
+  const sh = _sheet();
+  const data = sh.getDataRange().getValues();
+  const now = new Date().toISOString();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === user && data[i][1] === key) {
+      sh.getRange(i + 1, 3, 1, 2).setValues([[value, now]]);
+      return;
+    }
+  }
+  sh.appendRow([user, key, value, now]);
+}
+
+function _resp(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+        </div>
+
+        <div class="note info"><i class="fas fa-lightbulb"></i><strong>Tip:</strong> Anda boleh guna projek Apps Script yang sama dengan SPKB sedia ada. Apps Script support multiple file dalam satu projek.</div>
+      </div>
+    </div>
+
+    <!-- TAB: EMAIL NOTIFIKASI -->
+    <div class="tab-page" id="tab-email">
+      <div class="tab-h">
+        <div>
+          <h2><i class="fas fa-bell"></i> Notifikasi Email Automatik</h2>
+          <p>Reminder mesyuarat, deadline laporan, audit SK@S — auto-email kepada GPK Kokurikulum</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-cog"></i> Konfigurasi Reminder</h3>
+        <div class="fld">
+          <label>Email Penerima (GPK / Setiausaha)</label>
+          <input type="email" id="emailPenerima" placeholder="gpk.koku@sekolah.edu.my" oninput="saveEmailConfig()">
+        </div>
+        <div class="fld">
+          <label>Tarikh Mesyuarat JK Akan Datang</label>
+          <input type="date" id="emailTarikhMesyuarat" oninput="saveEmailConfig()">
+        </div>
+        <div class="fld">
+          <label>Tarikh Akhir Penghantaran Laporan PAJSK</label>
+          <input type="date" id="emailTarikhPAJSK" oninput="saveEmailConfig()">
+        </div>
+
+        <h4 style="margin-top:14px;font-size:13px;color:var(--pri);">Jenis Reminder Aktif:</h4>
+        <div class="toggle-row">
+          <div class="info"><div class="name">Reminder Mesyuarat JK (5 hari sebelum)</div><div class="desc">Email amaran tentang mesyuarat akan datang</div></div>
+          <label class="toggle"><input type="checkbox" id="reminderMesyuarat" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="info"><div class="name">Reminder Deadline PAJSK (2 minggu sebelum)</div><div class="desc">Amaran tarikh akhir input PAJSK</div></div>
+          <label class="toggle"><input type="checkbox" id="reminderPAJSK" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="info"><div class="name">Reminder Audit SK@S Awal Tahun</div><div class="desc">Amaran setiap Januari untuk semakan evidens</div></div>
+          <label class="toggle"><input type="checkbox" id="reminderAudit" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-code"></i> Langkah Setup Backend Email</h3>
+        <ol class="step-list">
+          <li>Dalam projek Apps Script SPKB, tambah fail baharu <code>email-reminder.gs</code>.</li>
+          <li>Salin kod di bawah ke fail itu.</li>
+          <li>Klik <strong>Triggers</strong> (jam icon) → Add Trigger → Function: <code>sendDailyReminders</code> → Time-driven → Day timer → 7am to 8am.</li>
+          <li>Reminder akan dihantar secara automatik setiap hari pagi.</li>
+        </ol>
+
+        <div class="code-block">
+<button class="copy-btn" onclick="copyToClipboard('emailCode')"><i class="fas fa-copy"></i> Salin</button>
+<pre id="emailCode">// ====================================================
+// SPKB EMAIL REMINDER — Backend Module
+// Letak sebagai 'email-reminder.gs' dalam projek Apps Script SPKB
+// Setup trigger: Daily time-driven, 7am-8am
+// ====================================================
+const REMINDER_CONFIG_SHEET = 'spkb_reminder_config';
+
+function sendDailyReminders() {
+  const cfg = _loadReminderConfig();
+  if (!cfg.email) return;
+
+  const today = new Date();
+  const todayISO = today.toISOString().substring(0, 10);
+
+  // 1. Mesyuarat JK reminder (5 hari sebelum)
+  if (cfg.enabled_mesyuarat && cfg.tarikh_mesyuarat) {
+    const days = _daysBetween(todayISO, cfg.tarikh_mesyuarat);
+    if (days === 5 || days === 1) {
+      MailApp.sendEmail({
+        to: cfg.email,
+        subject: '⏰ Reminder: Mesyuarat JK Kokurikulum ' + (days === 1 ? 'ESOK' : 'dalam 5 hari'),
+        htmlBody: _emailMesyuarat(cfg, days)
+      });
+    }
+  }
+
+  // 2. PAJSK deadline reminder (14 hari sebelum)
+  if (cfg.enabled_pajsk && cfg.tarikh_pajsk) {
+    const days = _daysBetween(todayISO, cfg.tarikh_pajsk);
+    if (days === 14 || days === 7 || days === 3) {
+      MailApp.sendEmail({
+        to: cfg.email,
+        subject: '📊 Reminder: Input PAJSK dalam ' + days + ' hari',
+        htmlBody: _emailPAJSK(cfg, days)
+      });
+    }
+  }
+
+  // 3. Audit SK@S (setiap 1 Januari)
+  if (cfg.enabled_audit && today.getMonth() === 0 && today.getDate() === 5) {
+    MailApp.sendEmail({
+      to: cfg.email,
+      subject: '🔍 Reminder: Semakan Evidens SK@S 3.2 Tahun ' + today.getFullYear(),
+      htmlBody: _emailAudit(cfg)
+    });
+  }
+}
+
+function _loadReminderConfig() {
+  const sh = _getConfigSheet();
+  const data = sh.getDataRange().getValues();
+  const cfg = {};
+  for (let i = 1; i < data.length; i++) cfg[data[i][0]] = data[i][1];
+  return {
+    email: cfg.email || '',
+    tarikh_mesyuarat: cfg.tarikh_mesyuarat || '',
+    tarikh_pajsk: cfg.tarikh_pajsk || '',
+    enabled_mesyuarat: cfg.enabled_mesyuarat !== 'false',
+    enabled_pajsk: cfg.enabled_pajsk !== 'false',
+    enabled_audit: cfg.enabled_audit !== 'false',
+  };
+}
+
+function _getConfigSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(REMINDER_CONFIG_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(REMINDER_CONFIG_SHEET);
+    sh.appendRow(['key', 'value']);
+  }
+  return sh;
+}
+
+function _daysBetween(d1, d2) {
+  const ms = new Date(d2).getTime() - new Date(d1).getTime();
+  return Math.round(ms / 86400000);
+}
+
+function _emailMesyuarat(cfg, days) {
+  return '&lt;h2&gt;Reminder Mesyuarat JK Kokurikulum&lt;/h2&gt;' +
+    '&lt;p&gt;Tarikh: &lt;strong&gt;' + cfg.tarikh_mesyuarat + '&lt;/strong&gt;&lt;/p&gt;' +
+    '&lt;p&gt;Sila pastikan: minit lepas tersedia, agenda disahkan, kehadiran AJK dimaklumkan.&lt;/p&gt;' +
+    '&lt;p&gt;Gunakan Modul Generator Dokumen SPKB untuk auto-jana template minit.&lt;/p&gt;';
+}
+
+function _emailPAJSK(cfg, days) {
+  return '&lt;h2&gt;Reminder Input PAJSK&lt;/h2&gt;' +
+    '&lt;p&gt;Deadline: &lt;strong&gt;' + cfg.tarikh_pajsk + '&lt;/strong&gt;&lt;/p&gt;' +
+    '&lt;p&gt;Tindakan: semak Modul Kehadiran SPKB, pastikan semua perjumpaan direkod, jana Laporan Akhir Tahun.&lt;/p&gt;';
+}
+
+function _emailAudit(cfg) {
+  return '&lt;h2&gt;Reminder Audit SK@S 3.2&lt;/h2&gt;' +
+    '&lt;p&gt;Awal tahun baharu — semak status evidens 7 aspek dalam Modul Instrumen SKPMg2 3.2.&lt;/p&gt;' +
+    '&lt;p&gt;Gunakan Auto-Padan SK@S untuk pautkan fail Google Drive ke evidens.&lt;/p&gt;';
+}
+
+// Test function — boleh run untuk hantar email ujian
+function testSendReminder() {
+  const cfg = _loadReminderConfig();
+  if (cfg.email) {
+    MailApp.sendEmail({ to: cfg.email, subject: 'SPKB Reminder Test', body: 'Sistem reminder berfungsi!' });
+  }
+}</pre>
+        </div>
+
+        <div class="row-btns">
+          <button class="btn btn-pri" onclick="syncReminderConfig()"><i class="fas fa-sync"></i> Sync Konfigurasi ke Cloud</button>
+        </div>
+        <div class="note info"><i class="fas fa-lightbulb"></i>Konfigurasi reminder disimpan di Google Sheets selepas Cloud Sync diaktifkan.</div>
+      </div>
+    </div>
+
+    <!-- TAB: PROFIL -->
+    <div class="tab-page" id="tab-profile">
+      <div class="tab-h">
+        <div>
+          <h2><i class="fas fa-user-cog"></i> Profil Pengguna & Tetapan</h2>
+          <p>Maklumat pengguna SPKB · Keutamaan paparan · Reset penuh</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-id-card"></i> Profil Anda</h3>
+        <div class="fld-row">
+          <div class="fld">
+            <label>Nama Penuh</label>
+            <input type="text" id="profNama" oninput="saveProfile()">
+          </div>
+          <div class="fld">
+            <label>Jawatan</label>
+            <select id="profJawatan" onchange="saveProfile()">
+              <option value="">— Pilih —</option>
+              <option value="Pengetua">Pengetua</option>
+              <option value="GPK Kokurikulum">GPK Kokurikulum</option>
+              <option value="Setiausaha Kokurikulum">Setiausaha Kokurikulum</option>
+              <option value="Penyelaras Beruniform">Penyelaras Beruniform</option>
+              <option value="Penyelaras Kelab">Penyelaras Kelab/Persatuan</option>
+              <option value="Penyelaras Sukan">Penyelaras Sukan/Permainan</option>
+              <option value="Guru Penasihat">Guru Penasihat</option>
+            </select>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Email</label>
+          <input type="email" id="profEmail" placeholder="anda@sekolah.edu.my" oninput="saveProfile()">
+        </div>
+        <div class="note info"><i class="fas fa-info-circle"></i>Maklumat ini disimpan dalam pelayar anda sahaja. Akan digunakan untuk auto-isi dokumen dijana.</div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-paint-brush"></i> Tetapan Paparan</h3>
+        <div class="toggle-row">
+          <div class="info"><div class="name">Mod Gelap (Coming Soon)</div><div class="desc">Tukar tema ke mod gelap untuk kerja malam</div></div>
+          <label class="toggle"><input type="checkbox" disabled><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="info"><div class="name">Auto-refresh Data API</div><div class="desc">Refresh data setiap 5 minit secara automatik</div></div>
+          <label class="toggle"><input type="checkbox" id="autoRefreshToggle" onchange="saveSetting('autoRefresh', this.checked)"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="info"><div class="name">Tunjuk Tip Permulaan</div><div class="desc">Papar tip & tutorial dalam setiap modul</div></div>
+          <label class="toggle"><input type="checkbox" id="showTipsToggle" checked onchange="saveSetting('showTips', this.checked)"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:#fadbd8;">
+        <h3 style="color:var(--err);"><i class="fas fa-trash-restore"></i> Reset Sistem (BAHAYA)</h3>
+        <p>Padam SEMUA data SPKB dalam pelayar ini. Eksport sandaran dahulu jika perlu.</p>
+        <div class="row-btns">
+          <button class="btn btn-err" onclick="resetAllSPKB()"><i class="fas fa-exclamation-triangle"></i> Padam Semua Data SPKB</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: BANTUAN -->
+    <div class="tab-page" id="tab-bantuan">
+      <div class="tab-h">
+        <div>
+          <h2><i class="fas fa-circle-info"></i> Bantuan & Tentang SPKB</h2>
+          <p>Tutorial ringkas · Soalan lazim · Maklumat sistem</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-rocket"></i> Permulaan Pantas (Workflow Tahunan)</h3>
+        <ol class="step-list">
+          <li><strong>Awal tahun (Januari):</strong> Upload data pelajar & guru ke Google Sheets. Tetapkan Takwim 3-kategori dalam Modul Kehadiran. Jana surat lantikan guru penasihat (Generator Dokumen → Bulk).</li>
+          <li><strong>Setiap minggu:</strong> Rekod kehadiran murid dalam Modul Kehadiran selepas perjumpaan.</li>
+          <li><strong>Setiap bulan:</strong> Update transaksi kewangan & inventori unit. Jana Laporan KOKUM Bulanan dari Generator.</li>
+          <li><strong>Setiap fasa (Mac, Julai, Oktober):</strong> Update evidens SK@S 3.2 dalam Modul Instrumen.</li>
+          <li><strong>Akhir tahun (November):</strong> Jana Laporan Akhir Tahun PDF. Eksport sandaran ke JSON. Hantar laporan ke PPD/JPN.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-question-circle"></i> Soalan Lazim</h3>
+        <details style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><summary style="cursor:pointer;font-weight:700;color:var(--pri);">Adakah data saya selamat?</summary><div style="padding:8px 0;font-size:12.5px;color:#555;">Data localStorage disimpan dalam pelayar anda sahaja. Tidak dihantar ke mana-mana server tanpa kebenaran. Untuk perkongsian/sandaran, gunakan Eksport JSON atau aktifkan Cloud Sync.</div></details>
+        <details style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><summary style="cursor:pointer;font-weight:700;color:var(--pri);">Bagaimana jika saya tukar pelayar/komputer?</summary><div style="padding:8px 0;font-size:12.5px;color:#555;">Eksport sandaran JSON dari komputer lama, kemudian Import dalam komputer baharu. Atau aktifkan Cloud Sync untuk auto-sync.</div></details>
+        <details style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><summary style="cursor:pointer;font-weight:700;color:var(--pri);">Berapa banyak data boleh disimpan?</summary><div style="padding:8px 0;font-size:12.5px;color:#555;">localStorage biasanya benarkan ~5MB-10MB per domain. Untuk SPKB ini cukup untuk 5-10 tahun rekod. Sila pantau saiz di tab Status Sistem.</div></details>
+        <details style="padding:8px 0;"><summary style="cursor:pointer;font-weight:700;color:var(--pri);">Bagaimana auditor PPD nak akses?</summary><div style="padding:8px 0;font-size:12.5px;color:#555;">Buka SPKB di komputer anda → tunjuk modul yang relevan (Buku Pengurusan, Instrumen SK@S, Laporan Akhir Tahun). Atau eksport PDF terlebih dahulu dari setiap modul.</div></details>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-info-circle"></i> Tentang SPKB</h3>
+        <table class="data-tbl">
+          <tr><td><strong>Nama Sistem</strong></td><td>Sistem Pengurusan Kokurikulum Bersepadu (SPKB)</td></tr>
+          <tr><td><strong>Versi</strong></td><td>1.0 — Final Release (Fasa A → D)</td></tr>
+          <tr><td><strong>Modul Aktif</strong></td><td>8 modul utama + Pusat Sandar</td></tr>
+          <tr><td><strong>Berasaskan</strong></td><td>SKPMg2 Standard 3.2 Edisi 2026 · PAJSK Kebangsaan</td></tr>
+          <tr><td><strong>Platform</strong></td><td>Google Apps Script + Google Sheets + HTML/JS</td></tr>
+          <tr><td><strong>Pelayar Disokong</strong></td><td>Chrome, Edge, Safari, Firefox (terkini)</td></tr>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================================================
+// API & STATE
+// ========================================================
+const STUDENT_API = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+const GURU_API = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+
+const MEM = {};
+function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
+function sdel(k){try{localStorage.removeItem(k)}catch(e){delete MEM[k]}}
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'err' ? 'var(--err)' : type === 'ok' ? 'var(--ok)' : 'var(--pri)';
+  t.style.display = 'block';
+  setTimeout(()=>{ t.style.display = 'none'; }, 2500);
+}
+
+function fmtBytes(b){
+  if(b < 1024) return b + ' B';
+  if(b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(2) + ' MB';
+}
+
+// SPKB key prefixes - data milik kita
+const SPKB_PREFIXES = ['takwim_','kehadiran_','instrumen32_','kewangan_','inventori_','lat_','spkb_'];
+const MODULE_MAP = {
+  'takwim_': { name:'Takwim Kokurikulum', icon:'fa-calendar' },
+  'kehadiran_': { name:'Modul Kehadiran', icon:'fa-clipboard-check' },
+  'instrumen32_': { name:'Instrumen SKPMg2 3.2', icon:'fa-stamp' },
+  'kewangan_': { name:'Kewangan Unit', icon:'fa-money-check-alt' },
+  'inventori_': { name:'Inventori Unit', icon:'fa-boxes' },
+  'lat_': { name:'Laporan Akhir Tahun', icon:'fa-file-pdf' },
+  'spkb_': { name:'Tetapan SPKB', icon:'fa-cog' },
+};
+
+function getAllSPKBKeys(){
+  const keys = [];
+  try {
+    for(let i=0; i<localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(SPKB_PREFIXES.some(p => k.indexOf(p) === 0)) keys.push(k);
+    }
+  } catch(e){}
+  return keys;
+}
+
+function getKeyModule(key){
+  for(const pfx in MODULE_MAP){
+    if(key.indexOf(pfx) === 0) return { prefix:pfx, ...MODULE_MAP[pfx] };
+  }
+  return { prefix:'?', name:'Unknown', icon:'fa-question' };
+}
+
+// ========================================================
+// TABS
+// ========================================================
+function showTab(name){
+  document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.toggle('active', p.id === 'tab-'+name));
+  if(name === 'status') runHealthCheck();
+  if(name === 'sandar') updateModuleResetList();
+  if(name === 'cloud') updateCloudStatus();
+  if(name === 'profile') loadProfileForm();
+  if(name === 'email') loadEmailConfig();
+}
+
+// ========================================================
+// HEALTH CHECK
+// ========================================================
+async function runHealthCheck(){
+  const apis = [
+    { name:'STUDENT_API', url:STUDENT_API + '?action=data_pelajar_all' },
+    { name:'GURU_API', url:GURU_API + '?action=maklumat_sekolah' },
+  ];
+  const cont = document.getElementById('apiHealth');
+  cont.innerHTML = apis.map(a => `<div class="health-item checking" data-name="${a.name}"><div class="status-dot"></div><div class="info"><div class="name">${a.name}</div><div class="status">Memeriksa…</div></div></div>`).join('');
+
+  for(const a of apis){
+    const t0 = Date.now();
+    try {
+      const r = await fetch(a.url + '&_t=' + Date.now());
+      const j = await r.json();
+      const ms = Date.now() - t0;
+      const ok = !!(j && j.success);
+      const el = cont.querySelector(`[data-name="${a.name}"]`);
+      el.classList.remove('checking');
+      el.classList.add(ok?'ok':'err');
+      el.querySelector('.status').textContent = ok ? `OK · ${ms}ms` : 'Gagal: ' + (j && j.error || 'No response');
+    } catch(e){
+      const el = cont.querySelector(`[data-name="${a.name}"]`);
+      el.classList.remove('checking');
+      el.classList.add('err');
+      el.querySelector('.status').textContent = 'Tidak dapat sambung';
+    }
+  }
+
+  // Storage info
+  let totalSize = 0, totalKeys = 0, spkbKeys = 0;
+  try {
+    for(let i=0; i<localStorage.length; i++){
+      const k = localStorage.key(i);
+      const v = localStorage.getItem(k) || '';
+      totalSize += (k.length + v.length) * 2;
+      totalKeys++;
+      if(SPKB_PREFIXES.some(p => k.indexOf(p) === 0)) spkbKeys++;
+    }
+  } catch(e){}
+
+  document.querySelector('#kpi-totalKeys .v').textContent = totalKeys;
+  document.querySelector('#kpi-totalSize .v').textContent = fmtBytes(totalSize);
+  document.querySelector('#kpi-spkbKeys .v').textContent = spkbKeys;
+
+  // Group by module
+  const byModule = {};
+  getAllSPKBKeys().forEach(k => {
+    const m = getKeyModule(k);
+    if(!byModule[m.prefix]) byModule[m.prefix] = { name:m.name, icon:m.icon, keys:[], size:0 };
+    const v = sget(k) || '';
+    byModule[m.prefix].keys.push(k);
+    byModule[m.prefix].size += (k.length + v.length) * 2;
+  });
+  let h = '';
+  Object.values(MODULE_MAP).forEach(m => {
+    const pfx = Object.keys(MODULE_MAP).find(p => MODULE_MAP[p] === m);
+    const d = byModule[pfx] || { keys:[], size:0 };
+    h += `<tr><td><i class="fas ${m.icon}" style="color:var(--pri);margin-right:6px;"></i><strong>${m.name}</strong></td><td class="sz">${d.keys.length} item${d.keys.length>1?'s':''}</td><td class="sz">${fmtBytes(d.size)}</td><td>${d.keys.length ? '<span class="badge-yes">ADA DATA</span>' : '<span class="badge-no">KOSONG</span>'}</td></tr>`;
+  });
+  document.querySelector('#storageTable tbody').innerHTML = h;
+}
+
+// ========================================================
+// EXPORT / IMPORT
+// ========================================================
+function exportAllData(){
+  const keys = getAllSPKBKeys();
+  if(!keys.length){ toast('Tiada data SPKB untuk dieksport', 'err'); return; }
+
+  const data = {};
+  keys.forEach(k => { data[k] = sget(k); });
+
+  const backup = {
+    spkb_version: '1.0',
+    exported_at: new Date().toISOString(),
+    total_keys: keys.length,
+    data: data
+  };
+
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().substring(0,19).replace(/[:T]/g,'-');
+  a.href = url; a.download = `spkb_backup_${ts}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  toast(`✅ ${keys.length} item dieksport ke fail JSON`, 'ok');
+}
+
+function exportSelective(){
+  const opts = Object.keys(MODULE_MAP).map(p => MODULE_MAP[p].name);
+  alert('Fungsi eksport pilihan: gunakan butang "Eksport Semua Data" buat masa ini. Eksport per-modul akan ditambah dalam versi seterusnya.');
+}
+
+function handleFileImport(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const backup = JSON.parse(e.target.result);
+      if(!backup.data || !backup.spkb_version){
+        toast('Format fail JSON tidak sah untuk SPKB', 'err');
+        return;
+      }
+      const keys = Object.keys(backup.data);
+      if(!confirm(`Pulihkan ${keys.length} item dari sandaran ini?\n\nDieksport pada: ${backup.exported_at}\n\nData sedia ada untuk kunci yang sama AKAN DIGANTI.`)) return;
+      keys.forEach(k => { sset(k, backup.data[k]); });
+      toast(`✅ ${keys.length} item dipulihkan`, 'ok');
+      runHealthCheck();
+    } catch(err){
+      toast('Ralat parse JSON: ' + err.message, 'err');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Drag-drop wiring
+(function(){
+  const dz = document.getElementById('dropZone');
+  if(!dz) return;
+  ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('dragover'); }));
+  dz.addEventListener('drop', e => {
+    if(e.dataTransfer.files.length) handleFileImport(e.dataTransfer.files[0]);
+  });
+})();
+
+// ========================================================
+// AUTO-BACKUP
+// ========================================================
+let autoBackupTimer = null;
+
+function loadAutoBackupState(){
+  const on = sget('spkb_autobackup') === '1';
+  document.getElementById('autoBackupToggle').checked = on;
+  if(on) startAutoBackup();
+  showLastBackupInfo();
+}
+
+function toggleAutoBackup(on){
+  sset('spkb_autobackup', on?'1':'0');
+  if(on){ startAutoBackup(); manualBackup(); toast('Auto-backup aktif', 'ok'); }
+  else { stopAutoBackup(); toast('Auto-backup dimatikan'); }
+}
+
+function startAutoBackup(){
+  stopAutoBackup();
+  autoBackupTimer = setInterval(manualBackup, 30 * 60 * 1000); // 30 min
+}
+function stopAutoBackup(){ if(autoBackupTimer) clearInterval(autoBackupTimer); }
+
+function manualBackup(){
+  const keys = getAllSPKBKeys().filter(k => k.indexOf('spkb_backup_') !== 0); // jangan backup the backups
+  const data = {};
+  keys.forEach(k => data[k] = sget(k));
+  const snapshot = {
+    ts: new Date().toISOString(),
+    count: keys.length,
+    data
+  };
+  sset('spkb_backup_snapshot', JSON.stringify(snapshot));
+  showLastBackupInfo();
+}
+
+function showLastBackupInfo(){
+  const raw = sget('spkb_backup_snapshot');
+  if(!raw){ document.getElementById('lastBackupInfo').textContent = 'Belum ada snapshot.'; return; }
+  try {
+    const s = JSON.parse(raw);
+    const d = new Date(s.ts);
+    document.getElementById('lastBackupInfo').innerHTML = `Snapshot terakhir: <strong>${d.toLocaleString('ms-MY')}</strong> · ${s.count} item`;
+  } catch(e){}
+}
+
+function restoreLastBackup(){
+  const raw = sget('spkb_backup_snapshot');
+  if(!raw){ toast('Tiada snapshot', 'err'); return; }
+  try {
+    const s = JSON.parse(raw);
+    if(!confirm(`Pulihkan ${s.count} item dari snapshot ${new Date(s.ts).toLocaleString('ms-MY')}?\n\nData semasa akan diganti.`)) return;
+    Object.keys(s.data).forEach(k => sset(k, s.data[k]));
+    toast(`✅ ${s.count} item dipulihkan`, 'ok');
+    runHealthCheck();
+  } catch(e){ toast('Ralat: ' + e.message, 'err'); }
+}
+
+// ========================================================
+// MODULE RESET
+// ========================================================
+function updateModuleResetList(){
+  const cont = document.getElementById('moduleResetList');
+  if(!cont) return;
+  let h = '';
+  Object.entries(MODULE_MAP).forEach(([pfx, m]) => {
+    if(pfx === 'spkb_') return; // skip settings
+    const count = getAllSPKBKeys().filter(k => k.indexOf(pfx) === 0).length;
+    h += `<div class="toggle-row">
+      <div class="info"><div class="name"><i class="fas ${m.icon}"></i> ${m.name}</div><div class="desc">${count} item disimpan</div></div>
+      <button class="btn btn-outline btn-sm" style="border-color:var(--err);color:var(--err);" onclick="resetModule('${pfx}', '${m.name}')" ${count===0?'disabled':''}><i class="fas fa-trash"></i> Padam</button>
+    </div>`;
+  });
+  cont.innerHTML = h;
+}
+
+function resetModule(pfx, name){
+  const keys = getAllSPKBKeys().filter(k => k.indexOf(pfx) === 0);
+  if(!confirm(`Padam ${keys.length} item dari modul "${name}"?\n\nTIDAK BOLEH UNDO. Eksport sandaran dahulu jika perlu.`)) return;
+  keys.forEach(k => sdel(k));
+  updateModuleResetList();
+  runHealthCheck();
+  toast(`${keys.length} item dipadam`);
+}
+
+function resetAllSPKB(){
+  if(!confirm('PADAM SEMUA DATA SPKB?\n\nINI AKAN MEMADAM:\n• Takwim\n• Kehadiran\n• Instrumen SK@S\n• Kewangan & Inventori\n• Draf Laporan\n• Tetapan\n\nTIDAK BOLEH UNDO.')) return;
+  if(!confirm('Anda PASTI nak padam semua? Pastikan dah eksport sandaran!')) return;
+  getAllSPKBKeys().forEach(k => sdel(k));
+  toast('Semua data SPKB dipadam');
+  setTimeout(() => location.reload(), 1500);
+}
+
+// ========================================================
+// CLOUD SYNC
+// ========================================================
+function saveSyncEndpoint(){
+  sset('spkb_sync_endpoint', document.getElementById('syncEndpoint').value.trim());
+}
+
+function updateCloudStatus(){
+  const ep = sget('spkb_sync_endpoint');
+  document.getElementById('syncEndpoint').value = ep || '';
+  const status = document.getElementById('cloudStatus');
+  const pushBtn = document.getElementById('syncPushBtn');
+  const pullBtn = document.getElementById('syncPullBtn');
+  if(ep){
+    status.className = 'note info';
+    status.innerHTML = '<i class="fas fa-link"></i><strong>Endpoint disimpan.</strong> Klik "Uji Sambungan" untuk pastikan ia berfungsi.';
+    pushBtn.disabled = false; pullBtn.disabled = false;
+  } else {
+    status.className = 'note';
+    status.innerHTML = '<i class="fas fa-info-circle"></i><strong>Belum disetup.</strong> Ikuti langkah di bawah untuk aktifkan cloud sync.';
+    pushBtn.disabled = true; pullBtn.disabled = true;
+  }
+}
+
+async function testCloudConnection(){
+  const ep = sget('spkb_sync_endpoint');
+  if(!ep){ toast('Sila isi URL endpoint dahulu', 'err'); return; }
+  toast('Memeriksa sambungan…');
+  try {
+    const r = await fetch(ep + '?action=sync_ping&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success){
+      document.getElementById('cloudStatus').className = 'note ok';
+      document.getElementById('cloudStatus').innerHTML = `<i class="fas fa-check-circle"></i><strong>Sambungan OK!</strong> Backend timestamp: ${j.ts}`;
+      toast('✅ Sambungan berjaya', 'ok');
+    } else {
+      throw new Error(j.error || 'Backend tidak respond');
+    }
+  } catch(e){
+    document.getElementById('cloudStatus').className = 'note';
+    document.getElementById('cloudStatus').style.background = '#fdedec';
+    document.getElementById('cloudStatus').style.borderColor = '#fadbd8';
+    document.getElementById('cloudStatus').innerHTML = '<i class="fas fa-times-circle" style="color:var(--err)"></i><strong>Sambungan gagal:</strong> ' + e.message + '<br><small>Pastikan kod cloud-sync.gs sudah dideploy.</small>';
+    toast('Gagal sambung', 'err');
+  }
+}
+
+async function syncPush(){
+  const ep = sget('spkb_sync_endpoint');
+  if(!ep){ return; }
+  if(!confirm('Push SEMUA data SPKB ke cloud? Data lama di cloud akan ditindih.')) return;
+  const keys = getAllSPKBKeys().filter(k => k.indexOf('spkb_backup_') !== 0);
+  const items = {};
+  keys.forEach(k => items[k] = sget(k));
+  const user = sget('spkb_profile_email') || 'default';
+  toast(`Menghantar ${keys.length} item ke cloud…`);
+  try {
+    const r = await fetch(ep, {
+      method:'POST',
+      body: JSON.stringify({ action:'sync_set_bulk', user, items })
+    });
+    const j = await r.json();
+    if(j.success){
+      sset('spkb_last_push', new Date().toISOString());
+      toast(`✅ ${j.count} item disync ke cloud`, 'ok');
+    } else throw new Error(j.error || 'Gagal');
+  } catch(e){ toast('Push gagal: ' + e.message, 'err'); }
+}
+
+async function syncPull(){
+  const ep = sget('spkb_sync_endpoint');
+  if(!ep){ return; }
+  if(!confirm('Pull data dari cloud? Data lokal akan diganti.')) return;
+  const user = sget('spkb_profile_email') || 'default';
+  toast('Mengambil data dari cloud…');
+  try {
+    const r = await fetch(ep + '?action=sync_get_all&user=' + encodeURIComponent(user) + '&_t=' + Date.now());
+    const j = await r.json();
+    if(j.success && j.data){
+      const items = j.data;
+      const count = Object.keys(items).length;
+      Object.keys(items).forEach(k => sset(k, items[k]));
+      sset('spkb_last_pull', new Date().toISOString());
+      toast(`✅ ${count} item dipulih dari cloud`, 'ok');
+    } else throw new Error(j.error || 'Tiada data');
+  } catch(e){ toast('Pull gagal: ' + e.message, 'err'); }
+}
+
+// ========================================================
+// EMAIL CONFIG
+// ========================================================
+function saveEmailConfig(){
+  const cfg = {
+    email: document.getElementById('emailPenerima').value.trim(),
+    tarikh_mesyuarat: document.getElementById('emailTarikhMesyuarat').value,
+    tarikh_pajsk: document.getElementById('emailTarikhPAJSK').value,
+    enabled_mesyuarat: document.getElementById('reminderMesyuarat').checked,
+    enabled_pajsk: document.getElementById('reminderPAJSK').checked,
+    enabled_audit: document.getElementById('reminderAudit').checked,
+  };
+  sset('spkb_email_config', JSON.stringify(cfg));
+}
+
+function loadEmailConfig(){
+  try {
+    const cfg = JSON.parse(sget('spkb_email_config') || '{}');
+    if(cfg.email) document.getElementById('emailPenerima').value = cfg.email;
+    if(cfg.tarikh_mesyuarat) document.getElementById('emailTarikhMesyuarat').value = cfg.tarikh_mesyuarat;
+    if(cfg.tarikh_pajsk) document.getElementById('emailTarikhPAJSK').value = cfg.tarikh_pajsk;
+    if(cfg.enabled_mesyuarat !== undefined) document.getElementById('reminderMesyuarat').checked = cfg.enabled_mesyuarat;
+    if(cfg.enabled_pajsk !== undefined) document.getElementById('reminderPAJSK').checked = cfg.enabled_pajsk;
+    if(cfg.enabled_audit !== undefined) document.getElementById('reminderAudit').checked = cfg.enabled_audit;
+  } catch(e){}
+}
+
+async function syncReminderConfig(){
+  const ep = sget('spkb_sync_endpoint');
+  if(!ep){ toast('Aktifkan Cloud Sync dahulu', 'err'); return; }
+  // Push reminder config to cloud as one item
+  const cfg = sget('spkb_email_config') || '{}';
+  const user = sget('spkb_profile_email') || 'default';
+  try {
+    const r = await fetch(ep, {
+      method:'POST',
+      body: JSON.stringify({ action:'sync_set', user, key:'spkb_reminder_config', value:cfg })
+    });
+    const j = await r.json();
+    if(j.success) toast('✅ Konfigurasi disync', 'ok');
+    else throw new Error(j.error);
+  } catch(e){ toast('Sync gagal: ' + e.message, 'err'); }
+}
+
+// ========================================================
+// PROFILE
+// ========================================================
+function saveProfile(){
+  const p = {
+    nama: document.getElementById('profNama').value.trim(),
+    jawatan: document.getElementById('profJawatan').value,
+    email: document.getElementById('profEmail').value.trim(),
+  };
+  sset('spkb_profile_nama', p.nama);
+  sset('spkb_profile_jawatan', p.jawatan);
+  sset('spkb_profile_email', p.email);
+}
+
+function loadProfileForm(){
+  document.getElementById('profNama').value = sget('spkb_profile_nama') || '';
+  document.getElementById('profJawatan').value = sget('spkb_profile_jawatan') || '';
+  document.getElementById('profEmail').value = sget('spkb_profile_email') || '';
+  document.getElementById('autoRefreshToggle').checked = sget('spkb_setting_autoRefresh') === '1';
+  document.getElementById('showTipsToggle').checked = sget('spkb_setting_showTips') !== '0';
+}
+
+function saveSetting(key, val){
+  sset('spkb_setting_' + key, val ? '1' : '0');
+}
+
+// ========================================================
+// UTILITY
+// ========================================================
+function copyToClipboard(elId){
+  const text = document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(text).then(() => toast('✅ Disalin ke clipboard', 'ok')).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('✅ Disalin', 'ok');
+  });
+}
+
+// ========================================================
+// INIT
+// ========================================================
+(function init(){
+  try{ if(window!==window.top) document.body.classList.add('in-spkb') }catch(e){}
+  runHealthCheck();
+  loadAutoBackupState();
+  updateModuleResetList();
+})();
+</script>
+</body>
+</html>
