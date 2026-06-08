@@ -1906,6 +1906,11 @@ body.demo-active .main { margin-top: 98px; }
       <span class="nav-text">Pengurusan Kelab/Persatuan</span>
       <span class="badge-nav new">v3</span>
     </a>
+    <a class="nav-item" data-page="takwim">
+      <i class="fas fa-calendar-alt nav-icon"></i>
+      <span class="nav-text">Pengurusan Takwim</span>
+      <span style="background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;margin-left:auto;">BARU</span>
+    </a>
     <a class="nav-item" data-page="kehadiran">
       <i class="fas fa-clipboard-list nav-icon"></i>
       <span class="nav-text">Kehadiran</span>
@@ -2465,53 +2470,21 @@ body.demo-active .main { margin-top: 98px; }
         </div>
       </div>
 
-      <!-- Amaran & Makluman -->
+      <!-- Aktiviti Akan Datang (dari Takwim) -->
       <div class="card">
         <div class="card-header">
-          <h3><i class="fas fa-bell"></i> Amaran & Makluman</h3>
-          <span style="background:var(--danger);color:#fff;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">5 BARU</span>
+          <h3><i class="fas fa-calendar-day"></i> Aktiviti Akan Datang</h3>
+          <span id="aktivitiBadge" style="background:var(--success);color:#fff;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">— BARU</span>
         </div>
-        <div class="card-body">
-          <div class="alert-item">
-            <div class="alert-icon error"><i class="fas fa-exclamation"></i></div>
-            <div class="alert-text">
-              <div class="atitle">32 pelajar kehadiran < 50%</div>
-              <div class="adesc">Perlu hantar surat amaran</div>
-            </div>
-            <div class="alert-time">Hari ini</div>
+        <div class="card-body" id="aktivitiBody" style="max-height:420px;overflow-y:auto;">
+          <div style="text-align:center;padding:20px;color:#7f8c8d;font-size:12px;">
+            <i class="fas fa-spinner fa-spin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--primary);"></i>
+            Memuatkan takwim...
           </div>
-          <div class="alert-item">
-            <div class="alert-icon warn"><i class="fas fa-clock"></i></div>
-            <div class="alert-text">
-              <div class="atitle">Laporan PAJSK Sem 2 belum dihantar</div>
-              <div class="adesc">Tarikh akhir: 31 Mei 2026</div>
-            </div>
-            <div class="alert-time">Hari ini</div>
-          </div>
-          <div class="alert-item">
-            <div class="alert-icon warn"><i class="fas fa-file-alt"></i></div>
-            <div class="alert-text">
-              <div class="atitle">5 guru — minit mesyuarat tertunggak</div>
-              <div class="adesc">Q1 2026</div>
-            </div>
-            <div class="alert-time">Semalam</div>
-          </div>
-          <div class="alert-item">
-            <div class="alert-icon info"><i class="fas fa-info-circle"></i></div>
-            <div class="alert-text">
-              <div class="atitle">Pendaftaran Sukan Daerah dibuka</div>
-              <div class="adesc">Tutup: 25 April 2026</div>
-            </div>
-            <div class="alert-time">2 hari</div>
-          </div>
-          <div class="alert-item">
-            <div class="alert-icon ok"><i class="fas fa-check"></i></div>
-            <div class="alert-text">
-              <div class="atitle">Audit PPD 2026 — lulus</div>
-              <div class="adesc">Laporan rasmi diterima</div>
-            </div>
-            <div class="alert-time">3 hari</div>
-          </div>
+        </div>
+        <div style="padding:8px 14px;border-top:1px solid var(--bdr);background:#f8fafc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+          <span style="font-size:10.5px;color:#7f8c8d;"><i class="fas fa-sync"></i> Auto-pull dari Modul Pengurusan Takwim</span>
+          <a onclick="navigateTo('takwim')" style="font-size:11px;color:var(--primary);font-weight:700;cursor:pointer;text-decoration:none;">Urus Takwim <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>
     </div>
@@ -3002,6 +2975,68 @@ body.demo-active .main { margin-top: 98px; }
 
   <!-- ============================================================
        END PAGE: PUSAT SANDAR
+       ============================================================ -->
+
+  <!-- ============================================================
+       PAGE: PENGURUSAN TAKWIM (Master Takwim Tahunan)
+       ============================================================ -->
+  <section class="page" id="page-takwim">
+
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Pengurusan Takwim Kokurikulum</span>
+    </div>
+
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <h2><i class="fas fa-calendar-alt"></i> Pengurusan Takwim Kokurikulum (Master)</h2>
+        <p>Pusat pengurusan takwim · Pre-load SMK TK 2026 · Eksport Word · Wizard Tahun Baru · Auto-sync semua modul</p>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.open(TAKWIM_URL,'_blank')">
+          <i class="fas fa-external-link-alt"></i> Tab Baru
+        </button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--primary);">3+2</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Kategori + Events + Cuti</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--success);">23×3</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Perjumpaan SMKTK 2026</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--purple);">WORD</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Eksport Buku Format</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">WIZARD</div>
+        <div style="font-size:10px;color:#7f8c8d;text-transform:uppercase;">Tahun Baru Auto</div>
+      </div>
+    </div>
+
+    <div id="takwim-iframe-wrap" style="width:100%;height:calc(100vh - 280px);min-height:600px;border-radius:12px;overflow:hidden;position:relative;background:#f8fafc;border:1px solid #e0e0e0;">
+      <div id="takwim-iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;background:#f8fafc;">
+        <div style="text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">📅</div>
+          <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:6px;">Pengurusan Takwim Master</h3>
+          <p style="font-size:12px;color:#7f8c8d;max-width:400px;margin:0 auto 16px;line-height:1.5;">
+            Beruniform · Kelab · Sukan · Events · Cuti · Eksport Word · Wizard Tahun Baru
+          </p>
+          <div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+        </div>
+      </div>
+      <iframe id="takwim-iframe" src="" style="width:100%;height:100%;border:none;" onload="this.previousElementSibling.style.display='none';" allow="clipboard-write"></iframe>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       END PAGE: PENGURUSAN TAKWIM
        ============================================================ -->
 
 
@@ -5995,6 +6030,7 @@ const GENERATOR_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/generator-
 const LAPORAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/laporan-akhir-tahun.html';
 const KEWANGAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/kewangan-inventori.html';
 const PUSAT_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pusat-sandar.html';
+const TAKWIM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pengurusan-takwim.html';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
 /* ============================================================
@@ -6147,6 +6183,15 @@ function navigateTo(pageId) {
       var iframe = document.getElementById('pusat-iframe');
       if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
         iframe.src = PUSAT_URL;
+      }
+    }, 100);
+  }
+  if (pageId === 'takwim') {
+    setTimeout(function () {
+      var iframe = document.getElementById('takwim-iframe');
+      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+        var tahun = new Date().getFullYear();
+        iframe.src = TAKWIM_URL + '?tahun=' + tahun;
       }
     }, 100);
   }
@@ -17864,6 +17909,256 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   });
 
   console.log('✅ [TetapanSistem] Modul v1.0 dimuatkan');
+})();
+
+// ============================================================
+// AKTIVITI AKAN DATANG — Auto-pull dari Modul Pengurusan Takwim
+// ============================================================
+(function(){
+  'use strict';
+
+  const KAT_META = {
+    'beruniform':   { lbl:'Beruniform',        icon:'fa-shield-alt',    bg:'#e3f2fd', fg:'#1565c0', alertClass:'info' },
+    'kelab':        { lbl:'Kelab/Persatuan',   icon:'fa-book',          bg:'#e8f5e9', fg:'#2e7d32', alertClass:'ok' },
+    'sukan':        { lbl:'Sukan/Permainan',   icon:'fa-futbol',        bg:'#fff3e0', fg:'#e65100', alertClass:'warn' },
+    'karnival':     { lbl:'Karnival',          icon:'fa-flag',          bg:'#f3e5f5', fg:'#6a1b9a', alertClass:'info' },
+    'mesyuarat':    { lbl:'Mesyuarat',         icon:'fa-users',         bg:'#e1f5fe', fg:'#01579b', alertClass:'info' },
+    'bengkel':      { lbl:'Bengkel',           icon:'fa-chalkboard',    bg:'#e0f2f1', fg:'#00695c', alertClass:'ok' },
+    'pentaksiran':  { lbl:'Pentaksiran',       icon:'fa-pen-fancy',     bg:'#ffebee', fg:'#c62828', alertClass:'error' },
+    'pajsk':        { lbl:'PAJSK',             icon:'fa-clipboard-check',bg:'#fff8e1',fg:'#e65100', alertClass:'warn' },
+    'perhimpunan':  { lbl:'Perhimpunan',       icon:'fa-bullhorn',      bg:'#eceff1', fg:'#37474f', alertClass:'info' },
+    'pendaftaran':  { lbl:'Pendaftaran',       icon:'fa-user-plus',     bg:'#e0f7fa', fg:'#006064', alertClass:'info' },
+    'pelantikan':   { lbl:'Pelantikan',        icon:'fa-handshake',     bg:'#e8f5e9', fg:'#1b5e20', alertClass:'ok' },
+    'rimup':        { lbl:'RIMUP',             icon:'fa-people-arrows', bg:'#ffe0b2', fg:'#bf360c', alertClass:'warn' },
+    'serahan':      { lbl:'Serahan',           icon:'fa-file-import',   bg:'#f3e5f5', fg:'#4a148c', alertClass:'info' },
+    'latihan':      { lbl:'Latihan',           icon:'fa-running',       bg:'#e3f2fd', fg:'#0d47a1', alertClass:'info' },
+    'sukan-event':  { lbl:'Sukan',             icon:'fa-medal',         bg:'#fff3e0', fg:'#e65100', alertClass:'warn' },
+    'kajian':       { lbl:'Kajian',            icon:'fa-poll',          bg:'#eceff1', fg:'#263238', alertClass:'info' },
+    'kem':          { lbl:'Kem',               icon:'fa-campground',    bg:'#e0f2f1', fg:'#004d40', alertClass:'ok' },
+    'malam-bakat':  { lbl:'Malam Bakat',       icon:'fa-star',          bg:'#f3e5f5', fg:'#6a1b9a', alertClass:'info' },
+    'orientasi':    { lbl:'Orientasi',         icon:'fa-rocket',        bg:'#e8f5e9', fg:'#1b5e20', alertClass:'ok' },
+    'pesta':        { lbl:'Pesta',             icon:'fa-gift',          bg:'#fce4ec', fg:'#880e4f', alertClass:'info' },
+    'dialog':       { lbl:'Dialog',            icon:'fa-comments',      bg:'#e1f5fe', fg:'#0277bd', alertClass:'info' },
+    'anugerah':     { lbl:'Anugerah',          icon:'fa-trophy',        bg:'#fff8e1', fg:'#f57f17', alertClass:'warn' },
+    'cuti':         { lbl:'Cuti',              icon:'fa-umbrella-beach',bg:'#fafafa', fg:'#616161', alertClass:'info' },
+  };
+
+  const HARI = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+  const BULAN = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogos','Sep','Okt','Nov','Dis'];
+
+  function toDateOnly(d){
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function daysBetween(today, target){
+    const t1 = toDateOnly(today).getTime();
+    const t2 = toDateOnly(target).getTime();
+    return Math.round((t2 - t1) / 86400000);
+  }
+
+  function relativeLabel(days){
+    if(days === 0) return 'HARI INI';
+    if(days === 1) return 'ESOK';
+    if(days < 0) return Math.abs(days) + ' hari lepas';
+    if(days < 7) return days + ' hari';
+    if(days < 14) return '1 minggu';
+    if(days < 30) return Math.floor(days/7) + ' minggu';
+    if(days < 60) return '1 bulan';
+    if(days < 365) return Math.floor(days/30) + ' bulan';
+    return '> 1 tahun';
+  }
+
+  function fmtTarikh(iso){
+    const d = new Date(iso);
+    return d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function sget(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+
+  function collectActivities(){
+    const today = new Date();
+    const yr = today.getFullYear();
+    // Cuba pelbagai tahun bermula dari yr (jika takwim 2026, dan today 2026)
+    const tryYears = [yr, yr+1, yr-1];
+    let takwim = null;
+    let foundYear = null;
+    for(const y of tryYears){
+      const raw = sget('takwim_' + y);
+      if(raw){
+        try {
+          takwim = JSON.parse(raw);
+          foundYear = y;
+          break;
+        } catch(e){}
+      }
+    }
+    if(!takwim) return { items: [], found: false };
+
+    const items = [];
+
+    // Perjumpaan: Beruniform / Kelab / Sukan
+    ['beruniform','kelab','sukan'].forEach(kat => {
+      const cat = takwim[kat];
+      if(!cat) return;
+      const dates = cat.dates || [];
+      dates.forEach((d, idx) => {
+        const dt = new Date(d);
+        if(isNaN(dt)) return;
+        const days = daysBetween(today, dt);
+        if(days < 0 || days > 60) return; // tunjuk dari hari ini hingga 60 hari
+        const num = idx + 2; // perjumpaan dinomborkan dari 2 (orientasi=1)
+        items.push({
+          tarikh: d,
+          days: days,
+          kat: kat,
+          tajuk: 'Perjumpaan ' + KAT_META[kat].lbl + ' ' + num,
+          subtajuk: HARI[dt.getDay()] + ', ' + fmtTarikh(d),
+          urgent: days <= 1
+        });
+      });
+    });
+
+    // Events
+    (takwim.events || []).forEach(e => {
+      const dt = new Date(e.tarikh);
+      if(isNaN(dt)) return;
+      const days = daysBetween(today, dt);
+      if(days < 0 || days > 60) return;
+      items.push({
+        tarikh: e.tarikh,
+        days: days,
+        kat: e.kategori || 'mesyuarat',
+        tajuk: e.nama,
+        subtajuk: HARI[dt.getDay()] + ', ' + fmtTarikh(e.tarikh) + (e.masa ? ' · ' + e.masa : ''),
+        urgent: days <= 1
+      });
+    });
+
+    // Cuti
+    (takwim.cuti || []).forEach(c => {
+      const dt = new Date(c.tarikh);
+      if(isNaN(dt)) return;
+      const days = daysBetween(today, dt);
+      if(days < 0 || days > 30) return;
+      items.push({
+        tarikh: c.tarikh,
+        days: days,
+        kat: 'cuti',
+        tajuk: c.nama,
+        subtajuk: HARI[dt.getDay()] + ', ' + fmtTarikh(c.tarikh),
+        urgent: false
+      });
+    });
+
+    // Sort by date
+    items.sort((a, b) => a.days - b.days);
+    return { items: items, found: true, year: foundYear };
+  }
+
+  function renderActivities(){
+    const body = document.getElementById('aktivitiBody');
+    const badge = document.getElementById('aktivitiBadge');
+    if(!body) return;
+
+    const result = collectActivities();
+    if(!result.found){
+      body.innerHTML = '<div style="text-align:center;padding:24px 18px;color:#7f8c8d;">'+
+        '<i class="fas fa-calendar-times" style="font-size:32px;color:#bdc3c7;display:block;margin-bottom:10px;"></i>'+
+        '<div style="font-weight:700;color:var(--tx);font-size:13px;margin-bottom:4px;">Takwim Belum Ditetapkan</div>'+
+        '<div style="font-size:11.5px;margin-bottom:12px;">Ke <strong>Pengurusan Takwim</strong> untuk load preset SMK Tinggi Kuching 2026</div>'+
+        '<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" onclick="navigateTo(\'takwim\')"><i class="fas fa-rocket"></i> Set Takwim Sekarang</button>'+
+        '</div>';
+      badge.textContent = '0';
+      badge.style.background = 'var(--mute, #95a5a6)';
+      return;
+    }
+
+    const items = result.items;
+    if(items.length === 0){
+      body.innerHTML = '<div style="text-align:center;padding:24px 18px;color:#7f8c8d;">'+
+        '<i class="fas fa-umbrella-beach" style="font-size:32px;color:var(--success);display:block;margin-bottom:10px;"></i>'+
+        '<div style="font-weight:700;color:var(--tx);font-size:13px;">Tiada Aktiviti dalam 60 Hari Akan Datang</div>'+
+        '<div style="font-size:11.5px;margin-top:4px;">Mungkin masa cuti? Selamat berehat!</div>'+
+        '</div>';
+      badge.textContent = '0';
+      badge.style.background = 'var(--success)';
+      return;
+    }
+
+    // Tunjuk 8 item pertama
+    const showItems = items.slice(0, 8);
+    badge.textContent = items.length + ' AKTIVITI';
+    badge.style.background = items.some(x => x.urgent) ? 'var(--danger)' : 'var(--success)';
+
+    let h = '';
+    showItems.forEach(item => {
+      const meta = KAT_META[item.kat] || KAT_META['mesyuarat'];
+      const rel = relativeLabel(item.days);
+      const urgentStyle = item.urgent ? 'background:linear-gradient(90deg,#fff5f5,#fff);border-left:3px solid var(--danger);' : '';
+      const timeColor = item.urgent ? 'var(--danger)' : (item.days <= 3 ? 'var(--accent)' : '#7f8c8d');
+      h += '<div class="alert-item" style="'+urgentStyle+'transition:all 0.15s;cursor:pointer;" onclick="navigateTo(\'takwim\')">'+
+        '<div class="alert-icon" style="background:'+meta.bg+';color:'+meta.fg+';"><i class="fas '+meta.icon+'"></i></div>'+
+        '<div class="alert-text">'+
+          '<div class="atitle">'+escapeHTML(item.tajuk)+'</div>'+
+          '<div class="adesc">'+escapeHTML(item.subtajuk)+'</div>'+
+        '</div>'+
+        '<div class="alert-time" style="color:'+timeColor+';font-weight:'+(item.urgent?'800':'600')+';">'+rel+'</div>'+
+      '</div>';
+    });
+
+    if(items.length > 8){
+      h += '<div style="text-align:center;padding:8px;font-size:11px;color:#7f8c8d;font-style:italic;">… dan '+(items.length-8)+' aktiviti lain</div>';
+    }
+
+    body.innerHTML = h;
+  }
+
+  function escapeHTML(s){
+    return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  }
+
+  // Hook: render bila dashboard ditunjuk
+  function tryRender(){
+    if(document.getElementById('aktivitiBody')) renderActivities();
+  }
+
+  // Initial render
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', tryRender);
+  } else {
+    setTimeout(tryRender, 200);
+  }
+
+  // Re-render bila navigate ke dashboard
+  const origNavigateTo = window.navigateTo;
+  if(typeof origNavigateTo === 'function'){
+    window.navigateTo = function(pageId){
+      const result = origNavigateTo.apply(this, arguments);
+      if(pageId === 'dashboard' || pageId === 'papan-pemuka' || !pageId){
+        setTimeout(tryRender, 100);
+      }
+      return result;
+    };
+  }
+
+  // Listen storage change (bila modul takwim simpan, dashboard auto-update)
+  window.addEventListener('storage', function(e){
+    if(e.key && e.key.indexOf('takwim_') === 0){
+      tryRender();
+    }
+  });
+
+  // Listen postMessage dari iframe takwim
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.action === 'takwim-updated'){
+      tryRender();
+    }
+  });
+
+  // Refresh setiap 30 saat (untuk tukar "Hari ini" → "Esok" bila lewat malam)
+  setInterval(tryRender, 30000);
+
+  console.log('✅ [AktivitiAkanDatang] Modul v1.0 dimuatkan');
 })();
 
 </script>
