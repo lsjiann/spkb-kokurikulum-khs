@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pengurusan Takwim Kokurikulum — SPKB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60; --warn:#f39c12; --err:#c0392b;
+  --bg:#f4f6f9; --card:#fff; --bdr:#e1e4e8; --mute:#6c7383; --tx:#2c3e50;
+  --beruniform:#2980b9; --kelab:#16a085; --sukan:#e67e22; --event:#9b59b6; --cuti:#c0392b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55}
+
+.top{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.1);position:sticky;top:0;z-index:30}
+.top h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.top-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.year-sel{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+.btn-top{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-top:hover{background:rgba(255,255,255,0.25)}
+.btn-top.primary{background:var(--acc);border-color:var(--acc)}
+
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:#fff;border-right:1px solid var(--bdr);padding:14px 0;overflow-y:auto;position:sticky;top:60px;height:calc(100vh - 60px);max-height:calc(100vh - 60px)}
+.sb-tab{display:flex;align-items:center;gap:9px;padding:10px 18px;font-size:13px;color:var(--tx);cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.sb-tab:hover{background:#f4f6f9;border-left-color:var(--acc)}
+.sb-tab.active{background:#eef4fb;border-left-color:var(--pri);font-weight:700;color:var(--pri)}
+.sb-tab i{width:18px;text-align:center;font-size:14px}
+.sb-tab .count{margin-left:auto;background:#eef4fb;color:var(--pri);font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px}
+.sb-tab.active .count{background:var(--pri);color:#fff}
+
+.sb-divider{height:1px;background:var(--bdr);margin:8px 0}
+.sb-action{padding:8px 14px}
+
+.main{padding:20px 26px;max-width:1200px;margin:0 auto;width:100%}
+.tab-page{display:none}
+.tab-page.active{display:block}
+
+.tab-h{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f0f0f0}
+.tab-h h2{font-size:20px;color:var(--pri);display:flex;align-items:center;gap:10px}
+.tab-h p{font-size:12px;color:var(--mute);margin-top:3px}
+
+.card{background:#fff;border:1px solid var(--bdr);border-radius:10px;padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.card h3{font-size:14px;color:var(--pri);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+
+/* WELCOME */
+.welcome{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#eef4fb,#fff);border-radius:12px;border:1px solid var(--bdr);margin-bottom:14px}
+.welcome .icon{font-size:48px;color:var(--pri);margin-bottom:10px;opacity:0.85}
+.welcome h2{font-size:20px;color:var(--pri);margin-bottom:6px}
+.welcome p{font-size:13px;color:var(--mute);max-width:600px;margin:0 auto 8px}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;text-align:center}
+.kpi .v{font-size:22px;font-weight:800;color:var(--pri);line-height:1.1}
+.kpi .l{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
+.kpi.ok .v{color:var(--ok)}
+.kpi.warn .v{color:var(--warn)}
+.kpi.err .v{color:var(--err)}
+.kpi.beruniform .v{color:var(--beruniform)}
+.kpi.kelab .v{color:var(--kelab)}
+.kpi.sukan .v{color:var(--sukan)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;font-size:12.5px;cursor:pointer;border:1.5px solid transparent;font-weight:600;font-family:inherit}
+.btn-pri{background:var(--pri);color:#fff}
+.btn-pri:hover{background:var(--pri2)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-ok:hover{background:#229954}
+.btn-acc{background:var(--acc);color:#fff}
+.btn-err{background:var(--err);color:#fff}
+.btn-outline{background:#fff;color:var(--tx);border-color:var(--bdr)}
+.btn-outline:hover{background:#f4f6f9;border-color:var(--pri)}
+.btn-sm{padding:5px 9px;font-size:11px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* DATE LIST */
+.date-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-top:10px}
+.date-chip{background:#f8fafc;border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.date-chip .info{flex:1;min-width:0}
+.date-chip .info .d{font-weight:700;color:var(--pri)}
+.date-chip .info .meta{font-size:10px;color:var(--mute)}
+.date-chip .del{background:none;border:none;color:var(--err);cursor:pointer;padding:2px 4px;font-size:11px;opacity:0.5}
+.date-chip .del:hover{opacity:1;background:#fdedec;border-radius:3px}
+.date-chip.beruniform{border-left:3px solid var(--beruniform)}
+.date-chip.kelab{border-left:3px solid var(--kelab)}
+.date-chip.sukan{border-left:3px solid var(--sukan)}
+
+/* ADD FORM */
+.add-form{background:#f8fafc;border:1.5px dashed var(--bdr);border-radius:8px;padding:14px;margin-top:14px}
+.add-form .fld-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
+.fld label{display:block;font-size:10.5px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;padding:7px 9px;border:1.5px solid var(--bdr);border-radius:5px;font-size:12px;font-family:inherit}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--pri)}
+
+/* EVENTS TABLE */
+table.data{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+table.data th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase}
+table.data td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
+table.data tr:hover{background:#f8fafc}
+.badge-kat{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:var(--event);color:#fff}
+.badge-cuti{background:var(--err)}
+.badge-karnival{background:#9b59b6}
+.badge-mesyuarat{background:#3498db}
+.badge-bengkel{background:#16a085}
+.badge-pentaksiran{background:#e74c3c}
+.badge-pajsk{background:var(--warn)}
+.badge-perhimpunan{background:#34495e}
+.badge-pendaftaran{background:#1abc9c}
+.badge-pelantikan{background:#27ae60}
+.badge-rimup{background:#d35400}
+.badge-serahan{background:#8e44ad}
+.badge-latihan{background:#2980b9}
+.badge-sukan{background:#e67e22}
+.badge-kajian{background:#2c3e50}
+.badge-kem{background:#16a085}
+.badge-malam-bakat{background:#9b59b6}
+.badge-orientasi{background:#27ae60}
+.badge-pesta{background:#e74c3c}
+.badge-dialog{background:#3498db}
+.badge-anugerah{background:#f39c12}
+
+/* WORD EXPORT */
+.month-table{margin-bottom:20px;background:#fff;border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
+.month-table .mth-header{background:var(--pri);color:#fff;padding:8px 14px;display:flex;justify-content:space-between;align-items:center}
+.month-table .mth-header h4{font-size:14px}
+.month-table .mth-header .copy-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:4px 10px;font-size:11px;border-radius:4px;cursor:pointer}
+.month-table .mth-header .copy-btn:hover{background:rgba(255,255,255,0.3)}
+.month-table table{width:100%;font-size:11px}
+.month-table table th{padding:5px 7px;background:#f4f6f9;color:var(--tx)}
+.month-table table td{padding:4px 7px;border:1px solid #ddd}
+.month-table table td.t-perjumpaan{background:#fffde7}
+.month-table table td.t-event{background:#fdf2f8}
+.month-table table td.t-cuti{background:#fdedec;color:var(--err)}
+.month-table table td.t-day-rabu{background:#e3f2fd}
+.month-table table td.t-day-khamis{background:#e0f2f1}
+.month-table table td.t-day-sabtu{background:#fff3e0}
+
+/* NOTE */
+.note{background:#fff8f1;border:1px solid #ffe4b3;border-radius:6px;padding:10px 14px;font-size:12px;color:#7d6608;margin:10px 0}
+.note i{color:var(--acc);margin-right:5px}
+.note.info{background:#eef4fb;border-color:#d4e1f0;color:var(--pri2)}
+.note.info i{color:var(--pri)}
+.note.ok{background:#eafaf1;border-color:#a3e4c4;color:#0e6251}
+.note.ok i{color:var(--ok)}
+.note.warn{background:#fff8f1;border-color:#ffe4b3;color:#7d6608}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:10px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+.modal-h{padding:14px 18px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center}
+.modal-h h3{font-size:15px;color:var(--pri);display:flex;align-items:center;gap:8px}
+.modal-h .close{background:none;border:none;font-size:22px;color:var(--mute);cursor:pointer;line-height:1}
+.modal-b{padding:16px 18px}
+.modal-f{padding:12px 18px;border-top:1px solid var(--bdr);display:flex;gap:8px;justify-content:flex-end}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pri);color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:200;display:none}
+
+@media print{
+  body{background:#fff}
+  .top,.sidebar,.no-print,.copy-btn{display:none !important}
+  .layout{display:block}
+  .main{padding:0}
+  .month-table{box-shadow:none;page-break-inside:avoid;margin-bottom:8px}
+  .month-table .mth-header{background:#1e3a5f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:relative;top:auto;height:auto;max-height:none;border-right:none;border-bottom:1px solid var(--bdr)}
+}
+
+body.in-spkb .top{display:none}
+body.in-spkb .layout{min-height:auto}
+body.in-spkb .sidebar{height:calc(100vh - 20px);top:0}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1><i class="fas fa-calendar-alt"></i> Pengurusan Takwim Kokurikulum</h1>
+  <div class="top-r">
+    <select class="year-sel" id="yearSel" onchange="changeYear(this.value)"></select>
+    <button class="btn-top primary" onclick="saveAll()"><i class="fas fa-save"></i> Simpan</button>
+    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-tab active" data-tab="overview" onclick="showTab('overview')"><i class="fas fa-tachometer-alt"></i>Gambaran Keseluruhan</div>
+    <div class="sb-divider"></div>
+    <div class="sb-tab" data-tab="beruniform" onclick="showTab('beruniform')"><i class="fas fa-shield-alt" style="color:var(--beruniform)"></i>Beruniform <span class="count" id="cnt-beruniform">0</span></div>
+    <div class="sb-tab" data-tab="kelab" onclick="showTab('kelab')"><i class="fas fa-book" style="color:var(--kelab)"></i>Kelab/Persatuan <span class="count" id="cnt-kelab">0</span></div>
+    <div class="sb-tab" data-tab="sukan" onclick="showTab('sukan')"><i class="fas fa-futbol" style="color:var(--sukan)"></i>Sukan/Permainan <span class="count" id="cnt-sukan">0</span></div>
+    <div class="sb-divider"></div>
+    <div class="sb-tab" data-tab="events" onclick="showTab('events')"><i class="fas fa-star" style="color:var(--event)"></i>Events Lain <span class="count" id="cnt-events">0</span></div>
+    <div class="sb-tab" data-tab="cuti" onclick="showTab('cuti')"><i class="fas fa-umbrella-beach" style="color:var(--cuti)"></i>Cuti <span class="count" id="cnt-cuti">0</span></div>
+    <div class="sb-divider"></div>
+    <div class="sb-tab" data-tab="word" onclick="showTab('word')"><i class="fas fa-file-word"></i>Eksport Word</div>
+    <div class="sb-tab" data-tab="wizard" onclick="showTab('wizard')"><i class="fas fa-magic"></i>Wizard Tahun Baru</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- TAB: OVERVIEW -->
+    <div class="tab-page active" id="tab-overview">
+      <div class="tab-h">
+        <div><h2><i class="fas fa-tachometer-alt"></i> Gambaran Keseluruhan Takwim <span id="yearDisp">2026</span></h2>
+        <p>Pengurusan takwim master untuk semua modul kokurikulum SPKB</p></div>
+      </div>
+
+      <div class="welcome" id="welcomeBox" style="display:none;">
+        <div class="icon">📅</div>
+        <h2>Belum Ada Takwim Tahun <span class="yearDispInline">2026</span></h2>
+        <p>Klik butang di bawah untuk mula. Anda boleh import data SMK Tinggi Kuching 2026 yang sudah pre-loaded, atau bina dari kosong.</p>
+        <div class="btn-row" style="justify-content:center;">
+          <button class="btn btn-ok" onclick="loadSMKTKPreset()"><i class="fas fa-magic"></i> Load Takwim SMK Tinggi Kuching 2026 (Pre-loaded)</button>
+          <button class="btn btn-outline" onclick="initEmpty()"><i class="fas fa-plus"></i> Bina dari Kosong</button>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi beruniform"><div class="v" id="ov-ber">0</div><div class="l">Beruniform (Rabu)</div></div>
+        <div class="kpi kelab"><div class="v" id="ov-kel">0</div><div class="l">Kelab (Khamis)</div></div>
+        <div class="kpi sukan"><div class="v" id="ov-suk">0</div><div class="l">Sukan (Sabtu)</div></div>
+        <div class="kpi"><div class="v" id="ov-ev">0</div><div class="l">Events Lain</div></div>
+        <div class="kpi"><div class="v" id="ov-ct">0</div><div class="l">Cuti</div></div>
+        <div class="kpi ok"><div class="v" id="ov-jam">0</div><div class="l">Total Jam/Kat</div></div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-info-circle"></i> Status PAJSK</h3>
+        <div id="pajskStatus"></div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-cog"></i> Tetapan Takwim</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+          <div class="fld"><label>Durasi/perjumpaan (minit)</label><input type="number" id="setDurasi" value="90" onchange="saveAll()"></div>
+          <div class="fld"><label>Min. Perjumpaan/tahun</label><input type="number" id="setMinJumpa" value="12" onchange="saveAll()"></div>
+          <div class="fld"><label>Min. Jam/tahun (PAJSK)</label><input type="number" id="setMinJam" value="18" onchange="saveAll()"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-rocket"></i> Tindakan Pantas</h3>
+        <div class="btn-row">
+          <button class="btn btn-ok" onclick="loadSMKTKPreset()"><i class="fas fa-magic"></i> Load SMK Tinggi Kuching 2026</button>
+          <button class="btn btn-outline" onclick="exportJSON()"><i class="fas fa-download"></i> Export JSON</button>
+          <button class="btn btn-outline" onclick="document.getElementById('jsonImport').click()"><i class="fas fa-upload"></i> Import JSON</button>
+          <input type="file" id="jsonImport" accept=".json" style="display:none;" onchange="importJSON(this.files[0])">
+          <button class="btn btn-err" onclick="resetAll()"><i class="fas fa-trash"></i> Reset Semua</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: BERUNIFORM / KELAB / SUKAN (shared) -->
+    <div class="tab-page" id="tab-beruniform"></div>
+    <div class="tab-page" id="tab-kelab"></div>
+    <div class="tab-page" id="tab-sukan"></div>
+
+    <!-- TAB: EVENTS -->
+    <div class="tab-page" id="tab-events"></div>
+
+    <!-- TAB: CUTI -->
+    <div class="tab-page" id="tab-cuti"></div>
+
+    <!-- TAB: WORD EXPORT -->
+    <div class="tab-page" id="tab-word"></div>
+
+    <!-- TAB: WIZARD -->
+    <div class="tab-page" id="tab-wizard"></div>
+
+  </main>
+</div>
+
+<!-- MODAL Add/Edit Event -->
+<div class="modal-bg" id="modalEvent">
+  <div class="modal">
+    <div class="modal-h"><h3><i class="fas fa-star"></i> <span id="evTitle">Tambah Event</span></h3><button class="close" onclick="closeEventModal()">&times;</button></div>
+    <div class="modal-b">
+      <div class="fld" style="margin-bottom:10px;"><label>Tarikh*</label><input type="date" id="evTarikh"></div>
+      <div class="fld" style="margin-bottom:10px;"><label>Kategori</label>
+        <select id="evKategori">
+          <option value="karnival">Karnival</option>
+          <option value="mesyuarat">Mesyuarat</option>
+          <option value="bengkel">Bengkel</option>
+          <option value="pentaksiran">Pentaksiran</option>
+          <option value="pajsk">PAJSK</option>
+          <option value="perhimpunan">Perhimpunan</option>
+          <option value="pendaftaran">Pendaftaran</option>
+          <option value="pelantikan">Pelantikan</option>
+          <option value="rimup">RIMUP</option>
+          <option value="serahan">Serahan</option>
+          <option value="latihan">Latihan</option>
+          <option value="sukan">Sukan</option>
+          <option value="kajian">Kajian</option>
+          <option value="kem">Kem</option>
+          <option value="malam-bakat">Malam Bakat</option>
+          <option value="orientasi">Orientasi</option>
+          <option value="pesta">Pesta</option>
+          <option value="dialog">Dialog</option>
+          <option value="anugerah">Anugerah</option>
+        </select>
+      </div>
+      <div class="fld" style="margin-bottom:10px;"><label>Nama Event*</label><input type="text" id="evNama" placeholder="cth: KARNIVAL BAHASA 2026"></div>
+      <div class="fld" style="margin-bottom:10px;"><label>Masa (opsyen)</label><input type="text" id="evMasa" placeholder="cth: 11:00 - 14:00"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" onclick="closeEventModal()">Batal</button>
+      <button class="btn btn-pri" onclick="saveEvent()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================================================
+// CONFIG
+// ========================================================
+const MEM = {};
+function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='err'?'var(--err)':type==='ok'?'var(--ok)':'var(--pri)';
+  t.style.display = 'block';
+  setTimeout(()=>{ t.style.display='none'; }, 2500);
+}
+
+const HARI = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+const HARI_SHORT = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+const BULAN_FULL = ['JANUARI','FEBRUARI','MAC','APRIL','MEI','JUN','JULAI','OGOS','SEPTEMBER','OKTOBER','NOVEMBER','DISEMBER'];
+const BULAN_SHORT = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogos','Sep','Okt','Nov','Dis'];
+
+let currentYear = new Date().getFullYear();
+let DATA = null;
+let editingEvId = null;
+
+// ========================================================
+// SMK TINGGI KUCHING 2026 PRE-LOAD
+// ========================================================
+const SMKTK_2026 = {
+  source: 'SMK Tinggi Kuching - Buku Pengurusan Kokurikulum 2026',
+  durasi_minit: 90,
+  min_jumpa: 12,
+  min_jam: 18,
+
+  // Beruniform (Rabu) — 23 perjumpaan, numbered 2-24
+  beruniform: {
+    hari: 3,
+    mula: '2026-01-28',
+    tamat: '2026-10-07',
+    dates: ['2026-01-28','2026-02-04','2026-02-11','2026-02-25','2026-03-11','2026-04-01','2026-04-08','2026-04-15','2026-04-22','2026-04-29','2026-06-10','2026-06-17','2026-06-24','2026-07-01','2026-07-08','2026-07-15','2026-07-22','2026-07-29','2026-09-09','2026-09-16','2026-09-23','2026-09-30','2026-10-07']
+  },
+
+  // Kelab/Persatuan (Khamis) — 23 perjumpaan
+  kelab: {
+    hari: 4,
+    mula: '2026-01-29',
+    tamat: '2026-10-08',
+    dates: ['2026-01-29','2026-02-05','2026-02-12','2026-02-26','2026-03-12','2026-04-02','2026-04-09','2026-04-16','2026-04-23','2026-04-30','2026-06-11','2026-06-18','2026-06-25','2026-07-02','2026-07-09','2026-07-16','2026-07-23','2026-07-30','2026-09-10','2026-09-17','2026-09-24','2026-10-01','2026-10-08']
+  },
+
+  // Sukan/Permainan (Sabtu) — 23 perjumpaan
+  sukan: {
+    hari: 6,
+    mula: '2026-01-31',
+    tamat: '2026-10-10',
+    dates: ['2026-01-31','2026-02-07','2026-02-14','2026-02-28','2026-03-14','2026-04-04','2026-04-11','2026-04-18','2026-04-25','2026-05-02','2026-06-13','2026-06-20','2026-06-27','2026-07-04','2026-07-11','2026-07-18','2026-07-25','2026-08-01','2026-09-12','2026-09-19','2026-09-26','2026-10-03','2026-10-10']
+  },
+
+  events: [
+    { tarikh:'2026-01-16', kategori:'orientasi', nama:'Orientasi Kokurikulum', masa:'11:00am - 3:00pm' },
+    { tarikh:'2026-01-19', kategori:'pendaftaran', nama:'Pendaftaran T1 & Peralihan, Semakan Keahlian T2-5 (Aktiviti Gerko 1)' },
+    { tarikh:'2026-01-21', kategori:'bengkel', nama:'Bengkel Pengurusan Kokurikulum 1/26', masa:'11:00-12:30, 1:45-3:15' },
+    { tarikh:'2026-01-27', kategori:'sukan', nama:'Sukantara Olahraga (T1-2)' },
+    { tarikh:'2026-01-28', kategori:'perhimpunan', nama:'Perhimpunan KK' },
+    { tarikh:'2026-01-30', kategori:'pelantikan', nama:'Pengesahan Pelantikan AJK Perkhidmatan Sekolah (PRS/Pengawas/SPBT/Majalah/Koperasi)' },
+    { tarikh:'2026-02-03', kategori:'karnival', nama:'KARNIVAL SUKAN BERMULA' },
+    { tarikh:'2026-02-06', kategori:'rimup', nama:'Hari Koperasi/Keusahawanan + RIMUP Tahun Baru Cina' },
+    { tarikh:'2026-02-09', kategori:'serahan', nama:'Tarikh Serahan Pelan Taktikal Perancangan Strategik Kokurikulum 2026' },
+    { tarikh:'2026-03-10', kategori:'karnival', nama:'KARNIVAL BAHASA 2026' },
+    { tarikh:'2026-03-11', kategori:'karnival', nama:'KARNIVAL SENI 2026' },
+    { tarikh:'2026-03-17', kategori:'karnival', nama:'KARNIVAL STEM 2026' },
+    { tarikh:'2026-04-10', kategori:'mesyuarat', nama:'Mesyuarat Rumah Sukan' },
+    { tarikh:'2026-04-14', kategori:'pajsk', nama:'Tarikh Mula Penilaian PAJSK di EDMS 2026' },
+    { tarikh:'2026-04-14', kategori:'latihan', nama:'Latihan Rumah Sukan Azam/Berani/Cemerlang' },
+    { tarikh:'2026-04-16', kategori:'latihan', nama:'Latihan Rumah Sukan Gigih/Tabah/Yakin' },
+    { tarikh:'2026-04-21', kategori:'latihan', nama:'Latihan Rumah Sukan Azam/Berani/Cemerlang' },
+    { tarikh:'2026-04-23', kategori:'latihan', nama:'Latihan Rumah Sukan Gigih/Tabah/Yakin' },
+    { tarikh:'2026-04-28', kategori:'latihan', nama:'Latihan Rumah Sukan Azam/Berani/Cemerlang' },
+    { tarikh:'2026-04-30', kategori:'latihan', nama:'Latihan Rumah Sukan Gigih/Tabah/Yakin' },
+    { tarikh:'2026-05-04', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.14/2026' },
+    { tarikh:'2026-05-04', kategori:'pentaksiran', nama:'Pentaksiran Penggal 1 Sesi 26 PA, T1-T5 (4-8 Mei)' },
+    { tarikh:'2026-05-11', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.15/2026' },
+    { tarikh:'2026-05-11', kategori:'pentaksiran', nama:'Pentaksiran Penggal 1 (11-15 Mei)' },
+    { tarikh:'2026-05-18', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.16/2026' },
+    { tarikh:'2026-05-18', kategori:'pentaksiran', nama:'Pentaksiran Penggal 1 (18 Mei)' },
+    { tarikh:'2026-05-20', kategori:'sukan', nama:'Hari Sukan Sekolah' },
+    { tarikh:'2026-05-21', kategori:'sukan', nama:'Hari Sukan Sekolah' },
+    { tarikh:'2026-06-09', kategori:'kajian', nama:'Kajian Penglibatan KK Murid' },
+    { tarikh:'2026-06-16', kategori:'bengkel', nama:'Bengkel Pengurusan KK 2/26' },
+    { tarikh:'2026-06-20', kategori:'kem', nama:'Kem Olahraga Sekolah 2026' },
+    { tarikh:'2026-06-27', kategori:'malam-bakat', nama:'Malam Bakat (Gerko 10)' },
+    { tarikh:'2026-06-28', kategori:'malam-bakat', nama:'Malam Bakat (Gerko 10)' },
+    { tarikh:'2026-07-28', kategori:'karnival', nama:'KARNIVAL KEMERDEKAAN' },
+    { tarikh:'2026-08-03', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.25/2026 + UAS T5 (3-5 Ogos)' },
+    { tarikh:'2026-08-07', kategori:'pentaksiran', nama:'Peperiksaan Percubaan SPM 1 (7-21 Ogos)' },
+    { tarikh:'2026-08-10', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.26/2026' },
+    { tarikh:'2026-08-17', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.27/2026' },
+    { tarikh:'2026-08-24', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.28/2026' },
+    { tarikh:'2026-10-02', kategori:'pesta', nama:'Pesta Kuih Bulan' },
+    { tarikh:'2026-10-06', kategori:'bengkel', nama:'Bengkel Pengurusan KK 3/26' },
+    { tarikh:'2026-10-12', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.34/2026 + ULBM BI BC T4 (12-15 Okt)' },
+    { tarikh:'2026-10-16', kategori:'pentaksiran', nama:'Pentaksiran Akhir Tahun T1-T4 (16 Okt - 30 Okt)' },
+    { tarikh:'2026-10-17', kategori:'mesyuarat', nama:'Mesyuarat Staf bil.4/2026' },
+    { tarikh:'2026-10-19', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.35/2026' },
+    { tarikh:'2026-10-26', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.36/2026' },
+    { tarikh:'2026-11-14', kategori:'dialog', nama:'Dialog Prestasi Kali 4' },
+    { tarikh:'2026-11-16', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.37/2026' },
+    { tarikh:'2026-11-21', kategori:'mesyuarat', nama:'Mesyuarat Guru 4/2026' },
+    { tarikh:'2026-11-23', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.38/2026' },
+    { tarikh:'2026-11-27', kategori:'anugerah', nama:'Majlis Anugerah Murid Cemerlang' },
+    { tarikh:'2026-11-30', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.39/2026' },
+    { tarikh:'2026-12-27', kategori:'mesyuarat', nama:'Mesyuarat Pengurusan bil.1/27' },
+    { tarikh:'2026-12-28', kategori:'mesyuarat', nama:'Mesyuarat Staf bil.1/27' },
+    { tarikh:'2026-12-29', kategori:'pendaftaran', nama:'Persediaan Guru Kelas' },
+    { tarikh:'2026-12-30', kategori:'pendaftaran', nama:'Pendaftaran Tingkatan 1 & Peralihan 2027' },
+    { tarikh:'2026-12-31', kategori:'pendaftaran', nama:'Pendaftaran Tingkatan 2-5 2027' },
+  ],
+
+  cuti: [
+    { tarikh:'2026-02-16', nama:'Cuti Tambahan Tahun Baru Cina' },
+    { tarikh:'2026-02-17', nama:'Cuti Umum Tahun Baru Cina' },
+    { tarikh:'2026-02-18', nama:'Cuti Umum Tahun Baru Cina' },
+    { tarikh:'2026-02-19', nama:'Cuti Tambahan Tahun Baru Cina' },
+    { tarikh:'2026-02-20', nama:'Cuti Tambahan Tahun Baru Cina' },
+    { tarikh:'2026-05-01', nama:'Hari Pekerja' },
+    { tarikh:'2026-05-23', nama:'Cuti Pertengahan Tahun bermula' },
+    { tarikh:'2026-05-27', nama:'Hari Raya Haji/Korban' },
+    { tarikh:'2026-05-31', nama:'Hari Wesak' },
+    { tarikh:'2026-08-25', nama:'Cuti Umum Maulidur Rasul' },
+    { tarikh:'2026-08-29', nama:'Cuti Penggal 2 bermula' },
+    { tarikh:'2026-08-31', nama:'Hari Kebangsaan (National Day)' },
+    { tarikh:'2026-11-01', nama:"All Saints' Day" },
+    { tarikh:'2026-11-02', nama:"Cuti Peristiwa 4: All Souls' Day" },
+    { tarikh:'2026-11-08', nama:'Cuti Umum Deepavali' },
+    { tarikh:'2026-11-09', nama:'Cuti Tambahan Deepavali' },
+    { tarikh:'2026-12-05', nama:'Cuti Akhir Persekolahan bermula' },
+    { tarikh:'2026-12-25', nama:'Hari Krismas' },
+  ]
+};
+
+// ========================================================
+// LOAD / SAVE
+// ========================================================
+function load(){
+  const raw = sget('takwim_' + currentYear);
+  if(!raw){ DATA = null; return; }
+  try {
+    DATA = JSON.parse(raw);
+    // Migrate older format
+    ['beruniform','kelab','sukan'].forEach(k => {
+      if(DATA[k] && !DATA[k].dates){
+        // Old format: hari + mula + tamat + kecuali + tambahan
+        DATA[k].dates = generateDatesFromOld(DATA[k]);
+      }
+    });
+    if(!DATA.events) DATA.events = [];
+    if(!DATA.cuti) DATA.cuti = [];
+  } catch(e){ DATA = null; }
+}
+
+function generateDatesFromOld(t){
+  if(!t || !t.mula || !t.tamat) return [];
+  const dates = new Set();
+  const start = new Date(t.mula), end = new Date(t.tamat);
+  const jsDay = t.hari === 7 ? 0 : t.hari;
+  for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+    if(d.getDay() === jsDay){
+      const iso = d.toISOString().substring(0,10);
+      if((t.kecuali||[]).indexOf(iso) === -1) dates.add(iso);
+    }
+  }
+  (t.tambahan||[]).forEach(d => { if(d >= t.mula && d <= t.tamat) dates.add(d); });
+  return Array.from(dates).sort();
+}
+
+function saveAll(){
+  if(!DATA) return;
+  DATA.durasi_minit = parseInt(document.getElementById('setDurasi').value) || 90;
+  DATA.min_jumpa = parseInt(document.getElementById('setMinJumpa').value) || 12;
+  DATA.min_jam = parseInt(document.getElementById('setMinJam').value) || 18;
+
+  // Compute backward-compatible kecuali/tambahan for each kategori
+  ['beruniform','kelab','sukan'].forEach(k => {
+    const cat = DATA[k];
+    if(!cat || !cat.dates) return;
+    const dates = cat.dates.sort();
+    if(dates.length === 0){
+      cat.kecuali = []; cat.tambahan = [];
+      return;
+    }
+    cat.mula = cat.mula || dates[0];
+    cat.tamat = cat.tamat || dates[dates.length - 1];
+    // Auto-detect hari if all same day
+    const days = dates.map(d => new Date(d).getDay());
+    const uniqDays = [...new Set(days)];
+    if(uniqDays.length === 1) cat.hari = uniqDays[0];
+
+    // Compute kecuali = all `hari` days in range - dates
+    const jsDay = cat.hari === 7 ? 0 : cat.hari;
+    const allInRange = [];
+    const start = new Date(cat.mula), end = new Date(cat.tamat);
+    for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+      if(d.getDay() === jsDay) allInRange.push(d.toISOString().substring(0,10));
+    }
+    cat.kecuali = allInRange.filter(d => dates.indexOf(d) === -1);
+    cat.tambahan = dates.filter(d => allInRange.indexOf(d) === -1);
+  });
+
+  sset('takwim_' + currentYear, JSON.stringify(DATA));
+  refreshUI();
+  toast('✅ Disimpan');
+}
+
+function loadSMKTKPreset(){
+  if(DATA && (DATA.beruniform?.dates?.length || DATA.kelab?.dates?.length || DATA.sukan?.dates?.length)){
+    if(!confirm('Data takwim sedia ada akan diganti dengan preset SMK Tinggi Kuching 2026. Teruskan?')) return;
+  }
+  DATA = JSON.parse(JSON.stringify(SMKTK_2026));
+  saveAll();
+  toast('✅ Preset SMK Tinggi Kuching 2026 dimuatkan', 'ok');
+  showTab('overview');
+}
+
+function initEmpty(){
+  DATA = {
+    durasi_minit: 90,
+    min_jumpa: 12,
+    min_jam: 18,
+    beruniform: { hari:3, mula:'', tamat:'', dates:[] },
+    kelab: { hari:4, mula:'', tamat:'', dates:[] },
+    sukan: { hari:6, mula:'', tamat:'', dates:[] },
+    events: [],
+    cuti: []
+  };
+  saveAll();
+  toast('Takwim kosong dibuat. Mula tambah tarikh.', 'ok');
+}
+
+function resetAll(){
+  if(!confirm('Padam SEMUA data takwim tahun ' + currentYear + '? Tidak boleh undo.')) return;
+  try { localStorage.removeItem('takwim_' + currentYear); } catch(e){}
+  DATA = null;
+  refreshUI();
+  toast('Takwim ' + currentYear + ' direset');
+}
+
+// ========================================================
+// REFRESH UI
+// ========================================================
+function refreshUI(){
+  document.getElementById('yearDisp').textContent = currentYear;
+  document.querySelectorAll('.yearDispInline').forEach(e => e.textContent = currentYear);
+  const welcome = document.getElementById('welcomeBox');
+
+  if(!DATA){
+    welcome.style.display = 'block';
+    setKpis(0,0,0,0,0,0);
+    document.getElementById('pajskStatus').innerHTML = '<p style="color:var(--mute);">Belum ada takwim. Klik "Load Takwim SMK Tinggi Kuching 2026" di atas.</p>';
+    ['beruniform','kelab','sukan','events','cuti'].forEach(k => document.getElementById('cnt-'+k).textContent='0');
+    return;
+  }
+  welcome.style.display = 'none';
+  document.getElementById('setDurasi').value = DATA.durasi_minit || 90;
+  document.getElementById('setMinJumpa').value = DATA.min_jumpa || 12;
+  document.getElementById('setMinJam').value = DATA.min_jam || 18;
+
+  const ber = (DATA.beruniform?.dates || []).length;
+  const kel = (DATA.kelab?.dates || []).length;
+  const suk = (DATA.sukan?.dates || []).length;
+  const ev = (DATA.events || []).length;
+  const ct = (DATA.cuti || []).length;
+  const jam = ((Math.max(ber,kel,suk) * DATA.durasi_minit) / 60).toFixed(1);
+
+  setKpis(ber, kel, suk, ev, ct, jam);
+  document.getElementById('cnt-beruniform').textContent = ber;
+  document.getElementById('cnt-kelab').textContent = kel;
+  document.getElementById('cnt-sukan').textContent = suk;
+  document.getElementById('cnt-events').textContent = ev;
+  document.getElementById('cnt-cuti').textContent = ct;
+
+  renderPAJSKStatus(ber, kel, suk);
+}
+
+function setKpis(ber, kel, suk, ev, ct, jam){
+  document.getElementById('ov-ber').textContent = ber;
+  document.getElementById('ov-kel').textContent = kel;
+  document.getElementById('ov-suk').textContent = suk;
+  document.getElementById('ov-ev').textContent = ev;
+  document.getElementById('ov-ct').textContent = ct;
+  document.getElementById('ov-jam').textContent = jam + 'j';
+}
+
+function renderPAJSKStatus(ber, kel, suk){
+  const minJ = DATA.min_jumpa || 12;
+  const minH = DATA.min_jam || 18;
+  const dura = DATA.durasi_minit || 90;
+  const wrap = document.getElementById('pajskStatus');
+  const stat = (count, label, color) => {
+    const jam = (count * dura / 60).toFixed(1);
+    const ok = count >= minJ && jam >= minH;
+    return `<div style="background:#f8fafc;border:1px solid var(--bdr);border-left:4px solid ${color};border-radius:6px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div><strong style="color:${color};">${label}</strong> · ${count} perjumpaan · ${jam} jam</div>
+      <div style="padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;background:${ok?'var(--ok)':'var(--err)'};color:#fff;">${ok?'✓ Cukup PAJSK':'⚠ Bawah Minimum ('+minJ+' jumpa / '+minH+'j)'}</div>
+    </div>`;
+  };
+  wrap.innerHTML = stat(ber, 'Beruniform', 'var(--beruniform)') + stat(kel, 'Kelab/Persatuan', 'var(--kelab)') + stat(suk, 'Sukan/Permainan', 'var(--sukan)');
+}
+
+// ========================================================
+// TABS
+// ========================================================
+function showTab(name){
+  document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.toggle('active', p.id === 'tab-'+name));
+  if(['beruniform','kelab','sukan'].indexOf(name) !== -1) renderKategori(name);
+  else if(name === 'events') renderEvents();
+  else if(name === 'cuti') renderCuti();
+  else if(name === 'word') renderWord();
+  else if(name === 'wizard') renderWizard();
+  else if(name === 'overview') refreshUI();
+}
+
+// ========================================================
+// KATEGORI (Beruniform/Kelab/Sukan)
+// ========================================================
+const KAT_META = {
+  beruniform: { label:'Beruniform', icon:'fa-shield-alt', color:'var(--beruniform)', hari:3 },
+  kelab: { label:'Kelab/Persatuan', icon:'fa-book', color:'var(--kelab)', hari:4 },
+  sukan: { label:'Sukan/Permainan', icon:'fa-futbol', color:'var(--sukan)', hari:6 }
+};
+
+function renderKategori(katKey){
+  const m = KAT_META[katKey];
+  const cat = DATA?.[katKey];
+  if(!DATA || !cat){
+    document.getElementById('tab-'+katKey).innerHTML = '<div class="note warn"><i class="fas fa-info-circle"></i>Belum ada takwim. Sila ke <strong>Gambaran Keseluruhan</strong> untuk init.</div>';
+    return;
+  }
+
+  const dates = (cat.dates || []).sort();
+  const jam = (dates.length * (DATA.durasi_minit||90) / 60).toFixed(1);
+  const minJ = DATA.min_jumpa || 12;
+
+  let h = `<div class="tab-h">
+    <div><h2 style="color:${m.color};"><i class="fas ${m.icon}"></i> ${m.label}</h2>
+    <p>Tetapkan tarikh perjumpaan mingguan untuk kategori ${m.label}. Hari standard: <strong>${HARI[m.hari]}</strong></p></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v" style="color:${m.color};">${dates.length}</div><div class="l">Bil. Perjumpaan</div></div>
+    <div class="kpi"><div class="v">${jam}</div><div class="l">Jumlah Jam</div></div>
+    <div class="kpi ${dates.length >= minJ ? 'ok':'err'}"><div class="v">${dates.length >= minJ ? '✓':'✗'}</div><div class="l">Status PAJSK</div></div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-calendar-check"></i> Senarai Tarikh Perjumpaan</h3>
+    <div class="date-list">${dates.map((d,i) => {
+      const wd = new Date(d).getDay();
+      return `<div class="date-chip ${katKey}">
+        <div class="info"><div class="d">#${i+1} · ${fmtTarikh(d)}</div><div class="meta">${HARI[wd]}</div></div>
+        <button class="del" onclick="removeKatDate('${katKey}','${d}')" title="Padam"><i class="fas fa-times"></i></button>
+      </div>`;
+    }).join('')}</div>
+    ${dates.length === 0 ? '<p style="color:var(--mute);font-style:italic;text-align:center;padding:20px;">Tiada tarikh. Tambah di bawah atau gunakan "Auto-Generate".</p>' : ''}
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-plus-circle"></i> Tambah Tarikh</h3>
+    <div class="add-form">
+      <div class="fld-row">
+        <div class="fld"><label>Tarikh</label><input type="date" id="add-${katKey}-date"></div>
+        <div class="fld"><label>&nbsp;</label><button class="btn btn-pri" onclick="addKatDate('${katKey}')"><i class="fas fa-plus"></i> Tambah</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-magic"></i> Auto-Generate Tarikh</h3>
+    <p style="font-size:12px;color:var(--mute);margin-bottom:8px;">Jana tarikh mingguan secara automatik berdasarkan hari + julat. Anda boleh tweak selepas dijana.</p>
+    <div class="add-form">
+      <div class="fld-row" style="grid-template-columns:1fr 1fr 1fr auto;">
+        <div class="fld"><label>Hari</label>
+          <select id="ag-${katKey}-hari">
+            ${HARI.map((h,i) => `<option value="${i}" ${i===m.hari?'selected':''}>${h}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fld"><label>Tarikh Mula</label><input type="date" id="ag-${katKey}-mula" value="${currentYear}-01-01"></div>
+        <div class="fld"><label>Tarikh Tamat</label><input type="date" id="ag-${katKey}-tamat" value="${currentYear}-10-31"></div>
+        <div class="fld"><label>&nbsp;</label><button class="btn btn-acc" onclick="autoGenKat('${katKey}')"><i class="fas fa-magic"></i> Jana</button></div>
+      </div>
+    </div>
+    <div class="note info" style="margin-top:8px;"><i class="fas fa-info-circle"></i>Jana akan TAMBAH ke senarai sedia ada (tidak ganti). Tarikh yang fall on cuti akan diskip automatik.</div>
+  </div>
+
+  <div class="card" style="border-color:#fadbd8;">
+    <h3 style="color:var(--err);"><i class="fas fa-eraser"></i> Tindakan Bahaya</h3>
+    <button class="btn btn-err btn-sm" onclick="clearKat('${katKey}')"><i class="fas fa-trash"></i> Padam Semua Tarikh ${m.label}</button>
+  </div>`;
+
+  document.getElementById('tab-'+katKey).innerHTML = h;
+}
+
+function addKatDate(katKey){
+  const d = document.getElementById('add-'+katKey+'-date').value;
+  if(!d){ toast('Sila pilih tarikh', 'err'); return; }
+  DATA[katKey].dates = DATA[katKey].dates || [];
+  if(DATA[katKey].dates.indexOf(d) !== -1){ toast('Tarikh sudah ada', 'err'); return; }
+  DATA[katKey].dates.push(d);
+  DATA[katKey].dates.sort();
+  saveAll();
+  renderKategori(katKey);
+}
+
+function removeKatDate(katKey, d){
+  DATA[katKey].dates = (DATA[katKey].dates || []).filter(x => x !== d);
+  saveAll();
+  renderKategori(katKey);
+}
+
+function autoGenKat(katKey){
+  const hari = parseInt(document.getElementById('ag-'+katKey+'-hari').value);
+  const mula = document.getElementById('ag-'+katKey+'-mula').value;
+  const tamat = document.getElementById('ag-'+katKey+'-tamat').value;
+  if(!mula || !tamat){ toast('Sila isi tarikh mula & tamat', 'err'); return; }
+  if(mula > tamat){ toast('Tarikh mula mesti sebelum tarikh tamat', 'err'); return; }
+
+  const cuti = (DATA.cuti || []).map(c => c.tarikh);
+  const dates = DATA[katKey].dates || [];
+  let added = 0, skipped = 0;
+  const start = new Date(mula), end = new Date(tamat);
+  for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+    if(d.getDay() === hari){
+      const iso = d.toISOString().substring(0,10);
+      if(cuti.indexOf(iso) !== -1){ skipped++; continue; }
+      if(dates.indexOf(iso) === -1){
+        dates.push(iso);
+        added++;
+      }
+    }
+  }
+  dates.sort();
+  DATA[katKey].dates = dates;
+  DATA[katKey].hari = hari;
+  DATA[katKey].mula = mula;
+  DATA[katKey].tamat = tamat;
+  saveAll();
+  renderKategori(katKey);
+  toast(`✅ ${added} tarikh ditambah (${skipped} fall on cuti, diskip)`, 'ok');
+}
+
+function clearKat(katKey){
+  if(!confirm('Padam SEMUA tarikh ' + KAT_META[katKey].label + '?')) return;
+  DATA[katKey].dates = [];
+  saveAll();
+  renderKategori(katKey);
+}
+
+// ========================================================
+// EVENTS
+// ========================================================
+function renderEvents(){
+  if(!DATA){ document.getElementById('tab-events').innerHTML = '<div class="note warn"><i class="fas fa-info-circle"></i>Belum ada takwim.</div>'; return; }
+  const events = (DATA.events || []).slice().sort((a,b) => a.tarikh.localeCompare(b.tarikh));
+
+  let h = `<div class="tab-h">
+    <div><h2><i class="fas fa-star" style="color:var(--event);"></i> Events & Aktiviti Lain</h2>
+    <p>Karnival, mesyuarat, bengkel, pentaksiran, dll. Sumber utama untuk Lajur CATATAN dalam Buku Pengurusan.</p></div>
+    <div><button class="btn btn-pri" onclick="openEventModal()"><i class="fas fa-plus"></i> Tambah Event</button></div>
+  </div>
+
+  <div class="card">
+    <table class="data">
+      <thead><tr><th style="width:5%;">#</th><th style="width:13%;">Tarikh</th><th style="width:12%;">Hari</th><th style="width:14%;">Kategori</th><th>Nama Event</th><th style="width:10%;">Masa</th><th style="width:10%;">Aksi</th></tr></thead>
+      <tbody>`;
+  events.forEach((e, i) => {
+    const wd = new Date(e.tarikh).getDay();
+    h += `<tr>
+      <td>${i+1}</td>
+      <td><strong>${fmtTarikh(e.tarikh)}</strong></td>
+      <td>${HARI[wd]}</td>
+      <td><span class="badge-kat badge-${e.kategori}">${e.kategori.toUpperCase()}</span></td>
+      <td>${e.nama}</td>
+      <td>${e.masa || '—'}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editEvent(${i})" title="Edit"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err);" onclick="deleteEvent(${i})" title="Padam"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`;
+  });
+  h += `</tbody></table>`;
+  if(events.length === 0) h += '<p style="text-align:center;color:var(--mute);padding:20px;font-style:italic;">Tiada event direkod.</p>';
+  h += `</div>`;
+  document.getElementById('tab-events').innerHTML = h;
+}
+
+function openEventModal(){
+  editingEvId = null;
+  document.getElementById('evTitle').textContent = 'Tambah Event';
+  document.getElementById('evTarikh').value = currentYear + '-01-01';
+  document.getElementById('evKategori').value = 'karnival';
+  document.getElementById('evNama').value = '';
+  document.getElementById('evMasa').value = '';
+  document.getElementById('modalEvent').classList.add('show');
+}
+
+function editEvent(idx){
+  const events = (DATA.events || []).slice().sort((a,b) => a.tarikh.localeCompare(b.tarikh));
+  const ev = events[idx];
+  if(!ev) return;
+  // Find original index
+  editingEvId = DATA.events.findIndex(e => e.tarikh === ev.tarikh && e.nama === ev.nama);
+  document.getElementById('evTitle').textContent = 'Edit Event';
+  document.getElementById('evTarikh').value = ev.tarikh;
+  document.getElementById('evKategori').value = ev.kategori;
+  document.getElementById('evNama').value = ev.nama;
+  document.getElementById('evMasa').value = ev.masa || '';
+  document.getElementById('modalEvent').classList.add('show');
+}
+
+function closeEventModal(){ document.getElementById('modalEvent').classList.remove('show'); }
+
+function saveEvent(){
+  const tarikh = document.getElementById('evTarikh').value;
+  const nama = document.getElementById('evNama').value.trim();
+  if(!tarikh || !nama){ toast('Sila isi tarikh dan nama', 'err'); return; }
+  const ev = { tarikh, kategori: document.getElementById('evKategori').value, nama, masa: document.getElementById('evMasa').value.trim() };
+  DATA.events = DATA.events || [];
+  if(editingEvId !== null && editingEvId >= 0){
+    DATA.events[editingEvId] = ev;
+  } else {
+    DATA.events.push(ev);
+  }
+  closeEventModal();
+  saveAll();
+  renderEvents();
+  toast('✅ Event disimpan', 'ok');
+}
+
+function deleteEvent(idx){
+  const events = (DATA.events || []).slice().sort((a,b) => a.tarikh.localeCompare(b.tarikh));
+  const ev = events[idx];
+  if(!confirm('Padam event "' + ev.nama + '"?')) return;
+  DATA.events = DATA.events.filter(e => !(e.tarikh === ev.tarikh && e.nama === ev.nama));
+  saveAll();
+  renderEvents();
+  toast('Event dipadam');
+}
+
+// ========================================================
+// CUTI
+// ========================================================
+function renderCuti(){
+  if(!DATA){ document.getElementById('tab-cuti').innerHTML = '<div class="note warn"><i class="fas fa-info-circle"></i>Belum ada takwim.</div>'; return; }
+  const cuti = (DATA.cuti || []).slice().sort((a,b) => a.tarikh.localeCompare(b.tarikh));
+  let h = `<div class="tab-h">
+    <div><h2><i class="fas fa-umbrella-beach" style="color:var(--cuti);"></i> Senarai Cuti</h2>
+    <p>Cuti umum, cuti perayaan, cuti penggal. Tarikh ini akan diskip dari auto-generate perjumpaan.</p></div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-plus-circle"></i> Tambah Cuti</h3>
+    <div class="add-form">
+      <div class="fld-row" style="grid-template-columns:1fr 2fr auto;">
+        <div class="fld"><label>Tarikh</label><input type="date" id="cuti-tarikh"></div>
+        <div class="fld"><label>Nama Cuti</label><input type="text" id="cuti-nama" placeholder="cth: Hari Wesak"></div>
+        <div class="fld"><label>&nbsp;</label><button class="btn btn-pri" onclick="addCuti()"><i class="fas fa-plus"></i> Tambah</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-calendar-times"></i> Senarai Cuti (${cuti.length})</h3>
+    <table class="data">
+      <thead><tr><th style="width:5%;">#</th><th style="width:15%;">Tarikh</th><th style="width:12%;">Hari</th><th>Nama</th><th style="width:8%;">Aksi</th></tr></thead>
+      <tbody>`;
+  cuti.forEach((c, i) => {
+    const wd = new Date(c.tarikh).getDay();
+    h += `<tr>
+      <td>${i+1}</td>
+      <td><strong>${fmtTarikh(c.tarikh)}</strong></td>
+      <td>${HARI[wd]}</td>
+      <td>${c.nama}</td>
+      <td><button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err);" onclick="deleteCuti('${c.tarikh}','${c.nama.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></td>
+    </tr>`;
+  });
+  h += `</tbody></table>`;
+  if(cuti.length === 0) h += '<p style="text-align:center;color:var(--mute);padding:20px;font-style:italic;">Tiada cuti direkod.</p>';
+  h += `</div>`;
+  document.getElementById('tab-cuti').innerHTML = h;
+}
+
+function addCuti(){
+  const tarikh = document.getElementById('cuti-tarikh').value;
+  const nama = document.getElementById('cuti-nama').value.trim();
+  if(!tarikh || !nama){ toast('Sila isi tarikh dan nama', 'err'); return; }
+  DATA.cuti = DATA.cuti || [];
+  DATA.cuti.push({ tarikh, nama });
+  saveAll();
+  renderCuti();
+  toast('✅ Cuti ditambah', 'ok');
+}
+
+function deleteCuti(tarikh, nama){
+  if(!confirm('Padam cuti "' + nama + '"?')) return;
+  DATA.cuti = (DATA.cuti || []).filter(c => !(c.tarikh === tarikh && c.nama === nama));
+  saveAll();
+  renderCuti();
+}
+
+// ========================================================
+// WORD EXPORT
+// ========================================================
+function renderWord(){
+  if(!DATA){
+    document.getElementById('tab-word').innerHTML = '<div class="note warn"><i class="fas fa-info-circle"></i>Belum ada takwim.</div>';
+    return;
+  }
+
+  let h = `<div class="tab-h">
+    <div><h2><i class="fas fa-file-word"></i> Eksport Word — Format Buku Pengurusan</h2>
+    <p>Jana takwim dalam format yang sepadan dengan Buku Pengurusan Kokurikulum. Copy table dan paste ke Word.</p></div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-info-circle"></i> Cara Guna</h3>
+    <ol style="padding-left:22px;font-size:12.5px;line-height:1.7;">
+      <li><strong>Klik "Copy"</strong> di sebelah setiap bulan untuk salin jadual ke clipboard</li>
+      <li><strong>Buka Word</strong> → letakkan kursor di tempat anda nak masukkan jadual</li>
+      <li><strong>Tekan Ctrl+V</strong> → jadual akan terus jadi format Word yang betul</li>
+      <li>Atau klik <strong>"Copy SEMUA Bulan"</strong> untuk salin keseluruhan tahun sekali gus</li>
+      <li>Klik <strong>"Cetak"</strong> untuk preview cetakan</li>
+    </ol>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn-ok" onclick="copyAllMonths()"><i class="fas fa-copy"></i> Copy SEMUA Bulan ke Clipboard</button>
+      <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Cetak</button>
+      <button class="btn btn-outline" onclick="downloadAsDoc()"><i class="fas fa-download"></i> Download .doc</button>
+    </div>
+  </div>`;
+
+  // Generate 12 month tables
+  for(let m = 0; m < 12; m++){
+    h += generateMonthTable(m);
+  }
+
+  document.getElementById('tab-word').innerHTML = h;
+}
+
+function generateMonthTable(monthIdx){
+  // Build lookup tables
+  const beruDates = new Set((DATA.beruniform?.dates) || []);
+  const kelabDates = new Set((DATA.kelab?.dates) || []);
+  const sukanDates = new Set((DATA.sukan?.dates) || []);
+  const cuti = new Map();
+  (DATA.cuti || []).forEach(c => cuti.set(c.tarikh, c.nama));
+  const events = new Map();
+  (DATA.events || []).forEach(e => {
+    if(!events.has(e.tarikh)) events.set(e.tarikh, []);
+    events.get(e.tarikh).push(e);
+  });
+
+  // Compute perjumpaan numbers per kategori
+  const beruArr = ((DATA.beruniform?.dates) || []).slice().sort();
+  const kelabArr = ((DATA.kelab?.dates) || []).slice().sort();
+  const sukanArr = ((DATA.sukan?.dates) || []).slice().sort();
+  const beruNo = (d) => beruArr.indexOf(d) >= 0 ? (beruArr.indexOf(d) + 2) : null; // 2-indexed (perjumpaan 1 = orientasi)
+  const kelabNo = (d) => kelabArr.indexOf(d) >= 0 ? (kelabArr.indexOf(d) + 2) : null;
+  const sukanNo = (d) => sukanArr.indexOf(d) >= 0 ? (sukanArr.indexOf(d) + 2) : null;
+
+  let mthHTML = `<div class="month-table" id="mth-${monthIdx}">
+    <div class="mth-header"><h4>${BULAN_FULL[monthIdx]} ${currentYear}</h4>
+    <button class="copy-btn no-print" onclick="copyMonth(${monthIdx})"><i class="fas fa-copy"></i> Copy</button></div>
+    <table>
+      <thead><tr><th style="width:8%;">Tarikh</th><th style="width:10%;">Hari</th><th style="width:42%;">KOKURIKULUM</th><th style="width:40%;">CATATAN</th></tr></thead>
+      <tbody>`;
+
+  // Saturday counter
+  let sabtuNo = 0;
+  const lastDay = new Date(currentYear, monthIdx + 1, 0).getDate();
+  for(let day = 1; day <= lastDay; day++){
+    const d = new Date(currentYear, monthIdx, day);
+    const iso = d.toISOString().substring(0,10);
+    const wd = d.getDay();
+    const isSabtu = wd === 6;
+    if(isSabtu) sabtuNo++;
+
+    let kokuTxt = '';
+    let catatanTxt = '';
+    let kokuClass = '';
+    let catatanClass = '';
+
+    // KOKURIKULUM column
+    if(beruDates.has(iso)){
+      const n = beruNo(iso);
+      kokuTxt = `Perjumpaan Mingguan Kokurikulum Unit Beruniform ${n}`;
+      kokuClass = 't-perjumpaan';
+    } else if(kelabDates.has(iso)){
+      const n = kelabNo(iso);
+      kokuTxt = `Perjumpaan Mingguan Kokurikulum Kelab/Persatuan ${n}`;
+      kokuClass = 't-perjumpaan';
+    } else if(sukanDates.has(iso)){
+      const n = sukanNo(iso);
+      kokuTxt = `Perjumpaan Mingguan Kokurikulum - Sukan ${n}`;
+      kokuClass = 't-perjumpaan';
+    }
+
+    // CATATAN column
+    const catatanParts = [];
+    if(cuti.has(iso)) catatanParts.push(cuti.get(iso));
+    if(events.has(iso)){
+      events.get(iso).forEach(e => catatanParts.push(e.nama + (e.masa ? ' ('+e.masa+')' : '')));
+    }
+    if(catatanParts.length){
+      catatanTxt = catatanParts.join(' • ');
+      catatanClass = cuti.has(iso) ? 't-cuti' : 't-event';
+    }
+
+    // Day class for visual cue
+    let dayClass = '';
+    if(wd === 3) dayClass = 't-day-rabu';
+    else if(wd === 4) dayClass = 't-day-khamis';
+    else if(wd === 6) dayClass = 't-day-sabtu';
+
+    mthHTML += `<tr>
+      <td>${day}</td>
+      <td class="${dayClass}">${HARI[wd]}${isSabtu ? ' '+sabtuNo : ''}</td>
+      <td class="${kokuClass}">${kokuTxt}</td>
+      <td class="${catatanClass}">${catatanTxt}</td>
+    </tr>`;
+  }
+
+  mthHTML += `</tbody></table></div>`;
+  return mthHTML;
+}
+
+function copyMonth(monthIdx){
+  const div = document.getElementById('mth-'+monthIdx);
+  if(!div) return;
+  // Clone, strip copy button
+  const clone = div.cloneNode(true);
+  const cb = clone.querySelector('.copy-btn'); if(cb) cb.remove();
+  copyHTMLToClipboard(clone.innerHTML);
+  toast('✅ ' + BULAN_FULL[monthIdx] + ' disalin. Paste ke Word dengan Ctrl+V', 'ok');
+}
+
+function copyAllMonths(){
+  let html = '<h2>Takwim Kokurikulum ' + currentYear + '</h2>';
+  for(let m = 0; m < 12; m++){
+    const div = document.getElementById('mth-'+m);
+    if(div){
+      const clone = div.cloneNode(true);
+      const cb = clone.querySelector('.copy-btn'); if(cb) cb.remove();
+      html += clone.innerHTML;
+    }
+  }
+  copyHTMLToClipboard(html);
+  toast('✅ 12 bulan disalin. Paste ke Word dengan Ctrl+V', 'ok');
+}
+
+function copyHTMLToClipboard(html){
+  try {
+    const blob = new Blob([html], { type:'text/html' });
+    const data = [new ClipboardItem({ 'text/html': blob })];
+    navigator.clipboard.write(data);
+  } catch(e){
+    // Fallback
+    const ta = document.createElement('div');
+    ta.contentEditable = true;
+    ta.innerHTML = html;
+    ta.style.position = 'absolute'; ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    const r = document.createRange(); r.selectNodeContents(ta);
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+}
+
+function downloadAsDoc(){
+  let body = '<h1 style="text-align:center;">Takwim Kokurikulum ' + currentYear + '</h1>';
+  for(let m = 0; m < 12; m++){
+    const div = document.getElementById('mth-'+m);
+    if(div){
+      const clone = div.cloneNode(true);
+      const cb = clone.querySelector('.copy-btn'); if(cb) cb.remove();
+      body += clone.outerHTML;
+    }
+  }
+  const doc = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Takwim ${currentYear}</title>
+<style>body{font-family:'Times New Roman',serif;font-size:11pt}h1,h4{color:#1e3a5f}
+table{width:100%;border-collapse:collapse;margin-bottom:10pt}
+th,td{border:1px solid #333;padding:3pt 5pt;vertical-align:top}
+th{background:#f0f0f0;font-weight:700}
+.mth-header{background:#1e3a5f;color:#fff;padding:5pt;font-weight:700}</style>
+</head><body>${body}</body></html>`;
+  const blob = new Blob([doc], { type:'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Takwim_Kokurikulum_' + currentYear + '.doc';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('✅ Fail .doc dimuat turun', 'ok');
+}
+
+// ========================================================
+// WIZARD TAHUN BARU
+// ========================================================
+function renderWizard(){
+  const allKeys = [];
+  try { for(let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if(k.indexOf('takwim_')===0) allKeys.push(k); } } catch(e){}
+  const availableYears = allKeys.map(k => parseInt(k.replace('takwim_',''))).filter(y => !isNaN(y)).sort((a,b)=>b-a);
+
+  let h = `<div class="tab-h">
+    <div><h2><i class="fas fa-magic"></i> Wizard Tahun Baru — Auto-Cipta Takwim ${currentYear+1}</h2>
+    <p>Auto-duplikasi takwim dari tahun lain dengan auto-shift tarikh. Sangat sesuai untuk perancangan tahun depan.</p></div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-arrow-right"></i> Langkah 1: Pilih Tahun Sumber</h3>
+    <div class="add-form">
+      <div class="fld" style="max-width:300px;">
+        <label>Tahun Sumber (yang akan didupikasi)</label>
+        <select id="wzSource">${availableYears.length ? availableYears.map(y => `<option value="${y}">Takwim ${y}</option>`).join('') : '<option value="">— Tiada tahun tersedia —</option>'}</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-arrow-right"></i> Langkah 2: Pilih Tahun Sasaran</h3>
+    <div class="add-form">
+      <div class="fld-row" style="grid-template-columns:1fr 1fr;">
+        <div class="fld">
+          <label>Tahun Sasaran</label>
+          <input type="number" id="wzTarget" value="${currentYear+1}" min="2020" max="2050">
+        </div>
+        <div class="fld">
+          <label>Cara Shift Tarikh</label>
+          <select id="wzMethod">
+            <option value="weekday">Kekal hari minggu sama (shift 364 hari)</option>
+            <option value="date">Kekal tarikh sama (shift 365/366 hari)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="note info"><i class="fas fa-info-circle"></i>
+      <strong>Kekal hari minggu</strong>: jika perjumpaan 28 Jan 2026 (Rabu), maka 2027 akan jadi 27 Jan (Rabu).<br>
+      <strong>Kekal tarikh</strong>: 28 Jan 2026 → 28 Jan 2027 (mungkin hari berbeza). Anda kena ubah suai manual.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-arrow-right"></i> Langkah 3: Item Yang Akan Disalin</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">
+      <label style="display:flex;gap:6px;cursor:pointer;"><input type="checkbox" id="wzInclBer" checked>Tarikh Beruniform</label>
+      <label style="display:flex;gap:6px;cursor:pointer;"><input type="checkbox" id="wzInclKel" checked>Tarikh Kelab</label>
+      <label style="display:flex;gap:6px;cursor:pointer;"><input type="checkbox" id="wzInclSuk" checked>Tarikh Sukan</label>
+      <label style="display:flex;gap:6px;cursor:pointer;"><input type="checkbox" id="wzInclEv" checked>Events</label>
+      <label style="display:flex;gap:6px;cursor:pointer;"><input type="checkbox" id="wzInclCu">Cuti (sila semak manual!)</label>
+      <label style="display:flex;gap:6px;cursor:pointer;"><input type="checkbox" id="wzInclSet" checked>Tetapan (durasi/min)</label>
+    </div>
+    <div class="note warn" style="margin-top:10px;"><i class="fas fa-exclamation-triangle"></i>
+      <strong>PENTING:</strong> Cuti antara tahun berubah-ubah (Tahun Baru Cina, Deepavali, Hari Raya). Tidak disyorkan copy cuti — sila isi manual selepas duplikasi.
+    </div>
+  </div>
+
+  <div class="card" style="background:#eef4fb;border-color:var(--pri);">
+    <h3 style="color:var(--pri);"><i class="fas fa-rocket"></i> Langkah 4: Jana Takwim</h3>
+    <button class="btn btn-ok" style="font-size:14px;padding:10px 20px;" onclick="runWizard()"><i class="fas fa-magic"></i> Jana Takwim Tahun Baru</button>
+  </div>
+
+  <div class="card">
+    <h3><i class="fas fa-lightbulb"></i> Tips Pengemaskinian Tahun Baru</h3>
+    <ol style="padding-left:22px;font-size:12.5px;line-height:1.8;">
+      <li>Gunakan Wizard ini di <strong>awal tahun</strong> (Disember atau Januari)</li>
+      <li>Selepas duplikasi, semak:
+        <ul><li>Tarikh cuti umum (Tahun Baru Cina, Hari Raya, Deepavali — berubah setiap tahun)</li>
+        <li>Tarikh karnival & majlis sekolah (rancangan tahun baru)</li>
+        <li>Tarikh mesyuarat pengurusan (numbering bil.XX/YY perlu diupdate)</li>
+        <li>Tarikh pentaksiran (mengikut takwim Kementerian Pelajaran)</li></ul>
+      </li>
+      <li>Eksport Word → paste ke Buku Pengurusan Kokurikulum tahun baru</li>
+      <li>Simpan sandaran JSON sebagai backup</li>
+    </ol>
+  </div>`;
+
+  document.getElementById('tab-wizard').innerHTML = h;
+}
+
+function runWizard(){
+  const src = parseInt(document.getElementById('wzSource').value);
+  const tgt = parseInt(document.getElementById('wzTarget').value);
+  const method = document.getElementById('wzMethod').value;
+  if(!src || !tgt){ toast('Sila pilih tahun sumber & sasaran', 'err'); return; }
+  if(src === tgt){ toast('Tahun sumber & sasaran mesti berbeza', 'err'); return; }
+
+  const srcRaw = sget('takwim_' + src);
+  if(!srcRaw){ toast('Tahun sumber tiada data', 'err'); return; }
+  const srcData = JSON.parse(srcRaw);
+  const tgtRaw = sget('takwim_' + tgt);
+  if(tgtRaw){
+    if(!confirm('Takwim ' + tgt + ' sudah wujud. Ganti?')) return;
+  }
+
+  const inclBer = document.getElementById('wzInclBer').checked;
+  const inclKel = document.getElementById('wzInclKel').checked;
+  const inclSuk = document.getElementById('wzInclSuk').checked;
+  const inclEv = document.getElementById('wzInclEv').checked;
+  const inclCu = document.getElementById('wzInclCu').checked;
+  const inclSet = document.getElementById('wzInclSet').checked;
+
+  const shiftDate = (iso) => {
+    const d = new Date(iso);
+    if(method === 'weekday'){
+      d.setDate(d.getDate() + 364); // shift 52 weeks
+    } else {
+      d.setFullYear(d.getFullYear() + (tgt - src));
+    }
+    return d.toISOString().substring(0,10);
+  };
+
+  const newData = {
+    durasi_minit: inclSet ? (srcData.durasi_minit || 90) : 90,
+    min_jumpa: inclSet ? (srcData.min_jumpa || 12) : 12,
+    min_jam: inclSet ? (srcData.min_jam || 18) : 18,
+    source: 'Dijana dari Wizard - tahun sumber ' + src,
+    beruniform: { hari:3, mula:'', tamat:'', dates: inclBer ? (srcData.beruniform?.dates || []).map(shiftDate).sort() : [] },
+    kelab: { hari:4, mula:'', tamat:'', dates: inclKel ? (srcData.kelab?.dates || []).map(shiftDate).sort() : [] },
+    sukan: { hari:6, mula:'', tamat:'', dates: inclSuk ? (srcData.sukan?.dates || []).map(shiftDate).sort() : [] },
+    events: inclEv ? (srcData.events || []).map(e => ({...e, tarikh: shiftDate(e.tarikh)})) : [],
+    cuti: inclCu ? (srcData.cuti || []).map(c => ({...c, tarikh: shiftDate(c.tarikh)})) : []
+  };
+
+  sset('takwim_' + tgt, JSON.stringify(newData));
+  toast(`✅ Takwim ${tgt} dijana dari ${src}. Tukar ke tahun ${tgt} untuk semak.`, 'ok');
+  // Auto-switch
+  setTimeout(() => {
+    currentYear = tgt;
+    document.getElementById('yearSel').value = tgt;
+    load();
+    refreshUI();
+    showTab('overview');
+  }, 1500);
+}
+
+// ========================================================
+// EXPORT/IMPORT JSON
+// ========================================================
+function exportJSON(){
+  if(!DATA){ toast('Tiada data', 'err'); return; }
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'takwim_' + currentYear + '.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('✅ Eksport JSON', 'ok');
+}
+
+function importJSON(file){
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!confirm('Import takwim untuk tahun ' + currentYear + '? Data sedia ada akan diganti.')) return;
+      DATA = data;
+      saveAll();
+      toast('✅ Import berjaya', 'ok');
+      showTab('overview');
+    } catch(err){ toast('Format JSON tidak sah', 'err'); }
+  };
+  r.readAsText(file);
+}
+
+// ========================================================
+// UTILITIES
+// ========================================================
+const BULAN_MS = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+function fmtTarikh(iso){
+  const d = new Date(iso);
+  return d.getDate() + ' ' + BULAN_MS[d.getMonth()];
+}
+
+function populateYearSelector(){
+  const sel = document.getElementById('yearSel');
+  const now = new Date().getFullYear();
+  let h = '';
+  for(let y = now-1; y <= now+2; y++){
+    h += `<option value="${y}" ${y===currentYear?'selected':''}>Tahun ${y}</option>`;
+  }
+  sel.innerHTML = h;
+}
+
+function changeYear(y){
+  currentYear = parseInt(y);
+  load();
+  refreshUI();
+  // Re-render current tab
+  const active = document.querySelector('.sb-tab.active');
+  if(active) showTab(active.dataset.tab);
+}
+
+// ========================================================
+// INIT
+// ========================================================
+(function init(){
+  try{ if(window !== window.top) document.body.classList.add('in-spkb') }catch(e){}
+  populateYearSelector();
+  load();
+  refreshUI();
+  // Close modal on background click
+  document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if(e.target === bg) bg.classList.remove('show'); }));
+})();
+</script>
+</body>
+</html>
