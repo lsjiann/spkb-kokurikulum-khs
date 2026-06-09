@@ -1901,6 +1901,11 @@ body.demo-active .main { margin-top: 98px; }
   <!-- Seksyen: Pengurusan Harian -->
   <div class="nav-section">
     <div class="nav-label">Pengurusan Harian</div>
+    <a class="nav-item" data-page="pkk">
+      <i class="fas fa-list-check nav-icon"></i>
+      <span class="nav-text">Tugas Harian PKK</span>
+      <span style="background:var(--accent);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;margin-left:auto;">BARU</span>
+    </a>
     <a class="nav-item" data-page="pengurusan-kelab">
       <i class="fas fa-folder-open"></i>
       <span class="nav-text">Pengurusan Kelab/Persatuan</span>
@@ -2980,6 +2985,49 @@ body.demo-active .main { margin-top: 98px; }
   <!-- ============================================================
        PAGE: PENGURUSAN TAKWIM (Master Takwim Tahunan)
        ============================================================ -->
+  <!-- ============================================================
+       PAGE: TUGAS HARIAN PKK
+       ============================================================ -->
+  <section class="page" id="page-pkk">
+
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Tugas Harian PKK</span>
+    </div>
+
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <h2><i class="fas fa-list-check"></i> Tugas Harian Penolong Kanan Kokurikulum</h2>
+        <p>Peringatan tugas tertunggak · Tugas hari ini · Auto-jana dari takwim · Log surat masuk · Penjejak PAJSK</p>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.open(PKK_URL,'_blank')">
+          <i class="fas fa-external-link-alt"></i> Tab Baru
+        </button>
+      </div>
+    </div>
+
+    <div id="pkk-iframe-wrap" style="width:100%;height:calc(100vh - 220px);min-height:600px;border-radius:12px;overflow:hidden;position:relative;background:#f8fafc;border:1px solid #e0e0e0;">
+      <div id="pkk-iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;background:#f8fafc;">
+        <div style="text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">📋</div>
+          <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:6px;">Tugas Harian PKK</h3>
+          <p style="font-size:12px;color:#7f8c8d;max-width:400px;margin:0 auto 16px;line-height:1.5;">
+            Tertunggak · Hari ini · Akan datang · Program · Surat masuk · PAJSK
+          </p>
+          <div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+        </div>
+      </div>
+      <iframe id="pkk-iframe" src="" style="width:100%;height:100%;border:none;" onload="this.previousElementSibling.style.display='none';" allow="clipboard-write"></iframe>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       END PAGE: TUGAS HARIAN PKK
+       ============================================================ -->
+
   <section class="page" id="page-takwim">
 
     <div class="breadcrumb">
@@ -6031,6 +6079,7 @@ const LAPORAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/laporan-akhi
 const KEWANGAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/kewangan-inventori.html';
 const PUSAT_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pusat-sandar.html';
 const TAKWIM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pengurusan-takwim.html';
+const PKK_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-pkk.html';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
 /* ============================================================
@@ -6051,6 +6100,7 @@ document.getElementById('sidebarToggle').addEventListener('click', function() {
    ============================================================ */
 const pageInfo = {
   'dashboard':        { title: 'SPKB v3.1 — Papan Pemuka Kokurikulum',     label: 'Papan Pemuka Utama',         phase: 'active', icon: '📊' },
+  'pkk':              { title: 'SPKB v3.1 — Tugas Harian PKK',             label: 'Tugas Harian PKK',           phase: 'active', icon: '📋' },
   'pengurusan-kelab': { title: 'SPKB v3.1 — Pengurusan Kelab/Persatuan',   label: 'Pengurusan Kelab/Persatuan', phase: 'active', icon: '📁' },
   'skas':             { title: 'SPKB v3.1 — Pengurusan SK@S 3.2',          label: 'Pengurusan SK@S 3.2',        phase: 'active', icon: '✅' },
   'pajsk':            { title: 'SPKB v3.1 — Penilaian PAJSK',              label: 'Penilaian PAJSK',            phase: 'active', icon: '📈' },
@@ -6186,6 +6236,15 @@ function navigateTo(pageId) {
       }
     }, 100);
   }
+  if (pageId === 'pkk') {
+    setTimeout(function () {
+      var iframe = document.getElementById('pkk-iframe');
+      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+        var tahun = new Date().getFullYear();
+        iframe.src = PKK_URL + '?tahun=' + tahun;
+      }
+    }, 100);
+  }
   if (pageId === 'takwim') {
     setTimeout(function () {
       var iframe = document.getElementById('takwim-iframe');
@@ -6259,6 +6318,9 @@ function switchSkasTab(tab) {
 window.addEventListener('message', function(e) {
   if (e.data && e.data.action === 'spkb-back') {
     navigateTo('dashboard');
+  }
+  if (e.data && e.data.action === 'spkb-open' && e.data.page) {
+    navigateTo(e.data.page);
   }
 });
 
