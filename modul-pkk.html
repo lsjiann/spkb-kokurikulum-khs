@@ -152,6 +152,7 @@ body.in-spkb .topbar{display:none}
     <div class="tab" data-page="surat" onclick="showPage('surat')"><span class="ic">&#9993;</span>Surat Masuk <span class="pill" id="pill-surat" style="display:none">0</span></div>
     <div class="tab" data-page="pajsk" onclick="showPage('pajsk')"><span class="ic">&#128202;</span>Penjejak PAJSK</div>
     <div class="tab" data-page="importppd" onclick="showPage('importppd')"><span class="ic">&#128229;</span>Import Takwim PPD</div>
+    <div class="tab" data-page="ai" onclick="showPage('ai')"><span class="ic">&#10024;</span>Draf Dokumen (AI)</div>
     <div class="tab" data-page="tetapan" onclick="showPage('tetapan')"><span class="ic">&#9881;</span>Tetapan Templat</div>
     <div class="tab" data-page="peringatan" onclick="showPage('peringatan')"><span class="ic">&#128276;</span>Peringatan (Telegram/Email)</div>
   </nav>
@@ -163,6 +164,7 @@ body.in-spkb .topbar{display:none}
     <div class="page" id="page-surat"></div>
     <div class="page" id="page-pajsk"></div>
     <div class="page" id="page-importppd"></div>
+    <div class="page" id="page-ai"></div>
     <div class="page" id="page-tetapan"></div>
     <div class="page" id="page-peringatan"></div>
   </main>
@@ -192,6 +194,11 @@ body.in-spkb .topbar{display:none}
   <div class="modal">
     <div class="modal-h"><span>Daftar Surat Masuk</span><span class="x" onclick="closeSurat()">&times;</span></div>
     <div class="modal-b">
+      <div style="background:#f4f0fb;border:1px dashed #9b59b6;border-radius:8px;padding:11px;margin-bottom:14px">
+        <label style="color:#7d3c98">&#10024; Cungkil automatik dari teks surat (AI)</label>
+        <textarea id="sCungkil" rows="3" placeholder="Tampal teks surat di sini, kemudian klik Cungkil — AI akan isi medan di bawah." style="margin-bottom:8px"></textarea>
+        <button class="btn btn-sm" id="sCungkilBtn" style="background:#9b59b6;color:#fff" onclick="cungkilSuratAI()">&#10024; Cungkil &amp; isi medan</button>
+      </div>
       <label>Tajuk surat</label>
       <input type="text" id="sTajuk" placeholder="cth. Jemputan Kejohanan Bola Sepak MSSD">
       <label>Daripada</label>
@@ -232,6 +239,7 @@ const K_TEMPLAT  = 'pkk_templat_'+YEAR;
 const K_SURAT    = 'pkk_surat_'+YEAR;
 const K_PAJSK    = 'pkk_pajsk_'+YEAR;
 const K_REMINDER = 'pkk_reminder_config';
+const K_AI       = 'pkk_ai_endpoint';
 
 let DEMO = null;           // in-memory demo takwim (does not overwrite real data)
 let CURRENT = 'hariini';
@@ -644,7 +652,7 @@ function savePajskField(k,v){ const c=getPajsk(); c[k]=v; setPajsk(c); renderPaj
 /* ---------- Surat Masuk ---------- */
 function getSurat(){ const r=sget(K_SURAT); if(!r) return []; try{return JSON.parse(r)}catch(e){return []} }
 function setSurat(a){ sset(K_SURAT, JSON.stringify(a)); }
-function openSurat(){ document.getElementById('sTajuk').value=''; document.getElementById('sDari').value=''; document.getElementById('sJenis').value='pertandingan'; document.getElementById('sTerima').value=todayISO(); document.getElementById('sProgram').value=''; document.getElementById('sTindakan').value=''; document.getElementById('suratModal').classList.add('on'); }
+function openSurat(){ document.getElementById('sCungkil').value=''; document.getElementById('sTajuk').value=''; document.getElementById('sDari').value=''; document.getElementById('sJenis').value='pertandingan'; document.getElementById('sTerima').value=todayISO(); document.getElementById('sProgram').value=''; document.getElementById('sTindakan').value=''; document.getElementById('suratModal').classList.add('on'); }
 function closeSurat(){ document.getElementById('suratModal').classList.remove('on'); }
 function saveSurat(){
   const tajuk=document.getElementById('sTajuk').value.trim();
@@ -775,6 +783,81 @@ async function postReminder(action){
 function hantarSnapshot(){ saveReminder(); postReminder('sync'); }
 function ujiPeringatan(){ saveReminder(); postReminder('uji'); }
 
+/* ============================================================
+   FASA 3 — Lapisan AI (cungkil surat, draf dokumen)
+   ============================================================ */
+function getAIEndpoint(){ return sget(K_AI) || ''; }
+function setAIEndpoint(v){ sset(K_AI, v); }
+async function callAI(action, payload){
+  const url=getAIEndpoint();
+  if(!url) throw new Error('no-endpoint');
+  const res=await fetch(url, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action, payload}) });
+  return await res.json();
+}
+async function cungkilSuratAI(){
+  const teks=document.getElementById('sCungkil').value.trim();
+  if(!teks){ toast('Sila tampal teks surat dahulu'); return; }
+  if(!getAIEndpoint()){ toast('Sila tetapkan URL AI di tab "Draf Dokumen (AI)"'); return; }
+  const btn=document.getElementById('sCungkilBtn'); const old=btn.innerHTML; btn.innerHTML='Mencungkil...'; btn.disabled=true;
+  try{
+    const r=await callAI('cungkil',{teks});
+    if(r && r.ok && r.data){
+      const d=r.data;
+      if(d.tajuk) document.getElementById('sTajuk').value=d.tajuk;
+      if(d.dari) document.getElementById('sDari').value=d.dari;
+      if(d.jenis) document.getElementById('sJenis').value=d.jenis;
+      if(d.tarikh_program) document.getElementById('sProgram').value=d.tarikh_program;
+      if(d.tindakan) document.getElementById('sTindakan').value=d.tindakan;
+      toast('Medan diisi oleh AI — sila semak sebelum simpan');
+    } else { toast('AI gagal mencungkil — sila isi manual'); }
+  }catch(e){ toast(e.message==='no-endpoint'?'Sila tetapkan URL AI dahulu':'Gagal hubungi backend AI'); }
+  btn.innerHTML=old; btn.disabled=false;
+}
+function renderAI(){
+  const el=document.getElementById('page-ai');
+  const ep=getAIEndpoint();
+  el.innerHTML =
+    '<div class="card"><h2><span style="color:#9b59b6">&#10024;</span> Draf dokumen dengan AI</h2>'+
+    '<div class="desc">Jana draf One Page Report, minit mesyuarat, atau kertas kerja secara automatik. Memerlukan backend <b>pkk-ai.gs</b> (projek Apps Script berasingan). Draf adalah cadangan — sila semak &amp; edit sebelum guna.</div>'+
+    '<label style="font-size:12px;font-weight:600">URL Web App AI (Apps Script)</label>'+
+    '<input type="text" id="aiEndpoint" value="'+ep.replace(/"/g,'&quot;')+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 8px">'+
+    '<button class="btn btn-ok btn-sm" onclick="saveAIEndpoint()">Simpan URL</button>'+
+    '</div>'+
+    '<div class="card"><h2>Jana draf</h2>'+
+    '<label style="font-size:12px;font-weight:600">Jenis dokumen</label>'+
+    '<select id="aiJenis" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
+      '<option value="opr">One Page Report (OPR)</option>'+
+      '<option value="minit">Minit Mesyuarat</option>'+
+      '<option value="kertaskerja">Kertas Kerja Program</option>'+
+    '</select>'+
+    '<label style="font-size:12px;font-weight:600">Maklumat ringkas (AI akan kembangkan)</label>'+
+    '<textarea id="aiMaklumat" rows="6" placeholder="cth. Karnival Sukan Sekolah, 20 Jun 2026 di padang sekolah, 800 murid, objektif memupuk semangat berpasukan, johan keseluruhan Rumah Merah..." style="width:100%;border:1px solid var(--line);border-radius:8px;padding:11px;font-size:13px"></textarea>'+
+    '<div style="margin-top:10px"><button class="btn btn-pri" id="aiGenBtn" onclick="drafAI()">&#10024; Jana draf</button></div>'+
+    '<div id="aiOut" style="display:none;margin-top:14px"><label style="font-size:12px;font-weight:600">Draf (boleh edit &amp; salin)</label>'+
+    '<textarea id="aiHasil" rows="16" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:11px;font-size:13px;font-family:inherit"></textarea>'+
+    '<div style="margin-top:8px;display:flex;gap:8px"><button class="btn btn-ok btn-sm" onclick="salinDraf()">Salin</button></div></div>'+
+    '</div>';
+}
+function saveAIEndpoint(){ setAIEndpoint(document.getElementById('aiEndpoint').value.trim()); toast('URL AI disimpan'); }
+async function drafAI(){
+  const jenis=document.getElementById('aiJenis').value;
+  const maklumat=document.getElementById('aiMaklumat').value.trim();
+  if(!maklumat){ toast('Sila isi maklumat ringkas dahulu'); return; }
+  if(!getAIEndpoint()){ toast('Sila simpan URL AI dahulu'); return; }
+  const btn=document.getElementById('aiGenBtn'); const old=btn.innerHTML; btn.innerHTML='Menjana draf...'; btn.disabled=true;
+  try{
+    const r=await callAI('draf',{jenis,maklumat});
+    if(r && r.ok && r.teks){
+      document.getElementById('aiHasil').value=r.teks;
+      document.getElementById('aiOut').style.display='block';
+      toast('Draf siap — sila semak & edit sebelum guna');
+    } else { toast('AI gagal menjana — '+((r&&r.error)||'cuba lagi')); }
+  }catch(e){ toast('Gagal hubungi backend AI'); }
+  btn.innerHTML=old; btn.disabled=false;
+}
+function salinDraf(){ const t=document.getElementById('aiHasil'); t.select(); try{document.execCommand('copy'); toast('Draf disalin')}catch(e){ if(navigator.clipboard) navigator.clipboard.writeText(t.value); toast('Draf disalin'); } }
+
 
 function showPage(p){
   CURRENT=p;
@@ -790,6 +873,7 @@ function renderAll(){
   if(CURRENT==='surat') renderSurat();
   if(CURRENT==='pajsk') renderPajsk();
   if(CURRENT==='importppd') renderImport();
+  if(CURRENT==='ai') renderAI();
   if(CURRENT==='tetapan') renderTetapan();
   if(CURRENT==='peringatan') renderPeringatan();
 }
