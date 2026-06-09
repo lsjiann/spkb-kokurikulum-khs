@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tugas Harian PKK — SPKB</title>
+<style>
+:root{
+  --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60;
+  --warn:#f39c12; --err:#c0392b; --sk:#3498db;
+  --beruniform:#2980b9; --kelab:#16a085; --sukan:#e67e22; --event:#9b59b6;
+  --ink:#2c3e50; --muted:#7f8c8d; --line:#e1e6ec; --bg:#f4f6f9; --card:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+
+/* Top header (hidden inside iframe) */
+.topbar{background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50}
+.topbar .back{background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:16px}
+.topbar .back:hover{background:rgba(255,255,255,.28)}
+.topbar h1{font-size:17px;font-weight:600}
+.topbar .sub{font-size:12px;opacity:.85;margin-top:1px}
+body.in-spkb .topbar{display:none}
+
+.wrap{display:flex;min-height:100vh}
+/* Sidebar */
+.side{width:240px;background:#fff;border-right:1px solid var(--line);flex-shrink:0;padding:14px 10px}
+.side .addbtn{width:100%;margin-bottom:14px}
+.tab{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:9px;cursor:pointer;color:var(--ink);font-weight:500;margin-bottom:3px}
+.tab:hover{background:#eef2f7}
+.tab.on{background:var(--pri);color:#fff}
+.tab .ic{width:20px;text-align:center}
+.tab .pill{margin-left:auto;background:var(--err);color:#fff;border-radius:11px;font-size:11px;padding:1px 7px;font-weight:600}
+.tab.on .pill{background:rgba(255,255,255,.25)}
+
+/* Main */
+.main{flex:1;padding:22px;max-width:1100px}
+.page{display:none}
+.page.on{display:block}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.card h2{font-size:16px;color:var(--pri);margin-bottom:4px;display:flex;align-items:center;gap:9px}
+.card .desc{color:var(--muted);font-size:12.5px;margin-bottom:12px}
+
+/* Greeting */
+.hello{background:linear-gradient(120deg,var(--pri),var(--pri2));color:#fff;border:none}
+.hello h2{color:#fff;font-size:20px;margin-bottom:2px}
+.hello .date{opacity:.9;font-size:13.5px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.chip{background:rgba(255,255,255,.14);border-radius:9px;padding:9px 14px;min-width:96px}
+.chip .n{font-size:22px;font-weight:700;line-height:1}
+.chip .l{font-size:11.5px;opacity:.9;margin-top:3px}
+
+/* Task list */
+.tasks{display:flex;flex-direction:column;gap:9px}
+.task{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:#fff}
+.task.late{border-left:4px solid var(--err)}
+.task.today{border-left:4px solid var(--warn)}
+.task.soon{border-left:4px solid var(--sk)}
+.task.done{opacity:.55}
+.task.done .tname{text-decoration:line-through}
+.tick{flex-shrink:0;width:22px;height:22px;border:2px solid var(--line);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;margin-top:1px}
+.tick.done{background:var(--ok);border-color:var(--ok)}
+.tbody{flex:1;min-width:0}
+.tname{font-weight:600;font-size:13.5px}
+.tmeta{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:4px;font-size:11.5px;color:var(--muted)}
+.tag{border-radius:11px;padding:1px 8px;font-size:10.5px;font-weight:600;color:#fff;white-space:nowrap}
+.due-late{color:var(--err);font-weight:600}
+.due-today{color:var(--warn);font-weight:600}
+.tprog{color:var(--muted)}
+.tlink,.tdel{background:none;border:1px solid var(--line);border-radius:7px;padding:3px 9px;cursor:pointer;font-size:11.5px;color:var(--pri2)}
+.tlink:hover{background:#eef2f7}
+.tdel{color:var(--err)}
+.tact{display:flex;gap:6px;flex-shrink:0;align-items:center;margin-top:1px}
+
+/* Awareness */
+.evrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.evrow:last-child{border-bottom:none}
+.evdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.evdate{color:var(--muted);font-size:12px;min-width:120px}
+
+/* Buttons */
+.btn{border:none;border-radius:8px;padding:9px 15px;cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+.btn-pri{background:var(--pri);color:#fff}.btn-pri:hover{background:var(--pri2)}
+.btn-ok{background:var(--ok);color:#fff}.btn-ok:hover{filter:brightness(1.06)}
+.btn-acc{background:var(--acc);color:#fff}.btn-acc:hover{filter:brightness(1.06)}
+.btn-outline{background:#fff;border:1px solid var(--line);color:var(--ink)}.btn-outline:hover{background:#f0f3f7}
+.btn-sm{padding:6px 11px;font-size:12px}
+
+/* Program progress */
+.progwrap{background:#eef2f7;border-radius:7px;height:8px;overflow:hidden;margin:6px 0}
+.progbar{height:100%;background:var(--ok)}
+.miles{margin-top:10px;display:none;flex-direction:column;gap:6px}
+.miles.open{display:flex}
+
+/* Filter bar */
+.filter{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.filter input,.filter select{border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:13px;font-family:inherit}
+.filter input[type=text]{flex:1;min-width:180px}
+
+/* Tetapan */
+.troww{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.troww:last-child{border-bottom:none}
+.troww .nm{flex:1;font-size:13px}
+.troww input{width:70px;border:1px solid var(--line);border-radius:7px;padding:6px;text-align:center;font-size:13px}
+.troww .u{color:var(--muted);font-size:12px}
+
+/* Empty */
+.empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:13px}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:200;padding:16px}
+.modal-bg.on{display:flex}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:440px;overflow:hidden}
+.modal-h{background:var(--pri);color:#fff;padding:14px 18px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.modal-h .x{cursor:pointer;font-size:20px;opacity:.85}
+.modal-b{padding:18px}
+.modal-b label{display:block;font-size:12.5px;font-weight:600;margin:0 0 5px;color:var(--ink)}
+.modal-b input,.modal-b textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;margin-bottom:13px}
+.modal-f{padding:0 18px 18px;display:flex;gap:9px;justify-content:flex-end}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:9px;font-size:13px;opacity:0;transition:.25s;z-index:300;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:760px){
+  .wrap{flex-direction:column}
+  .side{width:100%;border-right:none;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;padding:10px}
+  .side .addbtn{display:none}
+  .tab{margin-bottom:0;white-space:nowrap}
+  .tab .ic{display:none}
+  .main{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="back" onclick="goBack()" title="Kembali">&larr;</button>
+  <div>
+    <h1>Tugas Harian PKK</h1>
+    <div class="sub">Penolong Kanan Kokurikulum &middot; SMK Tinggi Kuching</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="side">
+    <button class="btn btn-acc addbtn" onclick="openAdd()">+ Tambah Tugas</button>
+    <div class="tab on" data-page="hariini" onclick="showPage('hariini')"><span class="ic">&#128197;</span>Hari Ini <span class="pill" id="pill-late" style="display:none">0</span></div>
+    <div class="tab" data-page="semua" onclick="showPage('semua')"><span class="ic">&#9776;</span>Semua Tugas</div>
+    <div class="tab" data-page="program" onclick="showPage('program')"><span class="ic">&#9733;</span>Program &amp; Aktiviti</div>
+    <div class="tab" data-page="surat" onclick="showPage('surat')"><span class="ic">&#9993;</span>Surat Masuk <span class="pill" id="pill-surat" style="display:none">0</span></div>
+    <div class="tab" data-page="pajsk" onclick="showPage('pajsk')"><span class="ic">&#128202;</span>Penjejak PAJSK</div>
+    <div class="tab" data-page="importppd" onclick="showPage('importppd')"><span class="ic">&#128229;</span>Import Takwim PPD</div>
+    <div class="tab" data-page="tetapan" onclick="showPage('tetapan')"><span class="ic">&#9881;</span>Tetapan Templat</div>
+    <div class="tab" data-page="peringatan" onclick="showPage('peringatan')"><span class="ic">&#128276;</span>Peringatan (Telegram/Email)</div>
+  </nav>
+
+  <main class="main">
+    <div class="page on" id="page-hariini"></div>
+    <div class="page" id="page-semua"></div>
+    <div class="page" id="page-program"></div>
+    <div class="page" id="page-surat"></div>
+    <div class="page" id="page-pajsk"></div>
+    <div class="page" id="page-importppd"></div>
+    <div class="page" id="page-tetapan"></div>
+    <div class="page" id="page-peringatan"></div>
+  </main>
+</div>
+
+<!-- Add task modal -->
+<div class="modal-bg" id="addModal">
+  <div class="modal">
+    <div class="modal-h"><span>Tambah Tugas</span><span class="x" onclick="closeAdd()">&times;</span></div>
+    <div class="modal-b">
+      <label>Nama tugas</label>
+      <input type="text" id="addNama" placeholder="cth. Hantar borang PAJSK ke PPD">
+      <label>Tarikh tindakan</label>
+      <input type="date" id="addTarikh">
+      <label>Catatan (pilihan)</label>
+      <textarea id="addCatatan" rows="2" placeholder="butiran tambahan..."></textarea>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" onclick="closeAdd()">Batal</button>
+      <button class="btn btn-ok" onclick="saveAdd()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Surat masuk modal -->
+<div class="modal-bg" id="suratModal">
+  <div class="modal">
+    <div class="modal-h"><span>Daftar Surat Masuk</span><span class="x" onclick="closeSurat()">&times;</span></div>
+    <div class="modal-b">
+      <label>Tajuk surat</label>
+      <input type="text" id="sTajuk" placeholder="cth. Jemputan Kejohanan Bola Sepak MSSD">
+      <label>Daripada</label>
+      <input type="text" id="sDari" placeholder="cth. PPD Kuching">
+      <label>Jenis</label>
+      <select id="sJenis" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;margin-bottom:13px">
+        <option value="pertandingan">Pertandingan</option>
+        <option value="mesyuarat">Mesyuarat</option>
+        <option value="umum">Umum / makluman</option>
+      </select>
+      <label>Tarikh terima</label>
+      <input type="date" id="sTerima">
+      <label>Tarikh program/acara (jika ada)</label>
+      <input type="date" id="sProgram">
+      <label>Tindakan diperlukan</label>
+      <input type="text" id="sTindakan" placeholder="cth. Sahkan penyertaan sebelum 20 Jun">
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" onclick="closeSurat()">Batal</button>
+      <button class="btn btn-ok" onclick="saveSurat()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Storage (try localStorage, fallback memory) ---------- */
+const MEM = {};
+function sget(k){ try{return localStorage.getItem(k)}catch(e){return MEM[k]||null} }
+function sset(k,v){ try{localStorage.setItem(k,v)}catch(e){MEM[k]=v} }
+
+const YEAR = new Date().getFullYear();
+const K_TAKWIM   = 'takwim_'+YEAR;
+const K_STATUS   = 'pkk_status_'+YEAR;
+const K_MANUAL   = 'pkk_tugas_manual_'+YEAR;
+const K_TEMPLAT  = 'pkk_templat_'+YEAR;
+const K_SURAT    = 'pkk_surat_'+YEAR;
+const K_PAJSK    = 'pkk_pajsk_'+YEAR;
+const K_REMINDER = 'pkk_reminder_config';
+
+let DEMO = null;           // in-memory demo takwim (does not overwrite real data)
+let CURRENT = 'hariini';
+
+/* ---------- Templates: kategori -> milestones (offset in days) ---------- */
+const TEMPLAT_DEFAULT = {
+  program: { label:'Program besar', miles:[
+    {kod:'m1',  nama:'Mesyuarat 1 (jawatankuasa)', offset:-60, link:'generator'},
+    {kod:'kk',  nama:'Kertas kerja disiapkan',     offset:-30, link:'generator'},
+    {kod:'m2',  nama:'Mesyuarat 2',                 offset:-14},
+    {kod:'kw1', nama:'Anggaran kewangan',           offset:-14, link:'kewangan-inv'},
+    {kod:'tg',  nama:'Taklimat guru',               offset:-7},
+    {kod:'opr', nama:'One Page Report (OPR)',       offset:7,  link:'laporan-akhir'},
+    {kod:'kw2', nama:'Penyata kewangan / tuntutan', offset:14, link:'kewangan-inv'},
+  ]},
+  mesyuarat: { label:'Mesyuarat', miles:[
+    {kod:'notis', nama:'Notis mesyuarat',  offset:-14, link:'generator'},
+    {kod:'ring',  nama:'Peringatan',        offset:-2},
+    {kod:'minit', nama:'Minit mesyuarat',   offset:7,  link:'buku-kk'},
+    {kod:'lap',   nama:'Laporan',           offset:7},
+  ]},
+  pertandingan: { label:'Pertandingan', miles:[
+    {kod:'lat', nama:'Mula latihan',        offset:-60},
+    {kod:'lap', nama:'Laporan pertandingan',offset:7},
+  ]},
+};
+
+/* kategori takwim -> kunci templat (null = acara info sahaja, tiada auto-tugas) */
+const PETA = {
+  orientasi:'program', pendaftaran:'program', bengkel:'program', karnival:'program',
+  rimup:'program', sukan:'program', kem:'program', pesta:'program', kebudayaan:'program',
+  dialog:'program', 'malam-bakat':'program', anugerah:'program', kajian:'program',
+  mesyuarat:'mesyuarat',
+  pertandingan:'pertandingan',
+  pajsk:null, latihan:null, serahan:null, perhimpunan:null, pelantikan:null, pentaksiran:null
+};
+const KATEGORI_WARNA = {
+  program:'#9b59b6', mesyuarat:'#34495e', pertandingan:'#e67e22'
+};
+
+function getTemplat(){
+  const raw = sget(K_TEMPLAT);
+  if(!raw) return JSON.parse(JSON.stringify(TEMPLAT_DEFAULT));
+  try{ return JSON.parse(raw); }catch(e){ return JSON.parse(JSON.stringify(TEMPLAT_DEFAULT)); }
+}
+function saveTemplat(t){ sset(K_TEMPLAT, JSON.stringify(t)); }
+
+/* ---------- Date helpers ---------- */
+const HARI = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+const BULAN = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+function todayISO(){ const d=new Date(); return iso(d); }
+function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parse(s){ const p=s.split('-'); return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); }
+function addDays(s,n){ const d=parse(s); d.setUTCDate(d.getUTCDate()+n); return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0'); }
+function diffDays(a,b){ return Math.round((parse(a)-parse(b))/86400000); } // a - b
+function fmtFull(s){ const d=parse(s); return HARI[d.getUTCDay()]+', '+d.getUTCDate()+' '+BULAN[d.getUTCMonth()]+' '+d.getUTCFullYear(); }
+function fmtShort(s){ const d=parse(s); return HARI[d.getUTCDay()].slice(0,3)+' '+d.getUTCDate()+'/'+(d.getUTCMonth()+1); }
+function slug(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40); }
+
+function relText(t){
+  const d = diffDays(t, todayISO());
+  if(d<0) return {txt:'Lewat '+(-d)+' hari', cls:'due-late'};
+  if(d===0) return {txt:'Hari ini', cls:'due-today'};
+  if(d===1) return {txt:'Esok', cls:''};
+  return {txt:'Dalam '+d+' hari', cls:''};
+}
+
+/* ---------- Load takwim ---------- */
+function loadTakwim(){
+  if(DEMO) return DEMO;
+  const raw = sget(K_TAKWIM);
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(e){ return null; }
+}
+
+/* ---------- Status store ---------- */
+function getStatus(){ const r=sget(K_STATUS); if(!r) return {}; try{return JSON.parse(r)}catch(e){return {}} }
+function setStatusFor(id, st){ const s=getStatus(); if(st==='belum'){ delete s[id]; } else { s[id]={status:st, tarikh_siap: st==='selesai'?todayISO():null}; } sset(K_STATUS, JSON.stringify(s)); }
+
+/* ---------- Manual tasks ---------- */
+function getManual(){ const r=sget(K_MANUAL); if(!r) return []; try{return JSON.parse(r)}catch(e){return []} }
+function setManual(arr){ sset(K_MANUAL, JSON.stringify(arr)); }
+
+/* ---------- Engine: generate full task list ---------- */
+function janaTugas(){
+  const T = loadTakwim();
+  const out = [];
+  const status = getStatus();
+  const templat = getTemplat();
+  if(T && T.events){
+    T.events.forEach(ev=>{
+      const tk = PETA[ev.kategori];
+      if(!tk || !templat[tk]) return;
+      const evId = ev.tarikh+'~'+slug(ev.nama);
+      templat[tk].miles.forEach(m=>{
+        const id = evId+'~'+m.kod;
+        out.push({
+          id, sumber:'auto', tk,
+          program: ev.nama, programTarikh: ev.tarikh, kategori: ev.kategori,
+          nama: m.nama, tarikh: addDays(ev.tarikh, m.offset),
+          link: m.link||null,
+          status: (status[id] && status[id].status) || 'belum'
+        });
+      });
+    });
+  }
+  getManual().forEach(mt=>{
+    out.push({ id:mt.id, sumber:'manual', program:null, kategori:null,
+      nama:mt.nama, tarikh:mt.tarikh, catatan:mt.catatan||'', link:null,
+      status:mt.status||'belum' });
+  });
+  pajskTasks().forEach(t=>out.push(t));
+  out.sort((a,b)=> a.tarikh.localeCompare(b.tarikh) || a.nama.localeCompare(b.nama));
+  return out;
+}
+
+/* ---------- Toggle complete ---------- */
+function toggle(id, sumber){
+  if(sumber==='manual'){
+    const arr=getManual(); const it=arr.find(x=>x.id===id);
+    if(it){ it.status = it.status==='selesai'?'belum':'selesai'; setManual(arr); }
+  } else {
+    const s=getStatus(); const cur=(s[id]&&s[id].status)||'belum';
+    setStatusFor(id, cur==='selesai'?'belum':'selesai');
+  }
+  renderAll();
+}
+function delManual(id){
+  if(!confirm('Padam tugas ini?')) return;
+  setManual(getManual().filter(x=>x.id!==id)); toast('Tugas dipadam'); renderAll();
+}
+function clearBacklog(){
+  if(!confirm('Tandai SEMUA tugas tertunggak (sebelum hari ini) sebagai selesai?')) return;
+  const tasks = janaTugas().filter(t=>t.status!=='selesai' && diffDays(t.tarikh,todayISO())<0);
+  const s=getStatus(); const man=getManual();
+  tasks.forEach(t=>{ if(t.sumber==='manual'){ const it=man.find(x=>x.id===t.id); if(it) it.status='selesai'; } else { s[t.id]={status:'selesai',tarikh_siap:todayISO()}; } });
+  sset(K_STATUS, JSON.stringify(s)); setManual(man);
+  toast(tasks.length+' tugas ditanda selesai'); renderAll();
+}
+
+/* ---------- Render: task card ---------- */
+function taskCard(t){
+  const rel = relText(t.tarikh);
+  const d = diffDays(t.tarikh, todayISO());
+  let cls='task'; if(t.status==='selesai') cls+=' done';
+  else if(d<0) cls+=' late'; else if(d===0) cls+=' today'; else if(d<=14) cls+=' soon';
+  let tags='';
+  if(t.sumber==='manual'){ tags='<span class="tag" style="background:#7f8c8d">Manual</span>'; }
+  else { const w=KATEGORI_WARNA[t.tk]||'#9b59b6'; tags='<span class="tag" style="background:'+w+'">'+(t.kategori||'')+'</span>'; }
+  const prog = t.program ? '<span class="tprog">&#8226; '+t.program+'</span>' : '';
+  const cat = t.catatan ? '<span class="tprog">&#8226; '+t.catatan+'</span>' : '';
+  const link = t.link ? '<button class="tlink" onclick="openLink(\''+t.link+'\')">Buka modul</button>' : '';
+  const del = t.sumber==='manual' ? '<button class="tdel" onclick="delManual(\''+t.id+'\')">Padam</button>' : '';
+  return '<div class="'+cls+'">'+
+    '<div class="tick '+(t.status==='selesai'?'done':'')+'" onclick="toggle(\''+t.id+'\',\''+t.sumber+'\')">'+(t.status==='selesai'?'&#10003;':'')+'</div>'+
+    '<div class="tbody"><div class="tname">'+t.nama+'</div>'+
+      '<div class="tmeta"><span class="'+rel.cls+'">'+rel.txt+'</span><span>&#8226; '+fmtShort(t.tarikh)+'</span>'+tags+prog+cat+'</div></div>'+
+    '<div class="tact">'+link+del+'</div></div>';
+}
+
+/* ---------- Render: Hari Ini ---------- */
+function renderHariIni(){
+  const el = document.getElementById('page-hariini');
+  const T = loadTakwim();
+  const nama = sget('spkb_profile_nama') || '';
+  const jam = new Date().getHours();
+  const salam = jam<12?'Selamat pagi':(jam<19?'Selamat petang':'Selamat malam');
+
+  if(!T){
+    el.innerHTML =
+      '<div class="card hello"><h2>'+salam+(nama?', '+nama:'')+'</h2><div class="date">'+fmtFull(todayISO())+'</div></div>'+
+      '<div class="card"><h2>Takwim belum ditetapkan</h2>'+
+      '<div class="desc">Modul ini menjana tugas automatik daripada takwim kokurikulum. Sila tetapkan takwim dahulu melalui modul <b>Pengurusan Takwim</b>, atau lihat paparan dengan data contoh.</div>'+
+      '<button class="btn btn-pri" onclick="loadDemo()">Lihat dengan data contoh</button></div>';
+    return;
+  }
+
+  const tasks = janaTugas();
+  const today = todayISO();
+  const late  = tasks.filter(t=>t.status!=='selesai' && diffDays(t.tarikh,today)<0);
+  const now   = tasks.filter(t=>diffDays(t.tarikh,today)===0);
+  const soon  = tasks.filter(t=>t.status!=='selesai' && diffDays(t.tarikh,today)>0 && diffDays(t.tarikh,today)<=14);
+
+  // pill on sidebar
+  const pill=document.getElementById('pill-late');
+  if(late.length){ pill.style.display='inline-block'; pill.textContent=late.length; } else { pill.style.display='none'; }
+  const ps=document.getElementById('pill-surat'); const suratBaru=getSurat().filter(s=>s.status==='baru').length;
+  if(ps){ if(suratBaru){ ps.style.display='inline-block'; ps.textContent=suratBaru; } else ps.style.display='none'; }
+
+  let h = '<div class="card hello"><h2>'+salam+(nama?', '+nama:'')+'</h2>'+
+    '<div class="date">'+fmtFull(today)+'</div>'+
+    '<div class="chips">'+
+      '<div class="chip"><div class="n">'+late.length+'</div><div class="l">Tertunggak</div></div>'+
+      '<div class="chip"><div class="n">'+now.length+'</div><div class="l">Tugas hari ini</div></div>'+
+      '<div class="chip"><div class="n">'+soon.length+'</div><div class="l">Akan datang (14 hari)</div></div>'+
+    '</div></div>';
+
+  // Tertunggak
+  h += '<div class="card"><h2><span style="color:var(--err)">&#9888;</span> Tugas tertunggak</h2>';
+  if(late.length){
+    h += '<div class="desc">Tugas ini belum selesai dan tarikhnya sudah lepas. Ia kekal di sini sehingga ditanda selesai.</div>';
+    h += '<button class="btn btn-outline btn-sm" style="margin-bottom:10px" onclick="clearBacklog()">Tandai semua sebagai selesai</button>';
+    h += '<div class="tasks">'+late.map(taskCard).join('')+'</div>';
+  } else { h += '<div class="empty">&#10003; Tiada tugas tertunggak. Bagus!</div>'; }
+  h += '</div>';
+
+  // Hari ini
+  h += '<div class="card"><h2><span style="color:var(--warn)">&#9201;</span> Tugas hari ini</h2>';
+  h += now.length ? '<div class="tasks">'+now.map(taskCard).join('')+'</div>' : '<div class="empty">Tiada tugas dijadualkan hari ini.</div>';
+  h += '</div>';
+
+  // Akan datang
+  h += '<div class="card"><h2><span style="color:var(--sk)">&#128279;</span> Tugas akan datang (14 hari)</h2>';
+  h += soon.length ? '<div class="tasks">'+soon.map(taskCard).join('')+'</div>' : '<div class="empty">Tiada tugas dalam 14 hari akan datang.</div>';
+  h += '</div>';
+
+  // Acara takwim 7 hari (awareness)
+  h += '<div class="card"><h2><span style="color:var(--event)">&#128197;</span> Acara takwim minggu ini (7 hari)</h2>';
+  const ev = acaraMinggu(T, 7);
+  if(ev.length){
+    h += ev.map(e=>'<div class="evrow"><span class="evdot" style="background:'+e.warna+'"></span><span class="evdate">'+fmtShort(e.tarikh)+'</span><span>'+e.nama+'</span></div>').join('');
+  } else { h += '<div class="empty">Tiada acara dalam 7 hari akan datang.</div>'; }
+  h += '</div>';
+
+  // Surat masuk belum diproses
+  const suratBlm = getSurat().filter(s=>s.status==='baru').sort((a,b)=>(b.terima||'').localeCompare(a.terima||''));
+  h += '<div class="card"><h2><span style="color:var(--acc)">&#9993;</span> Surat masuk belum diproses</h2>';
+  if(suratBlm.length){
+    h += suratBlm.map(s=>'<div class="evrow"><span class="evdot" style="background:var(--acc)"></span><span class="evdate">'+fmtShort(s.terima)+'</span><span>'+s.tajuk+(s.dari?' <span class="tprog">&#8226; '+s.dari+'</span>':'')+'</span></div>').join('');
+    h += '<div style="margin-top:8px"><button class="btn btn-outline btn-sm" onclick="showPage(\'surat\')">Urus surat masuk</button></div>';
+  } else { h += '<div class="empty">Tiada surat menunggu tindakan.</div>'; }
+  h += '</div>';
+
+  el.innerHTML = h;
+}
+
+/* acara takwim (events + perjumpaan) dalam N hari ke hadapan */
+function acaraMinggu(T, n){
+  const out=[]; const today=todayISO();
+  (T.events||[]).forEach(e=>{ const d=diffDays(e.tarikh,today); if(d>=0 && d<=n) out.push({tarikh:e.tarikh, nama:e.nama, warna:'#9b59b6'}); });
+  [['beruniform','#2980b9','Perjumpaan Beruniform'],['kelab','#16a085','Perjumpaan Kelab/Persatuan'],['sukan','#e67e22','Perjumpaan Sukan/Permainan']].forEach(([k,w,label])=>{
+    const dates=(T[k]&&T[k].dates)||[];
+    dates.forEach(dt=>{ const d=diffDays(dt,today); if(d>=0 && d<=n) out.push({tarikh:dt, nama:label, warna:w}); });
+  });
+  out.sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
+  return out;
+}
+
+/* ---------- Render: Semua Tugas ---------- */
+let FILTER={status:'belum', q:''};
+function renderSemua(){
+  const el=document.getElementById('page-semua');
+  let tasks=janaTugas();
+  if(FILTER.status==='belum') tasks=tasks.filter(t=>t.status!=='selesai');
+  if(FILTER.status==='selesai') tasks=tasks.filter(t=>t.status==='selesai');
+  if(FILTER.q){ const q=FILTER.q.toLowerCase(); tasks=tasks.filter(t=>(t.nama+' '+(t.program||'')).toLowerCase().includes(q)); }
+
+  let h='<div class="card"><h2>Semua tugas</h2>'+
+    '<div class="filter">'+
+      '<input type="text" id="fq" placeholder="Cari tugas..." value="'+FILTER.q.replace(/"/g,'&quot;')+'" oninput="FILTER.q=this.value;renderSemua()">'+
+      '<select onchange="FILTER.status=this.value;renderSemua()">'+
+        '<option value="belum"'+(FILTER.status==='belum'?' selected':'')+'>Belum selesai</option>'+
+        '<option value="selesai"'+(FILTER.status==='selesai'?' selected':'')+'>Selesai</option>'+
+        '<option value="semua"'+(FILTER.status==='semua'?' selected':'')+'>Semua</option>'+
+      '</select>'+
+      '<button class="btn btn-acc btn-sm" onclick="openAdd()">+ Tambah</button>'+
+    '</div>';
+  h += tasks.length ? '<div class="tasks">'+tasks.map(taskCard).join('')+'</div>' : '<div class="empty">Tiada tugas sepadan.</div>';
+  h += '</div>';
+  el.innerHTML=h;
+  const f=document.getElementById('fq'); if(f){ f.focus(); f.setSelectionRange(f.value.length,f.value.length); }
+}
+
+/* ---------- Render: Program & Aktiviti ---------- */
+function renderProgram(){
+  const el=document.getElementById('page-program');
+  const T=loadTakwim();
+  if(!T){ el.innerHTML='<div class="card"><div class="empty">Takwim belum ditetapkan.</div></div>'; return; }
+  const status=getStatus(); const templat=getTemplat();
+  const progs=(T.events||[]).filter(e=>PETA[e.kategori]);
+  if(!progs.length){ el.innerHTML='<div class="card"><div class="empty">Tiada program berjadual dalam takwim.</div></div>'; return; }
+
+  let h='<div class="card"><h2>Program &amp; aktiviti</h2><div class="desc">Setiap program menjana langkah persediaan &amp; susulan secara automatik. Klik untuk lihat senarai semak.</div></div>';
+  progs.sort((a,b)=>a.tarikh.localeCompare(b.tarikh)).forEach((ev,i)=>{
+    const tk=PETA[ev.kategori]; const miles=templat[tk].miles;
+    const evId=ev.tarikh+'~'+slug(ev.nama);
+    let done=0; const rows=miles.map(m=>{
+      const id=evId+'~'+m.kod; const st=(status[id]&&status[id].status)||'belum';
+      if(st==='selesai') done++;
+      const t={id,sumber:'auto',tk,program:ev.nama,kategori:ev.kategori,nama:m.nama,tarikh:addDays(ev.tarikh,m.offset),link:m.link||null,status:st};
+      return taskCard(t);
+    }).join('');
+    const pct=Math.round(done/miles.length*100);
+    const w=KATEGORI_WARNA[tk]||'#9b59b6';
+    h+='<div class="card">'+
+      '<h2 style="cursor:pointer" onclick="document.getElementById(\'ml'+i+'\').classList.toggle(\'open\')">'+
+        '<span class="tag" style="background:'+w+'">'+ev.kategori+'</span> '+ev.nama+'</h2>'+
+      '<div class="desc">'+fmtFull(ev.tarikh)+' &middot; '+done+'/'+miles.length+' langkah selesai</div>'+
+      '<div class="progwrap"><div class="progbar" style="width:'+pct+'%"></div></div>'+
+      '<div class="miles" id="ml'+i+'">'+rows+'</div></div>';
+  });
+  el.innerHTML=h;
+}
+
+/* ---------- Render: Tetapan Templat ---------- */
+function renderTetapan(){
+  const el=document.getElementById('page-tetapan');
+  const t=getTemplat();
+  let h='<div class="card"><h2>Tetapan templat tugas</h2><div class="desc">Laras bilangan hari sebelum (negatif) atau selepas (positif) tarikh program untuk setiap tugas auto-jana. Perubahan disimpan dalam pelayar ini.</div></div>';
+  Object.keys(t).forEach(k=>{
+    h+='<div class="card"><h2>'+t[k].label+'</h2>';
+    t[k].miles.forEach((m,i)=>{
+      h+='<div class="troww"><span class="nm">'+m.nama+'</span>'+
+         '<input type="number" value="'+m.offset+'" onchange="updOffset(\''+k+'\','+i+',this.value)"><span class="u">hari</span></div>';
+    });
+    h+='</div>';
+  });
+  h+='<div class="card"><button class="btn btn-outline" onclick="resetTemplat()">Set semula kepada lalai</button></div>';
+  el.innerHTML=h;
+}
+function updOffset(k,i,v){ const t=getTemplat(); t[k].miles[i].offset=parseInt(v)||0; saveTemplat(t); toast('Templat dikemas kini'); }
+function resetTemplat(){ if(!confirm('Set semula semua templat kepada nilai lalai?'))return; try{localStorage.removeItem(K_TEMPLAT)}catch(e){delete MEM[K_TEMPLAT]} toast('Templat diset semula'); renderAll(); }
+
+/* ---------- Add task modal ---------- */
+function openAdd(){ document.getElementById('addNama').value=''; document.getElementById('addCatatan').value=''; document.getElementById('addTarikh').value=todayISO(); document.getElementById('addModal').classList.add('on'); }
+function closeAdd(){ document.getElementById('addModal').classList.remove('on'); }
+function saveAdd(){
+  const nama=document.getElementById('addNama').value.trim();
+  const tarikh=document.getElementById('addTarikh').value;
+  if(!nama){ toast('Sila isi nama tugas'); return; }
+  if(!tarikh){ toast('Sila pilih tarikh'); return; }
+  const arr=getManual();
+  arr.push({ id:'m'+Date.now(), nama, tarikh, catatan:document.getElementById('addCatatan').value.trim(), status:'belum' });
+  setManual(arr); closeAdd(); toast('Tugas ditambah'); renderAll();
+}
+
+/* ---------- Open linked module (works standalone & in SPKB) ---------- */
+function openLink(page){
+  try{ window.parent.postMessage({action:'spkb-open', page:page}, '*'); }catch(e){}
+  toast('Membuka modul berkaitan...');
+}
+
+/* ---------- Demo data (memory only) ---------- */
+function loadDemo(){
+  const t=todayISO();
+  DEMO = {
+    durasi_minit:90, min_jumpa:12, min_jam:18,
+    beruniform:{dates:[addDays(t,1),addDays(t,8)]},
+    kelab:{dates:[addDays(t,2),addDays(t,9)]},
+    sukan:{dates:[addDays(t,4),addDays(t,11)]},
+    cuti:[],
+    events:[
+      {tarikh:addDays(t,2),  kategori:'mesyuarat', nama:'Mesyuarat JK Kokurikulum Bil. 3/2026'},
+      {tarikh:addDays(t,11), kategori:'karnival',  nama:'Karnival Sukan Sekolah 2026'},
+      {tarikh:addDays(t,55), kategori:'pertandingan', nama:'Kejohanan Olahraga MSSD Kuching'},
+      {tarikh:addDays(t,-3), kategori:'bengkel',   nama:'Bengkel Pengurusan Kelab 2/2026'}
+    ]
+  };
+  toast('Data contoh dimuat (tidak disimpan)'); renderAll();
+}
+
+/* ============================================================
+   FASA 2 — Surat Masuk, PAJSK, Import PPD, Peringatan
+   ============================================================ */
+
+/* ---------- PAJSK ---------- */
+function getPajsk(){ const r=sget(K_PAJSK); let c={mula:YEAR+'-03-01', tamat:YEAR+'-11-30', peratus:0}; if(r){try{c=Object.assign(c,JSON.parse(r))}catch(e){}} return c; }
+function setPajsk(c){ sset(K_PAJSK, JSON.stringify(c)); }
+function pajskTasks(){
+  const c=getPajsk(); const status=getStatus(); const out=[];
+  const start=parse(c.mula), end=parse(c.tamat);
+  let y=start.getUTCFullYear(), m=start.getUTCMonth(); let guard=0;
+  while(guard++ < 36){
+    const dt=y+'-'+String(m+1).padStart(2,'0')+'-01';
+    if(parse(dt) > end) break;
+    if(parse(dt) >= start){
+      const id='pajsk~'+dt;
+      out.push({ id, sumber:'pajsk', tk:null, program:'Pentaksiran PAJSK', kategori:'pajsk',
+        nama:'Semak & pantau pengisian PAJSK ('+BULAN[m]+')', tarikh:dt, link:'pajsk',
+        status:(status[id]&&status[id].status)||'belum' });
+    }
+    m++; if(m>11){m=0;y++;}
+  }
+  return out;
+}
+function renderPajsk(){
+  const el=document.getElementById('page-pajsk');
+  const c=getPajsk();
+  const today=todayISO();
+  const dStart=diffDays(c.mula,today), dEnd=diffDays(c.tamat,today);
+  let fasa, warna;
+  if(dStart>0){ fasa='Belum bermula — buka dalam '+dStart+' hari'; warna='var(--muted)'; }
+  else if(dEnd<0){ fasa='Tetingkap sudah ditutup'; warna='var(--err)'; }
+  else { fasa='Sedang dibuka — '+dEnd+' hari sebelum tutup'; warna='var(--ok)'; }
+  el.innerHTML =
+    '<div class="card"><h2>Penjejak pengisian PAJSK</h2>'+
+    '<div class="desc">Tetingkap pentaksiran tahunan. Sistem menjana peringatan pemantauan pada 1 haribulan setiap bulan sepanjang tempoh ini (lihat di "Hari Ini").</div>'+
+    '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px">'+
+      '<div><label style="font-size:12px;font-weight:600">Tarikh mula</label><br><input type="date" value="'+c.mula+'" onchange="savePajskField(\'mula\',this.value)" style="border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
+      '<div><label style="font-size:12px;font-weight:600">Tarikh tutup</label><br><input type="date" value="'+c.tamat+'" onchange="savePajskField(\'tamat\',this.value)" style="border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
+    '</div>'+
+    '<div style="font-weight:600;color:'+warna+';margin-bottom:12px">'+fasa+'</div>'+
+    '<label style="font-size:12px;font-weight:600">Anggaran peratus pengisian semasa: '+c.peratus+'%</label>'+
+    '<input type="range" min="0" max="100" value="'+c.peratus+'" oninput="savePajskField(\'peratus\',+this.value)" style="width:100%;margin-top:6px">'+
+    '<div class="progwrap" style="height:12px;margin-top:6px"><div class="progbar" style="width:'+c.peratus+'%"></div></div>'+
+    '</div>';
+}
+function savePajskField(k,v){ const c=getPajsk(); c[k]=v; setPajsk(c); renderPajsk(); if(k==='peratus') return; renderHariIni(); }
+
+/* ---------- Surat Masuk ---------- */
+function getSurat(){ const r=sget(K_SURAT); if(!r) return []; try{return JSON.parse(r)}catch(e){return []} }
+function setSurat(a){ sset(K_SURAT, JSON.stringify(a)); }
+function openSurat(){ document.getElementById('sTajuk').value=''; document.getElementById('sDari').value=''; document.getElementById('sJenis').value='pertandingan'; document.getElementById('sTerima').value=todayISO(); document.getElementById('sProgram').value=''; document.getElementById('sTindakan').value=''; document.getElementById('suratModal').classList.add('on'); }
+function closeSurat(){ document.getElementById('suratModal').classList.remove('on'); }
+function saveSurat(){
+  const tajuk=document.getElementById('sTajuk').value.trim();
+  if(!tajuk){ toast('Sila isi tajuk surat'); return; }
+  const arr=getSurat();
+  arr.push({ id:'s'+Date.now(), tajuk, dari:document.getElementById('sDari').value.trim(),
+    jenis:document.getElementById('sJenis').value, terima:document.getElementById('sTerima').value||todayISO(),
+    program:document.getElementById('sProgram').value||'', tindakan:document.getElementById('sTindakan').value.trim(),
+    status:'baru' });
+  setSurat(arr); closeSurat(); toast('Surat didaftar'); renderAll();
+}
+function delSurat(id){ if(!confirm('Padam surat ini?'))return; setSurat(getSurat().filter(x=>x.id!==id)); toast('Surat dipadam'); renderAll(); }
+function prosesSurat(id){
+  const arr=getSurat(); const s=arr.find(x=>x.id===id); if(!s) return;
+  if(s.program){
+    const T=loadTakwim();
+    if(!T || DEMO){ toast('Sila tetapkan takwim sebenar dahulu sebelum jana acara'); return; }
+    const kat = s.jenis==='mesyuarat'?'mesyuarat':(s.jenis==='pertandingan'?'pertandingan':'mesyuarat');
+    T.events = T.events||[];
+    const dup = T.events.some(e=>e.tarikh===s.program && e.nama===s.tajuk);
+    if(!dup){ T.events.push({tarikh:s.program, kategori:kat, nama:s.tajuk, sumber:'surat'}); sset(K_TAKWIM, JSON.stringify(T)); notifyTakwim(); }
+  }
+  s.status='diproses'; setSurat(arr);
+  toast(s.program?'Acara dijana + tugas auto dibuat':'Surat ditanda diproses'); renderAll();
+}
+function renderSurat(){
+  const el=document.getElementById('page-surat');
+  const arr=getSurat().slice().sort((a,b)=>(b.terima||'').localeCompare(a.terima||''));
+  let h='<div class="card"><h2>Surat masuk</h2><div class="desc">Daftar surat jemputan mesyuarat/pertandingan yang diterima. Surat bertarikh program boleh dijana terus menjadi acara takwim + tugas automatik.</div>'+
+    '<button class="btn btn-acc btn-sm" onclick="openSurat()">+ Daftar surat</button></div>';
+  if(!arr.length){ h+='<div class="card"><div class="empty">Belum ada surat didaftar.</div></div>'; el.innerHTML=h; return; }
+  arr.forEach(s=>{
+    const baru = s.status==='baru';
+    const jw = s.jenis==='pertandingan'?'#e67e22':(s.jenis==='mesyuarat'?'#34495e':'#7f8c8d');
+    h+='<div class="card" style="'+(baru?'border-left:4px solid var(--warn)':'')+'">'+
+      '<h2 style="font-size:14.5px"><span class="tag" style="background:'+jw+'">'+s.jenis+'</span> '+s.tajuk+'</h2>'+
+      '<div class="desc" style="margin-bottom:8px">Daripada: '+(s.dari||'-')+' &middot; Terima: '+fmtShort(s.terima)+(s.program?' &middot; Acara: '+fmtShort(s.program):'')+(s.tindakan?'<br>Tindakan: '+s.tindakan:'')+'</div>'+
+      '<div style="display:flex;gap:7px;flex-wrap:wrap">'+
+        (baru? '<button class="btn btn-ok btn-sm" onclick="prosesSurat(\''+s.id+'\')">'+(s.program?'Jana acara + tanda diproses':'Tanda diproses')+'</button>' : '<span class="tag" style="background:var(--ok)">Diproses</span>')+
+        '<button class="tdel" onclick="delSurat(\''+s.id+'\')">Padam</button>'+
+      '</div></div>';
+  });
+  el.innerHTML=h;
+}
+
+/* ---------- Import Takwim PPD ---------- */
+function renderImport(){
+  const el=document.getElementById('page-importppd');
+  el.innerHTML =
+    '<div class="card"><h2>Import takwim pertandingan PPD</h2>'+
+    '<div class="desc">Tampal senarai pertandingan daripada takwim PPD. Satu baris satu pertandingan, format: <b>Tarikh ; Nama pertandingan</b> (tarikh: YYYY-MM-DD). Contoh:<br>'+
+    '<code>2026-08-15 ; Kejohanan Olahraga MSSD Kuching</code><br><code>2026-09-03 ; Pertandingan Bola Jaring MSSD</code></div>'+
+    '<textarea id="ppdText" rows="7" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:11px;font-family:monospace;font-size:13px" placeholder="2026-08-15 ; Kejohanan Olahraga MSSD Kuching"></textarea>'+
+    '<div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-pri" onclick="importPPD()">Import ke takwim</button></div>'+
+    '<div class="desc" style="margin-top:10px">Setiap pertandingan ditanda <b>sumber: PPD</b>, dimasukkan ke takwim master (kategori: pertandingan), dan automatik menjana tugas "mula latihan −2 bulan".</div>'+
+    '</div>';
+}
+function importPPD(){
+  const raw=document.getElementById('ppdText').value.trim();
+  if(!raw){ toast('Sila tampal senarai pertandingan'); return; }
+  const T=loadTakwim();
+  if(!T || DEMO){ toast('Sila tetapkan takwim sebenar dahulu (modul Pengurusan Takwim)'); return; }
+  T.events=T.events||[];
+  let n=0, skip=0;
+  raw.split(/\n/).forEach(line=>{
+    line=line.trim(); if(!line) return;
+    const parts=line.split(/[;|\t]/).map(x=>x.trim());
+    let tarikh, nama;
+    if(parts.length>=2 && /^\d{4}-\d{2}-\d{2}$/.test(parts[0])){ tarikh=parts[0]; nama=parts.slice(1).join(' '); }
+    else { const m=line.match(/(\d{4}-\d{2}-\d{2})/); if(!m){skip++;return;} tarikh=m[1]; nama=line.replace(m[1],'').replace(/^[;|\s-]+/,'').trim(); }
+    if(!nama){ skip++; return; }
+    const dup=T.events.some(e=>e.tarikh===tarikh && e.nama===nama);
+    if(dup){ skip++; return; }
+    T.events.push({tarikh, kategori:'pertandingan', nama, sumber:'ppd'}); n++;
+  });
+  if(n){ sset(K_TAKWIM, JSON.stringify(T)); notifyTakwim(); }
+  document.getElementById('ppdText').value='';
+  toast(n+' pertandingan diimport'+(skip?', '+skip+' dilangkau':''));
+  showPage('hariini');
+}
+function notifyTakwim(){ try{ window.parent.postMessage({action:'takwim-updated'}, '*'); }catch(e){} }
+
+/* ---------- Peringatan (push) ---------- */
+function getReminder(){ const r=sget(K_REMINDER); let c={endpoint:'', telegram:'', email:'', aktif:false, masa:'07:00'}; if(r){try{c=Object.assign(c,JSON.parse(r))}catch(e){}} return c; }
+function setReminder(c){ sset(K_REMINDER, JSON.stringify(c)); }
+function renderPeringatan(){
+  const el=document.getElementById('page-peringatan');
+  const c=getReminder();
+  el.innerHTML =
+    '<div class="card"><h2>Peringatan automatik (Telegram / Email)</h2>'+
+    '<div class="desc">Hantar ringkasan tugas harian ke Telegram atau email, walaupun anda tidak membuka sistem. Memerlukan projek Apps Script <b>pkk-reminder.gs</b> yang berasingan (lihat fail backend). Tampal URL Web App-nya di bawah.</div>'+
+    '<label style="font-size:12px;font-weight:600">URL Web App peringatan (Apps Script)</label>'+
+    '<input type="text" id="rEndpoint" value="'+(c.endpoint||'').replace(/"/g,'&quot;')+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
+    '<label style="font-size:12px;font-weight:600">Telegram Chat ID (pilihan)</label>'+
+    '<input type="text" id="rTele" value="'+(c.telegram||'').replace(/"/g,'&quot;')+'" placeholder="cth. 123456789 atau -100xxxx (kumpulan)" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
+    '<label style="font-size:12px;font-weight:600">Email (pilihan)</label>'+
+    '<input type="text" id="rEmail" value="'+(c.email||'').replace(/"/g,'&quot;')+'" placeholder="nama@email.com" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
+    '<label style="font-size:12px;font-weight:600">Masa hantar harian</label>'+
+    '<input type="time" id="rMasa" value="'+(c.masa||'07:00')+'" style="border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 14px;display:block">'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<button class="btn btn-ok" onclick="saveReminder()">Simpan tetapan</button>'+
+      '<button class="btn btn-pri" onclick="hantarSnapshot()">Segerak data ke awan</button>'+
+      '<button class="btn btn-outline" onclick="ujiPeringatan()">Hantar peringatan ujian</button>'+
+    '</div>'+
+    '<div class="desc" style="margin-top:12px"><b>Cara kerja:</b> butang "Segerak data ke awan" menghantar takwim + tugas + tetapan PAJSK ke backend. Backend kemudian menjana ringkasan harian sendiri pada masa yang ditetapkan dan menghantarnya ke Telegram/email anda. Segerakkan semula apabila takwim berubah.</div>'+
+    '</div>';
+}
+function saveReminder(){
+  setReminder({ endpoint:document.getElementById('rEndpoint').value.trim(), telegram:document.getElementById('rTele').value.trim(),
+    email:document.getElementById('rEmail').value.trim(), masa:document.getElementById('rMasa').value||'07:00', aktif:true });
+  toast('Tetapan peringatan disimpan');
+}
+function snapshot(){
+  return { tahun:YEAR, takwim:loadTakwim(), manual:getManual(), status:getStatus(), templat:getTemplat(),
+    pajsk:getPajsk(), nama:sget('spkb_profile_nama')||'', telegram:getReminder().telegram, email:getReminder().email, masa:getReminder().masa };
+}
+async function postReminder(action){
+  const c=getReminder();
+  if(!c.endpoint){ toast('Sila isi URL Web App dahulu'); return; }
+  try{
+    const res=await fetch(c.endpoint, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({action, payload:snapshot()}) });
+    const txt=await res.text();
+    toast(action==='uji'?'Peringatan ujian dihantar':'Data disegerak ke awan');
+    return txt;
+  }catch(e){ toast('Gagal hubungi backend — semak URL & deployment'); }
+}
+function hantarSnapshot(){ saveReminder(); postReminder('sync'); }
+function ujiPeringatan(){ saveReminder(); postReminder('uji'); }
+
+
+function showPage(p){
+  CURRENT=p;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.page===p));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  renderAll();
+}
+function renderAll(){
+  renderHariIni(); // always recompute pills
+  if(CURRENT==='semua') renderSemua();
+  if(CURRENT==='program') renderProgram();
+  if(CURRENT==='surat') renderSurat();
+  if(CURRENT==='pajsk') renderPajsk();
+  if(CURRENT==='importppd') renderImport();
+  if(CURRENT==='tetapan') renderTetapan();
+  if(CURRENT==='peringatan') renderPeringatan();
+}
+function goBack(){ try{ window.parent.postMessage({action:'spkb-back'}, '*'); }catch(e){} }
+
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2500); }
+
+/* ---------- Init ---------- */
+(function(){
+  if(window.self!==window.top) document.body.classList.add('in-spkb');
+  renderHariIni();
+})();
+</script>
+</body>
+</html>
