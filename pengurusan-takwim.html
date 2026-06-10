@@ -1334,10 +1334,17 @@ function changeYear(y){
 // Dasar: simpanan terakhir menang. Auto-muat semasa buka + pengesahan.
 // ========================================================
 const K_CLOUD_URL = 'spkb_takwim_cloud_url';
-function getCloudURL(){ return sget(K_CLOUD_URL) || ''; }
+// ⬇️⬇️ TETAPKAN SEKALI SAHAJA: tampal URL Web App takwim-cloud.gs di antara tanda '' di bawah,
+//        kemudian push ke GitHub. Selepas ini SEMUA peranti guna URL ini secara automatik —
+//        tiada lagi tetapan per-peranti. Contoh:
+//        const CLOUD_URL_DEFAULT = 'https://script.google.com/macros/s/AKfyc..../exec';
+const CLOUD_URL_DEFAULT = '';
+function getCloudURL(){ return sget(K_CLOUD_URL) || CLOUD_URL_DEFAULT; }
 function updateCloudStatus(){
   const el = document.getElementById('cloudStatus'); if(!el) return;
-  el.textContent = getCloudURL() ? '☁️ URL Awan ditetapkan. Data disegerak merentas peranti.' : 'URL Awan belum ditetapkan — klik "Tetapan URL Awan".';
+  if(!getCloudURL()){ el.textContent = 'URL Awan belum ditetapkan — tanam dalam fail (CLOUD_URL_DEFAULT) atau klik "Tetapan URL Awan".'; return; }
+  const override = !!sget(K_CLOUD_URL);
+  el.textContent = '☁️ URL Awan aktif' + (override ? ' (override peranti ini).' : ' (lalai dari fail) — segerak merentas peranti secara automatik.');
 }
 function setCloudURLPrompt(){
   const v = prompt('Tampal URL Web App takwim-cloud.gs (berakhir dengan /exec):', getCloudURL());
