@@ -256,6 +256,13 @@ body.in-spkb .sidebar{height:calc(100vh - 20px);top:0}
           <input type="file" id="jsonImport" accept=".json" style="display:none;" onchange="importJSON(this.files[0])">
           <button class="btn btn-err" onclick="resetAll()"><i class="fas fa-trash"></i> Reset Semua</button>
         </div>
+        <h3 style="margin-top:16px"><i class="fas fa-cloud"></i> Segerak Awan (Multi-Peranti)</h3>
+        <div class="btn-row">
+          <button class="btn btn-ok" onclick="cloudSimpan()"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Awan</button>
+          <button class="btn btn-outline" onclick="cloudMuat(false)"><i class="fas fa-cloud-download-alt"></i> Muat dari Awan</button>
+          <button class="btn btn-outline" onclick="setCloudURLPrompt()"><i class="fas fa-link"></i> Tetapan URL Awan</button>
+        </div>
+        <div id="cloudStatus" style="font-size:12px;color:#7f8c8d;margin-top:8px"></div>
       </div>
     </div>
 
@@ -1323,6 +1330,59 @@ function changeYear(y){
 }
 
 // ========================================================
+// CLOUD SYNC (backend: takwim-cloud.gs — projek berasingan)
+// Dasar: simpanan terakhir menang. Auto-muat semasa buka + pengesahan.
+// ========================================================
+const K_CLOUD_URL = 'spkb_takwim_cloud_url';
+function getCloudURL(){ return sget(K_CLOUD_URL) || ''; }
+function updateCloudStatus(){
+  const el = document.getElementById('cloudStatus'); if(!el) return;
+  el.textContent = getCloudURL() ? '☁️ URL Awan ditetapkan. Data disegerak merentas peranti.' : 'URL Awan belum ditetapkan — klik "Tetapan URL Awan".';
+}
+function setCloudURLPrompt(){
+  const v = prompt('Tampal URL Web App takwim-cloud.gs (berakhir dengan /exec):', getCloudURL());
+  if(v === null) return;
+  sset(K_CLOUD_URL, v.trim());
+  toast(v.trim() ? '✅ URL Awan disimpan' : 'URL Awan dikosongkan');
+  updateCloudStatus();
+}
+async function cloudSimpan(){
+  const url = getCloudURL();
+  if(!url){ toast('Sila tetapkan URL Awan dahulu'); return; }
+  if(!DATA){ toast('Tiada data takwim untuk disimpan'); return; }
+  try{
+    const res = await fetch(url, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action:'simpan', tahun:currentYear, data:DATA }) });
+    const r = await res.json();
+    if(r && r.ok){ toast('☁️ Disimpan ke awan'); } else { toast('Gagal simpan ke awan'); }
+  }catch(e){ toast('Gagal hubungi awan — semak URL'); }
+}
+async function cloudMuat(auto){
+  const url = getCloudURL();
+  if(!url){ if(!auto) toast('Sila tetapkan URL Awan dahulu'); return; }
+  try{
+    const res = await fetch(url, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action:'muat', tahun:currentYear }) });
+    const r = await res.json();
+    if(!(r && r.ok && r.data)){ if(!auto) toast('Tiada data di awan untuk tahun ' + currentYear); return; }
+    // Peranti kosong — muat terus tanpa amaran tindih
+    if(!DATA){
+      DATA = r.data; sset('takwim_' + currentYear, JSON.stringify(DATA)); refreshUI();
+      toast('☁️ Takwim dimuat dari awan'); return;
+    }
+    // Sudah selari — tiada tindakan
+    if(JSON.stringify(r.data) === JSON.stringify(DATA)){ if(!auto) toast('Sudah selari dengan awan'); return; }
+    // Berbeza — minta pengesahan sebelum tindih
+    const msg = 'Versi awan dijumpai untuk tahun ' + currentYear +
+                (r.masa ? ' (dikemas kini ' + r.masa + ')' : '') +
+                '.\n\nMuat dan TINDIH data di peranti ini? Perubahan tempatan yang belum disimpan ke awan akan hilang.';
+    if(!confirm(msg)) return;
+    DATA = r.data; sset('takwim_' + currentYear, JSON.stringify(DATA)); refreshUI();
+    toast('☁️ Dimuat dari awan');
+  }catch(e){ if(!auto) toast('Gagal hubungi awan — semak URL'); }
+}
+
+// ========================================================
 // INIT
 // ========================================================
 (function init(){
@@ -1330,6 +1390,8 @@ function changeYear(y){
   populateYearSelector();
   load();
   refreshUI();
+  updateCloudStatus();
+  if(getCloudURL()) cloudMuat(true);   // auto-muat semasa buka (dengan pengesahan jika berbeza)
   // Close modal on background click
   document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if(e.target === bg) bg.classList.remove('show'); }));
 })();
