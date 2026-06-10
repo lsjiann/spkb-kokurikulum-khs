@@ -142,9 +142,10 @@ body.in-spkb .spkb-back-btn{display:flex}
   <div class="panel active" id="panel-rekod">
     <div class="filter-bar">
       <label>Unit:</label>
-      <select id="unitSel" onchange="loadPelajar()"><option value="">— Pilih Unit —</option></select>
+      <select id="unitSel" onchange="onUnitChange()"><option value="">— Pilih Unit —</option></select>
       <label>Tarikh:</label>
-      <input type="date" id="tarikhSel" onchange="loadPelajar()">
+      <select id="tarikhTakwimSel" onchange="onTarikhTakwimChange()" title="Tarikh perjumpaan dari takwim"><option value="">— Pilih unit dahulu —</option></select>
+      <input type="date" id="tarikhSel" onchange="onTarikhManual()" title="Atau pilih tarikh lain (di luar takwim)" style="max-width:150px;">
       <div class="stat-mini">
         <div><span class="v" id="miniHadir">0</span> <span class="l">Hadir</span></div>
         <div><span class="v" id="miniTH" style="color:var(--err)">0</span> <span class="l">Tidak Hadir</span></div>
@@ -1463,6 +1464,40 @@ function getTakwimForUnit(unitKod){
   if(!u) return [];
   const kKey = KAT_TO_KEY[u.kategori];
   return kKey ? generateTakwimDates(kKey) : [];
+}
+
+// ===== Pemilih tarikh dipacu takwim =====
+function fmtTarikhOpt(iso){
+  const d = new Date(iso + 'T00:00:00Z');
+  const p = iso.split('-');
+  return HARI_LABEL[d.getUTCDay()] + ', ' + p[2] + '/' + p[1] + '/' + p[0];
+}
+function populateTarikhTakwim(){
+  const unit = document.getElementById('unitSel').value;
+  const sel = document.getElementById('tarikhTakwimSel');
+  if(!sel) return;
+  if(!unit){ sel.innerHTML = '<option value="">— Pilih unit dahulu —</option>'; return; }
+  const dates = getTakwimForUnit(unit);
+  if(!dates.length){ sel.innerHTML = '<option value="">— Tiada tarikh takwim (set di tab Takwim) —</option>'; return; }
+  const today = new Date().toISOString().substring(0,10);
+  let h = '<option value="">— Pilih tarikh perjumpaan —</option>';
+  dates.forEach(d => { h += `<option value="${d}">${fmtTarikhOpt(d)}${d===today?' • hari ini':''}</option>`; });
+  sel.innerHTML = h;
+  // Jika hari ini ialah tarikh perjumpaan, auto-pilih
+  if(dates.indexOf(today) >= 0){ sel.value = today; document.getElementById('tarikhSel').value = today; }
+  else { document.getElementById('tarikhSel').value = ''; }
+}
+function onUnitChange(){ populateTarikhTakwim(); loadPelajar(); }
+function onTarikhTakwimChange(){
+  const v = document.getElementById('tarikhTakwimSel').value;
+  if(v) document.getElementById('tarikhSel').value = v;
+  loadPelajar();
+}
+function onTarikhManual(){
+  const v = document.getElementById('tarikhSel').value;
+  const sel = document.getElementById('tarikhTakwimSel');
+  if(sel){ sel.value = [...sel.options].some(o => o.value === v) ? v : ''; }
+  loadPelajar();
 }
 
 function renderTakwimPreview(){
