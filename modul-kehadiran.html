@@ -132,6 +132,7 @@ body.in-spkb .spkb-back-btn{display:flex}
 <div class="wrap">
   <div class="tabs">
     <button class="tab active" data-tab="rekod" onclick="switchTab('rekod')"><i class="fas fa-edit"></i> Rekod Perjumpaan</button>
+    <button class="tab" data-tab="pukal" onclick="switchTab('pukal')"><i class="fas fa-layer-group"></i> Rekod Pukal</button>
     <button class="tab" data-tab="takwim" onclick="switchTab('takwim')"><i class="fas fa-calendar-alt"></i> Takwim</button>
     <button class="tab" data-tab="unit" onclick="switchTab('unit')"><i class="fas fa-users"></i> Analisis Unit</button>
     <button class="tab" data-tab="pelajar" onclick="switchTab('pelajar')"><i class="fas fa-user-graduate"></i> Analisis Pelajar</button>
@@ -154,6 +155,9 @@ body.in-spkb .spkb-back-btn{display:flex}
     </div>
     <div id="rekodContent"><div class="empty"><i class="fas fa-info-circle"></i>Pilih unit dan tarikh untuk mula merekod kehadiran.</div></div>
   </div>
+
+  <!-- TAB PUKAL: Tandakan kehadiran untuk semua unit satu kategori sekali gus -->
+  <div class="panel" id="panel-pukal"></div>
 
   <!-- TAB TAKWIM: Pratetap jadual perjumpaan per kategori -->
   <div class="panel" id="panel-takwim">
@@ -1199,6 +1203,7 @@ function switchTab(tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
   if(tab==='takwim'){ populateTakwimForm(); renderTakwimPreview(); }
+  else if(tab==='pukal') renderPukal();
   else if(tab==='unit') renderAnalisisUnit();
   else if(tab==='pelajar') renderAnalisisPelajar();
   else if(tab==='laporan') renderLaporan();
@@ -1499,6 +1504,108 @@ function onTarikhManual(){
   if(sel){ sel.value = [...sel.options].some(o => o.value === v) ? v : ''; }
   loadPelajar();
 }
+
+// ===== REKOD PUKAL (batch: semua unit satu kategori, satu tarikh) =====
+let pukalKat = 'beruniform', pukalTarikh = '';
+function khToast(msg){
+  let t = document.getElementById('khToast');
+  if(!t){ t = document.createElement('div'); t.id = 'khToast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2c3e50;color:#fff;padding:11px 20px;border-radius:9px;font-size:13px;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:opacity .25s';
+    document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._h); t._h = setTimeout(()=>{ t.style.opacity = '0'; }, 2500);
+}
+function katLabel(kKey){ const k = KAT_CONFIG.find(x=>x.key===kKey); return k ? k.label : kKey; }
+function getUnitsByKat(kKey){
+  const lbl = katLabel(kKey);
+  return Object.values(unitMap).filter(u => u.kategori === lbl).sort((a,b)=> a.nama.localeCompare(b.nama));
+}
+function renderPukal(){
+  const p = document.getElementById('panel-pukal');
+  const katOpts = KAT_CONFIG.map(k=>`<option value="${k.key}"${k.key===pukalKat?' selected':''}>${k.label}</option>`).join('');
+  p.innerHTML = `
+    <div style="background:linear-gradient(135deg,#eef6ff,#e8f0fe);border:1px solid var(--sec);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:12.5px;color:#1a3c6e;">
+      <i class="fas fa-bolt"></i> <strong>Mod Pukal:</strong> tandakan kehadiran untuk <strong>semua unit dalam satu kategori</strong> sekali gus, untuk satu tarikh takwim. Contoh: tandakan semua unit Beruniform "Semua Hadir" pada Rabu 28/01.
+    </div>
+    <div class="filter-bar">
+      <label>Kategori:</label>
+      <select id="pukalKatSel" onchange="onPukalKat()">${katOpts}</select>
+      <label>Tarikh:</label>
+      <select id="pukalTarikhSel" onchange="onPukalTarikh()"></select>
+    </div>
+    <div class="filter-bar" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-ok btn-sm" onclick="pukalApply('H')"><i class="fas fa-check-double"></i> Tandai Semua HADIR</button>
+      <button class="btn btn-sm" style="background:var(--err);color:#fff;" onclick="pukalApply('TH')"><i class="fas fa-user-times"></i> Semua TIDAK HADIR</button>
+      <button class="btn btn-outline btn-sm" onclick="pukalApply('')"><i class="fas fa-folder-plus"></i> Wujudkan Rekod (kosong)</button>
+      <button class="btn btn-outline btn-sm" onclick="pukalClear()"><i class="fas fa-eraser"></i> Kosongkan Rekod</button>
+    </div>
+    <div id="pukalList"></div>`;
+  renderPukalDates();
+  renderPukalList();
+}
+function renderPukalDates(){
+  const sel = document.getElementById('pukalTarikhSel'); if(!sel) return;
+  const dates = generateTakwimDates(pukalKat);
+  if(!dates.length){ sel.innerHTML = '<option value="">— Tiada tarikh takwim —</option>'; pukalTarikh = ''; return; }
+  const today = new Date().toISOString().substring(0,10);
+  if(!pukalTarikh || dates.indexOf(pukalTarikh) < 0) pukalTarikh = (dates.indexOf(today) >= 0 ? today : dates[0]);
+  sel.innerHTML = dates.map(d=>`<option value="${d}"${d===pukalTarikh?' selected':''}>${fmtTarikhOpt(d)}${d===today?' • hari ini':''}</option>`).join('');
+}
+function renderPukalList(){
+  const wrap = document.getElementById('pukalList'); if(!wrap) return;
+  const units = getUnitsByKat(pukalKat);
+  if(!units.length){ wrap.innerHTML = '<div class="empty"><i class="fas fa-users-slash"></i>Tiada unit dalam kategori ini.</div>'; return; }
+  if(!pukalTarikh){ wrap.innerHTML = '<div class="empty"><i class="fas fa-calendar-times"></i>Tiada tarikh takwim — sila tetapkan di tab Takwim.</div>'; return; }
+  let h = `<div style="margin:12px 0 8px;font-size:12px;"><label style="cursor:pointer;"><input type="checkbox" id="pukalAll" checked onchange="pukalToggleAll(this.checked)"> Pilih semua unit (${units.length})</label></div>`;
+  h += '<div style="display:flex;flex-direction:column;gap:6px;">';
+  units.forEach(u=>{
+    const rec = kehadiranData[getKey(u.kod, pukalTarikh)] || null;
+    const total = u.ahli.length;
+    let badge;
+    if(!rec){ badge = '<span style="color:var(--mute);">Belum direkod</span>'; }
+    else {
+      const hadir = u.ahli.filter(sid => rec[String(sid)] === 'H').length;
+      const ditanda = u.ahli.filter(sid => rec[String(sid)]).length;
+      badge = `<span style="color:var(--ok);font-weight:700;">${hadir} hadir</span> <span style="color:var(--mute);">· ${ditanda}/${total} ditanda</span>`;
+    }
+    h += `<label class="card" style="display:flex;align-items:center;gap:10px;padding:9px 12px;margin:0;cursor:pointer;box-shadow:none;border:1px solid var(--bdr);">
+      <input type="checkbox" class="pukalUnit" value="${u.kod}" checked>
+      <span style="flex:1;font-weight:700;font-size:13px;">${u.nama}</span>
+      <span style="font-size:11.5px;">${badge}</span>
+      <span style="font-size:11px;color:var(--mute);white-space:nowrap;">${total} ahli</span>
+    </label>`;
+  });
+  h += '</div>';
+  wrap.innerHTML = h;
+}
+function onPukalKat(){ pukalKat = document.getElementById('pukalKatSel').value; pukalTarikh = ''; renderPukalDates(); renderPukalList(); }
+function onPukalTarikh(){ pukalTarikh = document.getElementById('pukalTarikhSel').value; renderPukalList(); }
+function pukalToggleAll(on){ document.querySelectorAll('.pukalUnit').forEach(c => c.checked = on); }
+function pukalSelected(){ return [...document.querySelectorAll('.pukalUnit:checked')].map(c => c.value); }
+function pukalApply(st){
+  const units = pukalSelected();
+  if(!units.length){ alert('Sila pilih sekurang-kurangnya satu unit.'); return; }
+  if(!pukalTarikh){ alert('Tiada tarikh dipilih.'); return; }
+  const aksi = st === 'H' ? 'HADIR' : (st === 'TH' ? 'TIDAK HADIR' : 'rekod kosong');
+  if(!confirm(`Tetapkan "${aksi}" untuk ${units.length} unit pada ${fmtTarikhOpt(pukalTarikh)}?`)) return;
+  units.forEach(kod=>{
+    const u = unitMap[kod]; if(!u) return;
+    const key = getKey(kod, pukalTarikh);
+    if(!kehadiranData[key]) kehadiranData[key] = {};
+    if(st){ u.ahli.forEach(sid => { kehadiranData[key][String(sid)] = st; }); }
+  });
+  saveKehadiran(); renderPukalList();
+  khToast(`✅ ${units.length} unit dikemas kini (${aksi})`);
+}
+function pukalClear(){
+  const units = pukalSelected();
+  if(!units.length){ alert('Sila pilih sekurang-kurangnya satu unit.'); return; }
+  if(!confirm(`Kosongkan rekod ${units.length} unit pada ${fmtTarikhOpt(pukalTarikh)}?\n\nSemua status kehadiran pelajar untuk tarikh ini akan hilang.`)) return;
+  units.forEach(kod => { delete kehadiranData[getKey(kod, pukalTarikh)]; });
+  saveKehadiran(); renderPukalList();
+  khToast(`${units.length} unit dikosongkan`);
+}
+
 
 function renderTakwimPreview(){
   const wrap = document.getElementById('takwimPreview');
