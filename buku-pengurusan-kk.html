@@ -190,6 +190,10 @@ const SECTIONS = [
       evidens:['3.2.1 a'],
       evidens_spesifik:['Dasar Kokurikulum Sekolah','KPI Kokurikulum Sekolah','Piagam Kejayaan Unit Kokurikulum'],
       static:true },
+    { id:'panduan-mingguan', num:'4', icon:'fa-calendar-check', title:'Panduan Perjumpaan & Operasi Mingguan',
+      evidens:['3.2.1 a','3.2.1 b'],
+      evidens_spesifik:['Ketetapan / Panduan Pelaksanaan Perjumpaan Kokurikulum Mingguan','Jadual Bertugas Guru Semasa Perjumpaan','Senarai Semak Persediaan Ketua Guru Penasihat','Surat Makluman Logistik & Waktu Murid (Sesi Pagi/Petang)'],
+      static:true },
   ]},
   // BAB B: STRUKTUR & PENGURUSAN
   { group:'B. Struktur & Pengurusan', sections:[
@@ -272,6 +276,9 @@ const SECTIONS = [
       static:true },
   ]},
 ];
+
+// Auto-nombor seksyen secara berurutan merentas semua bab (supaya penambahan seksyen tidak merosakkan nombor)
+(function(){ let n = 0; SECTIONS.forEach(g => g.sections.forEach(s => { s.num = String(++n); })); })();
 
 // ========================================================
 // SIDEBAR RENDER
@@ -404,24 +411,73 @@ function getSectionContent(id){
 const CONTENT = {
   falsafah: `
     <h3><i class="fas fa-quote-left"></i> Falsafah Pendidikan Kebangsaan</h3>
-    <blockquote>"Pendidikan di Malaysia adalah suatu usaha berterusan ke arah lebih memperkembangkan potensi individu secara menyeluruh dan bersepadu untuk melahirkan insan yang seimbang dan harmonis dari segi intelek, rohani, emosi dan jasmani berdasarkan kepercayaan dan kepatuhan kepada Tuhan."</blockquote>
+    <blockquote>"Pendidikan di Malaysia adalah suatu usaha berterusan ke arah lebih memperkembangkan potensi individu secara menyeluruh dan bersepadu untuk melahirkan insan yang seimbang dan harmonis dari segi intelek, rohani, emosi dan jasmani berdasarkan kepercayaan dan kepatuhan kepada Tuhan.<br><br>Usaha ini adalah bertujuan untuk melahirkan warganegara Malaysia yang berilmu pengetahuan, berketrampilan, berakhlak mulia, bertanggungjawab dan berkeupayaan mencapai kesejahteraan diri serta memberikan sumbangan terhadap keharmonian dan kemakmuran keluarga, masyarakat dan negara."</blockquote>
 
     <h3>Visi Sekolah</h3>
-    <p style="font-size:14px;font-weight:600;color:var(--pri2);">PENDIDIKAN BERKUALITI · INSAN TERDIDIK · NEGARA SEJAHTERA</p>
+    <p style="font-size:14px;font-weight:700;color:var(--pri2);letter-spacing:.3px;">PENDIDIKAN BERKUALITI · INSAN TERDIDIK · NEGARA SEJAHTERA</p>
 
     <h3>Misi Sekolah</h3>
     <p>Melestarikan Sistem Pendidikan Yang Berkualiti Untuk Membangunkan Potensi Individu Bagi Memenuhi Aspirasi Negara.</p>
 
     <h3>Matlamat Sekolah</h3>
     <ol>
-      <li>Meningkatkan potensi pelajar dalam bidang akademik dan kokurikulum secara berterusan</li>
-      <li>Melahirkan pelajar yang berketrampilan dalam menangani cabaran pada alaf baru</li>
-      <li>Memupuk nilai-nilai murni dan ciri-ciri kepimpinan yang cemerlang dalam kalangan warga sekolah</li>
-      <li>Mengamalkan budaya ilmu dan budaya cemerlang</li>
+      <li>Meningkatkan potensi pelajar dalam bidang akademik dan kokurikulum secara berterusan.</li>
+      <li>Melahirkan pelajar yang berketrampilan dalam menangani cabaran pada alaf baru.</li>
+      <li>Memupuk nilai-nilai murni dan ciri-ciri kepimpinan yang cemerlang dalam kalangan warga sekolah.</li>
+      <li>Mengamalkan budaya ilmu dan budaya cemerlang.</li>
     </ol>
 
     <h3>Piagam Sekolah</h3>
-    <p style="font-style:italic;">Kami warga pendidik Sekolah Menengah Kebangsaan Kuching High akan berusaha sedaya upaya untuk melahirkan pelajar-pelajar yang bercirikan Wawasan Sekolah berlandaskan Falsafah Pendidikan Guru, Falsafah Pendidikan Kebangsaan dan Wawasan Negara. Kami akan melaksanakan amanah yang diberi dengan dedikasi, iltizam, progresif, berdisiplin dan bermuafakat. Kami senantiasa berikhtiar untuk menyediakan suasana pengajaran dan pembelajaran kondusif bagi membentuk suatu budaya persekolahan yang cemerlang.</p>
+    <blockquote style="font-style:italic;">
+      Kami warga pendidik Sekolah Menengah Kebangsaan Kuching High akan berusaha sedaya upaya untuk melahirkan pelajar-pelajar yang bercirikan Wawasan Sekolah, berlandaskan Falsafah Pendidikan Guru, Falsafah Pendidikan Kebangsaan dan Wawasan Negara.
+    </blockquote>
+    <table>
+      <tr><th style="width:38%;">Ikrar</th><th>Komitmen</th></tr>
+      <tr><td><strong>Kami akan</strong></td><td>melaksanakan amanah yang diberi dengan <strong>dedikasi, iltizam, progresif, berdisiplin dan bermuafakat</strong>.</td></tr>
+      <tr><td><strong>Kami senantiasa</strong></td><td>berikhtiar untuk menyediakan suasana pengajaran dan pembelajaran yang <strong>kondusif</strong> bagi membentuk suatu budaya persekolahan yang cemerlang.</td></tr>
+    </table>
+    <div class="note"><i class="fas fa-info-circle"></i> Falsafah, Visi, Misi, Matlamat dan Piagam ini menjadi rujukan hala tuju bagi semua perancangan dan pelaksanaan kokurikulum sekolah (evidens SK@S 3.2.1 — Ketetapan Hala Tuju).</div>
+  `,
+
+  'panduan-mingguan': `
+    <div class="note"><i class="fas fa-info-circle"></i> Ketetapan pelaksanaan operasi mingguan kokurikulum sekolah — menjadi rujukan rasmi guru dan murid serta evidens SK@S 3.2.1 (Ketetapan Pelaksanaan).</div>
+
+    <h3><i class="fas fa-calendar-week"></i> Panduan Perjumpaan Kokurikulum Mingguan 2026</h3>
+    <table>
+      <tr><th style="width:32%;">Perkara</th><th>Ketetapan</th></tr>
+      <tr><td><strong>Bilangan minggu</strong></td><td>24 minggu perjumpaan sepanjang tahun 2026.</td></tr>
+      <tr><td><strong>Hari tetap</strong></td><td>Rabu &amp; Khamis (mengikut takwim yang ditetapkan).</td></tr>
+      <tr><td><strong>Kehadiran</strong></td><td>Kehadiran serentak — semua unit berjumpa pada hari yang sama.</td></tr>
+      <tr><td><strong>Penggunaan fleksibel</strong></td><td>Slot perjumpaan boleh digunakan untuk aktiviti sekolah lain (perhimpunan kokurikulum, ceramah) dengan <strong>makluman awal</strong> kepada guru dan murid.</td></tr>
+    </table>
+
+    <h3><i class="fas fa-user-clock"></i> Logistik Untuk Murid</h3>
+    <table>
+      <tr><th style="width:22%;">Sesi</th><th>Aliran &amp; Waktu</th></tr>
+      <tr><td><strong>Sesi Pagi</strong></td><td>Tamat kelas &rarr; terus menyertai aktiviti kokurikulum &rarr; pulang selepas aktiviti tamat.</td></tr>
+      <tr><td><strong>Sesi Petang</strong></td>
+        <td>Berehat <strong>15 minit</strong> untuk makan ringan selepas tamat kelas sebelum menyertai kokurikulum. Pada hari kokurikulum, murid datang <strong>3 waktu lebih awal</strong>. Murid berehat selepas perjumpaan sebelum menyambung sesi pembelajaran.</td></tr>
+    </table>
+    <div class="note"><i class="fas fa-clock"></i> <strong>Jadual fleksibel sesi petang:</strong> jika tiada aktiviti kokurikulum pada minggu berkenaan, murid sesi petang datang <strong>3 waktu lebih lewat</strong> (tertakluk kepada jadual waktu 2026).</div>
+
+    <h3><i class="fas fa-chalkboard-teacher"></i> Peranan &amp; Tanggungjawab Guru</h3>
+    <table>
+      <tr><th style="width:34%;">Prinsip</th><th>Penjelasan</th></tr>
+      <tr><td><strong>Tiada sistem penggiliran</strong></td><td>Semua guru penasihat perlu hadir dan menguruskan perjumpaan mingguan secara bersama-sama.</td></tr>
+      <tr><td><strong>Penempatan kelab tetap</strong></td><td>Setiap guru ditempatkan dalam satu unit bagi setiap kategori (Kelab/Persatuan, Beruniform, Sukan/Permainan) untuk mengelakkan pertindihan tugas.</td></tr>
+      <tr><td><strong>Pemantauan aktiviti tambahan</strong></td><td>Guru memantau latihan tambahan (cth. latihan dengan jurulatih) mengikut jadual yang diatur, <strong>sekurang-kurangnya sekali sebulan</strong>.</td></tr>
+    </table>
+
+    <h3><i class="fas fa-clipboard-check"></i> Senarai Semak Persediaan Ketua Guru Penasihat</h3>
+    <ol>
+      <li><strong>Rancang Aktiviti Tahunan</strong> — pastikan jadual disediakan awal untuk kelancaran pengawasan.</li>
+      <li><strong>Hadkan Aktiviti Hujung Minggu</strong> — beri ruang rehat kepada murid dan guru; kurangkan aktiviti hari Sabtu.</li>
+      <li><strong>Sediakan Jadual Bertugas Guru</strong> semasa perjumpaan mingguan.</li>
+      <li><strong>Kawal Waktu Pulang Murid</strong> selepas aktiviti tamat.</li>
+      <li><strong>Jaga Kebersihan &amp; Kekemasan</strong> tempat dan peralatan kokurikulum.</li>
+      <li><strong>Atur Latihan Bersama Jurulatih Luar</strong> mengikut keperluan unit.</li>
+      <li><strong>Lengkapkan Laporan Mingguan</strong> perjumpaan dan aktiviti.</li>
+    </ol>
   `,
 
   mukadimah: `
@@ -538,7 +594,7 @@ const CONTENT = {
       <div class="info-card"><div class="lbl">Minimum PAJSK</div><div class="val">12</div><div class="sub">perjumpaan + 36 jam</div></div>
     </div>
 
-    <div class="note"><i class="fas fa-link"></i><strong>Lihat Takwim Sebenar:</strong> Tarikh-tarikh perjumpaan disenaraikan dalam <a onclick="scrollTo_('takwim')" style="color:var(--pri);cursor:pointer;font-weight:700;">Seksyen 9 — Takwim Kokurikulum</a> (data LIVE dari sistem).</div>
+    <div class="note"><i class="fas fa-link"></i><strong>Lihat Takwim Sebenar:</strong> Tarikh-tarikh perjumpaan disenaraikan dalam <a onclick="scrollTo_('takwim')" style="color:var(--pri);cursor:pointer;font-weight:700;">seksyen Takwim Kokurikulum</a> (data LIVE dari sistem).</div>
   `,
 
   'pelan-strategik': `
