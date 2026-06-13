@@ -179,11 +179,24 @@
     return s.replace(/\.000000$/,'').replace(/ 00:00:00$/,'');
   }
 
+  function pick(o, keys){ for(const k of keys){ if(o[k]!=null && String(o[k]).trim()!=='') return String(o[k]).trim(); } return ''; }
+  function normalizeRow(p){
+    if(!p || typeof p!=='object') return {nama:'',tarikh:'',masa:'',tempat:'',pdf:''};
+    return {
+      nama:   pick(p, ['nama','namaProgram','nama_program','Nama Program','program','tajuk','Tajuk']),
+      tarikh: pick(p, ['tarikh','tarikhProgram','tarikh_program','Tarikh Program','tarikhMula','date','Tarikh']),
+      masa:   pick(p, ['masa','Masa','time','Waktu']),
+      tempat: pick(p, ['tempat','Tempat','lokasi','Lokasi','venue']),
+      pdf:    pick(p, ['pdf','pautanPdf','pautan_pdf','Pautan PDF','pautan','Pautan','link','url','fileUrl'])
+    };
+  }
+
   function enrich(arr){
-    return (arr||[]).map(p => {
+    return (arr||[]).map(raw => {
+      const p=normalizeRow(raw);
       const kat=kategoriProgram(p.nama);
-      return { nama:p.nama||'(Tanpa nama)', tarikh:p.tarikh||'', masa:p.masa||'', tempat:p.tempat||'',
-               pdf:p.pdf||'', kat:kat, bulan:parseBulan(p.tarikh) };
+      return { nama:p.nama||'(Tanpa nama)', tarikh:p.tarikh, masa:p.masa, tempat:p.tempat,
+               pdf:p.pdf, kat:kat, bulan:parseBulan(p.tarikh) };
     });
   }
 
