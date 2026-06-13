@@ -2465,6 +2465,16 @@
             <p>Penyelarasan draf 28 Program Khas Kokurikulum 2026, Penyelaras Pertandingan, 4 Komponen Utama Program Peningkatan Kecemerlangan, serta Portal Pematuhan Anugerah Remaja Perdana Rakan Muda (ARPRM).</p>
           </div>
 
+          <!-- Pintu masuk ke Modul Laporan Program & Evidens -->
+          <div class="card" id="card-laporan-program" style="background:linear-gradient(135deg,var(--teal-50),#fff);border:1px solid var(--teal-100);">
+            <div class="info-card-header" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><i class="fa-solid fa-folder-open" style="color:var(--teal-600);"></i> Laporan Program &amp; Evidens Kokurikulum
+              <button class="action-btn" style="margin-left:auto;background:var(--teal-600);color:#fff;font-size:12px;" onclick="openLaporanProgram()"><i class="fa-solid fa-up-right-from-square"></i> Buka Modul Laporan Program</button>
+            </div>
+            <p class="ts-cd" style="color:#475569;">Direktori rasmi program &amp; aktiviti yang telah dianjurkan, lengkap dengan <strong>pautan evidens (laporan PDF)</strong> dan dipetakan kepada aspek SK@S 3.2. Tunjukkan terus kepada juruaudit tanpa mencari fail di Google Drive — meliputi program <strong>kecemerlangan</strong> dan <strong>intervensi</strong> kokurikulum.</p>
+            <div class="callout-box" style="border-left:4px solid var(--gold-500);font-size:12.5px;margin-top:6px;"><i class="fa-solid fa-link"></i> <strong>Evidens SK@S 3.2.5 &amp; 3.2.6:</strong> setiap laporan program menjadi bukti pelaksanaan program peningkatan kecemerlangan dan sukan untuk semua.</div>
+          </div>
+
+
           <!-- Papan Pemuka 4 Program Peningkatan -->
           <div class="card">
             <div class="info-card-header"><i class="fa-solid fa-graduation-cap"></i> 4 Program Peningkatan Kecemerlangan Kokurikulum (Aspek 3.2.5.1)</div>
@@ -3925,6 +3935,18 @@
     // ====================================================================
     // Modul SK@S 3.2 dalam shell SPKB: navigateTo('skas') → tab 'instrumen'
     const INSTRUMEN_FILE = 'instrumen-skas-32.html';
+    const LAPORAN_PROGRAM_FILE = 'laporan-program.html';
+    function openLaporanProgram(){
+      let embedded = false; try { embedded = (window.self !== window.top); } catch(e){ embedded = true; }
+      if(embedded){
+        try {
+          if(window.parent && typeof window.parent.navigateTo === 'function'){ window.parent.navigateTo('laporan-program'); return; }
+        } catch(e){}
+        parent.postMessage({ action:'spkb-open', page:'laporan-program' }, '*');
+      } else {
+        window.location.href = LAPORAN_PROGRAM_FILE;
+      }
+    }
     function openInstrumen(){
       let embedded = false; try { embedded = (window.self !== window.top); } catch(e){ embedded = true; }
       if(embedded){
@@ -3937,7 +3959,7 @@
           }
         } catch(e){}
         // Sandaran: postMessage untuk shell yang mengendalikannya
-        parent.postMessage({ action:'spkb-navigate', page:'skas', tab:'instrumen' }, '*');
+        parent.postMessage({ action:'spkb-open', page:'skas' }, '*');
       } else {
         window.location.href = INSTRUMEN_FILE;
       }
