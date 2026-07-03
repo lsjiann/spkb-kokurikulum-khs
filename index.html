@@ -1961,6 +1961,11 @@ body.demo-active .main { margin-top: 98px; }
       <span class="nav-text">Laporan Program</span>
       <span class="badge-nav new">Active</span>
     </a>
+    <a class="nav-item" data-page="jana-sijil">
+      <i class="fas fa-award"></i>
+      <span class="nav-text">Jana Sijil</span>
+      <span class="badge-nav new">Active</span>
+    </a>
   </div>
 
   <!-- Seksyen: Dokumen & Compliance -->
@@ -2524,6 +2529,11 @@ body.demo-active .main { margin-top: 98px; }
         <div class="mod-name">Laporan Program</div>
         <div class="mod-desc">Evidens PDF · SK@S 3.2</div>
       </a>
+      <a class="module-card" onclick="navigateTo('jana-sijil')">
+        <div class="mod-icon" style="background:#fef9e7;color:#d97706;"><i class="fas fa-award"></i></div>
+        <div class="mod-name">Jana Sijil</div>
+        <div class="mod-desc">Sijil guru · PDF</div>
+      </a>
       <a class="module-card" onclick="navigateTo('skas')">
         <div class="mod-icon" style="background:#eafaf1;color:var(--success);"><i class="fas fa-clipboard-check"></i></div>
         <div class="mod-name">SK@S 3.2 Compliance</div>
@@ -2773,6 +2783,41 @@ body.demo-active .main { margin-top: 98px; }
   </section>
   <!-- ============================================================
        END PAGE: LAPORAN PROGRAM & EVIDENS
+       ============================================================ -->
+
+  <!-- ============================================================
+       PAGE: JANA SIJIL GURU
+       ============================================================ -->
+  <section class="page" id="page-jana-sijil">
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Jana Sijil Guru</span>
+    </div>
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <h2><i class="fas fa-award"></i> Jana Sijil Guru</h2>
+        <p>Sijil Penghargaan / Penyertaan / Pencapaian · Pukal atau berasingan · PDF saiz kecil</p>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.open(SIJIL_URL,'_blank')" title="Buka dalam tab baharu"><i class="fas fa-external-link-alt"></i> Tab Baru</button>
+      </div>
+    </div>
+    <div id="jana-sijil-iframe-wrap" style="width:100%;height:calc(100vh - 240px);min-height:600px;border-radius:12px;overflow:hidden;position:relative;background:#f8fafc;border:1px solid #e0e0e0;">
+      <div id="jana-sijil-iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;background:#f8fafc;">
+        <div style="text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">🏅</div>
+          <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:6px;">Jana Sijil Guru</h3>
+          <p style="font-size:12px;color:#7f8c8d;max-width:400px;margin:0 auto 16px;line-height:1.5;">Pilih guru · Isi butiran acara · Susun atur templat · Jana PDF</p>
+          <div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+          <p style="font-size:11px;color:#bdc3c7;">Memuatkan penjana sijil…</p>
+        </div>
+      </div>
+      <iframe id="jana-sijil-iframe" src="" style="width:100%;height:100%;border:none;" onload="this.previousElementSibling.style.display='none';" allow="clipboard-write"></iframe>
+    </div>
+  </section>
+  <!-- ============================================================
+       END PAGE: JANA SIJIL GURU
        ============================================================ -->
 
   <!-- ============================================================
@@ -6134,6 +6179,7 @@ const PUSAT_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pusat-sandar.h
 const TAKWIM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pengurusan-takwim.html';
 const PKK_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-pkk.html';
 const LAPORAN_PROGRAM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/laporan-program.html';
+const SIJIL_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/jana-sijil.html';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
 /* ============================================================
@@ -6160,6 +6206,7 @@ const pageInfo = {
   'pajsk':            { title: 'SPKB v3.1 — Penilaian PAJSK',              label: 'Penilaian PAJSK',            phase: 'active', icon: '📈' },
   'pencapaian':       { title: 'SPKB v3.1 — Pencapaian',                   label: 'Pencapaian (Hall of Fame)',  phase: 'phase2', icon: '🏆' },
   'laporan-program':  { title: 'SPKB v3.1 — Laporan Program & Evidens',    label: 'Laporan Program & Evidens',  phase: 'active', icon: '📑' },
+  'jana-sijil':       { title: 'SPKB v3.1 — Jana Sijil Guru',              label: 'Jana Sijil Guru',            phase: 'active', icon: '🏅' },
   'fail':             { title: 'SPKB v3.1 — Pengurusan Fail',              label: 'Pengurusan Fail',            phase: 'phase3', icon: '📂' },
   'jana':             { title: 'SPKB v3.1 — Jana Dokumen',                 label: 'Jana Dokumen',               phase: 'phase3', icon: '📄' },
   'pelajar':          { title: 'SPKB v3.1 — Data Pelajar',                 label: 'Data Pelajar',               phase: 'phase3', icon: '🎓' },
@@ -6262,6 +6309,14 @@ function navigateTo(pageId) {
       if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
         var tahun = new Date().getFullYear();
         iframe.src = LAPORAN_PROGRAM_URL + '?tahun=' + tahun;
+      }
+    }, 100);
+  }
+  if (pageId === 'jana-sijil') {
+    setTimeout(function () {
+      var iframe = document.getElementById('jana-sijil-iframe');
+      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+        iframe.src = SIJIL_URL;
       }
     }, 100);
   }
