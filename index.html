@@ -1966,6 +1966,11 @@ body.demo-active .main { margin-top: 98px; }
       <span class="nav-text">Jana Sijil</span>
       <span class="badge-nav new">Active</span>
     </a>
+    <a class="nav-item" data-page="pengawas-kk">
+      <i class="fas fa-user-shield"></i>
+      <span class="nav-text">Pengawas Kokurikulum</span>
+      <span class="badge-nav new">Active</span>
+    </a>
   </div>
 
   <!-- Seksyen: Dokumen & Compliance -->
@@ -2534,6 +2539,11 @@ body.demo-active .main { margin-top: 98px; }
         <div class="mod-name">Jana Sijil</div>
         <div class="mod-desc">Sijil guru · PDF</div>
       </a>
+      <a class="module-card" onclick="navigateTo('pengawas-kk')">
+        <div class="mod-icon" style="background:#eef2ff;color:#4f46e5;"><i class="fas fa-user-shield"></i></div>
+        <div class="mod-name">Pengawas Kokurikulum</div>
+        <div class="mod-desc">Lembaga Pengawas KK</div>
+      </a>
       <a class="module-card" onclick="navigateTo('skas')">
         <div class="mod-icon" style="background:#eafaf1;color:var(--success);"><i class="fas fa-clipboard-check"></i></div>
         <div class="mod-name">SK@S 3.2 Compliance</div>
@@ -2818,6 +2828,43 @@ body.demo-active .main { margin-top: 98px; }
   </section>
   <!-- ============================================================
        END PAGE: JANA SIJIL GURU
+       ============================================================ -->
+
+  <!-- ============================================================
+       PAGE: PENGAWAS KOKURIKULUM (sistem standalone)
+       ============================================================ -->
+  <section class="page" id="page-pengawas-kk">
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Pengawas Kokurikulum</span>
+    </div>
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <h2><i class="fas fa-user-shield"></i> Pengawas Kokurikulum</h2>
+        <p>Sistem Lembaga Pengawas Kokurikulum · log masuk berasingan untuk murid</p>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.open(PENGAWAS_KK_URL,'_blank')" title="Buka dalam tab baharu">
+          <i class="fas fa-external-link-alt"></i> Buka Tab Baru
+        </button>
+      </div>
+    </div>
+    <div id="pengawas-kk-iframe-wrap" style="width:100%;height:calc(100vh - 240px);min-height:600px;border-radius:12px;overflow:hidden;position:relative;background:#f8fafc;border:1px solid #e0e0e0;">
+      <div id="pengawas-kk-iframe-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;background:#f8fafc;">
+        <div style="text-align:center;max-width:440px;padding:20px;">
+          <div style="font-size:48px;margin-bottom:12px;">🛡️</div>
+          <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:6px;">Sistem Pengawas Kokurikulum</h3>
+          <p style="font-size:12px;color:#7f8c8d;margin:0 auto 16px;line-height:1.5;">Sistem ini mempunyai log masuk tersendiri. Jika paparan tidak muncul di bawah, klik <b>Buka Tab Baru</b> di atas.</p>
+          <div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+          <p style="font-size:11px;color:#bdc3c7;">Memuatkan sistem…</p>
+        </div>
+      </div>
+      <iframe id="pengawas-kk-iframe" src="" style="width:100%;height:100%;border:none;" onload="this.previousElementSibling.style.display='none';" allow="clipboard-write; fullscreen"></iframe>
+    </div>
+  </section>
+  <!-- ============================================================
+       END PAGE: PENGAWAS KOKURIKULUM
        ============================================================ -->
 
   <!-- ============================================================
@@ -6180,6 +6227,7 @@ const TAKWIM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pengurusan-ta
 const PKK_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-pkk.html';
 const LAPORAN_PROGRAM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/laporan-program.html';
 const SIJIL_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/jana-sijil.html';
+const PENGAWAS_KK_URL = 'https://lsjiann.github.io/PKKKHS/';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
 /* ============================================================
@@ -6207,6 +6255,7 @@ const pageInfo = {
   'pencapaian':       { title: 'SPKB v3.1 — Pencapaian',                   label: 'Pencapaian (Hall of Fame)',  phase: 'phase2', icon: '🏆' },
   'laporan-program':  { title: 'SPKB v3.1 — Laporan Program & Evidens',    label: 'Laporan Program & Evidens',  phase: 'active', icon: '📑' },
   'jana-sijil':       { title: 'SPKB v3.1 — Jana Sijil Guru',              label: 'Jana Sijil Guru',            phase: 'active', icon: '🏅' },
+  'pengawas-kk':      { title: 'SPKB v3.1 — Pengawas Kokurikulum',         label: 'Pengawas Kokurikulum',       phase: 'active', icon: '🛡️' },
   'fail':             { title: 'SPKB v3.1 — Pengurusan Fail',              label: 'Pengurusan Fail',            phase: 'phase3', icon: '📂' },
   'jana':             { title: 'SPKB v3.1 — Jana Dokumen',                 label: 'Jana Dokumen',               phase: 'phase3', icon: '📄' },
   'pelajar':          { title: 'SPKB v3.1 — Data Pelajar',                 label: 'Data Pelajar',               phase: 'phase3', icon: '🎓' },
@@ -6317,6 +6366,14 @@ function navigateTo(pageId) {
       var iframe = document.getElementById('jana-sijil-iframe');
       if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
         iframe.src = SIJIL_URL;
+      }
+    }, 100);
+  }
+  if (pageId === 'pengawas-kk') {
+    setTimeout(function () {
+      var iframe = document.getElementById('pengawas-kk-iframe');
+      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+        iframe.src = PENGAWAS_KK_URL;
       }
     }, 100);
   }
@@ -18343,603 +18400,5 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 })();
 
 </script>
-<!-- ════════════════════════════════════════════════════════════════
-     LAPISAN PEMURNIAN SPKB v3.1 — Visual Polish · Carian Pantas · Mod Pembentangan
-     Lapisan ini 100% aditif: tiada kandungan asal diubah atau dibuang.
-     ════════════════════════════════════════════════════════════════ -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<style id="spkbRefineCSS">
-/* ─────────────────────────────────────────────
-   1 · TOKEN DIMURNIKAN — Navy & Emas Rasmi
-   ───────────────────────────────────────────── */
-:root {
-  --primary:   #14304F;          /* navy institusi, lebih dalam */
-  --navy-deep: #0B1D33;
-  --secondary: #2E6DA4;
-  --accent:    #C9A227;          /* emas sebenar (identiti navy–emas) */
-  --gold-soft: #F6EFD8;
-  --gold-deep: #A8861D;
-  --bdr:       #E3E8F0;
-  --ink-soft:  #5B6B7F;
-  --card-shadow: 0 1px 2px rgba(11,29,51,.06), 0 8px 24px rgba(11,29,51,.07);
-}
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background:
-    radial-gradient(1200px 400px at 85% -10%, rgba(201,162,39,.05), transparent 60%),
-    #F2F5F9;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* Nombor statistik sentiasa sejajar & bermartabat */
-.stat-info .num, .session-stat .num, .admin-kpi-value, .admin-meta-value,
-.club-score .pts, .pc-score {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-
-/* Skrolbar halus seragam */
-::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #C3CCDA; border-radius: 8px; border: 2px solid #F2F5F9; }
-::-webkit-scrollbar-thumb:hover { background: #9FACC0; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-color: transparent; }
-
-/* Fokus papan kekunci kelihatan (kualiti asas) */
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-
-/* ─────────────────────────────────────────────
-   2 · SIDEBAR — garis emas sebagai tanda tangan
-   ───────────────────────────────────────────── */
-.sidebar {
-  background: linear-gradient(180deg, #16334F 0%, #0B1D33 100%);
-  box-shadow: inset -1px 0 0 rgba(255,255,255,.06);
-}
-.sidebar-header {
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  position: relative;
-}
-.sidebar-header::after {
-  content: '';
-  position: absolute; left: 18px; bottom: -1px;
-  width: 46px; height: 2px;
-  background: linear-gradient(90deg, var(--accent), transparent);
-}
-.sidebar-logo {
-  background: linear-gradient(135deg, #D9B335, #A8861D);
-  box-shadow: 0 4px 12px rgba(201,162,39,.35);
-}
-.nav-label { color: rgba(214,196,138,.75); letter-spacing: 1.6px; }
-.nav-item { border-left-width: 3px; }
-.nav-item:hover { background: rgba(255,255,255,.06); border-left-color: rgba(201,162,39,.6); }
-.nav-item.active {
-  background: linear-gradient(90deg, rgba(201,162,39,.18), rgba(201,162,39,.03));
-  border-left-color: var(--accent);
-  font-weight: 700;
-}
-.nav-item.active i { color: #E6C75A; }
-
-/* ─────────────────────────────────────────────
-   3 · TOPBAR — kaca beku profesional
-   ───────────────────────────────────────────── */
-.topbar {
-  background: rgba(255,255,255,.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 -1px 0 var(--bdr), 0 1px 12px rgba(11,29,51,.04);
-}
-.topbar-title { color: var(--primary); font-weight: 800; letter-spacing: -0.01em; }
-.school-badge {
-  background: linear-gradient(135deg, #14304F, #0B1D33);
-  box-shadow: inset 0 0 0 1px rgba(201,162,39,.45);
-}
-.school-badge i { color: #E6C75A; }
-.topbar-icon, .topbar-toggle { background: #EEF2F8; transition: all .2s; }
-.topbar-icon:hover, .topbar-toggle:hover { background: var(--gold-soft); color: var(--gold-deep); }
-.user-avatar { background: linear-gradient(135deg, #D9B335, #14304F); box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px rgba(201,162,39,.5); }
-
-/* ─────────────────────────────────────────────
-   4 · KEPALA HALAMAN & KAD — jalur emas kiri
-   ───────────────────────────────────────────── */
-.page-header {
-  border: 1px solid var(--bdr);
-  border-left: 4px solid var(--accent);
-  border-radius: 12px;
-}
-.page-header h2 { letter-spacing: -0.015em; }
-.page-header h2 i { color: var(--gold-deep); }
-
-.card {
-  border: 1px solid var(--bdr);
-  border-radius: 12px;
-  transition: box-shadow .25s;
-}
-.card:hover { box-shadow: 0 2px 4px rgba(11,29,51,.06), 0 14px 34px rgba(11,29,51,.10); }
-.card-header { border-bottom: 1px solid #EDF1F7; background: linear-gradient(180deg,#FDFEFF,#F8FAFD); }
-.card-header h3 i { color: var(--gold-deep); }
-
-/* ─────────────────────────────────────────────
-   5 · SESSION BANNER — rim emas atas
-   ───────────────────────────────────────────── */
-.session-banner {
-  background:
-    radial-gradient(600px 200px at 90% -40%, rgba(201,162,39,.25), transparent 60%),
-    linear-gradient(135deg, #16334F 0%, #0B1D33 100%);
-  border-top: 3px solid var(--accent);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(11,29,51,.25);
-}
-.session-banner h3 i { color: #E6C75A; }
-.session-stat { position: relative; padding: 0 4px; }
-.session-stat .num { text-shadow: 0 2px 8px rgba(0,0,0,.25); }
-.session-stat .lbl { color: rgba(230,199,90,.9); }
-
-/* ─────────────────────────────────────────────
-   6 · KAD STATISTIK & KPI
-   ───────────────────────────────────────────── */
-.stat-card {
-  border: 1px solid var(--bdr);
-  border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::after {
-  content: '';
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), transparent 70%);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .3s ease;
-}
-.stat-card:hover { transform: translateY(-3px); box-shadow: 0 3px 6px rgba(11,29,51,.07), 0 16px 32px rgba(11,29,51,.12); }
-.stat-card:hover::after { transform: scaleX(1); }
-.stat-info .num { font-size: 27px; color: var(--primary); }
-.stat-info .label { font-weight: 600; color: var(--ink-soft); }
-.stat-icon { border-radius: 11px; box-shadow: inset 0 0 0 1px rgba(11,29,51,.05); }
-
-.admin-kpi-card, .admin-meta-card { border-radius: 11px; transition: transform .2s, box-shadow .2s; }
-.admin-kpi-card:hover, .admin-meta-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11,29,51,.10); }
-
-.pajsk-comp { border-radius: 12px; transition: transform .2s, box-shadow .2s; }
-.pajsk-comp:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(11,29,51,.10); }
-
-/* ─────────────────────────────────────────────
-   7 · BUTANG & MODUL
-   ───────────────────────────────────────────── */
-.btn { border-radius: 9px; letter-spacing: .01em; }
-.btn-primary { background: linear-gradient(180deg, #1A3A5F, #14304F); box-shadow: 0 3px 10px rgba(20,48,79,.28); }
-.btn-primary:hover { background: linear-gradient(180deg, #14304F, #0B1D33); }
-.btn-accent { background: linear-gradient(180deg, #D9B335, #C9A227); color: #2E2405; box-shadow: 0 3px 10px rgba(201,162,39,.30); }
-.btn-accent:hover { background: linear-gradient(180deg, #C9A227, #A8861D); color: #fff; }
-
-.module-card { border: 1px solid var(--bdr); border-radius: 12px; transition: all .22s; }
-.module-card:hover { border-color: rgba(201,162,39,.55); transform: translateY(-3px); box-shadow: 0 12px 28px rgba(11,29,51,.12); }
-.module-card.featured { border-color: rgba(201,162,39,.5); background: linear-gradient(180deg,#FFFDF5,#fff); }
-
-.dashboard-footer { color: #8B99AB; letter-spacing: .04em; }
-
-/* ═════════════════════════════════════════════
-   8 · CARIAN PANTAS (Ctrl+K)
-   ═════════════════════════════════════════════ */
-#spkbSearchOverlay {
-  position: fixed; inset: 0; z-index: 11000;
-  background: rgba(11,29,51,.45);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-  display: none; align-items: flex-start; justify-content: center;
-  padding: 12vh 16px 16px;
-  animation: fadeIn .15s ease;
-}
-#spkbSearchOverlay.open { display: flex; }
-#spkbSearchBox {
-  width: min(620px, 100%);
-  background: #fff; border-radius: 16px;
-  box-shadow: 0 24px 80px rgba(11,29,51,.45);
-  border: 1px solid rgba(201,162,39,.35);
-  overflow: hidden;
-  animation: spkbPop .18s cubic-bezier(.2,.9,.3,1.2);
-}
-@keyframes spkbPop { from { opacity: 0; transform: translateY(-10px) scale(.98); } to { opacity: 1; transform: none; } }
-#spkbSearchHead {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 18px; border-bottom: 1px solid #EDF1F7;
-  background: linear-gradient(180deg,#FDFEFF,#F8FAFD);
-}
-#spkbSearchHead i.fa-search { color: var(--gold-deep); font-size: 15px; }
-#spkbSearchInput {
-  flex: 1; border: none; outline: none; background: transparent;
-  font-family: inherit; font-size: 15px; font-weight: 600; color: var(--primary);
-}
-#spkbSearchInput::placeholder { color: #9AA8BB; font-weight: 500; }
-.spkb-kbd {
-  font-size: 10px; font-weight: 700; color: #7A8AA0;
-  border: 1px solid #D7DFEA; border-bottom-width: 2px; border-radius: 5px;
-  padding: 2px 6px; background: #F5F8FC;
-}
-#spkbSearchResults { max-height: 52vh; overflow-y: auto; padding: 8px; }
-.spkb-res-label {
-  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px;
-  color: #A8861D; padding: 10px 12px 4px;
-}
-.spkb-res-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; border-radius: 10px; cursor: pointer;
-  border-left: 3px solid transparent;
-}
-.spkb-res-item i { width: 20px; text-align: center; color: var(--secondary); font-size: 14px; }
-.spkb-res-item .t { flex: 1; font-size: 13px; font-weight: 700; color: var(--primary); }
-.spkb-res-item .s { font-size: 10.5px; color: #8B99AB; font-weight: 600; }
-.spkb-res-item:hover, .spkb-res-item.sel {
-  background: linear-gradient(90deg, var(--gold-soft), #fff);
-  border-left-color: var(--accent);
-}
-.spkb-res-item.sel i { color: var(--gold-deep); }
-.spkb-empty { text-align: center; padding: 32px 16px; color: #9AA8BB; font-size: 12.5px; font-weight: 600; }
-#spkbSearchFoot {
-  display: flex; gap: 16px; align-items: center;
-  padding: 10px 18px; border-top: 1px solid #EDF1F7;
-  font-size: 10.5px; color: #8B99AB; font-weight: 600; background: #FAFBFD;
-}
-#spkbSearchFoot span { display: inline-flex; align-items: center; gap: 5px; }
-
-/* ═════════════════════════════════════════════
-   9 · MOD PEMBENTANGAN (Audit / LCD)
-   ═════════════════════════════════════════════ */
-#presentBar {
-  position: fixed; top: 0; left: 0; right: 0; height: 58px;
-  z-index: 10500;
-  display: none; align-items: center; gap: 18px;
-  padding: 0 22px;
-  background: linear-gradient(180deg, #16334F, #0B1D33);
-  border-bottom: 3px solid var(--accent);
-  color: #fff;
-  box-shadow: 0 8px 30px rgba(11,29,51,.35);
-}
-body.presenting #presentBar { display: flex; }
-.pb-brand { display: flex; align-items: center; gap: 11px; }
-.pb-logo {
-  width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
-  background: linear-gradient(135deg, #D9B335, #A8861D);
-  display: flex; align-items: center; justify-content: center; font-size: 18px;
-  box-shadow: 0 3px 10px rgba(201,162,39,.4);
-}
-.pb-brand-text { display: flex; flex-direction: column; line-height: 1.15; }
-.pb-brand-text b { font-size: 13.5px; font-weight: 800; letter-spacing: .02em; }
-.pb-brand-text small { font-size: 9.5px; color: rgba(230,199,90,.95); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; }
-.pb-page {
-  flex: 1; text-align: center;
-  font-size: 15px; font-weight: 800; letter-spacing: .01em;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.pb-page small { display: block; font-size: 9.5px; font-weight: 700; color: rgba(230,199,90,.9); letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 1px; }
-.pb-right { display: flex; align-items: center; gap: 9px; }
-.pb-clock { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: rgba(255,255,255,.92); text-align: right; line-height: 1.25; }
-.pb-clock small { display: block; font-size: 9.5px; color: rgba(255,255,255,.55); font-weight: 600; }
-.pb-btn {
-  background: rgba(255,255,255,.10); color: #fff;
-  border: 1px solid rgba(255,255,255,.22);
-  width: 34px; height: 34px; border-radius: 9px;
-  font-size: 13px; cursor: pointer; transition: all .18s;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-.pb-btn:hover { background: rgba(201,162,39,.85); border-color: transparent; color: #2E2405; }
-.pb-btn.exit { width: auto; padding: 0 13px; gap: 7px; font-size: 11.5px; font-weight: 800; }
-
-body.presenting .sidebar,
-body.presenting .topbar,
-body.presenting .demo-banner { display: none !important; }
-body.presenting .main {
-  margin-left: 0 !important;
-  margin-top: 58px !important;
-  padding: 34px clamp(28px, 5vw, 72px);
-  font-size: 15.2px;
-}
-body.presenting .page-header h2 { font-size: 23px; }
-body.presenting .stat-info .num { font-size: 33px; }
-body.presenting .session-stat .num { font-size: 27px; }
-body.presenting .stat-info .label, body.presenting .page-header p { font-size: 13px; }
-body.presenting .admin-panel-topbar-right,
-body.presenting .admin-profile-actions,
-body.presenting .page-actions { display: none !important; }
-
-/* Butang topbar tambahan (Mod Pembentangan) */
-#btnPresent.topbar-icon { color: var(--gold-deep); background: var(--gold-soft); }
-#btnPresent.topbar-icon:hover { background: #EFE2B4; }
-
-/* ─────────────────────────────────────────────
-   10 · CETAKAN LEBIH KEMAS (eviden audit)
-   ───────────────────────────────────────────── */
-@media print {
-  body { background: #fff !important; }
-  #presentBar, #spkbSearchOverlay { display: none !important; }
-  .card, .stat-card, .page-header { box-shadow: none !important; border: 1px solid #CBD5E1 !important; }
-  .session-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-}
-
-@media (max-width: 760px) {
-  .pb-brand-text small, .pb-clock small { display: none; }
-  .pb-page { font-size: 12.5px; }
-  body.presenting .main { padding: 20px 14px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-}
-</style>
-
-<!-- ── Carian Pantas ─────────────────────────── -->
-<div id="spkbSearchOverlay" role="dialog" aria-label="Carian Pantas">
-  <div id="spkbSearchBox">
-    <div id="spkbSearchHead">
-      <i class="fas fa-search"></i>
-      <input id="spkbSearchInput" type="text" placeholder="Cari modul, laporan, sijil, PAJSK, SK@S…" autocomplete="off">
-      <span class="spkb-kbd">ESC</span>
-    </div>
-    <div id="spkbSearchResults"></div>
-    <div id="spkbSearchFoot">
-      <span><span class="spkb-kbd">↑↓</span> Pilih</span>
-      <span><span class="spkb-kbd">Enter</span> Buka</span>
-      <span style="margin-left:auto;"><span class="spkb-kbd">Ctrl</span>+<span class="spkb-kbd">K</span> Buka carian bila-bila masa</span>
-    </div>
-  </div>
-</div>
-
-<!-- ── Bar Mod Pembentangan ──────────────────── -->
-<div id="presentBar">
-  <div class="pb-brand">
-    <div class="pb-logo">🎯</div>
-    <div class="pb-brand-text">
-      <b>SPKB · SMK Tinggi Kuching</b>
-      <small>Sesi 2025/2026 — Mod Pembentangan</small>
-    </div>
-  </div>
-  <div class="pb-page">
-    <small>Sedang Dipaparkan</small>
-    <span id="pbPageName">Papan Pemuka Utama</span>
-  </div>
-  <div class="pb-right">
-    <div class="pb-clock"><span id="pbClock">--:--</span><small id="pbDate"></small></div>
-    <button class="pb-btn" onclick="spkbPresentNav(-1)" title="Halaman sebelumnya (←)"><i class="fas fa-chevron-left"></i></button>
-    <button class="pb-btn" onclick="spkbPresentNav(1)" title="Halaman seterusnya (→)"><i class="fas fa-chevron-right"></i></button>
-    <button class="pb-btn" onclick="spkbToggleFullscreen()" title="Skrin penuh (F)"><i class="fas fa-expand"></i></button>
-    <button class="pb-btn exit" onclick="spkbExitPresent()" title="Keluar (Esc)"><i class="fas fa-times"></i> Keluar</button>
-  </div>
-</div>
-
-<script id="spkbRefineJS">
-/* ════════════════════════════════════════════════════════════
-   LAPISAN PEMURNIAN — Carian Pantas + Mod Pembentangan
-   (Aditif sahaja; tiada fungsi asal diubah)
-   ════════════════════════════════════════════════════════════ */
-(function () {
-  'use strict';
-
-  /* ── Indeks carian: dibina daripada menu sedia ada (derive, bukan taip) ── */
-  var EXTRA_KEYWORDS = {
-    'dashboard':        'papan pemuka utama statistik ringkasan overview kpi',
-    'pkk':              'tugas harian penolong kanan senarai semak checklist',
-    'pengurusan-kelab': 'kelab persatuan unit badan beruniform sukan permainan kluster',
-    'takwim':           'kalendar aktiviti tarikh jadual perancangan tahunan',
-    'kehadiran':        'attendance rekod hadir pelajar peratus',
-    'buku-kk':          'buku pengurusan kokurikulum skpmg2 rujukan',
-    'generator':        'generator dokumen surat memo minit mesyuarat',
-    'laporan-akhir':    'laporan akhir tahun pdf tahunan rumusan',
-    'kewangan-inv':     'kewangan inventori aset wang duit perbelanjaan',
-    'pusat-sandar':     'sandar backup restore tetapan data eksport import',
-    'pajsk':            'penilaian pajsk gps markah skor analitik',
-    'pencapaian':       'pencapaian johan hall of fame anugerah pertandingan',
-    'laporan-program':  'laporan program opr evidens gambar pdf skas',
-    'jana-sijil':       'sijil guru penghargaan cetak template',
-    'skas':             'skas sk@s 3.2 compliance audit skpmg2 standard kpm ppd jpn eviden',
-    'fail':             'pengurusan fail dokumen folder',
-    'jana':             'jana dokumen surat rasmi',
-    'pelajar':          'data pelajar murid senarai maklumat',
-    'guru':             'guru penasihat cikgu senarai',
-    'sekolah':          'maklumat sekolah profil alamat kod',
-    'profil':           'profil pentadbir admin akaun',
-    'tetapan':          'tetapan sistem konfigurasi setting'
-  };
-
-  var searchIndex = [];
-  document.querySelectorAll('.sidebar .nav-section').forEach(function (sec) {
-    var lbl = sec.querySelector('.nav-label');
-    var section = lbl ? lbl.textContent.trim() : '';
-    sec.querySelectorAll('.nav-item').forEach(function (item) {
-      var page = item.getAttribute('data-page');
-      var name = item.querySelector('.nav-text') ? item.querySelector('.nav-text').textContent.trim() : page;
-      var icon = item.querySelector('i') ? item.querySelector('i').className : 'fas fa-circle';
-      searchIndex.push({
-        type: 'Modul', section: section, page: page, name: name, icon: icon,
-        hay: (name + ' ' + page + ' ' + (EXTRA_KEYWORDS[page] || '')).toLowerCase()
-      });
-    });
-  });
-
-  /* Tindakan pantas tambahan */
-  var quickActions = [
-    { name: 'Mod Pembentangan (Audit)', sub: 'Skrin penuh untuk LCD/projektor', icon: 'fas fa-tv', hay: 'mod pembentangan present audit lcd projektor fullscreen skrin penuh', run: function(){ spkbEnterPresent(); } },
-    { name: 'Cetak Halaman Semasa',     sub: 'Eviden bercetak / PDF',           icon: 'fas fa-print', hay: 'cetak print pdf eviden', run: function(){ window.print(); } },
-    { name: 'Demo Mode PPD/JPN',        sub: 'Banner mod demo audit',           icon: 'fas fa-bullhorn', hay: 'demo mode audit ppd jpn banner', run: function(){ if (typeof toggleDemoMode === 'function') toggleDemoMode(); } },
-    { name: 'Kemaskini Data SK@S & PAJSK', sub: 'Segerak dari Google Sheets',   icon: 'fas fa-sync', hay: 'kemaskini refresh sync data skas pajsk', run: function(){ if (typeof loadSKASData==='function') loadSKASData(); if (typeof loadPAJSKDashboard==='function') loadPAJSKDashboard(); } }
-  ];
-
-  var overlay = document.getElementById('spkbSearchOverlay');
-  var input   = document.getElementById('spkbSearchInput');
-  var resBox  = document.getElementById('spkbSearchResults');
-  var selIdx  = 0, flatItems = [];
-
-  function openSearch() {
-    overlay.classList.add('open');
-    input.value = '';
-    renderResults('');
-    setTimeout(function(){ input.focus(); }, 30);
-  }
-  function closeSearch() { overlay.classList.remove('open'); }
-
-  function renderResults(q) {
-    q = q.trim().toLowerCase();
-    var mods = searchIndex.filter(function (it) { return !q || it.hay.indexOf(q) !== -1; });
-    var acts = quickActions.filter(function (it) { return !q || it.hay.indexOf(q) !== -1; });
-    flatItems = []; selIdx = 0;
-    var html = '';
-
-    if (acts.length) {
-      html += '<div class="spkb-res-label">Tindakan Pantas</div>';
-      acts.forEach(function (a) {
-        var i = flatItems.length; flatItems.push({ run: a.run });
-        html += '<div class="spkb-res-item" data-i="' + i + '"><i class="' + a.icon + '"></i><span class="t">' + a.name + '</span><span class="s">' + a.sub + '</span></div>';
-      });
-    }
-    if (mods.length) {
-      var lastSec = null;
-      mods.forEach(function (m) {
-        if (m.section !== lastSec) { html += '<div class="spkb-res-label">' + m.section + '</div>'; lastSec = m.section; }
-        var i = flatItems.length;
-        flatItems.push({ run: (function (pg) { return function () { navigateTo(pg); }; })(m.page) });
-        html += '<div class="spkb-res-item" data-i="' + i + '"><i class="' + m.icon + '"></i><span class="t">' + m.name + '</span><span class="s">' + m.type + '</span></div>';
-      });
-    }
-    if (!flatItems.length) html = '<div class="spkb-empty"><i class="fas fa-search" style="display:block;font-size:22px;margin-bottom:8px;opacity:.4;"></i>Tiada padanan untuk “' + q + '”</div>';
-    resBox.innerHTML = html;
-    markSel();
-
-    resBox.querySelectorAll('.spkb-res-item').forEach(function (el) {
-      el.addEventListener('click', function () { pick(parseInt(el.getAttribute('data-i'), 10)); });
-      el.addEventListener('mousemove', function () { selIdx = parseInt(el.getAttribute('data-i'), 10); markSel(); });
-    });
-  }
-  function markSel() {
-    resBox.querySelectorAll('.spkb-res-item').forEach(function (el) {
-      var on = parseInt(el.getAttribute('data-i'), 10) === selIdx;
-      el.classList.toggle('sel', on);
-      if (on) el.scrollIntoView({ block: 'nearest' });
-    });
-  }
-  function pick(i) {
-    var it = flatItems[i];
-    closeSearch();
-    if (it && it.run) it.run();
-  }
-
-  input.addEventListener('input', function () { renderResults(input.value); });
-  input.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowDown') { e.preventDefault(); selIdx = Math.min(selIdx + 1, flatItems.length - 1); markSel(); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); selIdx = Math.max(selIdx - 1, 0); markSel(); }
-    else if (e.key === 'Enter') { e.preventDefault(); pick(selIdx); }
-  });
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeSearch(); });
-
-  /* Hidupkan butang carian sedia ada di topbar */
-  var btnSearch = document.querySelector('.topbar .topbar-icon[title="Carian"]');
-  if (btnSearch) {
-    btnSearch.addEventListener('click', openSearch);
-    btnSearch.title = 'Carian Pantas (Ctrl+K)';
-  }
-
-  /* ── MOD PEMBENTANGAN ────────────────────────────────────── */
-  var pageOrder = searchIndex.map(function (m) { return m.page; });
-
-  window.spkbEnterPresent = function () {
-    document.body.classList.add('presenting');
-    syncPresentTitle();
-    tickClock();
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(function(){});
-    }
-  };
-  window.spkbExitPresent = function () {
-    document.body.classList.remove('presenting');
-    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){});
-  };
-  window.spkbToggleFullscreen = function () {
-    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
-    else document.documentElement.requestFullscreen().catch(function(){});
-  };
-  window.spkbPresentNav = function (dir) {
-    var activeNav = document.querySelector('.nav-item.active');
-    var cur = activeNav ? activeNav.getAttribute('data-page') : 'dashboard';
-    var i = pageOrder.indexOf(cur);
-    var next = pageOrder[(i + dir + pageOrder.length) % pageOrder.length];
-    navigateTo(next);
-  };
-
-  function syncPresentTitle() {
-    var activeNav = document.querySelector('.nav-item.active');
-    var name = activeNav && activeNav.querySelector('.nav-text')
-      ? activeNav.querySelector('.nav-text').textContent.trim()
-      : 'Papan Pemuka Utama';
-    var el = document.getElementById('pbPageName');
-    if (el) el.textContent = name;
-  }
-  /* Balut navigateTo supaya tajuk pembentangan sentiasa selari (tanpa ubah fungsi asal) */
-  if (typeof window.navigateTo === 'function') {
-    var _origNav = window.navigateTo;
-    window.navigateTo = function (pageId) {
-      var r = _origNav.apply(this, arguments);
-      syncPresentTitle();
-      return r;
-    };
-  }
-
-  var clockTimer = null;
-  function tickClock() {
-    var c = document.getElementById('pbClock');
-    var d = document.getElementById('pbDate');
-    function upd() {
-      var now = new Date();
-      if (c) c.textContent = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-      if (d) d.textContent = now.toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    }
-    upd();
-    if (clockTimer) clearInterval(clockTimer);
-    clockTimer = setInterval(upd, 15000);
-  }
-
-  /* Butang Mod Pembentangan dalam topbar (di sebelah carian) */
-  var actions = document.querySelector('.topbar .header-actions');
-  if (actions && btnSearch) {
-    var btnPresent = document.createElement('button');
-    btnPresent.className = 'topbar-icon';
-    btnPresent.id = 'btnPresent';
-    btnPresent.title = 'Mod Pembentangan — Audit (Ctrl+P tidak diperlukan; klik sahaja)';
-    btnPresent.innerHTML = '<i class="fas fa-tv"></i>';
-    btnPresent.addEventListener('click', spkbEnterPresent);
-    actions.insertBefore(btnPresent, btnSearch);
-  }
-
-  /* ── Pintasan papan kekunci global ───────────────────────── */
-  document.addEventListener('keydown', function (e) {
-    var typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || document.activeElement.isContentEditable;
-
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      overlay.classList.contains('open') ? closeSearch() : openSearch();
-      return;
-    }
-    if (e.key === 'Escape') {
-      if (overlay.classList.contains('open')) { closeSearch(); return; }
-      if (document.body.classList.contains('presenting')) { spkbExitPresent(); return; }
-    }
-    if (!typing && !overlay.classList.contains('open') && e.key === '/') {
-      e.preventDefault(); openSearch(); return;
-    }
-    if (document.body.classList.contains('presenting') && !typing && !overlay.classList.contains('open')) {
-      if (e.key === 'ArrowRight') { e.preventDefault(); spkbPresentNav(1); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); spkbPresentNav(-1); }
-      else if (e.key.toLowerCase() === 'f') { e.preventDefault(); spkbToggleFullscreen(); }
-    }
-  });
-
-  /* Jika pengguna keluar skrin penuh melalui browser, kekalkan bar pembentangan (Esc kedua untuk keluar terus) */
-  console.log('✅ [Lapisan Pemurnian] Carian Pantas (Ctrl+K) & Mod Pembentangan sedia digunakan');
-})();
-</script>
-
 </body>
 </html>
