@@ -843,8 +843,7 @@ let clubsData = [
    ============================================================ */
 const SPKB_CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbxTXUFFwssqT7Nwg5sJ6tWsVUMD_-zV2h2S35lymOgTW88iVaT1mqag2yHfBoShTWA/exec',
-  API_SECRET: 'SPKB_KHS_2026_SECRET_KEY_CHANGE_THIS',
-  USER_EMAIL: 'pkkoku@moe-dl.edu.my',
+  // 🔒 Kunci tulis TIDAK disimpan dalam kod (laman ini awam). Ia diminta sekali setiap sesi — lihat dapatkanKunciTulis().
   USE_CACHE: true,
   FALLBACK_TO_LOCAL: true
 };
@@ -1791,16 +1790,30 @@ function openSheetsGuide(){
 /* ============================================================
    CRUD FUNCTIONS
    ============================================================ */
+// Kunci pentadbir: diminta sekali, disimpan dalam sessionStorage (hilang bila tab ditutup)
+function dapatkanKunciTulis() {
+  let k = null;
+  try { k = sessionStorage.getItem('spkb_kunci_tulis'); } catch (e) {}
+  if (!k) {
+    k = window.prompt('Masukkan kunci pentadbir untuk menyimpan perubahan:') || '';
+    k = k.trim();
+    if (k) try { sessionStorage.setItem('spkb_kunci_tulis', k); } catch (e) {}
+  }
+  return k;
+}
+function lupaKunciTulis() { try { sessionStorage.removeItem('spkb_kunci_tulis'); } catch (e) {} }
+
 async function callAPI(action, sheetName, data) {
   try {
+    const kunci = dapatkanKunciTulis();
+    if (!kunci) return { success: false, error: 'Kunci pentadbir diperlukan' };
     const response = await fetch(SPKB_CONFIG.API_URL, {
       method: 'POST',
       body: JSON.stringify({
         action: action,
         sheetName: sheetName,
         data: data,
-        apiKey: SPKB_CONFIG.API_SECRET,
-        userEmail: SPKB_CONFIG.USER_EMAIL
+        apiKey: kunci
       })
     });
     const result = await response.json();
@@ -1808,6 +1821,7 @@ async function callAPI(action, sheetName, data) {
       await loadDataFromSheets(true);
       return { success: true, data: result.result };
     } else {
+      if (/kunci/i.test(result.error || '')) lupaKunciTulis();
       throw new Error(result.error);
     }
   } catch (error) {

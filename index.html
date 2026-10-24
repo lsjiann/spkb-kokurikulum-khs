@@ -1843,6 +1843,139 @@ body.demo-active .main { margin-top: 98px; }
 }
 </style>
 
+<style id="dv4-style">
+/* ============================================================
+   PAPAN PEMUKA v4 — gaya terskop pada #page-dashboard.dv4
+   ============================================================ */
+#page-dashboard.dv4{
+  --dv4-surface:#ffffff; --dv4-surface-2:#f6f8fb; --dv4-ink:#0f1b2d; --dv4-ink-2:#4a5568; --dv4-muted:#8a94a6;
+  --dv4-line:#e6e9ef; --dv4-grid:#eceef2; --dv4-axis:#c3c8d2;
+  --dv4-brand:#1a3c6e; --dv4-accent:#e8862a; --dv4-accent-soft:#fdf1e5;
+  --dv4-now:#2a78d6; --dv4-prev:#a7b0be; --dv4-target:#e8862a;
+  --dv4-good:#0ca30c; --dv4-good-ink:#0b7a0b; --dv4-good-soft:#e7f6e7;
+  --dv4-warn-ink:#8a5a00; --dv4-warn-soft:#fff6df;
+  --dv4-crit-ink:#b42d2d; --dv4-crit-soft:#fdeaea; --dv4-info-soft:#eaf2fc;
+  --dv4-shadow:0 1px 2px rgba(15,27,45,.06),0 1px 1px rgba(15,27,45,.03);
+  max-width:1400px;color:var(--dv4-ink);
+}
+html[data-theme="dark"] #page-dashboard.dv4{
+  --dv4-surface:#1e293b; --dv4-surface-2:#233046; --dv4-ink:#eef1f5; --dv4-ink-2:#b4bdca; --dv4-muted:#8392a6;
+  --dv4-line:#334155; --dv4-grid:#2b3648; --dv4-axis:#475569;
+  --dv4-brand:#8fb6e8; --dv4-accent:#f0954a; --dv4-accent-soft:#3a2614;
+  --dv4-now:#3987e5; --dv4-prev:#64748b; --dv4-target:#f0954a;
+  --dv4-good-ink:#3cc23c; --dv4-good-soft:#132a16; --dv4-warn-ink:#f5c04a; --dv4-warn-soft:#2e2412;
+  --dv4-crit-ink:#ef7373; --dv4-crit-soft:#331818; --dv4-info-soft:#14243a; --dv4-shadow:none;
+}
+.dv4 .dv4-grow{flex:1}
+.dv4-head{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.dv4-head h2{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--dv4-ink)}
+.dv4-head p{margin:4px 0 0;color:var(--dv4-ink-2);font-size:13px}
+.dv4-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;background:var(--dv4-good-soft);color:var(--dv4-good-ink)}
+.dv4-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dv4-good)}
+.dv4-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9px;border:1px solid var(--dv4-line);background:var(--dv4-surface);color:var(--dv4-ink);font-weight:600;font-size:13px}
+.dv4-btn:hover{background:var(--dv4-surface-2)}
+.dv4-btn.primary{background:var(--dv4-brand);border-color:var(--dv4-brand);color:#fff}
+html[data-theme="dark"] .dv4-btn.primary{color:#0f172a}
+.dv4-link{background:none;border:0;padding:0;font-size:12.5px;color:var(--dv4-brand);font-weight:600;cursor:pointer}
+
+.dv4-card{background:var(--dv4-surface);border:1px solid var(--dv4-line);border-radius:12px;box-shadow:var(--dv4-shadow);padding:18px 20px;min-width:0}
+.dv4-card[role=button]{cursor:pointer;transition:border-color .15s}
+.dv4-card[role=button]:hover{border-color:var(--dv4-now)}
+.dv4-card-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.dv4-card-h h3{margin:0;font-size:14.5px;font-weight:700;color:var(--dv4-ink)}
+.dv4-card-h .note{font-size:12px;color:var(--dv4-muted)}
+.dv4-loading{color:var(--dv4-muted);font-size:12.5px;padding:14px 0;list-style:none}
+
+.dv4-kpis{display:grid;gap:16px;grid-template-columns:1.45fr repeat(4,1fr)}
+.dv4-hero{background:linear-gradient(160deg,#1a3c6e,#24578f);color:#fff;border:0;position:relative;overflow:hidden}
+html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2742)}
+.dv4-hero .lbl{font-size:12.5px;opacity:.85}
+.dv4-hero .val{font-size:52px;font-weight:700;line-height:1;margin:8px 0 8px;letter-spacing:-.02em}
+.dv4-hero .row{display:flex;gap:6px;flex-wrap:wrap}
+.dv4-hero .chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.14);font-weight:600;font-size:12px}
+.dv4-hero .hint{font-size:11.5px;opacity:.75;margin-top:10px}
+.dv4-hero .hint b{font-weight:700;margin-right:6px;opacity:1}
+.dv4-hero svg{position:absolute;right:14px;top:16px}
+.dv4-kpi .lbl{font-size:12.5px;color:var(--dv4-ink-2);display:flex;align-items:center;gap:8px}
+.dv4-kpi .lbl i{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--dv4-info-soft);color:var(--dv4-now);font-size:12px}
+.dv4-kpi .val{font-size:28px;font-weight:700;margin:10px 0 4px;letter-spacing:-.01em;color:var(--dv4-ink)}
+.dv4-kpi .meta{font-size:12px;color:var(--dv4-muted)}
+.dv4 .up{color:var(--dv4-good-ink);font-weight:700}
+.dv4 .down{color:var(--dv4-crit-ink);font-weight:700}
+.dv4-meter{height:6px;border-radius:99px;background:var(--dv4-info-soft);margin-top:10px;overflow:hidden}
+.dv4-meter span{display:block;height:100%;background:var(--dv4-now);border-radius:99px;transition:width .6s}
+.dv4-split{display:flex;height:6px;gap:2px;margin-top:10px}
+.dv4-split span{border-radius:2px}
+
+.dv4-row2{display:grid;gap:16px;grid-template-columns:1.7fr 1fr;margin-top:16px}
+.dv4-row3{display:grid;gap:16px;grid-template-columns:repeat(3,1fr);margin-top:16px}
+.dv4-chart{position:relative}
+.dv4-chart svg{display:block;width:100%;height:auto;overflow:visible}
+.dv4-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dv4-ink-2);margin-bottom:6px}
+.dv4-legend>span{display:inline-flex;align-items:center;gap:6px}
+.dv4 .key-line{width:16px;height:2px;border-radius:2px;display:inline-block}
+.dv4 .key-line.dash{background:repeating-linear-gradient(90deg,var(--dv4-target) 0 4px,transparent 4px 7px)}
+.dv4 .key-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dv4 .tick{font-size:11px;fill:var(--dv4-muted)}
+.dv4 .lab{font-size:12px;fill:var(--dv4-ink);font-weight:700}
+.dv4 .lab2{font-size:11.5px;fill:var(--dv4-ink-2)}
+.dv4-tip{position:absolute;pointer-events:none;background:var(--dv4-ink);color:var(--dv4-surface);font-size:12px;padding:7px 9px;border-radius:7px;white-space:nowrap;opacity:0;transform:translate(-50%,-110%);transition:opacity .1s;z-index:2}
+.dv4-callout{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:10px 12px;border-radius:9px;background:var(--dv4-surface-2);font-size:12.5px;color:var(--dv4-ink-2)}
+.dv4-callout i{color:var(--dv4-now);margin-top:2px}
+.dv4-callout.warn i{color:var(--dv4-warn-ink)}
+.dv4 table.dv4-data{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;font-variant-numeric:tabular-nums}
+.dv4 table.dv4-data th,.dv4 table.dv4-data td{padding:6px 8px;border-bottom:1px solid var(--dv4-line);text-align:right}
+.dv4 table.dv4-data th:first-child,.dv4 table.dv4-data td:first-child{text-align:left}
+
+.dv4-units{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.dv4-units li{display:grid;grid-template-columns:22px 1fr auto;gap:4px 10px;align-items:center}
+.dv4-units .rank{font-size:12px;color:var(--dv4-muted);font-weight:700;text-align:center}
+.dv4-units .name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dv4-ink)}
+.dv4-units .cat{font-size:11.5px;color:var(--dv4-muted);font-weight:400}
+.dv4-units .n{font-weight:700;font-variant-numeric:tabular-nums;font-size:13px;color:var(--dv4-ink)}
+.dv4-units .bar{grid-column:2/4;height:8px;background:var(--dv4-surface-2);border-radius:0 4px 4px 0}
+.dv4-units .bar span{display:block;height:100%;background:var(--dv4-now);border-radius:0 4px 4px 0}
+
+.dv4-todo{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.dv4-todo li.item{display:flex;gap:11px;align-items:flex-start;padding:10px 12px;border-radius:9px;border:1px solid var(--dv4-line);cursor:pointer}
+.dv4-todo li.item:hover{background:var(--dv4-surface-2)}
+.dv4-todo .ic{width:28px;height:28px;flex:none;border-radius:8px;display:grid;place-items:center;font-size:12px}
+.dv4-todo b{display:block;font-size:13px;color:var(--dv4-ink)}
+.dv4-todo small{color:var(--dv4-muted);font-size:12px}
+.dv4-todo .tag{margin-left:auto;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;flex:none;align-self:center}
+.dv4-todo .crit .ic,.dv4-todo .crit .tag{background:var(--dv4-crit-soft);color:var(--dv4-crit-ink)}
+.dv4-todo .warn .ic,.dv4-todo .warn .tag{background:var(--dv4-warn-soft);color:var(--dv4-warn-ink)}
+.dv4-todo .info .ic,.dv4-todo .info .tag{background:var(--dv4-info-soft);color:var(--dv4-now)}
+.dv4-todo .ok .ic,.dv4-todo .ok .tag{background:var(--dv4-good-soft);color:var(--dv4-good-ink)}
+
+.dv4-badge{font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px;background:var(--dv4-surface-2);color:var(--dv4-ink-2)}
+.dv4-agenda{max-height:260px;overflow-y:auto}
+.dv4-agenda .alert-item{border-radius:8px}
+.dv4-empty{text-align:center;padding:10px 8px 4px;color:var(--dv4-ink-2)}
+.dv4-empty .ic{width:46px;height:46px;border-radius:12px;background:var(--dv4-accent-soft);color:var(--dv4-accent);display:grid;place-items:center;margin:0 auto 10px;font-size:18px}
+.dv4-empty b{display:block;color:var(--dv4-ink);margin-bottom:4px}
+.dv4-empty p{margin:0 0 12px;font-size:12.5px}
+.dv4-school{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;border-top:1px solid var(--dv4-line);margin-top:16px;padding-top:14px}
+.dv4-school .badge{width:42px;height:42px;border-radius:11px;background:var(--dv4-info-soft);color:var(--dv4-brand);display:grid;place-items:center;font-size:17px}
+.dv4-school b{color:var(--dv4-ink)}
+.dv4-school .note{font-size:12px;color:var(--dv4-muted)}
+.dv4-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 16px;margin:12px 0 0;font-size:12.5px}
+.dv4-facts dt{color:var(--dv4-muted);font-size:11.5px}
+.dv4-facts dd{margin:0;font-weight:600;color:var(--dv4-ink)}
+
+.dv4-sec-h{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dv4-muted);font-weight:700;margin:26px 0 10px}
+.dv4-quick{display:grid;gap:12px;grid-template-columns:repeat(7,1fr)}
+.dv4-q{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;border:1px solid var(--dv4-line);background:var(--dv4-surface);cursor:pointer;transition:border-color .15s,transform .15s}
+.dv4-q:hover{border-color:var(--dv4-now);transform:translateY(-1px)}
+.dv4-q i{color:var(--dv4-brand);font-size:16px}
+.dv4-q b{font-size:13px;color:var(--dv4-ink)}
+.dv4-q small{font-size:11.5px;color:var(--dv4-muted)}
+
+@media (max-width:1280px){.dv4-kpis{grid-template-columns:repeat(2,1fr)}.dv4-hero{grid-column:1/-1}.dv4-quick{grid-template-columns:repeat(4,1fr)}.dv4-row3{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.dv4-row2,.dv4-row3{grid-template-columns:1fr}.dv4-btn span{display:none}}
+@media (max-width:520px){.dv4-kpis{gap:10px}.dv4-kpi{padding:14px}.dv4-kpi .val{font-size:24px}.dv4-quick{grid-template-columns:repeat(2,1fr)}.dv4-facts{grid-template-columns:1fr}.dv4-hero svg{display:none}}
+@media print{.dv4-quick,.dv4-sec-h,.dv4-head .dv4-btn{display:none}.dv4-card{break-inside:avoid;box-shadow:none}}
+</style>
 </head>
 <body>
 
@@ -2066,494 +2199,137 @@ body.demo-active .main { margin-top: 98px; }
   <!-- ============================================================
        PAGE 1: PAPAN PEMUKA (DASHBOARD)
        ============================================================ -->
-  <section class="page active" id="page-dashboard">
+  <section class="page active dv4" id="page-dashboard">
 
-    <!-- Page Header -->
-    <div class="page-header">
+    <!-- Kepala halaman -->
+    <div class="dv4-head">
       <div>
-        <h2><i class="fas fa-gauge-high"></i> Papan Pemuka Utama</h2>
-        <p>Gambaran menyeluruh kegiatan kokurikulum — Sesi 2025/2026, Semester 2</p>
+        <h2 id="dv4Greet">Selamat datang</h2>
+        <p><span id="schoolName">SMK Tinggi Kuching</span> · <span id="dv4Updated">memuatkan data langsung…</span></p>
       </div>
-      <div class="page-actions">
-        <button class="btn btn-outline" onclick="window.print()">
-          <i class="fas fa-print"></i> Cetak
-        </button>
-        <button class="btn btn-outline">
-          <i class="fas fa-download"></i> Muat Turun PDF
-        </button>
-        <button class="btn btn-primary" onclick="navigateTo('skas')">
-          <i class="fas fa-clipboard-check"></i> Pengurusan SK@S
-        </button>
+      <span class="dv4-pill" id="dv4Sem">Semester sedang berjalan</span>
+      <div class="dv4-grow"></div>
+      <button class="dv4-btn" onclick="hydrateDashboardLive()" title="Muat semula data"><i class="fas fa-rotate"></i><span>Muat semula</span></button>
+      <button class="dv4-btn" onclick="window.print()"><i class="fas fa-print"></i><span>Cetak</span></button>
+      <button class="dv4-btn primary" onclick="navigateTo('skas')"><i class="fas fa-clipboard-check"></i><span>SK@S 3.2</span></button>
+    </div>
+
+    <!-- KPI: satu angka utama + empat tile. Setiap nombor muncul sekali sahaja. -->
+    <div class="dv4-kpis">
+      <div class="dv4-card dv4-hero" onclick="navigateTo('pajsk')" role="button" tabindex="0">
+        <div class="lbl">GPS PAJSK <span id="dv4GpsYear">—</span></div>
+        <div class="val" id="dv4Gps">—</div>
+        <div class="row">
+          <span class="chip" id="dv4GpsDelta">—</span>
+          <span class="chip" id="dv4GpsTarget">Sasaran: —</span>
+        </div>
+        <div class="hint"><span id="dv4GpsRating"></span><span id="dv4Dir">GPS lebih rendah = lebih baik</span></div>
+        <svg id="dv4Spark" width="150" height="44" aria-hidden="true"></svg>
+      </div>
+      <div class="dv4-card dv4-kpi">
+        <div class="lbl"><i class="fas fa-user-graduate"></i>Penyertaan pelajar</div>
+        <div class="val" id="dv4Part">—</div>
+        <div class="meta" id="dv4PartSub">memuatkan…</div>
+        <div class="dv4-meter"><span id="dv4PartBar" style="width:0"></span></div>
+      </div>
+      <div class="dv4-card dv4-kpi" onclick="navigateTo('pengurusan-kelab')" role="button" tabindex="0">
+        <div class="lbl"><i class="fas fa-layer-group"></i>Unit kokurikulum</div>
+        <div class="val" id="dv4Units">—</div>
+        <div class="meta" id="dv4UnitsSub">memuatkan…</div>
+        <div class="dv4-split" id="dv4UnitsSplit" aria-hidden="true"></div>
+      </div>
+      <div class="dv4-card dv4-kpi">
+        <div class="lbl"><i class="fas fa-chalkboard-user"></i>Guru penasihat aktif</div>
+        <div class="val" id="dv4Adv">—</div>
+        <div class="meta" id="dv4AdvSub">memuatkan…</div>
+        <div class="dv4-meter"><span id="dv4AdvBar" style="width:0"></span></div>
+      </div>
+      <div class="dv4-card dv4-kpi" onclick="navigateTo('pencapaian')" role="button" tabindex="0">
+        <div class="lbl"><i class="fas fa-trophy"></i>Pencapaian <span id="dv4PenYear"></span></div>
+        <div class="val" id="dv4Pen">—</div>
+        <div class="meta" id="dv4PenSub">memuatkan…</div>
       </div>
     </div>
 
-<!-- ============================================================
-     ADMIN PANEL — Panel Pentadbiran
-     ============================================================ -->
-<div class="admin-panel">
-
-  <!-- Topbar -->
-  <div class="admin-panel-topbar">
-    <div class="admin-panel-topbar-left">
-      <span class="admin-version-badge">SPKB v3.1</span>
-      <span class="admin-panel-title">Panel Pentadbiran — Penolong Kanan Kokurikulum</span>
-    </div>
-    <div class="admin-panel-topbar-right">
-      <button class="admin-btn-mini" onclick="loadSKASData();loadPAJSKDashboard();">
-        <i class="fas fa-sync"></i> Kemaskini Data
-      </button>
-      <button class="admin-btn-mini" onclick="window.print()">
-        <i class="fas fa-file-export"></i> Eksport
-      </button>
-      <button class="admin-btn-mini" onclick="toggleNotif(event)">
-        <i class="fas fa-bell"></i> Notifikasi (<span id="adminNotifCount">0</span>)
-      </button>
-      <button class="admin-btn-mini" onclick="confirmLogout()">
-        <i class="fas fa-sign-out-alt"></i> Log Keluar
-      </button>
-    </div>
-  </div>
-
-  <!-- Body: Profile + School Info -->
-  <div class="admin-panel-body">
-
-    <!-- Left: Profile Card -->
-    <div class="admin-profile-card">
-      <div class="admin-avatar" id="adminAvatar">
-        KA
-        <div class="admin-avatar-status"></div>
-      </div>
-      <div class="admin-name" id="adminName">Tn. Khairul Azri bin Abdullah</div>
-      <div class="admin-role-pill" id="adminRole">Penolong Kanan Kokurikulum</div>
-      <div class="admin-id" id="adminId">PKK-2021-0047 · Gred DG48</div>
-
-      <div class="admin-info-row">
-        <i class="fas fa-phone"></i>
-        <div class="admin-info-row-content">
-          <div class="admin-info-row-label">Telefon</div>
-          <div class="admin-info-row-value" id="adminPhone">012-345 6789</div>
+    <!-- Carta -->
+    <div class="dv4-row2">
+      <div class="dv4-card">
+        <div class="dv4-card-h">
+          <h3>Trend GPS PAJSK</h3>
+          <span class="note" id="dv4TrendDir">paksi diterbalikkan: naik = lebih baik</span>
+          <div class="dv4-grow"></div>
+          <button class="dv4-link" data-dv4-tbl="dv4TrendTbl">Jadual</button>
         </div>
-      </div>
-      <div class="admin-info-row">
-        <i class="fas fa-envelope"></i>
-        <div class="admin-info-row-content">
-          <div class="admin-info-row-label">E-mel Rasmi</div>
-          <div class="admin-info-row-value" id="adminEmail">khairulazri@moe.gov.my</div>
+        <div class="dv4-legend">
+          <span><i class="key-line" style="background:var(--dv4-now)"></i>GPS sebenar</span>
+          <span><i class="key-line dash"></i>Sasaran</span>
         </div>
-      </div>
-      <div class="admin-info-row">
-        <i class="fas fa-calendar"></i>
-        <div class="admin-info-row-content">
-          <div class="admin-info-row-label">Dilantik</div>
-          <div class="admin-info-row-value" id="adminAppointed">1 Mac 2021</div>
-        </div>
-      </div>
-      <div class="admin-info-row">
-        <i class="fas fa-shield-alt"></i>
-        <div class="admin-info-row-content">
-          <div class="admin-info-row-label">Tahap Akses</div>
-          <div class="admin-info-row-value" id="adminAccess">Administrator Penuh</div>
-        </div>
+        <div class="dv4-chart" style="height:260px;"><canvas id="pajskChart"></canvas></div>
+        <div id="dv4TrendTbl" hidden></div>
+        <div class="dv4-callout" id="dv4TrendNote" hidden></div>
       </div>
 
-      <div class="admin-profile-actions">
-        <button class="admin-action-btn primary" onclick="editAdminProfile()">
-          <i class="fas fa-pen"></i> Edit Profil
-        </button>
-        <button class="admin-action-btn secondary" onclick="changeAdminPassword()">
-          <i class="fas fa-key"></i> Kata Laluan
-        </button>
+      <div class="dv4-card">
+        <div class="dv4-card-h">
+          <h3>GPS mengikut kategori</h3>
+          <div class="dv4-grow"></div>
+          <button class="dv4-link" data-dv4-tbl="dv4CatTbl">Jadual</button>
+        </div>
+        <div class="dv4-legend" id="dv4CatLegend">
+          <span><i class="key-dot" style="background:var(--dv4-prev)"></i><span id="dv4CatPrevY">Tahun lepas</span></span>
+          <span><i class="key-dot" style="background:var(--dv4-now)"></i><span id="dv4CatNowY">Tahun terkini</span></span>
+        </div>
+        <div class="dv4-chart" id="dv4Cats"><div class="dv4-loading">Memuatkan…</div></div>
+        <div id="dv4CatTbl" hidden></div>
+        <div class="dv4-callout warn" id="dv4CatNote" hidden></div>
       </div>
     </div>
 
-    <!-- Right: School Info + KPI + Quick Access -->
-    <div class="admin-school-section">
+    <!-- Tindakan, unit, takwim -->
+    <div class="dv4-row3">
+      <div class="dv4-card">
+        <div class="dv4-card-h"><h3>Perlu tindakan</h3><div class="dv4-grow"></div><span class="note" id="dv4TodoCount"></span></div>
+        <ul class="dv4-todo" id="dv4Todo"><li class="dv4-loading">Menyemak…</li></ul>
+      </div>
 
-      <!-- School Header -->
-      <div class="admin-school-header">
-        <div class="admin-school-icon">🏫</div>
-        <div class="admin-school-info">
-          <div class="admin-school-name" id="schoolName">Sekolah Menengah Kebangsaan Tinggi Kuching</div>
-          <div class="admin-school-address">
-            <i class="fas fa-map-marker-alt"></i>
-            <span id="schoolAddress">Jalan Mathie, 93100 Kuching, Sarawak</span>
-          </div>
-          <div class="admin-school-tags">
-            <span class="admin-school-tag" id="schoolCode">YFB1201</span>
-            <span class="admin-school-tag" id="schoolPPD">PPD: KUCHING</span>
-            <span class="admin-school-tag" id="schoolJPN">JPN: Sarawak</span>
-            <span class="admin-school-tag featured">⭐ Sekolah Cemerlang Akademik & Kokurikulum</span>
+      <div class="dv4-card">
+        <div class="dv4-card-h"><h3>Unit terbesar</h3><span class="note">ikut bilangan ahli</span><div class="dv4-grow"></div><a class="dv4-link" onclick="navigateTo('pengurusan-kelab')">Semua unit →</a></div>
+        <ul class="dv4-units" id="topClubsBody"><li class="dv4-loading">Memuatkan…</li></ul>
+      </div>
+
+      <div class="dv4-card">
+        <div class="dv4-card-h"><h3>Aktiviti akan datang</h3><span id="aktivitiBadge" class="dv4-badge">0</span><div class="dv4-grow"></div><a class="dv4-link" onclick="navigateTo('takwim')">Takwim →</a></div>
+        <div id="aktivitiBody" class="dv4-agenda"><div class="dv4-loading">Memuatkan takwim…</div></div>
+        <div class="dv4-school">
+          <div class="badge"><i class="fas fa-school"></i></div>
+          <div>
+            <b id="dv4SchoolShort">SMK Tinggi Kuching</b>
+            <div class="note"><span id="schoolCode">—</span> · <span id="schoolPPD">PPD</span> · <span id="schoolJPN">JPN</span></div>
           </div>
         </div>
-      </div>
-
-      <!-- School Meta -->
-      <div class="admin-school-meta-grid">
-        <div class="admin-meta-card">
-          <div class="admin-meta-label">Jumlah Pelajar</div>
-          <div class="admin-meta-value" id="schoolStudents">1,526</div>
-          <div class="admin-meta-sub">Tingkatan 1–5</div>
-        </div>
-        <div class="admin-meta-card">
-          <div class="admin-meta-label">Jumlah Guru</div>
-          <div class="admin-meta-value" id="schoolTeachers">98</div>
-          <div class="admin-meta-sub">Termasuk penasihat</div>
-        </div>
-        <div class="admin-meta-card">
-          <div class="admin-meta-label">Guru Penasihat Aktif</div>
-          <div class="admin-meta-value" id="schoolAdvisors">48</div>
-          <div class="admin-meta-sub" id="schoolUnitsSub">Dari 48 unit</div>
-        </div>
-        <div class="admin-meta-card">
-          <div class="admin-meta-label">Telefon Sekolah</div>
-          <div class="admin-meta-value" id="schoolPhone" style="font-size:13px;">082-247266</div>
-          <div class="admin-meta-sub" id="schoolFax">Faks: 082-246643</div>
-        </div>
-        <div class="admin-meta-card">
-          <div class="admin-meta-label">Pengetua</div>
-          <div class="admin-meta-value" id="schoolPrincipal" style="font-size:13px;">Jong Yian Chong</div>
-          <div class="admin-meta-sub" id="schoolPrincipalSub">DG54</div>
-        </div>
-        <div class="admin-meta-card">
-          <div class="admin-meta-label">Sesi</div>
-          <div class="admin-meta-value" id="schoolSession">Pagi</div>
-          <div class="admin-meta-sub" id="schoolSessionSub">7:30 pg – 1:45 tgh</div>
-        </div>
-      </div>
-
-      <!-- KPI Cards -->
-      <div class="admin-kpi-grid">
-        <div class="admin-kpi-card">
-          <div class="admin-kpi-value" id="kpiPenyertaan">97.4%</div>
-          <div class="admin-kpi-label">GPS PAJSK 2025</div>
-          <div class="admin-kpi-trend up" id="kpiPenyertaanTrend">▲ +2.1%</div>
-        </div>
-        <div class="admin-kpi-card">
-          <div class="admin-kpi-value" id="kpiPAJSK">4.2</div>
-          <div class="admin-kpi-label">Unit Kokurikulum</div>
-          <div class="admin-kpi-trend up" id="kpiPAJSKTrend">▲ +0.3</div>
-        </div>
-        <div class="admin-kpi-card">
-          <div class="admin-kpi-value" id="kpiKehadiran">88.6%</div>
-          <div class="admin-kpi-label">Rumah Sukan</div>
-          <div class="admin-kpi-trend down" id="kpiKehadiranTrend">▼ -1.2%</div>
-        </div>
-        <div class="admin-kpi-card">
-          <div class="admin-kpi-value" id="kpiPencapaian">47</div>
-          <div class="admin-kpi-label">Jawatankuasa Kokurikulum</div>
-          <div class="admin-kpi-trend up" id="kpiPencapaianTrend">▲ +12</div>
-        </div>
-      </div>
-
-      <!-- Quick Access -->
-      <div class="admin-quick-access" id="adminQuickAccess">
-        <!-- Auto-populated by JavaScript -->
-      </div>
-
-    </div>
-  </div>
-</div>
-<!-- ============================================================
-     END ADMIN PANEL
-     ============================================================ -->
-
-    <!-- Session Banner -->
-    <div class="session-banner">
-      <div class="session-info">
-        <h3 id="bannerTitle"><i class="fas fa-calendar-check"></i> Sesi 2026 — Semester 2 Sedang Berjalan</h3>
-      </div>
-      <div class="session-stats">
-        <div class="session-stat">
-          <span class="num" id="banner-pelajar">1,515</span>
-          <span class="lbl">Pelajar</span>
-        </div>
-        <div class="session-stat">
-          <span class="num" id="banner-kelab">46</span>
-          <span class="lbl">Unit</span>
-        </div>
-        <div class="session-stat">
-          <span class="num" id="banner-peserta">68</span>
-          <span class="lbl">Peserta</span>
-        </div>
-        <div class="session-stat">
-          <span class="num" id="banner-pencapaian">47</span>
-          <span class="lbl">Pencapaian</span>
-        </div>
-        <div class="session-stat">
-          <span class="num">348</span>
-          <span class="lbl">Fail</span>
-        </div>
+        <dl class="dv4-facts">
+          <div><dt>Pengetua</dt><dd id="schoolPrincipal">—</dd></div>
+          <div><dt>Sesi</dt><dd id="schoolSession">—</dd></div>
+          <div><dt>Telefon</dt><dd id="schoolPhone">—</dd></div>
+          <div><dt>Jumlah guru</dt><dd id="schoolTeachers">—</dd></div>
+        </dl>
       </div>
     </div>
 
-    <!-- Stat Cards Grid -->
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-        <div class="stat-info">
-          <div class="num" id="db-kelab">46</div>
-          <div class="label">Kelab & Persatuan</div>
-          <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +2 sesi lepas</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon teal"><i class="fas fa-medal"></i></div>
-        <div class="stat-info">
-          <div class="num" id="db-uniform">8</div>
-          <div class="label">Badan Beruniform</div>
-          <div class="trend trend-same"><i class="fas fa-minus"></i> Tiada perubahan</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon orange"><i class="fas fa-futbol"></i></div>
-        <div class="stat-info">
-          <div class="num" id="db-sukan">14</div>
-          <div class="label">Sukan & Permainan</div>
-          <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +3 sesi lepas</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon yellow"><i class="fas fa-trophy"></i></div>
-        <div class="stat-info">
-          <div class="num" id="db-pencapaian">47</div>
-          <div class="label">Pencapaian 2026</div>
-          <div class="trend trend-up" id="db-pencapaian-trend"><i class="fas fa-arrow-up"></i> +12 dari 2025</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon purple"><i class="fas fa-chart-line"></i></div>
-        <div class="stat-info">
-          <div class="num">1.89</div>
-          <div class="label">GPS PAJSK 2025</div>
-          <div class="trend trend-up"><i class="fas fa-arrow-down"></i> Improvement</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon navy"><i class="fas fa-folder"></i></div>
-        <div class="stat-info">
-          <div class="num">348</div>
-          <div class="label">Fail & Dokumen</div>
-          <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +24 minggu ini</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
-        <div class="stat-info">
-          <div class="num" id="db-pelajar-aktif">1,475</div>
-          <div class="label">Pelajar Aktif</div>
-          <div class="trend trend-up"><i class="fas fa-arrow-up"></i> 97.4% penyertaan</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
-        <div class="stat-info">
-          <div class="num" id="db-peserta">32</div>
-          <div class="label">Jumlah Peserta 2026</div>
-          <div class="trend trend-up"><i class="fas fa-user"></i> Aktif dalam unit</div>
-        </div>
-      </div>
-
-      <div class="stat-card" style="cursor:pointer;" onclick="navigateTo('skas')">
-        <div class="stat-icon pink"><i class="fas fa-clipboard-check"></i></div>
-        <div class="stat-info">
-          <div class="num" id="stat-skas-skor">--%</div>
-          <div class="label">Skor SK@S 3.2</div>
-          <div class="trend trend-same"><i class="fas fa-info-circle"></i> Compliance KPM</div>
-        </div>
-      </div>
+    <!-- Akses pantas -->
+    <div class="dv4-sec-h">Akses pantas</div>
+    <div class="dv4-quick">
+      <a class="dv4-q" onclick="navigateTo('pengurusan-kelab')"><i class="fas fa-users"></i><b>Kelab v3</b><small>46 kelab · 10 kluster</small></a>
+      <a class="dv4-q" onclick="navigateTo('pajsk')"><i class="fas fa-chart-line"></i><b>PAJSK</b><small>Analitik penilaian</small></a>
+      <a class="dv4-q" onclick="navigateTo('pencapaian')"><i class="fas fa-trophy"></i><b>Pencapaian</b><small>Hall of Fame</small></a>
+      <a class="dv4-q" onclick="navigateTo('laporan-program')"><i class="fas fa-folder-open"></i><b>Laporan Program</b><small>Evidens PDF</small></a>
+      <a class="dv4-q" onclick="navigateTo('jana-sijil')"><i class="fas fa-award"></i><b>Jana Sijil</b><small>Sijil guru · PDF</small></a>
+      <a class="dv4-q" onclick="navigateTo('pengawas-kk')"><i class="fas fa-user-shield"></i><b>Pengawas KK</b><small>Lembaga pengawas</small></a>
+      <a class="dv4-q" onclick="navigateTo('skas')"><i class="fas fa-clipboard-check"></i><b>SK@S 3.2</b><small>Audit-ready</small></a>
     </div>
 
-    <!-- PAJSK Summary -->
-    <div class="pajsk-summary">
-      <div class="pajsk-comp">
-        <div class="pc-icon">🏫</div>
-        <div class="pc-score" id="pcScore1">—</div>
-        <div class="pc-label">GPS Keseluruhan</div>
-        <span class="pc-weight" id="pcPill1">—</span>
-      </div>
-      <div class="pajsk-comp">
-        <div class="pc-icon">🎖️</div>
-        <div class="pc-score" id="pcScore2">—</div>
-        <div class="pc-label">Uniform</div>
-        <span class="pc-weight" id="pcPill2">—</span>
-      </div>
-      <div class="pajsk-comp">
-        <div class="pc-icon">📚</div>
-        <div class="pc-score" id="pcScore3">—</div>
-        <div class="pc-label">Kelab</div>
-        <span class="pc-weight" id="pcPill3">—</span>
-      </div>
-      <div class="pajsk-comp">
-        <div class="pc-icon">⚽</div>
-        <div class="pc-score" id="pcScore4">—</div>
-        <div class="pc-label">Sukan</div>
-        <span class="pc-weight" id="pcPill4">—</span>
-      </div>
-      <div class="pajsk-comp">
-        <div class="pc-icon">🎯</div>
-        <div class="pc-score" id="pcScore5">—</div>
-        <div class="pc-label" id="pcLabel5">Sasaran 2026</div>
-        <span class="pc-weight" id="pcPill5">Sasaran</span>
-      </div>
-    </div>
-
-    <!-- Charts Grid -->
-    <div class="chart-grid-2">
-      <!-- Trend PAJSK Chart -->
-      <div class="card">
-        <div class="card-header">
-          <h3 id="pajskTrendTitle"><i class="fas fa-chart-line"></i> Trend GPS PAJSK — 10 Tahun</h3>
-          <button class="btn btn-outline" onclick="toggleChart()" style="font-size:11px;padding:6px 12px;">
-            <i class="fas fa-exchange-alt"></i> Tukar Carta
-          </button>
-        </div>
-        <div class="card-body">
-          <div class="chart-container" style="height:300px;">
-            <canvas id="pajskChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Doughnut Chart -->
-      <div class="card">
-        <div class="card-header">
-          <h3 id="wajaranTitle"><i class="fas fa-chart-area"></i> Radar GPS Kategori PAJSK</h3>
-        </div>
-        <div class="card-body">
-          <div class="chart-container" style="height:300px;">
-            <canvas id="donutChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Top 5 Kelab + Amaran Grid -->
-    <div class="chart-grid-equal">
-      <!-- Top 5 Kelab -->
-      <div class="card">
-        <div class="card-header">
-          <h3><i class="fas fa-trophy"></i> Top 5 Unit Kokurikulum</h3>
-        </div>
-        <div class="card-body" id="topClubsBody">
-          <div class="club-item">
-            <div class="club-rank gold">1</div>
-            <div class="club-info">
-              <div class="club-name">PBSM</div>
-              <div class="club-type">Badan Beruniform</div>
-              <div class="prog-wrap"><div class="prog-bar" style="width:96%;background:var(--success);"></div></div>
-            </div>
-            <div class="club-score"><div class="pts">4.8</div><div class="lbl">PAJSK</div></div>
-          </div>
-          <div class="club-item">
-            <div class="club-rank silver">2</div>
-            <div class="club-info">
-              <div class="club-name">Persatuan STEM</div>
-              <div class="club-type">Persatuan Akademik</div>
-              <div class="prog-wrap"><div class="prog-bar" style="width:90%;background:var(--success);"></div></div>
-            </div>
-            <div class="club-score"><div class="pts">4.5</div><div class="lbl">PAJSK</div></div>
-          </div>
-          <div class="club-item">
-            <div class="club-rank bronze">3</div>
-            <div class="club-info">
-              <div class="club-name">Bola Sepak</div>
-              <div class="club-type">Sukan & Permainan</div>
-              <div class="prog-wrap"><div class="prog-bar" style="width:84%;background:var(--success);"></div></div>
-            </div>
-            <div class="club-score"><div class="pts">4.2</div><div class="lbl">PAJSK</div></div>
-          </div>
-          <div class="club-item">
-            <div class="club-rank">4</div>
-            <div class="club-info">
-              <div class="club-name">English Society</div>
-              <div class="club-type">Persatuan Akademik</div>
-              <div class="prog-wrap"><div class="prog-bar" style="width:76%;background:var(--secondary);"></div></div>
-            </div>
-            <div class="club-score"><div class="pts">3.8</div><div class="lbl">PAJSK</div></div>
-          </div>
-          <div class="club-item">
-            <div class="club-rank">5</div>
-            <div class="club-info">
-              <div class="club-name">Bola Jaring</div>
-              <div class="club-type">Sukan & Permainan</div>
-              <div class="prog-wrap"><div class="prog-bar" style="width:70%;background:var(--secondary);"></div></div>
-            </div>
-            <div class="club-score"><div class="pts">3.5</div><div class="lbl">PAJSK</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Aktiviti Akan Datang (dari Takwim) -->
-      <div class="card">
-        <div class="card-header">
-          <h3><i class="fas fa-calendar-day"></i> Aktiviti Akan Datang</h3>
-          <span id="aktivitiBadge" style="background:var(--success);color:#fff;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">— BARU</span>
-        </div>
-        <div class="card-body" id="aktivitiBody" style="max-height:420px;overflow-y:auto;">
-          <div style="text-align:center;padding:20px;color:#7f8c8d;font-size:12px;">
-            <i class="fas fa-spinner fa-spin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--primary);"></i>
-            Memuatkan takwim...
-          </div>
-        </div>
-        <div style="padding:8px 14px;border-top:1px solid var(--bdr);background:#f8fafc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-          <span style="font-size:10.5px;color:#7f8c8d;"><i class="fas fa-sync"></i> Auto-pull dari Modul Pengurusan Takwim</span>
-          <a onclick="navigateTo('takwim')" style="font-size:11px;color:var(--primary);font-weight:700;cursor:pointer;text-decoration:none;">Urus Takwim <i class="fas fa-arrow-right"></i></a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Akses Pantas — Module Cards -->
-    <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:20px 0 12px;">
-      <i class="fas fa-rocket"></i> Akses Pantas — Modul Sistem
-    </h3>
-    <div class="module-grid">
-      <a class="module-card featured" onclick="navigateTo('pengurusan-kelab')">
-        <div class="mod-icon" style="background:#f4ecf7;color:var(--purple);"><i class="fas fa-users"></i></div>
-        <div class="mod-name">Pengurusan Kelab v3</div>
-        <div class="mod-desc">46 kelab + 10 kluster</div>
-      </a>
-      <a class="module-card" onclick="navigateTo('pajsk')">
-        <div class="mod-icon" style="background:#ebf5fb;color:var(--secondary);"><i class="fas fa-chart-line"></i></div>
-        <div class="mod-name">Penilaian PAJSK</div>
-        <div class="mod-desc">Dashboard analytics</div>
-      </a>
-      <a class="module-card" onclick="navigateTo('pencapaian')">
-        <div class="mod-icon" style="background:#fef9e7;color:var(--accent);"><i class="fas fa-trophy"></i></div>
-        <div class="mod-name">Pencapaian</div>
-        <div class="mod-desc">Hall of Fame</div>
-      </a>
-      <a class="module-card" onclick="navigateTo('laporan-program')">
-        <div class="mod-icon" style="background:#e8f8f5;color:#0d9488;"><i class="fas fa-folder-open"></i></div>
-        <div class="mod-name">Laporan Program</div>
-        <div class="mod-desc">Evidens PDF · SK@S 3.2</div>
-      </a>
-      <a class="module-card" onclick="navigateTo('jana-sijil')">
-        <div class="mod-icon" style="background:#fef9e7;color:#d97706;"><i class="fas fa-award"></i></div>
-        <div class="mod-name">Jana Sijil</div>
-        <div class="mod-desc">Sijil guru · PDF</div>
-      </a>
-      <a class="module-card" onclick="navigateTo('pengawas-kk')">
-        <div class="mod-icon" style="background:#eef2ff;color:#4f46e5;"><i class="fas fa-user-shield"></i></div>
-        <div class="mod-name">Pengawas Kokurikulum</div>
-        <div class="mod-desc">Lembaga Pengawas KK</div>
-      </a>
-      <a class="module-card" onclick="navigateTo('skas')">
-        <div class="mod-icon" style="background:#eafaf1;color:var(--success);"><i class="fas fa-clipboard-check"></i></div>
-        <div class="mod-name">SK@S 3.2 Compliance</div>
-        <div class="mod-desc">Audit-Ready</div>
-      </a>
-    </div>
-
-    <!-- Footer -->
     <div class="dashboard-footer">
-      SPKB — Sistem Pengurusan Kokurikulum Bersepadu | KPM | Sesi 2025/2026 | v3.1.0
+      SPKB — Sistem Pengurusan Kokurikulum Bersepadu | KPM | v3.1.0 · Papan Pemuka v4 (pratonton)
     </div>
 
   </section>
@@ -6215,18 +5991,18 @@ body.demo-active .main { margin-top: 98px; }
    API CONFIGURATION
    ============================================================ */
 const SKAS_API_URL = 'https://script.google.com/macros/s/AKfycbxTXUFFwssqT7Nwg5sJ6tWsVUMD_-zV2h2S35lymOgTW88iVaT1mqag2yHfBoShTWA/exec';
-const KELAB_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-kelab-v3.html';
-const INSTRUMEN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/instrumen-skas-32.html';
-const KEHADIRAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-kehadiran.html';
-const BUKU_KK_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/buku-pengurusan-kk.html';
-const GENERATOR_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/generator-dokumen.html';
-const LAPORAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/laporan-akhir-tahun.html';
-const KEWANGAN_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/kewangan-inventori.html';
-const PUSAT_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pusat-sandar.html';
-const TAKWIM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/pengurusan-takwim.html';
-const PKK_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/modul-pkk.html';
-const LAPORAN_PROGRAM_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/laporan-program.html';
-const SIJIL_URL = 'https://lsjiann.github.io/spkb-kokurikulum-khs/jana-sijil.html';
+const KELAB_URL = 'modul-kelab-v3.html';
+const INSTRUMEN_URL = 'instrumen-skas-32.html';
+const KEHADIRAN_URL = 'modul-kehadiran.html';
+const BUKU_KK_URL = 'buku-pengurusan-kk.html';
+const GENERATOR_URL = 'generator-dokumen.html';
+const LAPORAN_URL = 'laporan-akhir-tahun.html';
+const KEWANGAN_URL = 'kewangan-inventori.html';
+const PUSAT_URL = 'pusat-sandar.html';
+const TAKWIM_URL = 'pengurusan-takwim.html';
+const PKK_URL = 'modul-pkk.html';
+const LAPORAN_PROGRAM_URL = 'laporan-program.html';
+const SIJIL_URL = 'jana-sijil.html';
 const PENGAWAS_KK_URL = 'https://lsjiann.github.io/PKKKHS/';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
 
@@ -6337,7 +6113,7 @@ function navigateTo(pageId) {
   if (pageId === 'kehadiran') {
     setTimeout(function () {
       var iframe = document.getElementById('kehadiran-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = KEHADIRAN_URL + '?tahun=' + tahun;
       }
@@ -6346,7 +6122,7 @@ function navigateTo(pageId) {
   if (pageId === 'buku-kk') {
     setTimeout(function () {
       var iframe = document.getElementById('buku-kk-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = BUKU_KK_URL + '?tahun=' + tahun;
       }
@@ -6355,7 +6131,7 @@ function navigateTo(pageId) {
   if (pageId === 'laporan-program') {
     setTimeout(function () {
       var iframe = document.getElementById('laporan-program-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = LAPORAN_PROGRAM_URL + '?tahun=' + tahun;
       }
@@ -6364,7 +6140,7 @@ function navigateTo(pageId) {
   if (pageId === 'jana-sijil') {
     setTimeout(function () {
       var iframe = document.getElementById('jana-sijil-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         iframe.src = SIJIL_URL;
       }
     }, 100);
@@ -6372,7 +6148,7 @@ function navigateTo(pageId) {
   if (pageId === 'pengawas-kk') {
     setTimeout(function () {
       var iframe = document.getElementById('pengawas-kk-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         iframe.src = PENGAWAS_KK_URL;
       }
     }, 100);
@@ -6380,7 +6156,7 @@ function navigateTo(pageId) {
   if (pageId === 'generator') {
     setTimeout(function () {
       var iframe = document.getElementById('generator-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = GENERATOR_URL + '?tahun=' + tahun;
       }
@@ -6389,7 +6165,7 @@ function navigateTo(pageId) {
   if (pageId === 'laporan-akhir') {
     setTimeout(function () {
       var iframe = document.getElementById('laporan-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = LAPORAN_URL + '?tahun=' + tahun;
       }
@@ -6398,7 +6174,7 @@ function navigateTo(pageId) {
   if (pageId === 'kewangan-inv') {
     setTimeout(function () {
       var iframe = document.getElementById('kewangan-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = KEWANGAN_URL + '?tahun=' + tahun;
       }
@@ -6407,7 +6183,7 @@ function navigateTo(pageId) {
   if (pageId === 'pusat-sandar') {
     setTimeout(function () {
       var iframe = document.getElementById('pusat-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         iframe.src = PUSAT_URL;
       }
     }, 100);
@@ -6415,7 +6191,7 @@ function navigateTo(pageId) {
   if (pageId === 'pkk') {
     setTimeout(function () {
       var iframe = document.getElementById('pkk-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = PKK_URL + '?tahun=' + tahun;
       }
@@ -6424,7 +6200,7 @@ function navigateTo(pageId) {
   if (pageId === 'takwim') {
     setTimeout(function () {
       var iframe = document.getElementById('takwim-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         var tahun = new Date().getFullYear();
         iframe.src = TAKWIM_URL + '?tahun=' + tahun;
       }
@@ -6433,7 +6209,7 @@ function navigateTo(pageId) {
     if (pageId === 'pengurusan-kelab') {
     setTimeout(function () {
       var iframe = document.getElementById('kelab-iframe');
-      if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src === '')) {
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         iframe.src = KELAB_URL;
       }
     }, 100);
@@ -6483,7 +6259,7 @@ function switchSkasTab(tab) {
   // Lazy-load iframe instrumen
   if (tab === 'instrumen') {
     var iframe = document.getElementById('skas-instrumen-iframe');
-    if (iframe && (!iframe.src || iframe.src === '' || iframe.src === 'about:blank')) {
+    if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
       var tahun = new Date().getFullYear();
       iframe.src = INSTRUMEN_URL + '?tahun=' + tahun;
     }
@@ -6510,76 +6286,280 @@ let chartType = 'line';
 let pajskHistory = null;
 let dashRadarInstance = null;
 
+/* ============================================================
+   PAPAN PEMUKA v4 — keadaan & pemaparan
+   Semua data diisi oleh hydrateDashboardLive() / renderActivities() /
+   updateNotifBadge(); dv4Render() melukis semula dari DV4.
+   Nota: GPS PAJSK — nilai lebih rendah = lebih baik.
+   ============================================================ */
+var DV4 = { units: null, adv: null, gps: null, target: null, pen: null, part: null, cat: null, skas: null, takwim: null, loadedAt: null };
+// TETAPAN: arah GPS PAJSK. true = nilai lebih rendah lebih baik (sasaran 2026 di bawah 2025).
+// Tukar kepada false jika sekolah mentafsir GPS lebih tinggi = lebih baik; semua carta & teks ikut.
+var DV4_LOWER_BETTER = true;
+function dv4Gain(from, to) { return DV4_LOWER_BETTER ? from - to : to - from; } // positif = bertambah baik
+function dv4Worse(a, b) { return DV4_LOWER_BETTER ? (b > a ? b : a) : (b < a ? b : a); }
+
+function dv4Css(name) {
+  var el = document.getElementById('page-dashboard') || document.documentElement;
+  return getComputedStyle(el).getPropertyValue(name).trim();
+}
+function dv4Set(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
+function dv4Fix(v) { return (v != null && !isNaN(v)) ? Number(v).toFixed(2) : '—'; }
+function dv4Esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]; }); }
+var DV4_NS = 'http://www.w3.org/2000/svg';
+function dv4El(t, a, p) { var e = document.createElementNS(DV4_NS, t); for (var k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+
 function buildPajsk(type) {
-  if (pajskChart) pajskChart.destroy();
-  var cfg;
-  if (pajskHistory && pajskHistory.length) {
-    var labels = pajskHistory.map(function (h) { return String(h.tahun); });
-    var actual = pajskHistory.map(function (h) { return h.isTarget ? null : h.gps; });
-    var target = pajskHistory.map(function (h) { return h.isTarget ? h.gps : null; });
-    var lastIdx = -1;
-    for (var i = 0; i < pajskHistory.length; i++) { if (!pajskHistory[i].isTarget) lastIdx = i; }
-    if (lastIdx >= 0) target[lastIdx] = pajskHistory[lastIdx].gps;
-    cfg = {
-      type: type,
-      data: { labels: labels, datasets: [
-        { label: 'GPS Sebenar', data: actual, borderColor: '#667eea', backgroundColor: type === 'bar' ? 'rgba(102,126,234,0.8)' : 'rgba(102,126,234,0.1)', borderWidth: 3, tension: 0.3, fill: type === 'line', pointRadius: 5, spanGaps: false },
-        { label: 'Sasaran', data: target, borderColor: '#f39c12', backgroundColor: 'rgba(243,156,18,0.1)', borderWidth: 2, borderDash: [8, 4], tension: 0, fill: false, pointRadius: 6 }
-      ]},
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
-        scales: {
-          y: { suggestedMin: 1.0, suggestedMax: 5.0, ticks: { stepSize: 0.5, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-          x: { ticks: { font: { size: 11 } }, grid: { display: false } }
-        }
-      }
-    };
-  } else {
-    cfg = { type: type, data: { labels: labels6, datasets: [
-      { label: 'Keseluruhan', data: [3.04,3.22,3.38,3.56,3.80,4.00], borderColor: '#1a3c6e', backgroundColor: type==='bar'?'rgba(26,60,110,0.8)':'rgba(26,60,110,0.08)', borderWidth: 3, tension: 0.4, fill: type==='line', pointRadius: 5 }
-    ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } }, scales: { y: { min: 2.0, max: 5.0, ticks: { stepSize: 0.5 } }, x: { grid: { display: false } } } } };
-  }
-  pajskChart = new Chart(document.getElementById('pajskChart'), cfg);
-}
-
-function toggleChart() {
-  chartType = chartType === 'line' ? 'bar' : 'line';
-  buildPajsk(chartType);
-}
-
-// Build chart awal
-buildPajsk('line');
-
-// Radar GPS Kategori PAJSK (gantian donat Wajaran) — diisi oleh hydrateDashboardLive
-function renderDashboardRadar(d) {
-  var canvas = document.getElementById('donutChart');
+  if (pajskChart) { pajskChart.destroy(); pajskChart = null; }
+  var canvas = document.getElementById('pajskChart');
   if (!canvas || typeof Chart === 'undefined') return;
-  var pu = (d && d.perUnit) || {};
-  var units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
-  var labels = ['Sekolah', 'Beruniform', 'Kelab & Persatuan', 'Sukan & Permainan'];
-  var gps = units.map(function (u) { return (pu[u] || {}).gps || 0; });
-  var gpsLepas = units.map(function (u) { return (pu[u] || {}).gpsLepas || 0; });
-  var tahun = d.tahun || (new Date().getFullYear() - 1);
-  var tahunLepas = d.tahunLepas || (tahun - 1);
-  if (dashRadarInstance) dashRadarInstance.destroy();
-  if (Chart.getChart) { var ex = Chart.getChart(canvas); if (ex) ex.destroy(); }
-  dashRadarInstance = new Chart(canvas, {
-    type: 'radar',
+  // Tiada lagi data contoh: tunggu sejarah sebenar dari API
+  if (!(pajskHistory && pajskHistory.length)) return;
+  var labels = pajskHistory.map(function (h) { return String(h.tahun); });
+  var actual = pajskHistory.map(function (h) { return h.isTarget ? null : h.gps; });
+  var target = pajskHistory.map(function (h) { return h.isTarget ? h.gps : null; });
+  var lastIdx = -1;
+  for (var i = 0; i < pajskHistory.length; i++) { if (!pajskHistory[i].isTarget) lastIdx = i; }
+  if (lastIdx >= 0) target[lastIdx] = pajskHistory[lastIdx].gps;
+  var cNow = dv4Css('--dv4-now') || '#2a78d6', cTgt = dv4Css('--dv4-target') || '#e8862a',
+      cGrid = dv4Css('--dv4-grid') || '#eceef2', cMuted = dv4Css('--dv4-muted') || '#8a94a6', cSurf = dv4Css('--dv4-surface') || '#fff';
+  pajskChart = new Chart(canvas, {
+    type: 'line',
     data: { labels: labels, datasets: [
-      { label: '' + tahunLepas, data: gpsLepas, backgroundColor: 'rgba(149,165,166,0.2)', borderColor: '#7f8c8d', borderWidth: 2, pointBackgroundColor: '#7f8c8d', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5 },
-      { label: '' + tahun, data: gps, backgroundColor: 'rgba(102,126,234,0.3)', borderColor: '#667eea', borderWidth: 3, pointBackgroundColor: '#667eea', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 6 }
+      { label: 'GPS sebenar', data: actual, borderColor: cNow, backgroundColor: cNow + '1a', borderWidth: 2, tension: 0.25, fill: 'end', spanGaps: false,
+        pointRadius: actual.map(function (v, i) { return i === lastIdx ? 5 : 0; }), pointHoverRadius: 6,
+        pointBackgroundColor: cNow, pointBorderColor: cSurf, pointBorderWidth: 2 },
+      { label: 'Sasaran', data: target, borderColor: cTgt, borderWidth: 2, borderDash: [4, 3], tension: 0, fill: false,
+        pointRadius: target.map(function (v, i) { return (v != null && i !== lastIdx) ? 5 : 0; }), pointHoverRadius: 6,
+        pointBackgroundColor: cSurf, pointBorderColor: cTgt, pointBorderWidth: 2 }
     ]},
     options: {
       responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      layout: { padding: { top: 8, right: 8 } },
       plugins: {
-        legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 14 } },
-        tooltip: { callbacks: { label: function (c) { return c.dataset.label + ': GPS ' + c.parsed.r.toFixed(2); } } }
+        legend: { display: false },
+        tooltip: { displayColors: false, callbacks: {
+          title: function (it) { return it[0].label; },
+          label: function (c) {
+            if (c.raw == null) return null;
+            if (c.datasetIndex === 1 && c.dataIndex === lastIdx) return null;
+            return (c.datasetIndex ? 'Sasaran ' : 'GPS ') + Number(c.raw).toFixed(2);
+          },
+          afterBody: function (it) {
+            var i = it[0].dataIndex; if (actual[i] == null || i === 0 || actual[i - 1] == null) return '';
+            var d = dv4Gain(actual[i - 1], actual[i]);
+            return d > 0 ? '▲ lebih baik ' + d.toFixed(2) : d < 0 ? '▼ merosot ' + Math.abs(d).toFixed(2) : 'Tiada perubahan';
+          } } }
       },
-      scales: { r: { min: 1.0, max: 3.5, ticks: { stepSize: 0.5, font: { size: 10 }, callback: function (v) { return v.toFixed(1); }, backdropColor: 'rgba(255,255,255,0.8)' }, grid: { color: 'rgba(0,0,0,0.1)' }, angleLines: { color: 'rgba(0,0,0,0.1)' }, pointLabels: { font: { size: 11, weight: 'bold' }, color: '#2c3e50' } } }
+      scales: {
+        y: { reverse: DV4_LOWER_BETTER, grace: '8%', border: { display: false }, ticks: { color: cMuted, font: { size: 11 }, maxTicksLimit: 6, callback: function (v) { return Number(v).toFixed(1); } }, grid: { color: cGrid } },
+        x: { border: { color: cGrid }, ticks: { color: cMuted, font: { size: 11 }, autoSkip: true, maxRotation: 0 }, grid: { display: false } }
+      }
     }
   });
+
+  // Jadual & rumusan automatik
+  dv4Set('dv4TrendTbl', '<table class="dv4-data"><tr><th>Tahun</th><th>GPS</th></tr>' + pajskHistory.map(function (h) {
+    return '<tr><td>' + dv4Esc(h.tahun) + '</td><td>' + dv4Fix(h.gps) + (h.isTarget ? ' (sasaran)' : '') + '</td></tr>';
+  }).join('') + '</table>');
+  var real = pajskHistory.filter(function (h) { return !h.isTarget && h.gps != null; });
+  var note = document.getElementById('dv4TrendNote');
+  if (note && real.length > 1) {
+    var last = real[real.length - 1];
+    var worst = real.reduce(function (a, b) { return dv4Gain(a.gps, b.gps) < 0 ? b : a; });
+    var best = real.reduce(function (a, b) { return dv4Gain(a.gps, b.gps) > 0 ? b : a; });
+    var bigJump = null;
+    for (var j = 1; j < real.length; j++) { var dd = dv4Gain(real[j - 1].gps, real[j].gps); if (!bigJump || dd > bigJump.d) bigJump = { d: dd, a: real[j - 1].tahun, b: real[j].tahun }; }
+    var tg = pajskHistory.filter(function (h) { return h.isTarget; })[0];
+    var gap = tg ? dv4Gain(last.gps, tg.gps) : 0;
+    var txt = (best === last ? 'GPS ' + last.tahun + ' (' + dv4Fix(last.gps) + ') ialah yang terbaik dalam ' + real.length + ' tahun.' : 'GPS terbaik ialah ' + dv4Fix(best.gps) + ' (' + best.tahun + ').') +
+      (worst !== last && dv4Gain(worst.gps, last.gps) > 0 ? ' Bertambah baik ' + dv4Gain(worst.gps, last.gps).toFixed(2) + ' mata sejak ' + worst.tahun + ' (' + dv4Fix(worst.gps) + ').' : '') +
+      (bigJump && bigJump.d > 0 ? ' Lonjakan terbesar: ' + bigJump.a + '→' + bigJump.b + '.' : '') +
+      (tg ? ' Sasaran ' + tg.tahun + ' (' + dv4Fix(tg.gps) + ') ' + (gap > 0 ? 'memerlukan ' + gap.toFixed(2) + ' lagi.' : 'sudah dicapai.') : '');
+    note.innerHTML = '<i class="fas fa-lightbulb"></i><span>' + dv4Esc(txt) + '</span>';
+    note.hidden = false;
+  }
+  dv4Spark();
 }
+
+function dv4Spark() {
+  var s = document.getElementById('dv4Spark'); if (!s) return; s.innerHTML = '';
+  var d = (pajskHistory || []).filter(function (h) { return !h.isTarget && h.gps != null; }).map(function (h) { return h.gps; });
+  if (d.length < 2) return;
+  var w = 150, h = 44, lo = Math.min.apply(null, d), hi = Math.max.apply(null, d); if (hi === lo) hi = lo + 0.1;
+  var x = function (i) { return 4 + i * (w - 8) / (d.length - 1); };
+  var y = function (v) { var t = (v - lo) / (hi - lo); return 4 + (DV4_LOWER_BETTER ? t : 1 - t) * (h - 8); }; // atas = lebih baik
+  dv4El('path', { d: d.map(function (v, i) { return (i ? 'L' : 'M') + x(i) + ' ' + y(v); }).join(''), fill: 'none', stroke: 'rgba(255,255,255,.75)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, s);
+  dv4El('circle', { cx: x(d.length - 1), cy: y(d[d.length - 1]), r: 4, fill: '#fff' }, s);
+}
+
+// Dahulu radar; kini carta "dumbbell" tahun lepas → tahun terkini bagi setiap kategori
+function renderDashboardRadar(d) {
+  var pu = (d && d.perUnit) || {};
+  var units = ['SEKOLAH', 'BADAN_BERUNIFORM', 'KELAB_PERSATUAN', 'SUKAN_PERMAINAN'];
+  var labels = ['Sekolah', 'Beruniform', 'Kelab & Persatuan', 'Sukan & Permainan'];
+  var tahun = d.tahun || (new Date().getFullYear() - 1);
+  DV4.cat = { tahun: tahun, tahunLepas: d.tahunLepas || (tahun - 1), rows: units.map(function (u, i) {
+    var p = pu[u] || {}; return { key: u, n: labels[i], a: p.gpsLepas != null ? Number(p.gpsLepas) : null, b: p.gps != null ? Number(p.gps) : null };
+  }).filter(function (r) { return r.b != null; }) };
+  dv4DrawCats();
+  dv4Render();
+}
+
+function dv4DrawCats() {
+  var box = document.getElementById('dv4Cats'); if (!box || !DV4.cat) return;
+  var rows = DV4.cat.rows; box.innerHTML = '';
+  dv4Set('dv4CatPrevY', DV4.cat.tahunLepas); dv4Set('dv4CatNowY', DV4.cat.tahun);
+  if (!rows.length) { box.innerHTML = '<div class="dv4-loading">Tiada data kategori.</div>'; return; }
+  var W = Math.max(box.clientWidth, 260), rowH = 50, m = { t: 8, r: 16, b: 30, l: 8 }, H = m.t + rows.length * rowH + m.b;
+  var vals = []; rows.forEach(function (r) { vals.push(r.b); if (r.a) vals.push(r.a); });
+  var lo = Math.floor((Math.min.apply(null, vals) - 0.15) * 5) / 5, hi = Math.ceil((Math.max.apply(null, vals) + 0.15) * 5) / 5;
+  var s = dv4El('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'GPS kategori ' + DV4.cat.tahunLepas + ' berbanding ' + DV4.cat.tahun }, box);
+  var x = function (v) { return m.l + (DV4_LOWER_BETTER ? hi - v : v - lo) / (hi - lo) * (W - m.l - m.r); }; // kanan = lebih baik
+  var step = (hi - lo) > 1.2 ? 0.4 : 0.2;
+  for (var t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) {
+    dv4El('line', { x1: x(t), x2: x(t), y1: m.t, y2: H - m.b, stroke: dv4Css('--dv4-grid') }, s);
+    var tx = x(t); if (tx < m.l + 40 || tx > W - m.r - 40) continue;
+    dv4El('text', { x: tx, y: H - 12, 'text-anchor': 'middle', class: 'tick' }, s).textContent = t.toFixed(1);
+  }
+  dv4El('text', { x: m.l, y: H - 12, class: 'tick' }, s).textContent = '← lemah';
+  dv4El('text', { x: W - m.r, y: H - 12, 'text-anchor': 'end', class: 'tick' }, s).textContent = 'baik →';
+  var tip = document.createElement('div'); tip.className = 'dv4-tip'; box.appendChild(tip);
+  rows.forEach(function (r, i) {
+    var cy = m.t + i * rowH + 32, a = r.a, b = r.b;
+    dv4El('text', { x: m.l, y: cy - 14, class: 'lab2' }, s).textContent = r.n;
+    if (a != null && a !== b) dv4El('line', { x1: x(a), x2: x(b), y1: cy, y2: cy, stroke: dv4Css('--dv4-axis'), 'stroke-width': 2 }, s);
+    if (a != null) dv4El('circle', { cx: x(a), cy: cy, r: 5, fill: dv4Css('--dv4-prev'), stroke: dv4Css('--dv4-surface'), 'stroke-width': 2 }, s);
+    dv4El('circle', { cx: x(b), cy: cy, r: 6, fill: dv4Css('--dv4-now'), stroke: dv4Css('--dv4-surface'), 'stroke-width': 2 }, s);
+    var right = Math.max(x(b), a != null ? x(a) : 0), left = Math.min(x(b), a != null ? x(a) : W);
+    var outside = right + 44 > W;
+    dv4El('text', { x: outside ? left - 10 : right + 10, y: cy + 4, 'text-anchor': outside ? 'end' : 'start', class: 'lab' }, s).textContent = b.toFixed(2);
+    dv4El('rect', { x: 0, y: cy - 24, width: W, height: rowH - 4, fill: 'transparent' }, s).addEventListener('mousemove', function () {
+      var rc = s.getBoundingClientRect(), d = a != null ? dv4Gain(a, b) : null;
+      tip.innerHTML = '<b>' + dv4Esc(r.n) + '</b><br>' + (a != null ? DV4.cat.tahunLepas + ': ' + a.toFixed(2) + ' → ' : '') + DV4.cat.tahun + ': <b>' + b.toFixed(2) + '</b>' +
+        (d == null ? '' : '<br>' + (d > 0 ? '▲ lebih baik ' + d.toFixed(2) : d < 0 ? '▼ merosot ' + Math.abs(d).toFixed(2) : 'Tiada perubahan'));
+      tip.style.left = (x(b) / W * rc.width) + 'px'; tip.style.top = ((cy - 6) / H * rc.height) + 'px'; tip.style.opacity = 1;
+    });
+  });
+  s.addEventListener('mouseleave', function () { tip.style.opacity = 0; });
+
+  dv4Set('dv4CatTbl', '<table class="dv4-data"><tr><th>Kategori</th><th>' + DV4.cat.tahunLepas + '</th><th>' + DV4.cat.tahun + '</th><th>Beza</th></tr>' + rows.map(function (r) {
+    return '<tr><td>' + dv4Esc(r.n) + '</td><td>' + dv4Fix(r.a) + '</td><td>' + dv4Fix(r.b) + '</td><td>' + (r.a != null ? (r.b - r.a).toFixed(2) : '—') + '</td></tr>';
+  }).join('') + '</table>');
+
+  var cats = rows.filter(function (r) { return r.key !== 'SEKOLAH'; });
+  var note = document.getElementById('dv4CatNote');
+  if (note && cats.length) {
+    var weak = cats.reduce(function (p, c) { return dv4Worse(p.b, c.b) === c.b && c.b !== p.b ? c : p; });
+    var withD = cats.filter(function (c) { return c.a != null; });
+    var most = withD.length ? withD.reduce(function (p, c) { return dv4Gain(c.a, c.b) > dv4Gain(p.a, p.b) ? c : p; }) : null;
+    var wd = weak.a != null ? dv4Gain(weak.a, weak.b) : null;
+    note.innerHTML = '<i class="fas fa-circle-exclamation"></i><span><b>' + dv4Esc(weak.n) + ' (' + weak.b.toFixed(2) + ')</b> kategori paling lemah' +
+      (wd == null ? '' : wd === 0 ? ', tiada perubahan sejak ' + DV4.cat.tahunLepas : wd < 0 ? ', merosot ' + Math.abs(wd).toFixed(2) : ', bertambah baik ' + wd.toFixed(2)) + '.' +
+      (most && most !== weak && dv4Gain(most.a, most.b) > 0 ? ' ' + dv4Esc(most.n) + ' paling banyak bertambah baik (' + dv4Gain(most.a, most.b).toFixed(2) + ' mata).' : '') + '</span>';
+    note.hidden = false;
+  }
+}
+
+function dv4Render() {
+  if (!document.getElementById('page-dashboard')) return;
+  var now = new Date(), hr = now.getHours();
+  // Sapaan
+  var nm = (typeof ADMIN_INFO !== 'undefined' && ADMIN_INFO.name) ? String(ADMIN_INFO.name).split(/\s+(bin|binti|bt\.?|b\.)\s+/i)[0] : '';
+  dv4Set('dv4Greet', (hr < 12 ? 'Selamat pagi' : hr < 14 ? 'Selamat tengah hari' : hr < 19 ? 'Selamat petang' : 'Selamat malam') + (nm ? ', ' + dv4Esc(nm) : ''));
+  if (DV4.loadedAt) dv4Set('dv4Updated', 'data langsung · dimuat ' + DV4.loadedAt.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }));
+  dv4Set('dv4Sem', 'Sesi ' + now.getFullYear() + ' · Semester ' + (now.getMonth() <= 4 ? 1 : 2) + ' sedang berjalan');
+  if (typeof SCHOOL_INFO !== 'undefined' && SCHOOL_INFO.name) dv4Set('dv4SchoolShort', dv4Esc(SCHOOL_INFO.name.replace(/^Sekolah Menengah Kebangsaan/i, 'SMK')));
+
+  dv4Set('dv4Dir', 'GPS lebih ' + (DV4_LOWER_BETTER ? 'rendah' : 'tinggi') + ' = lebih baik');
+  dv4Set('dv4TrendDir', DV4_LOWER_BETTER ? 'paksi diterbalikkan: naik = lebih baik' : 'naik = lebih baik');
+  // GPS (hero)
+  var g = DV4.gps;
+  if (g && g.v != null) {
+    dv4Set('dv4Gps', dv4Fix(g.v)); dv4Set('dv4GpsYear', dv4Esc(g.tahun));
+    dv4Set('dv4GpsRating', g.rating ? '<b>' + dv4Esc(g.rating) + '</b>' : '');
+    if (g.prev != null) {
+      var dg = dv4Gain(g.prev, g.v);
+      dv4Set('dv4GpsDelta', dg > 0 ? '<i class="fas fa-arrow-trend-up"></i>' + dg.toFixed(2) + ' lebih baik vs ' + (g.tahun - 1)
+        : dg < 0 ? '<i class="fas fa-arrow-trend-down"></i>' + Math.abs(dg).toFixed(2) + ' merosot vs ' + (g.tahun - 1) : 'Sama seperti ' + (g.tahun - 1));
+    } else dv4Set('dv4GpsDelta', 'Tiada data ' + (g.tahun - 1));
+  }
+  if (DV4.target && DV4.target.v != null) dv4Set('dv4GpsTarget', 'Sasaran ' + DV4.target.tahun + ': ' + dv4Fix(DV4.target.v));
+
+  // Penyertaan
+  var p = DV4.part;
+  if (p && p.n) {
+    var pct = p.aktif / p.n * 100;
+    dv4Set('dv4Part', pct.toFixed(1) + '%');
+    dv4Set('dv4PartSub', p.aktif.toLocaleString() + ' daripada ' + p.n.toLocaleString() + ' pelajar');
+    var pb = document.getElementById('dv4PartBar'); if (pb) pb.style.width = pct + '%';
+  }
+  // Unit
+  var u = DV4.units;
+  if (u) {
+    dv4Set('dv4Units', u.total);
+    dv4Set('dv4UnitsSub', u.kelab + ' kelab · ' + u.uniform + ' beruniform · ' + u.sukan + ' sukan');
+    dv4Set('dv4UnitsSplit', u.total ? '<span style="flex:' + u.kelab + ';background:var(--dv4-now)"></span><span style="flex:' + u.uniform + ';background:var(--dv4-accent)"></span><span style="flex:' + u.sukan + ';background:#1baf7a"></span>' : '');
+  }
+  // Guru penasihat
+  var a = DV4.adv;
+  if (a) {
+    dv4Set('dv4Adv', a.n);
+    dv4Set('dv4AdvSub', a.teachers ? 'daripada ' + a.teachers + ' guru · ' + Math.round(a.n / a.teachers * 100) + '%' : '');
+    var ab = document.getElementById('dv4AdvBar'); if (ab && a.teachers) ab.style.width = Math.min(100, a.n / a.teachers * 100) + '%';
+  }
+  // Pencapaian
+  var pe = DV4.pen;
+  if (pe && pe.missing) {
+    dv4Set('dv4Pen', '—'); dv4Set('dv4PenYear', pe.tahun);
+    dv4Set('dv4PenSub', 'Tiada rekod ' + pe.tahun + ' dalam Ringkasan Tahunan');
+  } else if (pe && pe.n != null) {
+    dv4Set('dv4Pen', pe.n); dv4Set('dv4PenYear', pe.tahun);
+    if (pe.prev != null) { var dp = pe.n - pe.prev; dv4Set('dv4PenSub', '<span class="' + (dp >= 0 ? 'up' : 'down') + '">' + (dp >= 0 ? '▲ ' : '▼ ') + Math.abs(dp) + '</span> berbanding ' + (pe.tahun - 1)); }
+    else dv4Set('dv4PenSub', 'Rekod ' + pe.tahun);
+  }
+  dv4Todo();
+}
+
+function dv4Todo() {
+  var ul = document.getElementById('dv4Todo'); if (!ul) return;
+  var items = [];
+  var tk = DV4.takwim;
+  if (tk && !tk.found) items.push({ lv: 'crit', ic: 'fa-calendar-xmark', t: 'Takwim belum ditetapkan', s: 'Aktiviti akan datang tidak dapat dipaparkan', go: 'takwim' });
+  else if (tk && tk.urgent) items.push({ lv: 'warn', ic: 'fa-calendar-day', t: tk.urgent + ' aktiviti dalam 24 jam', s: 'Semak persediaan di Takwim', go: 'takwim' });
+  if (DV4.skas == null) items.push({ lv: 'info', ic: 'fa-clipboard-check', t: 'Skor SK@S 3.2 sedang dimuat', s: 'Buka modul SK@S untuk butiran', go: 'skas' });
+  else if (DV4.skas < 80) items.push({ lv: DV4.skas < 50 ? 'crit' : 'warn', ic: 'fa-clipboard-check', t: 'Skor SK@S 3.2: ' + DV4.skas + '%', s: 'Lengkapkan evidens pematuhan KPM', go: 'skas' });
+  else items.push({ lv: 'ok', ic: 'fa-clipboard-check', t: 'Skor SK@S 3.2: ' + DV4.skas + '%', s: 'Pematuhan baik', go: 'skas' });
+  if (DV4.cat) {
+    var cats = DV4.cat.rows.filter(function (r) { return r.key !== 'SEKOLAH'; });
+    if (cats.length) {
+      var w = cats.reduce(function (p, c) { return dv4Worse(p.b, c.b) === c.b && c.b !== p.b ? c : p; });
+      var worse = w.a != null && dv4Gain(w.a, w.b) < 0;
+      items.push({ lv: worse ? 'crit' : 'warn', ic: 'fa-chart-line', t: 'GPS ' + w.n + ' ' + w.b.toFixed(2), s: 'Kategori paling lemah' + (w.a == null ? '' : w.b === w.a ? ', tiada perubahan' : worse ? ', merosot' : ', bertambah baik'), go: 'pajsk' });
+    }
+  }
+  var nf = (typeof notifData !== 'undefined' && notifData) ? notifData.length : 0;
+  if (nf) items.push({ lv: nf > 50 ? 'warn' : 'info', ic: 'fa-folder-open', t: nf.toLocaleString() + ' fail SK@S perlu dikemas kini', s: 'Fail evidens yang sudah lapuk', go: 'skas' });
+  var tag = { crit: 'Kritikal', warn: 'Pantau', info: 'Info', ok: 'Baik' }, ord = { crit: 0, warn: 1, info: 2, ok: 3 };
+  items.sort(function (x, y) { return ord[x.lv] - ord[y.lv]; });
+  var open = items.filter(function (i) { return i.lv !== 'ok'; }).length;
+  dv4Set('dv4TodoCount', open ? open + ' perkara' : 'semua beres');
+  ul.innerHTML = items.length ? items.map(function (i) {
+    return '<li class="item ' + i.lv + '" onclick="navigateTo(\'' + i.go + '\')"><span class="ic"><i class="fas ' + i.ic + '"></i></span><div><b>' + dv4Esc(i.t) + '</b><small>' + dv4Esc(i.s) + '</small></div><span class="tag">' + tag[i.lv] + '</span></li>';
+  }).join('') : '<li class="dv4-loading">Tiada tindakan diperlukan.</li>';
+}
+
+// Butang "Jadual", saiz semula & tukar tema
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-dv4-tbl]'); if (!b) return;
+  var t = document.getElementById(b.getAttribute('data-dv4-tbl')); if (!t) return;
+  t.hidden = !t.hidden; b.textContent = t.hidden ? 'Jadual' : 'Sembunyi';
+});
+(function () {
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(dv4DrawCats, 150); });
+  new MutationObserver(function () { buildPajsk('line'); dv4DrawCats(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
 
 /* ============================================================
    MODUL SK@S 3.2
@@ -7932,6 +7912,19 @@ function resetPAJSKForm() {
   autoCalculatePAJSK();
 }
 
+// 🔒 Kunci pentadbir untuk penulisan (K3): diminta sekali, disimpan dalam sessionStorage sahaja.
+// Kunci yang sama dikongsi dengan modul Kelab (sama origin).
+function dapatkanKunciTulis() {
+  let k = null;
+  try { k = sessionStorage.getItem('spkb_kunci_tulis'); } catch (e) {}
+  if (!k) {
+    k = (window.prompt('Masukkan kunci pentadbir untuk menyimpan data:') || '').trim();
+    if (k) try { sessionStorage.setItem('spkb_kunci_tulis', k); } catch (e) {}
+  }
+  return k;
+}
+function lupaKunciTulis() { try { sessionStorage.removeItem('spkb_kunci_tulis'); } catch (e) {} }
+
 async function submitPAJSKData(event) {
   event.preventDefault();
 
@@ -7961,16 +7954,26 @@ async function submitPAJSKData(event) {
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
   submitBtn.disabled = true;
 
+  const kunci = dapatkanKunciTulis();
+  if (!kunci) { submitBtn.innerHTML = originalHTML; submitBtn.disabled = false; return; }
+
   try {
-    await fetch(SKAS_API_URL, {
+    // text/plain mengelak preflight CORS, jadi respons Apps Script boleh dibaca (tiada lagi no-cors)
+    const r = await fetch(SKAS_API_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         action: 'pajsk_save',
-        payload: { tahun, unit, tingkatan, bil_murid: bilMurid, A, B, C, D, E, userEmail: 'admin@spkb.local' }
+        apiKey: kunci,
+        oleh: (typeof ADMIN_INFO !== 'undefined' && ADMIN_INFO.name) || 'pentadbir',
+        payload: { tahun, unit, tingkatan, bil_murid: bilMurid, A, B, C, D, E }
       })
     });
+    const res = await r.json();
+    if (!res || res.success !== true) {
+      if (/kunci/i.test((res && res.error) || '')) lupaKunciTulis();
+      throw new Error((res && res.error) || 'Respons tidak sah daripada pelayan');
+    }
 
     alert('✅ Data berjaya disimpan!\n\nDashboard akan refresh dalam 2 saat...');
     setTimeout(loadPAJSKDashboard, 2000);
@@ -12689,6 +12692,7 @@ function populateAdminPanel() {
     });
     qaContainer.innerHTML = html;
   }
+  if (typeof dv4Render === 'function') dv4Render();
 }
 
 /* Sync notification badge dengan admin panel */
@@ -12739,6 +12743,7 @@ function hydrateDashboardLive() {
   var setNum = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
   var setSub = setNum;
   var pfx = function (s, p) { s = String(s || '').trim(); if (!s) return p + ': —'; return new RegExp('^' + p, 'i').test(s) ? s : (p + ': ' + s); };
+  DV4.loadedAt = new Date(); dv4Render();
 
   // Banner: semester automatik (Jan–Mei = Sem 1, Jun–Dis = Sem 2)
   (function () {
@@ -12790,6 +12795,10 @@ function hydrateDashboardLive() {
     setNum('kpiPAJSK', codes.length); setSub('kpiPAJSKTrend', '');
     setNum('kpiKehadiran', rumah || 6); setSub('kpiKehadiranTrend', '');
     setNum('kpiPencapaian', jk); setSub('kpiPencapaianTrend', '');
+    // Papan Pemuka v4
+    DV4.units = { total: codes.length, kelab: kelab, uniform: uniform, sukan: sukan };
+    DV4.adv = { n: SCHOOL_INFO.advisors, teachers: SCHOOL_INFO.teachers };
+    dv4Render();
   }).catch(function () {});
 
   // (E) PAJSK — Rajah 3: hero GPS, 5 kad komponen, radar, sasaran, trend 10 tahun
@@ -12819,13 +12828,24 @@ function hydrateDashboardLive() {
     setNum('pcScore2', gOf('BADAN_BERUNIFORM')); setNum('pcPill2', thn);
     setNum('pcScore3', gOf('KELAB_PERSATUAN'));  setNum('pcPill3', thn);
     setNum('pcScore4', gOf('SUKAN_PERMAINAN'));  setNum('pcPill4', thn);
+    var gpsLepas = (k.gpsSekolahLepas != null) ? k.gpsSekolahLepas : (pu.SEKOLAH && pu.SEKOLAH.gpsLepas != null) ? pu.SEKOLAH.gpsLepas : null;
+    DV4.gps = { v: schoolGps != null ? Number(schoolGps) : null, prev: gpsLepas != null ? Number(gpsLepas) : null, rating: schoolRating, tahun: Number(thn) };
     if (typeof renderDashboardRadar === 'function') renderDashboardRadar(d);
   }).catch(function () {});
   // (E2) Sasaran tahun semasa
   var curY = new Date().getFullYear();
   fetch(SK + '?action=pajsk_target&tahun=' + curY + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
-    if (res && res.success && res.data && res.data.targetGPS != null) setNum('pcScore5', fix2(res.data.targetGPS));
+    if (res && res.success && res.data && res.data.targetGPS != null) {
+      setNum('pcScore5', fix2(res.data.targetGPS));
+      DV4.target = { v: Number(res.data.targetGPS), tahun: curY }; dv4Render();
+    }
     setSub('pcLabel5', 'Sasaran ' + curY);
+  }).catch(function () {});
+  // (G) Skor SK@S 3.2 untuk senarai "Perlu tindakan"
+  fetch(SK + '?action=skas_dashboard&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res || !res.success || !res.data || !res.data.keseluruhan) return;
+    var pc = Number(res.data.keseluruhan.peratus);
+    if (!isNaN(pc)) { DV4.skas = pc; setNum('stat-skas-skor', pc + '%'); dv4Render(); }
   }).catch(function () {});
   // (E3) Trend 10 tahun
   fetch(SK + '?action=pajsk_history&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
@@ -12843,9 +12863,11 @@ function hydrateDashboardLive() {
     fetch(PEN + '?action=pencapaian_ringkasan&tahun=' + (thnNow - 1) + '&_t=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return null; })
   ]).then(function (arr) {
     var cur = arr[0], prev = arr[1];
-    if (!cur || !cur.success || !cur.data || !cur.data.summary) return;
+    if (!cur || !cur.success || !cur.data || !cur.data.summary) { DV4.pen = { missing: true, tahun: thnNow }; dv4Render(); return; }
     var tp = cur.data.summary.totalPencapaian;
     if (tp != null) { setNum('db-pencapaian', tp); setNum('banner-pencapaian', tp); }
+    var prevTpV4 = (prev && prev.success && prev.data && prev.data.summary) ? prev.data.summary.totalPencapaian : null;
+    DV4.pen = { n: tp, prev: prevTpV4, tahun: thnNow }; dv4Render();
     var trendEl = document.getElementById('db-pencapaian-trend');
     if (trendEl) {
       var prevTp = (prev && prev.success && prev.data && prev.data.summary) ? prev.data.summary.totalPencapaian : null;
@@ -12884,6 +12906,7 @@ function hydrateDashboardLive() {
     setNum('banner-pelajar', n.toLocaleString());
     setNum('db-peserta', aktif.toLocaleString());
     setNum('banner-peserta', aktif.toLocaleString());
+    DV4.part = { n: n, aktif: aktif }; dv4Render();
     // RAJAH 4: Top 5 Unit Kokurikulum (uniform + kelab + sukan) ikut bilangan ahli
     var cmap = {};
     var katOf = function (kod) {
@@ -12907,22 +12930,18 @@ function hydrateDashboardLive() {
     var body = document.getElementById('topClubsBody');
     if (body) {
       if (!top.length) {
-        body.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-light);">Belum ada data keahlian kelab.</div>';
+        body.innerHTML = '<li class="dv4-loading">Belum ada data keahlian kelab.</li>';
       } else {
         var maxN = top[0].n || 1;
-        var ranks = ['gold', 'silver', 'bronze', '', ''];
+        var katPendek = { 'Badan Beruniform': 'Beruniform', 'Sukan & Permainan': 'Sukan', 'Kelab & Persatuan': 'Kelab' };
         body.innerHTML = top.map(function (c, i) {
           var w = Math.round(c.n / maxN * 100);
-          var col = i < 3 ? 'var(--success)' : 'var(--secondary)';
-          return '<div class="club-item">' +
-            '<div class="club-rank ' + ranks[i] + '">' + (i + 1) + '</div>' +
-            '<div class="club-info">' +
-              '<div class="club-name">' + c.nama + '</div>' +
-              '<div class="club-type">' + (c.kat || 'Unit Kokurikulum') + ' · ' + c.kod + '</div>' +
-              '<div class="prog-wrap"><div class="prog-bar" style="width:' + w + '%;background:' + col + ';"></div></div>' +
-            '</div>' +
-            '<div class="club-score"><div class="pts">' + c.n + '</div><div class="lbl">ahli</div></div>' +
-          '</div>';
+          return '<li title="' + dv4Esc(c.nama) + ' (' + dv4Esc(c.kod) + '): ' + c.n + ' ahli">' +
+            '<span class="rank">' + (i + 1) + '</span>' +
+            '<span class="name">' + dv4Esc(c.nama) + ' <span class="cat">· ' + dv4Esc(katPendek[c.kat] || c.kat) + '</span></span>' +
+            '<span class="n">' + c.n + '</span>' +
+            '<span></span><span class="bar"><span style="width:' + w + '%"></span></span>' +
+          '</li>';
         }).join('');
       }
     }
@@ -12938,6 +12957,7 @@ const _origUpdateNotifBadge = updateNotifBadge;
 updateNotifBadge = function() {
   _origUpdateNotifBadge();
   syncAdminNotifBadge();
+  dv4Render();
 };
 
 
@@ -18300,33 +18320,32 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
     const result = collectActivities();
     if(!result.found){
-      body.innerHTML = '<div style="text-align:center;padding:24px 18px;color:#7f8c8d;">'+
-        '<i class="fas fa-calendar-times" style="font-size:32px;color:#bdc3c7;display:block;margin-bottom:10px;"></i>'+
-        '<div style="font-weight:700;color:var(--tx);font-size:13px;margin-bottom:4px;">Takwim Belum Ditetapkan</div>'+
-        '<div style="font-size:11.5px;margin-bottom:12px;">Ke <strong>Pengurusan Takwim</strong> untuk load preset SMK Tinggi Kuching 2026</div>'+
-        '<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" onclick="navigateTo(\'takwim\')"><i class="fas fa-rocket"></i> Set Takwim Sekarang</button>'+
+      body.innerHTML = '<div class="dv4-empty">'+
+        '<div class="ic"><i class="fas fa-calendar-plus"></i></div>'+
+        '<b>Takwim belum ditetapkan</b>'+
+        '<p>Muatkan preset takwim SMK Tinggi Kuching untuk mula.</p>'+
+        '<button class="dv4-btn primary" onclick="navigateTo(\'takwim\')"><i class="fas fa-bolt"></i> Tetapkan takwim</button>'+
         '</div>';
       badge.textContent = '0';
-      badge.style.background = 'var(--mute, #95a5a6)';
+      if (window.DV4) { DV4.takwim = { found: false, n: 0, urgent: 0 }; dv4Render(); }
       return;
     }
 
     const items = result.items;
+    if (window.DV4) { DV4.takwim = { found: true, n: items.length, urgent: items.filter(x => x.urgent).length }; dv4Render(); }
     if(items.length === 0){
-      body.innerHTML = '<div style="text-align:center;padding:24px 18px;color:#7f8c8d;">'+
-        '<i class="fas fa-umbrella-beach" style="font-size:32px;color:var(--success);display:block;margin-bottom:10px;"></i>'+
-        '<div style="font-weight:700;color:var(--tx);font-size:13px;">Tiada Aktiviti dalam 60 Hari Akan Datang</div>'+
-        '<div style="font-size:11.5px;margin-top:4px;">Mungkin masa cuti? Selamat berehat!</div>'+
+      body.innerHTML = '<div class="dv4-empty">'+
+        '<div class="ic"><i class="fas fa-umbrella-beach"></i></div>'+
+        '<b>Tiada aktiviti dalam 60 hari akan datang</b>'+
+        '<p>Mungkin masa cuti? Selamat berehat!</p>'+
         '</div>';
       badge.textContent = '0';
-      badge.style.background = 'var(--success)';
       return;
     }
 
     // Tunjuk 8 item pertama
     const showItems = items.slice(0, 8);
-    badge.textContent = items.length + ' AKTIVITI';
-    badge.style.background = items.some(x => x.urgent) ? 'var(--danger)' : 'var(--success)';
+    badge.textContent = items.length;
 
     let h = '';
     showItems.forEach(item => {
@@ -18374,6 +18393,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       const result = origNavigateTo.apply(this, arguments);
       if(pageId === 'dashboard' || pageId === 'papan-pemuka' || !pageId){
         setTimeout(tryRender, 100);
+        setTimeout(function(){ if (typeof dv4DrawCats === 'function') dv4DrawCats(); }, 120); // lebar kad betul selepas halaman dipaparkan
       }
       return result;
     };
