@@ -2162,7 +2162,7 @@ async function refreshSKASDashboard() {
     const result = await response.json();
 
     if (result.success) {
-      showToast('✅ Refresh berjaya. Memuatkan data...');
+      showToast('🔄 ' + ((result.data && result.data.mesej) || 'Imbasan SK@S dimulakan di latar belakang.'));
       await loadSKASData();
     } else {
       throw new Error(result.error);

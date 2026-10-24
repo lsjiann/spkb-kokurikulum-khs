@@ -6790,7 +6790,7 @@ async function refreshSKASDashboard() {
 
     if (result.success) {
       await loadSKASData();
-      alert('✅ Dashboard SK@S berjaya di-refresh!');
+      alert('🔄 ' + ((result.data && result.data.mesej) || 'Imbasan SK@S dimulakan di latar belakang.') + '\n\nData semasa kekal dipaparkan sehingga imbasan selesai.');
     } else {
       alert('⚠️ Gagal refresh: ' + (result.error || 'Unknown error'));
     }
