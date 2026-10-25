@@ -345,7 +345,7 @@
     document.getElementById('heroTitle').textContent='Laporan Program Kokurikulum '+TAHUN;
     if(!SHEET_URL){ const bs=document.getElementById('btnSheet'); if(bs){ bs.style.opacity='.6'; } }
     // Navigasi terus ke program tertentu jika dipanggil (deep-link / postMessage)
-    window.addEventListener('message', function(e){ const d=e&&e.data; if(d&&d.action==='spkb-goto-program'&&d.q){ const qi=document.getElementById('q'); if(qi){qi.value=d.q; applyFilter();} } });
+    window.addEventListener('message', function(e){ if (e.origin !== location.origin) return; /* S10 */ const d=e&&e.data; if(d&&d.action==='spkb-goto-program'&&d.q){ const qi=document.getElementById('q'); if(qi){qi.value=d.q; applyFilter();} } });
     loadPrograms();
   })();
 </script>

@@ -4219,6 +4219,7 @@
       renderSkasStatusDashboard();
       // Pautan dua hala: terima arahan navigasi dari modul lain (cth Instrumen SK@S)
       window.addEventListener('message', function(e){
+        if (e.origin !== location.origin) return; // S10
         const d = e && e.data;
         if(d && d.action === 'spkb-goto' && d.section){ openSection(d.section); }
       });
