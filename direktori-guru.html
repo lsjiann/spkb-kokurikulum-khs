@@ -252,13 +252,13 @@ td.nm{font-weight:700}
       <div class="crest">SMKTK</div>
       <div>
         <h1>Direktori Guru &amp; Penjana AJK</h1>
-        <p id="mastSub">SMK Tinggi Kuching · Sesi 2026</p>
+        <p id="mastSub">SMK Tinggi Kuching · Sesi <span class="sesiTxt">2026</span></p>
       </div>
     </div>
     <div class="mast-meta">
       <span class="pill" id="pillGuru">— guru</span>
       <span class="pill" id="pillJawatan">— jawatan</span>
-      <span class="pill">Sumber: Buku Pengurusan 2026</span>
+      <span class="pill">Sumber: Buku Pengurusan <span class="sesiTxt">2026</span></span>
     </div>
   </div>
   <nav class="tabs" role="tablist">
@@ -361,7 +361,7 @@ td.nm{font-weight:700}
         <label class="sw"><input type="checkbox" id="gSkipUnverified" checked>
           <span>Kecualikan nama yang belum disahkan</span></label>
         <label class="sw"><input type="checkbox" id="gUseRiwayat" checked>
-          <span>Utamakan guru yang <b>pernah</b> memegang jawatan serupa dalam program 2026</span></label>
+          <span>Utamakan guru yang <b>pernah</b> memegang jawatan serupa dalam program <span class="sesiTxt">2026</span></span></label>
         <label class="sw"><input type="checkbox" id="gGiliran">
           <span>Beri giliran — kurangkan keutamaan guru yang <b>sudah</b> pegang jawatan itu, supaya kemahiran tersebar</span></label>
         <label class="sw"><input type="checkbox" id="gUseKep" checked>
@@ -407,7 +407,7 @@ td.nm{font-weight:700}
 <section class="panel" id="p-beban" role="tabpanel" hidden>
   <p class="eyebrow">Analisis agihan tugas</p>
   <h2 style="font-size:22px">Beban tugas setiap guru</h2>
-  <p class="lede">Setiap blok mewakili satu jawatan yang direkodkan dalam Buku Pengurusan 2026,
+  <p class="lede">Setiap blok mewakili satu jawatan yang direkodkan dalam Buku Pengurusan <span class="sesiTxt">2026</span>,
     diwarnakan mengikut bidang. Gunakan senarai ini sebelum melantik AJK baharu.</p>
   <div class="card">
     <div class="filters">
@@ -495,6 +495,7 @@ td.nm{font-weight:700}
       <button class="btn gold" id="edSimpan">Simpan guru ini</button>
       <button class="btn ghost" id="edPadam">Padam guru ini</button>
       <button class="btn" id="edSheet">Simpan semua ke Google Sheet</button>
+      <button class="btn ghost" id="edSesi" hidden></button>
       <div id="edMsg" class="why"></div>
     </div>
 
@@ -544,8 +545,8 @@ td.nm{font-weight:700}
 <section class="panel" id="p-nota" role="tabpanel" hidden>
   <p class="eyebrow">Ketelusan data</p>
   <h2 style="font-size:22px">Isu yang perlu disahkan</h2>
-  <p class="lede">Perkara berikut dikenal pasti semasa membandingkan Buku Pengurusan 2026
-    dengan fail Senarai Guru 2026.</p>
+  <p class="lede">Perkara berikut dikenal pasti semasa membandingkan Buku Pengurusan <span class="sesiTxt">2026</span>
+    dengan fail Senarai Guru <span class="sesiTxt">2026</span>.</p>
   <div class="notes" id="notes"></div>
 </section>
 
@@ -554,6 +555,12 @@ td.nm{font-weight:700}
 
 <script>
 function mulaDirektori(DATA){
+// R-6: tahun/sesi Direktori daripada data (bukan "2026" tertanam)
+const SESI = String(DATA.sesi || new Date().getFullYear());
+const PROGRAM_SESI = DATA['program_' + SESI] || DATA.program_2026 || [];
+document.querySelectorAll('.sesiTxt').forEach(function (e) { e.textContent = SESI; });
+document.getElementById('gNama').placeholder = 'Contoh: Malam Bakat ' + SESI;
+document.getElementById('gTarikh').placeholder = 'Contoh: 27–28 Jun ' + SESI + ', Dewan Sekolah';
 
 /* DATA kini dimuat dari Google Sheet (lihat pemuat di bawah) */
 
@@ -604,7 +611,7 @@ const isAdmin=g=>/Pengetua|Penolong Kanan/i.test(g.jawatan_utama);
 let BEBAN_REF=1;
 const KAMUS=DATA.kamus_kepakaran||[]; const KLBL={}; KAMUS.forEach(k=>KLBL[k.kod]=k.kepakaran);
 const MEDAN=DATA.medan_manual||[];
-const PROG={}; (DATA.program_2026||[]).forEach(p=>PROG[p.kod]=p.singkat||p.nama);
+const PROG={}; (PROGRAM_SESI||[]).forEach(p=>PROG[p.kod]=p.singkat||p.nama);
 const STOPJ=new Set(['ajk','jkk','dan','yang','pengurus','penyelaras','ketua','pegawai','hakim','unit','segmen','rasmi','murid','pen','penolong','umum','khas']);
 function jtok(t){return norm(t).split(' ').filter(w=>w.length>3&&!STOPJ.has(w));}
 /* Adakah guru pernah pegang jawatan serupa? */
@@ -769,7 +776,7 @@ function show(i){
           :`<p class="none">Tiada jawatan direkodkan.</p>`}
       </div>`).join('')}
       ${(g.rekod_program||[]).length?`<div class="bidang">
-        <h4 style="color:var(--b-koko)"><span>Rekod program 2026</span>
+        <h4 style="color:var(--b-koko)"><span>Rekod program ${esc(SESI)}</span>
         <span class="mono">${g.bil_program} program · ${g.bil_ketua_program} kali ketua</span></h4>
         <ul>${g.rekod_program.map(r=>`<li>${esc(r.jawatan)} — <span class="muted">${esc(PROG[r.program]||r.program)}</span>${r.aras==='Ketua'?' <b style="color:var(--gold)">[KETUA]</b>':''}</li>`).join('')}</ul></div>`:''}
       ${(g.kemahiran_khas||[]).length?`<div class="bidang">
@@ -820,7 +827,7 @@ $('#dlCsv').onclick=()=>{
   const rows=GURU.map((g,i)=>[i+1,g.nama,g.gred_jawatan,g.jantina,g.opsyen_1,g.opsyen_2,g.jawatan_utama,
     g.byB.pengurusan.join('; '),g.byB.kurikulum.join('; '),g.byB.hem.join('; '),
     g.byB.koko.join('; '),g.beban,g.catatan].map(csvq).join(','));
-  dl('Senarai_Guru_Jawatan_2026.csv',[head.map(csvq).join(','),...rows].join('\r\n'));
+  dl('Senarai_Guru_Jawatan_'+SESI+'.csv',[head.map(csvq).join(','),...rows].join('\r\n'));
 };
 
 /* ── 03 PENJANA ───────────────────────────── */
@@ -1085,7 +1092,7 @@ $('#gCopy').onclick=async()=>{
 $('#gCsv').onclick=()=>{
   if(!SLOTS.length)return toast('Jana cadangan dahulu');
   const nm=($('#gNama').value.trim()||'AJK').replace(/[^\w\s-]/g,'').replace(/\s+/g,'_');
-  dl('AJK_'+nm+'_2026.csv',[['Bil','Jawatan','Nama','Gred','Jawatan Hakiki','Beban Tugas'].map(csvq).join(','),
+  dl('AJK_'+nm+'_'+SESI+'.csv',[['Bil','Jawatan','Nama','Gred','Jawatan Hakiki','Beban Tugas'].map(csvq).join(','),
     ...genRows().map(r=>r.map(csvq).join(','))].join('\r\n'));
 };
 $('#gPrint').onclick=()=>{if(!SLOTS.length)return toast('Jana cadangan dahulu');window.print();};
@@ -1663,7 +1670,7 @@ $('#bSort').onchange=beban; $('#bHide').onchange=beban;
 /* ── 05 NOTA ──────────────────────────────── */
 const I=DATA.isu_data;
 $('#notes').innerHTML=[
- ['ok','Sumber data',`1. Buku Pengurusan & Panduan 2026 (Senarai Tugas Guru dan DG) — 112 halaman.\n2. Senarai_guru_2026.xlsx — 93 nama guru.\n\nJumlah rekod: ${GURU.length} guru, ${JOBS.length.toLocaleString('ms-MY')} rekod jawatan.`],
+ ['ok','Sumber data',`${(DATA.sumber||[]).map((s,i)=>(i+1)+'. '+s).join('\n')||'(tiada maklumat sumber)'}\n\nJumlah rekod: ${GURU.length} guru, ${JOBS.length.toLocaleString('ms-MY')} rekod jawatan.`],
  ['alert','Nama ditambah daripada Buku Pengurusan',
   (I.nama_ditambah_dari_buku_pengurusan||[]).join(', ')+
   ' — tiada dalam fail Excel tetapi tersenarai dalam Buku Pengurusan dan memegang jawatan penting. Sila kemas kini fail Senarai Guru.'],
@@ -1692,6 +1699,21 @@ $('#edSheet').onclick=async()=>{
     UBAH=[];ASAL=JSON.stringify(DATA.guru);logUbah();toast('Disimpan ke Google Sheet: '+d.bil_guru+' guru');}
   catch(x){toast('Gagal menyimpan: '+x.message);}
 };
+// R-6: roll over — tukar sesi data Direktori kepada "Tahun aktif" dashboard
+(function () {
+  let aktif = new Date().getFullYear();
+  try { const t = localStorage.getItem('spkb_tahun_aktif'); if (t && /^\d{4}$/.test(t)) aktif = parseInt(t, 10); } catch (e) {}
+  const b = $('#edSesi');
+  if (!b || String(aktif) === SESI) return;
+  b.hidden = false;
+  b.textContent = 'Tukar sesi Direktori: ' + SESI + ' → ' + aktif;
+  b.onclick = async () => {
+    if (!window.confirm('Tukar sesi data Direktori daripada ' + SESI + ' kepada ' + aktif + '?\n\n' +
+      'Senarai guru dan jawatan dikekalkan — kemas kini pertukaran guru selepas ini.')) return;
+    try { await dirApi('direktori_tetap_sesi', { sesi: aktif }); toast('Sesi Direktori kini ' + aktif); setTimeout(() => location.reload(), 900); }
+    catch (x) { toast('Gagal: ' + x.message); }
+  };
+})();
 muatDraf();
 } // mulaDirektori
 </script>
@@ -1795,7 +1817,7 @@ async function dirMuat(){
     '<h2 id="dirGateTajuk">Tidak dapat dimuatkan</h2><p>' + dirEsc(e.message) + '</p><button onclick="dirMuat()">Cuba lagi</button>'); }
   if (!data || !Array.isArray(data.guru) || !data.guru.length) return dirBorangImport();
   // Nilai lalai untuk medan yang mungkin tiada dalam Sheet
-  ['ketua_panitia','unit_kokurikulum','guru_kelas','staf_sokongan_akp','kamus_kepakaran','medan_manual','program_2026','nama_belum_dikenal','sumber']
+  ['ketua_panitia','unit_kokurikulum','guru_kelas','staf_sokongan_akp','kamus_kepakaran','medan_manual','program_2026','program_'+data.sesi,'nama_belum_dikenal','sumber']
     .forEach(k => { if (!Array.isArray(data[k])) data[k] = []; });
   ['gkmp','rumah_sukan','isu_data'].forEach(k => { if (!data[k] || typeof data[k] !== 'object') data[k] = {}; });
   data.sekolah = data.sekolah || 'SMK TINGGI KUCHING';

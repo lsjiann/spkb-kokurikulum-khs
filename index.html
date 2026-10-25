@@ -94,6 +94,33 @@ button {
 body.demo-active .topbar { top: 34px; }
 body.demo-active .sidebar { top: 34px; }
 body.demo-active .main { margin-top: 98px; }
+/* R-7: Wizard Roll Over */
+#page-rollover { max-width: 1100px; color: var(--dv4-ink); }
+.ro-kepala { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+.ro-kepala h2 { margin: 0; font-size: 22px; }
+.ro-kepala p { margin: 4px 0 0; color: var(--dv4-ink-2); font-size: 13px; }
+.ro-meter { height: 10px; border-radius: 99px; background: var(--dv4-info-soft); overflow: hidden; margin: 6px 0 4px; }
+.ro-meter span { display: block; height: 100%; background: var(--dv4-good); border-radius: 99px; transition: width .4s; }
+.ro-fasa { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--dv4-muted); font-weight: 700; margin: 22px 0 8px; }
+.ro-senarai { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ro-item { display: grid; grid-template-columns: 28px 1fr auto; gap: 4px 12px; align-items: start; padding: 12px 14px;
+  border: 1px solid var(--dv4-line); border-radius: 10px; background: var(--dv4-surface); }
+.ro-item.siap { background: var(--dv4-good-soft); border-color: transparent; }
+.ro-item input { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; }
+.ro-item b { font-size: 13.5px; color: var(--dv4-ink); }
+.ro-item small { display: block; color: var(--dv4-ink-2); font-size: 12.5px; margin-top: 2px; line-height: 1.45; }
+.ro-item .ro-aksi { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.ro-item .ro-tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--dv4-info-soft); color: var(--dv4-now); white-space: nowrap; }
+.ro-item.siap .ro-tag { background: transparent; color: var(--dv4-good-ink); }
+@media (max-width: 640px) { .ro-item { grid-template-columns: 24px 1fr; } .ro-item .ro-aksi { grid-column: 2; justify-content: flex-start; } }
+/* R-1: pemilih Tahun aktif di bar atas */
+.tahun-aktif { display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 5px 10px; border-radius: 20px;
+  background: #eef3f9; color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; }
+.tahun-aktif select { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; outline: none; }
+.tahun-aktif:has(select.bukan-semasa) { background: #fff3d6; color: #8a5a00; box-shadow: inset 0 0 0 1px #f0c36b; }
+body.tahun-bukan-semasa .topbar { box-shadow: inset 0 -3px 0 #f0b429; }
+html[data-theme="dark"] .tahun-aktif { background: #1e293b; color: #cbd5e1; }
+@media (max-width: 768px) { .tahun-aktif { margin-left: 4px; padding: 4px 8px; } .tahun-aktif i { display: none; } }
 /* S11: Mod Demo benar-benar menyorok data peribadi (bukan sekadar banner) */
 body.demo-active #page-pelajar > *:not(.breadcrumb),
 body.demo-active #page-guru > *:not(.breadcrumb),
@@ -1853,7 +1880,7 @@ body.demo-active #page-direktori-guru > *:not(.breadcrumb):not(.page-header) {
 /* ============================================================
    PAPAN PEMUKA v4 — gaya terskop pada #page-dashboard.dv4
    ============================================================ */
-#page-dashboard.dv4{
+#page-dashboard.dv4, #page-rollover{
   --dv4-surface:#ffffff; --dv4-surface-2:#f6f8fb; --dv4-ink:#0f1b2d; --dv4-ink-2:#4a5568; --dv4-muted:#8a94a6;
   --dv4-line:#e6e9ef; --dv4-grid:#eceef2; --dv4-axis:#c3c8d2;
   --dv4-brand:#1a3c6e; --dv4-accent:#e8862a; --dv4-accent-soft:#fdf1e5;
@@ -1864,7 +1891,7 @@ body.demo-active #page-direktori-guru > *:not(.breadcrumb):not(.page-header) {
   --dv4-shadow:0 1px 2px rgba(15,27,45,.06),0 1px 1px rgba(15,27,45,.03);
   max-width:1400px;color:var(--dv4-ink);
 }
-html[data-theme="dark"] #page-dashboard.dv4{
+html[data-theme="dark"] #page-dashboard.dv4, html[data-theme="dark"] #page-rollover{
   --dv4-surface:#1e293b; --dv4-surface-2:#233046; --dv4-ink:#eef1f5; --dv4-ink-2:#b4bdca; --dv4-muted:#8392a6;
   --dv4-line:#334155; --dv4-grid:#2b3648; --dv4-axis:#475569;
   --dv4-brand:#8fb6e8; --dv4-accent:#f0954a; --dv4-accent-soft:#3a2614;
@@ -1878,6 +1905,8 @@ html[data-theme="dark"] #page-dashboard.dv4{
 .dv4-head p{margin:4px 0 0;color:var(--dv4-ink-2);font-size:13px}
 .dv4-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;background:var(--dv4-good-soft);color:var(--dv4-good-ink)}
 .dv4-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dv4-good)}
+.dv4-pill.arkib{background:var(--dv4-warn-soft);color:var(--dv4-warn-ink)}
+.dv4-pill.arkib::before{background:#f0b429}
 .dv4-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9px;border:1px solid var(--dv4-line);background:var(--dv4-surface);color:var(--dv4-ink);font-weight:600;font-size:13px}
 .dv4-btn:hover{background:var(--dv4-surface-2)}
 .dv4-btn.primary{background:var(--dv4-brand);border-color:var(--dv4-brand);color:#fff}
@@ -2154,6 +2183,10 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
   <!-- Seksyen: Info & Tetapan -->
   <div class="nav-section">
     <div class="nav-label">Info & Tetapan</div>
+    <a class="nav-item" data-page="rollover">
+      <i class="fas fa-forward"></i>
+      <span class="nav-text">Roll Over Tahun</span>
+    </a>
     <a class="nav-item" data-page="sekolah">
       <i class="fas fa-school"></i>
       <span class="nav-text">Maklumat Sekolah</span>
@@ -2188,6 +2221,11 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
   <div class="school-badge">
     <i class="fas fa-school"></i> SMK Tinggi Kuching
   </div>
+
+  <label class="tahun-aktif" title="Tahun aktif — semua modul dan kad mengikut tahun ini">
+    <i class="fas fa-calendar-alt"></i>
+    <select id="pilihTahunAktif" aria-label="Tahun aktif" onchange="tetapTahunAktif(this.value)"></select>
+  </label>
 
   <div class="header-actions">
     <button class="topbar-icon" onclick="toggleNotif(event)" title="Notifikasi">
@@ -2654,6 +2692,33 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
   <!-- ============================================================
        END PAGE: PENGAWAS KOKURIKULUM
        ============================================================ -->
+
+  <!-- ============================================================
+       PAGE: ROLL OVER TAHUN (R-7) — senarai semak sandaran + roll over
+       ============================================================ -->
+  <section class="page" id="page-rollover">
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Roll Over Tahun</span>
+    </div>
+    <div class="ro-kepala">
+      <div>
+        <h2 id="roTajuk">Roll Over Tahun</h2>
+        <p>Sandar data tahun lama, kemudian sediakan tahun baharu. Data lama tidak dipadam.
+           Langkah bertanda <span class="ro-tag" style="font-size:11px;padding:1px 7px;border-radius:99px;background:var(--dv4-info-soft);color:var(--dv4-now);font-weight:700">auto</span>
+           dikesan sendiri; yang lain ditanda selepas dibuat.</p>
+      </div>
+      <div style="flex:1"></div>
+      <button class="dv4-btn" onclick="rolloverRender(true)"><i class="fas fa-rotate"></i><span>Semak semula</span></button>
+    </div>
+    <div class="dv4-card">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700"><span id="roKemajuanTeks">—</span><span id="roPeratus">0%</span></div>
+      <div class="ro-meter"><span id="roMeter" style="width:0"></span></div>
+      <div style="font-size:12px;color:var(--dv4-muted)">Panduan penuh: <b>PELAN_ROLLOVER_2027.md</b> · Tanda semak disimpan dalam pelayar ini.</div>
+    </div>
+    <div id="roKandungan"></div>
+  </section>
 
   <!-- ============================================================
        PAGE: DIREKTORI GURU & PENJANA AJK (data dari Google Sheet, perlu kunci pentadbir)
@@ -6087,6 +6152,7 @@ const pageInfo = {
   'laporan-program':  { title: 'SPKB v3.1 — Laporan Program & Evidens',    label: 'Laporan Program & Evidens',  phase: 'active', icon: '📑' },
   'jana-sijil':       { title: 'SPKB v3.1 — Jana Sijil Guru',              label: 'Jana Sijil Guru',            phase: 'active', icon: '🏅' },
   'pengawas-kk':      { title: 'SPKB v3.1 — Pengawas Kokurikulum',         label: 'Pengawas Kokurikulum',       phase: 'active', icon: '🛡️' },
+  'rollover':         { title: 'SPKB v3.1 — Roll Over Tahun',              label: 'Roll Over Tahun',            phase: 'active', icon: '⏭️' },
   'direktori-guru':   { title: 'SPKB v3.1 — Direktori Guru & AJK',         label: 'Direktori Guru & AJK',       phase: 'active', icon: '📇' },
   'fail':             { title: 'SPKB v3.1 — Pengurusan Fail',              label: 'Pengurusan Fail',            phase: 'phase3', icon: '📂' },
   'jana':             { title: 'SPKB v3.1 — Jana Dokumen',                 label: 'Jana Dokumen',               phase: 'phase3', icon: '📄' },
@@ -6100,10 +6166,207 @@ const pageInfo = {
 /* ============================================================
    NAVIGATION FUNCTION
    ============================================================ */
-// R1: teks sesi dikira daripada tarikh (Jan–Mei = Semester 1), bukan tertanam
+// ============================================================
+// R-1: TAHUN AKTIF — satu tahun untuk semua modul, kad dan pautan.
+// Lalai = tahun kalendar. Boleh ditukar untuk membuka arkib (cth. 2026 pada Januari 2027)
+// atau menyediakan tahun baharu (cth. 2027 pada Disember 2026).
+// Disimpan dalam localStorage 'spkb_tahun_aktif' (sudah dibaca oleh Jana Sijil & Laporan Program).
+// ============================================================
+function tahunKalendar() { return new Date().getFullYear(); }
+
+function tahunAktif() {
+  try {
+    const t = localStorage.getItem('spkb_tahun_aktif');
+    if (t && /^\d{4}$/.test(t)) return parseInt(t, 10);
+  } catch (e) {}
+  return tahunKalendar();
+}
+
+function tetapTahunAktif(y) {
+  y = parseInt(y, 10);
+  if (!(y >= 2017 && y <= 2100)) return;
+  try {
+    if (y === tahunKalendar()) localStorage.removeItem('spkb_tahun_aktif');
+    else localStorage.setItem('spkb_tahun_aktif', String(y));
+  } catch (e) {}
+  // Modul iframe dimuat semula dengan ?tahun= baharu apabila dibuka seterusnya
+  document.querySelectorAll('section.page iframe').forEach(function (f) {
+    if (f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') f.setAttribute('src', 'about:blank');
+  });
+  paparTahunAktif();
+  if (typeof hydrateDashboardLive === 'function') hydrateDashboardLive();
+  if (typeof tahunAktifBerubah === 'function') tahunAktifBerubah(y); // cangkuk modul lain (Pencapaian, PAJSK)
+  // Jika sedang di halaman modul, buka semula dengan tahun baharu
+  const aktif = document.querySelector('.page.active');
+  if (aktif && aktif.id && aktif.id !== 'page-dashboard') navigateTo(aktif.id.replace(/^page-/, ''));
+}
+
+function paparTahunAktif() {
+  const y = tahunAktif(), k = tahunKalendar();
+  const sel = document.getElementById('pilihTahunAktif');
+  if (sel) {
+    const pilihan = {};
+    for (let t = k - 3; t <= k + 1; t++) pilihan[t] = true;
+    pilihan[y] = true;
+    sel.innerHTML = Object.keys(pilihan).map(Number).sort().map(function (t) {
+      return '<option value="' + t + '"' + (t === y ? ' selected' : '') + '>' + t +
+        (t === k ? ' (semasa)' : t < k ? ' (arkib)' : ' (persediaan)') + '</option>';
+    }).join('');
+    sel.classList.toggle('bukan-semasa', y !== k);
+  }
+  document.body.classList.toggle('tahun-bukan-semasa', y !== k);
+  const s = document.getElementById('topbarSesi');
+  if (s) s.textContent = sesiSemasaTeks();
+}
+
+// R-2: pilihan tahun Pencapaian / PAJSK / Data Pelajar dijana daripada tahun aktif (bukan senarai tertanam)
+function binaPilihanTahun() {
+  const y = tahunAktif();
+  const isi = function (id, senarai, pilih) {
+    const el = document.getElementById(id); if (!el) return;
+    el.innerHTML = senarai.map(function (o) { return '<option value="' + o.v + '"' + (String(o.v) === String(pilih) ? ' selected' : '') + '>' + o.l + '</option>'; }).join('');
+  };
+  // Pencapaian: tahun aktif hingga 3 tahun lepas; tahun LIVE ada dua pilihan (LIVE + Data SPKB)
+  const pen = [];
+  for (let t = y; t >= Math.min(y - 3, 2023); t--) {
+    if (t === LIVE_TAHUN) pen.push({ v: LIVE_TAHUN + '_LIVE', l: '📡 ' + t + ' (Live)' });
+    pen.push({ v: t, l: (t === LIVE_TAHUN ? '📊 ' + t + ' (Data SPKB)' : String(t)) });
+  }
+  isi('pencapaianYearSelect', pen, y === LIVE_TAHUN ? LIVE_TAHUN + '_LIVE' : y);
+  // PAJSK: tahun aktif hingga 5 tahun lepas; lalai = tahun lepas (tahun terkini yang lengkap)
+  const pj = []; for (let t = y; t >= y - 5; t--) pj.push({ v: t, l: String(t) });
+  isi('pajskYearSelect', pj, y - 1);
+  const pl = []; for (let t = y; t >= y - 3; t--) pl.push({ v: t, l: String(t) });
+  isi('pelajarYearSelect', pl, y);
+}
+// Dipanggil oleh tetapTahunAktif() apabila tahun aktif bertukar
+function tahunAktifBerubah() {
+  binaPilihanTahun();
+  window.__dpPerluMuatSemula = true; // Data Pelajar dimuat semula untuk tahun baharu apabila dibuka
+}
+
+// ============================================================
+// R-7: WIZARD ROLL OVER — senarai semak sandaran + roll over tahun
+// Tanda manual disimpan dalam localStorage 'spkb_rollover_<tahun>'.
+// Langkah "auto" dikesan daripada API / pelayar.
+// ============================================================
+const RO_INDUK_URL = 'https://script.google.com/macros/s/AKfycbwJiZmd2fsUnfQz62WVxgxN1KCC3HxS_6dRvP-5gIskZxMaPEdE8cIRyx3gFLKnCX5QAQ/exec';
+const RO_GURU_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+const RO_PELAJAR_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+let RO_AUTO = {}, RO_AUTO_TAHUN = null;
+
+/** Okt–Dis: sediakan tahun depan; Jan–Sep: tahun semasa. */
+function rolloverSasaran() { const d = new Date(); return d.getMonth() >= 9 ? d.getFullYear() + 1 : d.getFullYear(); }
+
+function rolloverLangkah(T) {
+  const L = T - 1;
+  return [
+    { fasa: 'A. Sandaran data ' + L + ' (cadangan 14–20 Disember)' },
+    { id: 'lengkap', t: 'Lengkapkan data ' + L, s: 'PAJSK ' + L + ', Laporan Akhir Tahun ' + L + ', rekod pencapaian terakhir, dan Refresh SK@S.', btn: [['PAJSK', 'pajsk'], ['Laporan Akhir', 'laporan-akhir']] },
+    { id: 'pelayar', t: 'Eksport data pelayar pada SETIAP komputer', s: 'Pusat Sandar → Eksport. Takwim, Kehadiran, Kewangan, Inventori, Instrumen SK@S dan Laporan Akhir hanya disimpan dalam pelayar.', btn: [['Pusat Sandar', 'pusat-sandar']] },
+    { id: 'sandar', t: 'Sandar semua Google Sheet', s: 'script.google.com → projek SandaranTahunan → jalankan sandarSPKB. Hasil: folder SPKB_Arkib_' + L + '.' },
+    { id: 'semak', t: 'Semak folder SPKB_Arkib_' + L, s: 'Buka 2–3 salinan secara rawak. Masukkan fail JSON dari Pusat Sandar ke folder yang sama.' },
+    { fasa: 'B. Roll over ke ' + T + ' (cadangan 28 Disember – 10 Januari)' },
+    { id: 'aktif', auto: 'aktif', t: 'Tetapkan Tahun aktif kepada ' + T, s: 'Semua modul dan kad mengikut ' + T + '. Tahun ' + L + ' masih boleh dibuka melalui pemilih tahun di bar atas.', tahun: T },
+    { id: 'guru', auto: 'guru', t: 'Roll over Guru Penasihat', s: 'Apps Script projek Guru Penasihat → jalankan rolloverTahunBaharu. Kemudian kemas kini pertukaran guru.', btn: [['Guru Penasihat', 'guru']] },
+    { id: 'direktori', t: 'Kemas kini Direktori Guru', s: 'Tab "Kemas kini data" → Simpan semua ke Google Sheet → butang "Tukar sesi Direktori".', btn: [['Direktori', 'direktori-guru']] },
+    { id: 'induk', auto: 'induk', t: 'Tambah Sesi ' + T + ' dalam Pengawas KK', s: 'Log masuk Admin → Tambah Sesi ' + T + '. Sesi ' + L + ' menjadi baca-sahaja.', btn: [['Pengawas KK', 'pengawas-kk']] },
+    { id: 'takwim', auto: 'takwim', t: 'Jana Takwim ' + T, s: 'Takwim → Wizard Tahun Baru, kemudian sesuaikan dengan takwim KPM / JPN Sarawak ' + T + '.', btn: [['Takwim', 'takwim']] },
+    { id: 'pelajar', auto: 'pelajar', t: 'Senarai murid ' + T, s: 'Tambah lajur TAHUN dalam Sheet "Maklumat KK Murid" dan masukkan murid ' + T + ' selepas kemas kini APDM.', btn: [['Data Pelajar', 'pelajar']] },
+    { id: 'skas', t: 'SK@S ' + T, s: 'Cipta folder eviden ' + T + ' dalam Fail Induk Master → jalankan tetapTahunSKAS(' + T + ') → Refresh SK@S.', btn: [['SK@S', 'skas']] },
+    { id: 'pajsk', auto: 'pajsk', t: 'GPS PAJSK sebenar ' + L, s: 'Masukkan GPS ' + L + ' dalam tab GPS History apabila keputusan dimuktamadkan. Sasaran ' + T + ' dikira automatik.', btn: [['PAJSK', 'pajsk']] },
+    { id: 'pencapaian', t: 'Sheet pencapaian ' + T, s: 'Sheet sumber baharu dengan sel C2 = ' + T + '.', btn: [['Pencapaian', 'pencapaian']] },
+    { id: 'kunci', t: 'Tukar kunci pentadbir', s: 'SPKB_WRITE_KEY dalam projek Master DB dan Guru Penasihat (nilai yang sama).' }
+  ];
+}
+
+function roTanda(T) { try { return JSON.parse(localStorage.getItem('spkb_rollover_' + T) || '{}'); } catch (e) { return {}; } }
+function roSimpanTanda(T, o) { try { localStorage.setItem('spkb_rollover_' + T, JSON.stringify(o)); } catch (e) {} }
+
+/** Semakan pantas tanpa rangkaian (untuk "Perlu tindakan" di papan pemuka). */
+function rolloverRingkas() {
+  const T = rolloverSasaran(), m = new Date().getMonth();
+  const langkah = rolloverLangkah(T).filter(function (l) { return l.id; });
+  const tanda = roTanda(T);
+  let takwimAda = false; try { takwimAda = !!localStorage.getItem('takwim_' + T); } catch (e) {}
+  const siap = langkah.filter(function (l) {
+    return tanda[l.id] || (l.auto === 'aktif' && tahunAktif() === T) || (l.auto === 'takwim' && takwimAda) ||
+      (RO_AUTO_TAHUN === T && RO_AUTO[l.auto]);
+  }).length;
+  return { tahun: T, siap: siap, jumlah: langkah.length, perlu: m >= 9 || m === 0, mendesak: m === 11 || m === 0 };
+}
+
+async function rolloverSemakAuto(T) {
+  const hasil = { aktif: tahunAktif() === T };
+  try { hasil.takwim = !!localStorage.getItem('takwim_' + T); } catch (e) { hasil.takwim = false; }
+  const ambil = function (u) { return fetch(u).then(function (r) { return r.json(); }).catch(function () { return null; }); };
+  const [g, s, p, h] = await Promise.all([
+    ambil(RO_GURU_URL + '?action=guru_penasihat_all&tahun=' + T + '&_t=' + Date.now()),
+    ambil(RO_INDUK_URL + '?action=sesiList&_t=' + Date.now()),
+    ambil(RO_PELAJAR_URL + '?action=data_pelajar_years&_t=' + Date.now()),
+    ambil(SKAS_API_URL + '?action=pajsk_history&_t=' + Date.now())
+  ]);
+  hasil.guru = !!(g && g.success && g.data && (g.data.senaraiTahun || []).map(Number).indexOf(T) !== -1);
+  hasil.induk = !!(s && s.ok && s.data && String(s.data.semasa) === String(T));
+  // Tanpa lajur TAHUN, API melaporkan tahun kalendar — itu BUKAN tanda roll over selesai
+  hasil.pelajar = !!(p && p.success && !/tiada column/i.test(p.message || '') && (p.years || []).map(String).indexOf(String(T)) !== -1);
+  hasil.pajsk = !!(h && h.success && h.data && (h.data.history || []).some(function (x) { return Number(x.tahun) === T - 1 && !x.isTarget && x.gps != null; }));
+  RO_AUTO = hasil; RO_AUTO_TAHUN = T;
+  return hasil;
+}
+
+async function rolloverRender(semakSemula) {
+  const T = rolloverSasaran();
+  const el = document.getElementById('roKandungan'); if (!el) return;
+  dv4Set('roTajuk', 'Roll Over ' + (T - 1) + ' → ' + T);
+  const lukis = function () {
+    const tanda = roTanda(T), langkah = rolloverLangkah(T);
+    const item = langkah.filter(function (l) { return l.id; });
+    let siap = 0, html = '';
+    langkah.forEach(function (l) {
+      if (l.fasa) { html += (html ? '</ul>' : '') + '<div class="ro-fasa">' + dv4Esc(l.fasa) + '</div><ul class="ro-senarai">'; return; }
+      // Langkah yang boleh disemak terus dalam pelayar dikira semula setiap kali dilukis
+      let takwimAda = false; try { takwimAda = !!localStorage.getItem('takwim_' + T); } catch (e) {}
+      const auto = l.auto && ((l.auto === 'aktif' && tahunAktif() === T) || (l.auto === 'takwim' && takwimAda) ||
+        (RO_AUTO_TAHUN === T && RO_AUTO[l.auto]));
+      const ok = !!(tanda[l.id] || auto);
+      if (ok) siap++;
+      const tag = auto ? 'dikesan ✓' : l.auto ? (RO_AUTO_TAHUN === T ? 'auto · belum' : 'auto · menyemak…') : (ok ? 'ditanda ✓' : '');
+      const btn = (l.btn || []).map(function (b) {
+        return '<button class="dv4-btn" data-ro-pergi="' + dv4Esc(b[1]) + '"><i class="fas fa-arrow-right"></i>' + dv4Esc(b[0]) + '</button>';
+      }).join('') + (l.tahun && !auto ? '<button class="dv4-btn primary" data-ro-tahun="' + l.tahun + '">Tetapkan ' + l.tahun + '</button>' : '');
+      html += '<li class="ro-item' + (ok ? ' siap' : '') + '"><input type="checkbox" data-ro-id="' + l.id + '"' + (ok ? ' checked' : '') + (auto ? ' disabled title="Dikesan automatik"' : '') + ' aria-label="' + dv4Esc(l.t) + '">' +
+        '<div><b>' + dv4Esc(l.t) + '</b><small>' + dv4Esc(l.s) + '</small></div>' +
+        '<div class="ro-aksi">' + (tag ? '<span class="ro-tag">' + tag + '</span>' : '') + btn + '</div></li>';
+    });
+    el.innerHTML = html + '</ul>';
+    const pct = Math.round(siap / item.length * 100);
+    dv4Set('roKemajuanTeks', siap + ' daripada ' + item.length + ' langkah selesai');
+    dv4Set('roPeratus', pct + '%');
+    const m = document.getElementById('roMeter'); if (m) m.style.width = pct + '%';
+  };
+  lukis();
+  if (semakSemula || RO_AUTO_TAHUN !== T) { await rolloverSemakAuto(T); lukis(); }
+}
+
+document.addEventListener('click', function (e) {
+  const pergi = e.target.closest && e.target.closest('[data-ro-pergi]');
+  if (pergi) { navigateTo(pergi.getAttribute('data-ro-pergi')); return; }
+  const th = e.target.closest && e.target.closest('[data-ro-tahun]');
+  if (th) { tetapTahunAktif(th.getAttribute('data-ro-tahun')); navigateTo('rollover'); }
+});
+document.addEventListener('change', function (e) {
+  const c = e.target.closest && e.target.closest('[data-ro-id]'); if (!c) return;
+  const T = rolloverSasaran(), tanda = roTanda(T);
+  if (c.checked) tanda[c.getAttribute('data-ro-id')] = true; else delete tanda[c.getAttribute('data-ro-id')];
+  roSimpanTanda(T, tanda); rolloverRender(false);
+});
+
+// R1/R-1: teks sesi mengikut tahun aktif (Jan–Mei = Semester 1 bagi tahun semasa)
 function sesiSemasaTeks() {
-  const d = new Date();
-  return 'Sesi ' + d.getFullYear() + ' · Semester ' + (d.getMonth() <= 4 ? 1 : 2);
+  const y = tahunAktif(), k = tahunKalendar(), d = new Date();
+  if (y === k) return 'Sesi ' + y + ' · Semester ' + (d.getMonth() <= 4 ? 1 : 2);
+  return 'Sesi ' + y + (y < k ? ' · arkib' : ' · persediaan');
 }
 
 function navigateTo(pageId) {
@@ -6176,7 +6439,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('kehadiran-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = KEHADIRAN_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6185,7 +6448,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('buku-kk-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = BUKU_KK_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6194,7 +6457,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('laporan-program-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = LAPORAN_PROGRAM_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6208,12 +6471,14 @@ function navigateTo(pageId) {
     }, 100);
   }
   if (pageId === 'pelajar' && window.DataPelajar) {
-    DataPelajar.init(); // idempotent: hanya memuat kali pertama
+    if (window.__dpPerluMuatSemula) { window.__dpPerluMuatSemula = false; DataPelajar.refresh(); }
+    else DataPelajar.init(); // idempotent: hanya memuat kali pertama
   }
+  if (pageId === 'rollover' && typeof rolloverRender === 'function') rolloverRender(false);
   if (pageId === 'direktori-guru') {
     setTimeout(function () {
       var iframe = document.getElementById('direktori-guru-iframe');
-      if (iframe && !iframe.getAttribute('src')) iframe.src = DIREKTORI_URL;
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) iframe.src = DIREKTORI_URL;
     }, 100);
   }
   if (pageId === 'pengawas-kk') {
@@ -6228,7 +6493,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('generator-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = GENERATOR_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6237,7 +6502,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('laporan-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = LAPORAN_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6246,7 +6511,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('kewangan-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = KEWANGAN_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6263,7 +6528,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('pkk-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = PKK_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6272,7 +6537,7 @@ function navigateTo(pageId) {
     setTimeout(function () {
       var iframe = document.getElementById('takwim-iframe');
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-        var tahun = new Date().getFullYear();
+        var tahun = tahunAktif();
         iframe.src = TAKWIM_URL + '?tahun=' + tahun;
       }
     }, 100);
@@ -6331,7 +6596,7 @@ function switchSkasTab(tab) {
   if (tab === 'instrumen') {
     var iframe = document.getElementById('skas-instrumen-iframe');
     if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
-      var tahun = new Date().getFullYear();
+      var tahun = tahunAktif();
       iframe.src = INSTRUMEN_URL + '?tahun=' + tahun;
     }
   }
@@ -6476,7 +6741,7 @@ function renderDashboardRadar(d) {
   var labels = ['Sekolah', 'Beruniform', 'Kelab & Persatuan', 'Sukan & Permainan'];
   var tahun = d.tahun || (new Date().getFullYear() - 1);
   DV4.cat = { tahun: tahun, tahunLepas: d.tahunLepas || (tahun - 1), rows: units.map(function (u, i) {
-    var p = pu[u] || {}; return { key: u, n: labels[i], a: p.gpsLepas != null ? Number(p.gpsLepas) : null, b: p.gps != null ? Number(p.gps) : null };
+    var p = pu[u] || {}; return { key: u, n: labels[i], a: Number(p.gpsLepas) > 0 ? Number(p.gpsLepas) : null, b: Number(p.gps) > 0 ? Number(p.gps) : null }; // 0 = tiada data
   }).filter(function (r) { return r.b != null; }) };
   dv4DrawCats();
   dv4Render();
@@ -6486,7 +6751,11 @@ function dv4DrawCats() {
   var box = document.getElementById('dv4Cats'); if (!box || !DV4.cat) return;
   var rows = DV4.cat.rows; box.innerHTML = '';
   dv4Set('dv4CatPrevY', DV4.cat.tahunLepas); dv4Set('dv4CatNowY', DV4.cat.tahun);
-  if (!rows.length) { box.innerHTML = '<div class="dv4-loading">Tiada data kategori.</div>'; return; }
+  if (!rows.length) {
+    box.innerHTML = '<div class="dv4-loading">Belum ada data PAJSK ' + dv4Esc(DV4.cat.tahun) + '.</div>';
+    const n0 = document.getElementById('dv4CatNote'); if (n0) n0.hidden = true; // jangan papar rumusan tahun lain
+    dv4Set('dv4CatTbl', ''); return;
+  }
   var W = Math.max(box.clientWidth, 260), rowH = 50, m = { t: 8, r: 16, b: 30, l: 8 }, H = m.t + rows.length * rowH + m.b;
   var vals = []; rows.forEach(function (r) { vals.push(r.b); if (r.a) vals.push(r.a); });
   var lo = Math.floor((Math.min.apply(null, vals) - 0.15) * 5) / 5, hi = Math.ceil((Math.max.apply(null, vals) + 0.15) * 5) / 5;
@@ -6551,14 +6820,20 @@ function dv4Render() {
   }
   if (DV4.loadedAt) dv4Set('dv4Updated', 'data langsung · dimuat ' + DV4.loadedAt.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }));
   dv4Set('topbarSesi', sesiSemasaTeks());
-  dv4Set('dv4Sem', 'Sesi ' + now.getFullYear() + ' · Semester ' + (now.getMonth() <= 4 ? 1 : 2) + ' sedang berjalan');
+  const yA = tahunAktif(), yK = tahunKalendar();
+  dv4Set('dv4Sem', yA === yK ? ('Sesi ' + yA + ' · Semester ' + (now.getMonth() <= 4 ? 1 : 2) + ' sedang berjalan')
+    : ('Tahun aktif ' + yA + (yA < yK ? ' — paparan arkib' : ' — persediaan tahun baharu')));
+  const pill = document.getElementById('dv4Sem'); if (pill) pill.classList.toggle('arkib', yA !== yK);
   if (typeof SCHOOL_INFO !== 'undefined' && SCHOOL_INFO.name) dv4Set('dv4SchoolShort', dv4Esc(SCHOOL_INFO.name.replace(/^Sekolah Menengah Kebangsaan/i, 'SMK')));
 
   dv4Set('dv4Dir', 'GPS lebih ' + (DV4_LOWER_BETTER ? 'rendah' : 'tinggi') + ' = lebih baik');
   dv4Set('dv4TrendDir', DV4_LOWER_BETTER ? 'paksi diterbalikkan: naik = lebih baik' : 'naik = lebih baik');
   // GPS (hero)
   var g = DV4.gps;
-  if (g && g.v != null) {
+  if (g && !(g.v > 0)) { // GPS sah bermula 1.00 — 0 / kosong bermaksud data PAJSK tahun itu belum dimasukkan
+    dv4Set('dv4Gps', '—'); dv4Set('dv4GpsYear', dv4Esc(g.tahun));
+    dv4Set('dv4GpsDelta', 'Belum ada data PAJSK ' + dv4Esc(g.tahun)); dv4Set('dv4GpsRating', '');
+  } else if (g && g.v != null) {
     dv4Set('dv4Gps', dv4Fix(g.v)); dv4Set('dv4GpsYear', dv4Esc(g.tahun));
     dv4Set('dv4GpsRating', g.rating ? '<b>' + dv4Esc(g.rating) + '</b>' : '');
     if (g.prev != null) {
@@ -6586,7 +6861,11 @@ function dv4Render() {
   }
   // Guru penasihat
   var a = DV4.adv;
-  if (a) {
+  if (a && a.tiadaData) {
+    dv4Set('dv4Adv', '—');
+    dv4Set('dv4AdvSub', 'Belum ada tugasan ' + a.tahun + ' · roll over Guru Penasihat');
+    const ab0 = document.getElementById('dv4AdvBar'); if (ab0) ab0.style.width = '0';
+  } else if (a) {
     dv4Set('dv4Adv', a.n);
     dv4Set('dv4AdvSub', a.teachers ? 'daripada ' + a.teachers + ' guru · ' + Math.round(a.n / a.teachers * 100) + '%' : '');
     var ab = document.getElementById('dv4AdvBar'); if (ab && a.teachers) ab.style.width = Math.min(100, a.n / a.teachers * 100) + '%';
@@ -6638,6 +6917,11 @@ function dv4Todo() {
   }
   var nf = (typeof notifData !== 'undefined' && notifData) ? notifData.length : 0;
   if (nf) items.push({ lv: nf > 50 ? 'warn' : 'info', ic: 'fa-folder-open', t: nf.toLocaleString() + ' fail SK@S perlu dikemas kini', s: 'Fail evidens yang sudah lapuk', go: 'skas' });
+  const ro = (typeof rolloverRingkas === 'function') ? rolloverRingkas() : null;
+  if (ro && ro.perlu && ro.siap < ro.jumlah) {
+    items.push({ lv: ro.mendesak ? 'warn' : 'info', ic: 'fa-forward', t: 'Roll over ke ' + ro.tahun + ': ' + ro.siap + '/' + ro.jumlah + ' langkah',
+                 s: 'Sandar data ' + (ro.tahun - 1) + ' dan sediakan ' + ro.tahun, go: 'rollover' });
+  }
   const gagal = Object.keys(DV4.ralat || {});
   if (gagal.length) {
     const nama = { guru: 'Guru Penasihat', pajsk: 'PAJSK', trend: 'Trend GPS', skas: 'SK@S', pelajar: 'Data Pelajar' };
@@ -8023,7 +8307,7 @@ function autoCalculatePAJSK() {
 
 function resetPAJSKForm() {
   document.getElementById('pajskInputForm').reset();
-  document.getElementById('formTahun').value = new Date().getFullYear();
+  document.getElementById('formTahun').value = tahunAktif();
   autoCalculatePAJSK();
 }
 
@@ -11826,8 +12110,10 @@ function openLaporan2026FullSheet() {
 /* ============================================================
    YEAR MODE MANAGEMENT — Live vs SPKB Data
    ============================================================ */
+// R-2: tahun yang diliputi oleh sheet Laporan LIVE (LAPORAN_2026_API_URL). Tukar bersama URL apabila sheet LIVE tahun baharu tersedia.
+const LIVE_TAHUN = 2026;
 const YEAR_MODE = {
-  LIVE: '2026_LIVE',
+  LIVE: LIVE_TAHUN + '_LIVE',
   SPKB_2026: '2026',
   SPKB_2025: '2025',
   SPKB_2024: '2024',
@@ -11847,7 +12133,7 @@ function getCurrentYearForAPI() {
   if (!yearSelect) return 2025;
   
   const val = yearSelect.value;
-  if (val === YEAR_MODE.LIVE) return 2026; // For Live data
+  if (val === YEAR_MODE.LIVE) return LIVE_TAHUN; // For Live data
   return parseInt(val);
 }
 
@@ -12892,7 +13178,7 @@ function hydrateDashboardLive() {
   }).catch(function () {});
 
   // (B) Guru Penasihat — kiraan guru, unit, kategori
-  fetch(GURU + '?action=guru_penasihat_all&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+  fetch(GURU + '?action=guru_penasihat_all&tahun=' + tahunAktif() + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
     if (!res || !res.success || !res.data) return dv4Gagal('guru');
     var g = res.data, UL = g.unit_lookup || {};
     var codes = Object.keys(UL);
@@ -12913,13 +13199,13 @@ function hydrateDashboardLive() {
     setNum('kpiPencapaian', jk); setSub('kpiPencapaianTrend', '');
     // Papan Pemuka v4
     DV4.units = { total: codes.length, kelab: kelab, uniform: uniform, sukan: sukan };
-    DV4.adv = { n: SCHOOL_INFO.advisors, teachers: SCHOOL_INFO.teachers };
+    DV4.adv = { n: SCHOOL_INFO.advisors, teachers: SCHOOL_INFO.teachers, tahun: tahunAktif(), tiadaData: !(g.tugasan || []).length };
     dv4Render();
   }).catch(function () { dv4Gagal('guru'); });
 
   // (E) PAJSK — Rajah 3: hero GPS, 5 kad komponen, radar, sasaran, trend 10 tahun
   var SK = (typeof SKAS_API_URL !== 'undefined' && SKAS_API_URL) ? SKAS_API_URL : GURU;
-  var pjYear = new Date().getFullYear() - 1; // tahun PAJSK terkini disiapkan
+  var pjYear = tahunAktif() - 1; // R-1: PAJSK tahun sebelum tahun aktif (tahun terkini disiapkan)
   var fix2 = function (v) { return (v != null && !isNaN(v)) ? Number(v).toFixed(2) : '—'; };
   // (E1) Dashboard tahun terkini → hero GPS + 5 kad + radar
   fetch(SK + '?action=pajsk_dashboard&tahun=' + pjYear + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
@@ -12949,7 +13235,7 @@ function hydrateDashboardLive() {
     if (typeof renderDashboardRadar === 'function') renderDashboardRadar(d);
   }).catch(function () { dv4Gagal('pajsk'); });
   // (E2) Sasaran tahun semasa
-  var curY = new Date().getFullYear();
+  var curY = tahunAktif(); // R-1
   fetch(SK + '?action=pajsk_target&tahun=' + curY + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
     if (res && res.success && res.data && res.data.targetGPS != null) {
       setNum('pcScore5', fix2(res.data.targetGPS));
@@ -12973,7 +13259,7 @@ function hydrateDashboardLive() {
 
   // (F) Pencapaian — jumlah pencapaian tahun semasa (modul Pencapaian) + banding tahun lepas
   var PEN = (typeof PENCAPAIAN_API_URL !== 'undefined' && PENCAPAIAN_API_URL) ? PENCAPAIAN_API_URL : STUDENT;
-  var thnNow = new Date().getFullYear();
+  var thnNow = tahunAktif(); // R-1
   Promise.all([
     fetch(PEN + '?action=pencapaian_ringkasan&tahun=' + thnNow + '&_t=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return null; }),
     fetch(PEN + '?action=pencapaian_ringkasan&tahun=' + (thnNow - 1) + '&_t=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return null; })
@@ -13013,7 +13299,7 @@ function hydrateDashboardLive() {
   }).catch(function () {});
 
   // (C) Data Pelajar — kiraan pelajar
-  fetch(STUDENT + '?action=data_pelajar_all&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+  fetch(STUDENT + '?action=data_pelajar_all&tahun=' + tahunAktif() + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
     if (!res || !res.success || !Array.isArray(res.students)) return dv4Gagal('pelajar');
     var n = res.students.length;
     var aktif = res.students.filter(function (s) { return (s.uniform && String(s.uniform).trim()) || (s.kelab && String(s.kelab).trim()) || (s.sukan && String(s.sukan).trim()); }).length;
@@ -13065,6 +13351,8 @@ function hydrateDashboardLive() {
 }
 
 // Initialize Admin Panel on load
+paparTahunAktif(); // R-1
+binaPilihanTahun(); // R-2
 populateAdminPanel();
 hydrateDashboardLive();
 
@@ -13094,7 +13382,7 @@ const _origLoadAllCompetitionsSPKB = typeof loadAllCompetitions === 'function' ?
 function isLiveMode() {
   const yearSelect = document.getElementById('pencapaianYearSelect');
   if (!yearSelect) return false;
-  return yearSelect.value === '2026_LIVE';
+  return yearSelect.value === YEAR_MODE.LIVE;
 }
 
 /**
@@ -14418,7 +14706,8 @@ console.log('🚀 [DataPelajar] Loading module...');
   // ============================================================
   
     async function api(action) {
-    const res = await fetch(API_URL + '?action=' + action);
+    // R-5: data pelajar & statistik ikut tahun aktif dashboard
+    const res = await fetch(API_URL + '?action=' + action + (typeof tahunAktif === 'function' ? '&tahun=' + tahunAktif() : ''));
     return res.json();
   }
   
@@ -15690,7 +15979,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       if (s.sukan) kh += `<div class="m-koko"><div class="m-koko-i" style="background:linear-gradient(135deg,#16A34A,#4ade80);">⚽</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Sukan</div><div style="font-size:15px;font-weight:700;">${esc(s.sukan)}</div>${s.position_sukan?`<div style="color:#475569;">${esc(s.position_sukan)}</div>`:''}</div></div>`;
       document.getElementById('dp-i-k').innerHTML = kh;
       
-      const a = [['🏫 Sekolah', 'SMK Tinggi Kuching'], ['📚 Tingkatan', s.tingkatan], ['🎓 Kelas', s.kelas], ['📅 Tahun', new Date().getFullYear()], ['✅ Status', s.status_aktif || 'Aktif']];
+      const a = [['🏫 Sekolah', 'SMK Tinggi Kuching'], ['📚 Tingkatan', s.tingkatan], ['🎓 Kelas', s.kelas], ['📅 Tahun', s.tahun || tahunAktif()], ['✅ Status', s.status_aktif || 'Aktif']];
       document.getElementById('dp-i-a').innerHTML = a.map(it => `<div class="m-ii"><div class="m-il">${it[0]}</div><div class="m-iv">${esc(it[1]||'-')}</div></div>`).join('');
             // ⭐ Load achievements asynchronously
       loadStudentAchievements(s);
@@ -16162,7 +16451,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     if (state.studentsLoaded) { if (cb) cb(true); return; }
     if (state.studentsLoading) { return; }
     state.studentsLoading = true;
-    fetch(STUDENT_API_URL + '?action=data_pelajar_all&_t=' + Date.now())
+    fetch(STUDENT_API_URL + '?action=data_pelajar_all&tahun=' + tahunAktif() + '&_t=' + Date.now())
       .then(function (r) { return r.json(); })
       .then(function (res) {
         if (res && res.success && Array.isArray(res.students)) {
@@ -18213,7 +18502,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
   function collectActivities(){
     const today = new Date();
-    const yr = today.getFullYear();
+    const yr = (typeof tahunAktif === 'function') ? tahunAktif() : today.getFullYear(); // R-1
     // Cuba pelbagai tahun bermula dari yr (jika takwim 2026, dan today 2026)
     const tryYears = [yr, yr+1, yr-1];
     let takwim = null;
