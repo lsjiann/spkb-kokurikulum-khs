@@ -761,6 +761,17 @@ body.in-spkb .data-banner{display:none;}
 
 <script>
 /* ============================================================
+   KESELAMATAN — escape data luaran sebelum masuk ke HTML (T1 XSS)
+   ============================================================ */
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function safeUrl(u) {
+  const s = String(u ?? '').trim();
+  return (/^https?:\/\//i.test(s) || (s && !/^[^\/?#]*:/.test(s))) ? s : '#';
+}
+
+/* ============================================================
    LAPISAN DATA — FALLBACK (guna jika API gagal)
    ⚠️ Guna 'let' supaya boleh ditimpa oleh data Sheets
    ============================================================ */
@@ -953,11 +964,11 @@ function renderAdminSystems(){
   let html = '<div class="admin-sidebar-label">📌 Sistem Utama</div>';
   adminSystemsData.forEach(sys => {
     html += `
-      <a class="admin-sys-item" onclick="openSystem('${sys.id}')">
-        <div class="admin-sys-icon">${sys.icon}</div>
+      <a class="admin-sys-item" data-act="openSystem" data-id="${esc(sys.id)}">
+        <div class="admin-sys-icon">${esc(sys.icon)}</div>
         <div class="admin-sys-info">
-          <div class="admin-sys-name">${sys.nama}</div>
-          <div class="admin-sys-desc">${sys.desc}</div>
+          <div class="admin-sys-name">${esc(sys.nama)}</div>
+          <div class="admin-sys-desc">${esc(sys.desc)}</div>
         </div>
       </a>`;
   });
@@ -974,22 +985,22 @@ function renderForms(){
     html += `
       <div class="form-card ${f.special ? 'special' : ''}">
         <div class="form-card-top">
-          <div class="form-icon"><i class="fas ${f.icon}"></i></div>
+          <div class="form-icon"><i class="fas ${esc(f.icon)}"></i></div>
           <div class="form-info">
-            <div class="form-name">${f.nama}</div>
-            <div class="form-desc">${f.desc}</div>
+            <div class="form-name">${esc(f.nama)}</div>
+            <div class="form-desc">${esc(f.desc)}</div>
           </div>
         </div>
         <div class="form-actions">
           <a class="form-btn ${f.special ? 'special' : 'primary'}"
-             onclick="openForm('${f.id}')"
+             data-act="openForm" data-id="${esc(f.id)}"
              style="cursor:pointer;"><i class="fas fa-external-link-alt"></i> Buka Borang</a>
           <a class="form-btn"
-             onclick="copyFormLink('${f.id}')"
+             data-act="copyFormLink" data-id="${esc(f.id)}"
              title="Salin Link"
              style="cursor:pointer;"><i class="fas fa-link"></i></a>
           <a class="form-btn"
-             onclick="showQRCode('${f.id}')"
+             data-act="showQRCode" data-id="${esc(f.id)}"
              title="QR Code"
              style="cursor:pointer;"><i class="fas fa-qrcode"></i></a>
         </div>
@@ -1027,14 +1038,14 @@ function renderCategories(filter='all', search=''){
 
     clubs.forEach(c => {
       html += `
-        <div class="club-card" onclick="openClub('${c.kod}','${c.nama}')">
-          <div class="club-thumb ${c.kat}">
-            <span class="club-code">${c.kod}</span>
+        <div class="club-card" data-act="openClub" data-kod="${esc(c.kod)}" data-nama="${esc(c.nama)}">
+          <div class="club-thumb ${esc(c.kat)}">
+            <span class="club-code">${esc(c.kod)}</span>
             <div class="club-play-btn"><i class="fas fa-play"></i></div>
-            <div class="club-health ${c.status}"></div>
+            <div class="club-health ${esc(c.status)}"></div>
           </div>
           <div class="club-body">
-            <div class="club-title">${c.nama}</div>
+            <div class="club-title">${esc(c.nama)}</div>
             <div class="club-stats">
               <span class="club-stat"><i class="fas fa-users"></i> ${c.ahli}</span>
               <span class="club-stat"><i class="fas fa-star"></i> ${c.pajsk}</span>
@@ -1161,10 +1172,10 @@ function showQRCode(formId) {
   `;
   modal.innerHTML = `
     <div style="background:#fff;border-radius:16px;padding:24px;text-align:center;max-width:380px;width:100%;">
-      <h3 style="color:var(--khs-blue);margin-bottom:8px;font-size:16px;">${form.nama}</h3>
+      <h3 style="color:var(--khs-blue);margin-bottom:8px;font-size:16px;">${esc(form.nama)}</h3>
       <p style="font-size:11px;color:#7f8c8d;margin-bottom:16px;">Imbas QR untuk akses borang</p>
-      <img src="${qrUrl}" alt="QR Code" style="width:100%;max-width:300px;border:2px solid #eee;border-radius:8px;">
-      <div style="font-size:10px;color:#7f8c8d;margin-top:12px;word-break:break-all;background:#f8fafc;padding:8px;border-radius:6px;">${form.url}</div>
+      <img src="${esc(qrUrl)}" alt="QR Code" style="width:100%;max-width:300px;border:2px solid #eee;border-radius:8px;">
+      <div style="font-size:10px;color:#7f8c8d;margin-top:12px;word-break:break-all;background:#f8fafc;padding:8px;border-radius:6px;">${esc(form.url)}</div>
       <button onclick="this.closest('div[style*=fixed]').remove()"
               style="margin-top:16px;padding:10px 24px;background:var(--khs-blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;">
         Tutup
@@ -1227,9 +1238,9 @@ async function openClub(kod, nama) {
   // Render maklumat asas
   document.getElementById('detailTitle').textContent = `${club.kod} ${club.nama.toUpperCase()}`;
   document.getElementById('detailSubtitle').innerHTML =
-    `<i class="fas fa-chalkboard-user"></i> ${club.guru} ·
-     <i class="fas fa-users"></i> ${club.ahli} ahli aktif ·
-     <i class="fas fa-calendar"></i> Kategori ${club.kat}`;
+    `<i class="fas fa-chalkboard-user"></i> ${esc(club.guru)} ·
+     <i class="fas fa-users"></i> ${esc(club.ahli)} ahli aktif ·
+     <i class="fas fa-calendar"></i> Kategori ${esc(club.kat)}`;
 
   // Emblem ikut kategori
   const emblems = {A:'🎖️', B:'🤝', C:'📚', D:'🎭', S:'⚽'};
@@ -1237,9 +1248,9 @@ async function openClub(kod, nama) {
 
   // Quick stats
   document.getElementById('detailQuickStats').innerHTML = `
-    <div class="dqs">PAJSK <strong>${club.pajsk} / 5.0</strong></div>
+    <div class="dqs">PAJSK <strong>${esc(club.pajsk)} / 5.0</strong></div>
     <div class="dqs">Pingat 2026 <strong>—</strong></div>
-    <div class="dqs">Status <strong style="text-transform:capitalize;">${club.status}</strong></div>
+    <div class="dqs">Status <strong style="text-transform:capitalize;">${esc(club.status)}</strong></div>
   `;
 
   // Cuba ambil detail SKPM dari API
@@ -1344,7 +1355,7 @@ async function loadGuruByKelab(kod) {
           <div style="font-size:13px;font-weight:600;">Tiada guru penasihat berdaftar</div>
           <div style="font-size:11px;margin-top:4px;">
             Tambah di Sheets <code>SPKB_Guru_Penasihat</code><br>
-            Pastikan kod kelab di Sheets bermula dengan "${kod} "
+            Pastikan kod kelab di Sheets bermula dengan "${esc(kod)} "
           </div>
         </div>`;
       return;
@@ -1386,6 +1397,7 @@ const ahli = guruList.filter(g => !/ketua|penolong/i.test(g.peranan));
     if (ahli.length) {
       const showAll = ahli.length <= 6;
       const id = `ahli_${Date.now()}`;
+      AHLI_STORE[id] = ahli;
       html += `<div class="guru-group">
         <div class="guru-group-label">
           <i class="fas fa-users" style="color:#7f8c8d;"></i>
@@ -1395,7 +1407,7 @@ const ahli = guruList.filter(g => !/ketua|penolong/i.test(g.peranan));
           ${ahli.slice(0, showAll ? ahli.length : 6).map(g => guruCardHtml(g, 'ahli')).join('')}
         </div>
         ${!showAll ? `
-          <button class="guru-toggle" onclick='toggleAhliFull("${id}", ${JSON.stringify(ahli).replace(/'/g, "&#39;")})'>
+          <button class="guru-toggle" data-act="toggleAhliFull" data-id="${id}">
             <i class="fas fa-chevron-down"></i> Tunjuk Semua ${ahli.length} Guru
           </button>` : ''}
       </div>`;
@@ -1410,7 +1422,7 @@ const ahli = guruList.filter(g => !/ketua|penolong/i.test(g.peranan));
       <div class="guru-empty" style="color:var(--danger);">
         <i class="fas fa-exclamation-triangle"></i>
         <div style="font-size:13px;font-weight:600;">Gagal memuatkan senarai guru</div>
-        <div style="font-size:11px;margin-top:4px;">${e.message}</div>
+        <div style="font-size:11px;margin-top:4px;">${esc(e.message)}</div>
       </div>`;
   }
 }
@@ -1425,17 +1437,17 @@ function guruCardHtml(g, jenis) {
 
   // Sesi badge
   const sesiClass = String(g.sesi || '').toLowerCase().includes('petang') ? 'petang' : '';
-  const sesiBadge = g.sesi ? `<span class="sesi-badge ${sesiClass}">${g.sesi}</span>` : '';
+  const sesiBadge = g.sesi ? `<span class="sesi-badge ${sesiClass}">${esc(g.sesi)}</span>` : '';
 
   // Kategori sahaja jika peranan biasa
-  const meta = `${g.peranan}${g.kategori ? ' · ' + g.kategori : ''}`;
+  const meta = esc(`${g.peranan}${g.kategori ? ' · ' + g.kategori : ''}`);
 
   return `
     <div class="guru-card ${jenis}">
-      <div class="guru-avatar">${initials || '?'}</div>
+      <div class="guru-avatar">${esc(initials || '?')}</div>
       <div class="guru-info">
         <div class="guru-name">
-          <span title="${g.nama}">${g.nama}</span>
+          <span title="${esc(g.nama)}">${esc(g.nama)}</span>
           ${sesiBadge}
         </div>
         <div class="guru-meta">${meta}</div>
@@ -1446,9 +1458,11 @@ function guruCardHtml(g, jenis) {
 /**
  * Tunjuk semua ahli (bila guna butang)
  */
+const AHLI_STORE = {};  // Senarai penuh ahli bagi butang "Tunjuk Semua" (elak JSON dalam onclick)
 function toggleAhliFull(containerId, allAhli) {
   const list = document.getElementById(containerId);
   if (!list) return;
+  allAhli = allAhli || AHLI_STORE[containerId] || [];
 
   list.innerHTML = allAhli.map(g => guruCardHtml(g, 'ahli')).join('');
 
@@ -1601,7 +1615,7 @@ async function openCluster(klusterKod) {
       <div class="dok-loading" style="color:var(--danger);">
         <i class="fas fa-exclamation-triangle" style="animation:none;"></i>
         <div>Gagal memuatkan dokumen</div>
-        <div style="font-size:11px;margin-top:4px;">${e.message}</div>
+        <div style="font-size:11px;margin-top:4px;">${esc(e.message)}</div>
       </div>`;
   }
 }
@@ -1653,7 +1667,7 @@ function renderDokumenItem(d) {
     statusIcon = `<div class="dok-status-icon"><i class="fas fa-folder"></i></div>`;
 
     if (fileCount > 0) {
-      actionsBtn = `<button class="dok-btn dok-btn-folder" onclick="openClubFolder('${d.no_dok}')">
+      actionsBtn = `<button class="dok-btn dok-btn-folder" data-act="openClubFolder" data-id="${esc(d.no_dok)}">
         <i class="fas fa-folder-open"></i> ${fileCount} fail
       </button>`;
     } else {
@@ -1667,7 +1681,7 @@ function renderDokumenItem(d) {
     statusIcon = `<div class="dok-status-icon"><i class="fas fa-link"></i></div>`;
 
     if (d.edms_url) {
-      actionsBtn = `<a class="dok-btn dok-btn-edms" href="${d.edms_url}" target="_blank">
+      actionsBtn = `<a class="dok-btn dok-btn-edms" href="${esc(safeUrl(d.edms_url))}" target="_blank">
         <i class="fas fa-external-link-alt"></i> EDMS
       </a>`;
     } else {
@@ -1681,7 +1695,7 @@ function renderDokumenItem(d) {
       itemClass = 'ada';
       statusIcon = `<div class="dok-status-icon"><i class="fas fa-check"></i></div>`;
       actionsBtn = d.drive_url
-        ? `<a class="dok-btn dok-btn-drive" href="${d.drive_url}" target="_blank">
+        ? `<a class="dok-btn dok-btn-drive" href="${esc(safeUrl(d.drive_url))}" target="_blank">
              <i class="fas fa-external-link-alt"></i> Drive
            </a>`
         : `<button class="dok-btn dok-btn-empty" disabled>
@@ -1712,13 +1726,13 @@ function renderDokumenItem(d) {
   } else if (isPautan) {
     metaItems.push('<span class="dok-meta-tag warn">🌐 EDMS SchoolNet</span>');
   } else {
-    metaItems.push(`<span class="dok-meta-tag">${d.sumber || 'Drive'}</span>`);
-    if (d.format) metaItems.push(`<span class="dok-meta-tag">${d.format}</span>`);
+    metaItems.push(`<span class="dok-meta-tag">${esc(d.sumber || 'Drive')}</span>`);
+    if (d.format) metaItems.push(`<span class="dok-meta-tag">${esc(d.format)}</span>`);
     if (d.tarikh_kemas) {
       const tarikh = new Date(d.tarikh_kemas).toLocaleDateString('ms-MY');
-      metaItems.push(`<span class="dok-meta-tag">📅 ${tarikh}</span>`);
+      metaItems.push(`<span class="dok-meta-tag">📅 ${esc(tarikh)}</span>`);
     }
-    if (d.oleh) metaItems.push(`<span class="dok-meta-tag">👤 ${d.oleh}</span>`);
+    if (d.oleh) metaItems.push(`<span class="dok-meta-tag">👤 ${esc(d.oleh)}</span>`);
   }
 
   if (metaItems.length > 0) {
@@ -1729,8 +1743,8 @@ function renderDokumenItem(d) {
     <div class="dok-item ${itemClass}">
       ${statusIcon}
       <div class="dok-info">
-        <span class="dok-no">${d.no_dok}</span>
-        <div class="dok-nama">${d.nama_dok}</div>
+        <span class="dok-no">${esc(d.no_dok)}</span>
+        <div class="dok-nama">${esc(d.nama_dok)}</div>
         ${metaHtml}
       </div>
       <div class="dok-actions">${actionsBtn}</div>
@@ -1837,6 +1851,24 @@ async function deleteClub(kod)  { return await callAPI('delete', 'SPKB_Clubs', {
 /* ============================================================
    INISIALISASI
    ============================================================ */
+// Pengendali klik delegasi untuk elemen yang dijana daripada data (ganti onclick inline — T1 XSS)
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const id = el.dataset.id;
+  switch (el.dataset.act) {
+    case 'openSystem':       openSystem(id); break;
+    case 'openForm':         openForm(id); break;
+    case 'copyFormLink':     copyFormLink(id); break;
+    case 'showQRCode':       showQRCode(id); break;
+    case 'openClub':         openClub(el.dataset.kod, el.dataset.nama); break;
+    case 'toggleAhliFull':   toggleAhliFull(id); break;
+    case 'openClubFolder':   openClubFolder(id); break;
+    case 'bukaFolderDetail': bukaFolderDetail(id); break;
+    case 'openUrl':          window.open(el.dataset.url, '_blank'); break;
+  }
+});
+
 setInterval(() => loadDataFromSheets(false), 5 * 60 * 1000);
 document.addEventListener('DOMContentLoaded', () => loadDataFromSheets(false));
 // ============================================================
@@ -1925,7 +1957,7 @@ async function loadSKASData() {
     document.getElementById('skasAspekContainer').innerHTML =
       '<div style="text-align:center;padding:40px;color:var(--danger);">' +
       '<i class="fas fa-exclamation-triangle" style="font-size:32px;"></i>' +
-      '<p style="margin-top:14px;">Gagal memuatkan data: ' + e.message + '</p></div>';
+      '<p style="margin-top:14px;">Gagal memuatkan data: ' + esc(e.message) + '</p></div>';
   }
 }
 
@@ -2028,9 +2060,9 @@ function renderAspekCard(stdId, info, stdData, folders) {
     const statusColor = getStatusFromStats(f.stats);
     const noPart = String(f.no);
     folderChipsHtml += `
-      <div class="skas-folder-chip" onclick="bukaFolderDetail('${noPart}')">
-        <div class="skas-folder-chip-no">${noPart}</div>
-        <div class="skas-folder-chip-name">${f.nama_folder}</div>
+      <div class="skas-folder-chip" data-act="bukaFolderDetail" data-id="${esc(noPart)}">
+        <div class="skas-folder-chip-no">${esc(noPart)}</div>
+        <div class="skas-folder-chip-name">${esc(f.nama_folder)}</div>
         <div class="skas-folder-chip-status ${statusColor}"></div>
       </div>
     `;
@@ -2049,7 +2081,7 @@ function renderAspekCard(stdId, info, stdData, folders) {
         <div class="skas-skor-display">
           <div class="skas-skor-num">${peratus}%</div>
           <div class="skas-skor-label">Skor</div>
-          <div class="skas-skor-skpm skor-${skorSkpm}">${skorSkpm}/4 ${labelSkpm}</div>
+          <div class="skas-skor-skpm skor-${skorSkpm}">${skorSkpm}/4 ${esc(labelSkpm)}</div>
         </div>
       </div>
 
@@ -2123,11 +2155,11 @@ async function loadStaleFiles() {
             <i class="fas fa-exclamation"></i>
           </div>
           <div class="skas-reminder-item-info">
-            <div class="skas-reminder-item-name">${item.nama_fail}</div>
-            <div class="skas-reminder-item-meta">📁 Folder ${item.folder_no} · ${item.label}</div>
+            <div class="skas-reminder-item-name">${esc(item.nama_fail)}</div>
+            <div class="skas-reminder-item-meta">📁 Folder ${esc(item.folder_no)} · ${esc(item.label)}</div>
           </div>
           <div class="skas-reminder-item-actions">
-            <button class="skas-btn skas-btn-primary" style="padding:5px 10px;font-size:11px;" onclick="window.open('${item.url}', '_blank')">
+            <button class="skas-btn skas-btn-primary" style="padding:5px 10px;font-size:11px;" data-act="openUrl" data-url="${esc(safeUrl(item.url))}">
               <i class="fas fa-edit"></i> Update
             </button>
           </div>

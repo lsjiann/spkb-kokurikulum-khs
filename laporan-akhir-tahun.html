@@ -196,6 +196,10 @@ const MEM = {};
 function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
 function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
 
+// Keselamatan (T1): escape data luaran sebelum masuk HTML
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => { const s = String(u ?? '').trim(); return (/^https?:\/\//i.test(s) || (s && !/^[^\/?#]*:/.test(s))) ? s : '#'; };
+
 function toast(msg, type){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -369,11 +373,12 @@ const BULAN = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','Se
 function fmtTarikh(iso){
   if(!iso) return '—';
   const d = new Date(iso);
-  if(isNaN(d)) return iso;
+  if(isNaN(d)) return esc(iso);
   return d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear();
 }
+// Output sudah di-escape; S() hanya digunakan dalam HTML
 function S(field, fb){
-  return (SEKOLAH && SEKOLAH[field] && String(SEKOLAH[field]).trim()) || fb || '—';
+  return esc((SEKOLAH && SEKOLAH[field] && String(SEKOLAH[field]).trim()) || fb || '—');
 }
 
 // ========================================================
@@ -508,7 +513,7 @@ function renderGuruList(){
         <thead><tr><th style="width:8%;">Bil</th><th>Nama Guru</th><th>Unit</th><th>Jawatan</th></tr></thead>
         <tbody>`;
     items.forEach((it,i) => {
-      h += `<tr><td>${i+1}</td><td><strong>${it.nama}</strong></td><td>${it.kod} · ${it.unit}</td><td>${it.jawatan}</td></tr>`;
+      h += `<tr><td>${i+1}</td><td><strong>${esc(it.nama)}</strong></td><td>${esc(it.kod)} · ${esc(it.unit)}</td><td>${it.jawatan}</td></tr>`;
     });
     h += `</tbody></table>`;
   });
@@ -570,7 +575,7 @@ function renderStatistik(){
   tks.forEach(t => {
     const c = tingkatanCount[t];
     const pct = total ? (c/total*100).toFixed(1) : 0;
-    h += `<tr><td>${t}</td><td>${c.toLocaleString()}</td><td>${pct}%</td></tr>`;
+    h += `<tr><td>${esc(t)}</td><td>${c.toLocaleString()}</td><td>${pct}%</td></tr>`;
   });
   h += `<tr class="total"><td>JUMLAH</td><td>${total.toLocaleString()}</td><td>100%</td></tr></tbody></table>`;
 
@@ -581,7 +586,7 @@ function renderStatistik(){
     let t = `<h3 class="subsec-title">${title} (${arr.length} unit · ${arr.reduce((s,[,c])=>s+c,0)} ahli)</h3>
       <table><thead><tr><th style="width:8%;">Bil</th><th>Nama Unit</th><th style="width:20%;">Bil. Ahli</th></tr></thead><tbody>`;
     arr.forEach(([nama,c],i)=>{
-      t += `<tr><td>${i+1}</td><td>${nama}</td><td>${c}</td></tr>`;
+      t += `<tr><td>${i+1}</td><td>${esc(nama)}</td><td>${c}</td></tr>`;
     });
     t += `</tbody></table>`;
     return t;
@@ -620,7 +625,7 @@ function renderTakwim(){
     return Array.from(dates).sort();
   };
 
-  h += `<p>Takwim perjumpaan yang ditetapkan bagi sesi ${currentYear} dengan target minimum PAJSK <strong>${minJumpa} perjumpaan</strong> dan <strong>${minJam} jam</strong> per pelajar.</p>`;
+  h += `<p>Takwim perjumpaan yang ditetapkan bagi sesi ${currentYear} dengan target minimum PAJSK <strong>${esc(minJumpa)} perjumpaan</strong> dan <strong>${esc(minJam)} jam</strong> per pelajar.</p>`;
   h += `<table>
     <thead><tr><th>Kategori</th><th>Hari</th><th>Tempoh</th><th>Bil. Perjumpaan</th><th>Jumlah Jam</th><th>Status</th></tr></thead>
     <tbody>`;
@@ -634,14 +639,14 @@ function renderTakwim(){
     h += `<tr class="${cukup?'success':'warning'}">
       <td><strong>${KAT_LBL[k]}</strong></td>
       <td>${HARI[data.hari === 7 ? 0 : data.hari]}</td>
-      <td>${data.mula} – ${data.tamat}</td>
+      <td>${esc(data.mula)} – ${esc(data.tamat)}</td>
       <td>${dates.length}</td>
       <td>${jam.toFixed(1)} jam</td>
       <td>${cukup?'✓ Cukup PAJSK':'⚠ Bawah Minimum'}</td>
     </tr>`;
   });
   h += `</tbody></table>`;
-  h += `<p class="sec-meta">Durasi perjumpaan ditetapkan ${durasi} minit setiap satu.</p>`;
+  h += `<p class="sec-meta">Durasi perjumpaan ditetapkan ${esc(durasi)} minit setiap satu.</p>`;
   return h;
 }
 
@@ -694,7 +699,7 @@ function renderKehadiran(){
       <thead><tr><th>Bil</th><th>Unit</th><th>Perjumpaan</th><th>H</th><th>TH</th><th>MC</th><th>%</th></tr></thead><tbody>`;
   arr.forEach((u,i) => {
     const cls = u.pct >= 80 ? 'success' : u.pct < 60 ? 'warning' : '';
-    h += `<tr class="${cls}"><td>${i+1}</td><td><strong>${u.kod}</strong> · ${u.nama}</td><td>${u.perjumpaan}</td><td>${u.H}</td><td>${u.TH}</td><td>${u.MC}</td><td><strong>${u.pct}%</strong></td></tr>`;
+    h += `<tr class="${cls}"><td>${i+1}</td><td><strong>${esc(u.kod)}</strong> · ${esc(u.nama)}</td><td>${u.perjumpaan}</td><td>${u.H}</td><td>${u.TH}</td><td>${u.MC}</td><td><strong>${u.pct}%</strong></td></tr>`;
   });
   h += `</tbody></table>`;
   return h;
@@ -747,7 +752,7 @@ function renderPAJSK(){
   });
   bawahPAJSK.sort((a,b) => a.jam - b.jam);
 
-  h += `<p>Syarat minimum PAJSK: <strong>${minJumpa} perjumpaan</strong> dan <strong>${minJam} jam</strong> aktiviti setahun (kira H + B × ${durasi} minit).</p>`;
+  h += `<p>Syarat minimum PAJSK: <strong>${esc(minJumpa)} perjumpaan</strong> dan <strong>${esc(minJam)} jam</strong> aktiviti setahun (kira H + B × ${esc(durasi)} minit).</p>`;
 
   if(!bawahPAJSK.length){
     h += `<div class="no-data" style="background:#eafaf1;color:#0e6251;border-left-color:var(--ok);"><i class="fas fa-check-circle"></i>Semua pelajar memenuhi minimum PAJSK. Tahniah!</div>`;
@@ -756,17 +761,17 @@ function renderPAJSK(){
 
   h += `<div class="kpi-row">
     <div class="kpi-card err"><div class="v">${bawahPAJSK.length}</div><div class="l">Pelajar Bawah PAJSK</div></div>
-    <div class="kpi-card"><div class="v">${bawahPAJSK.filter(p=>!p.okJumpa).length}</div><div class="l">Bawah ${minJumpa} Jumpa</div></div>
-    <div class="kpi-card"><div class="v">${bawahPAJSK.filter(p=>!p.okJam).length}</div><div class="l">Bawah ${minJam}j</div></div>
+    <div class="kpi-card"><div class="v">${bawahPAJSK.filter(p=>!p.okJumpa).length}</div><div class="l">Bawah ${esc(minJumpa)} Jumpa</div></div>
+    <div class="kpi-card"><div class="v">${bawahPAJSK.filter(p=>!p.okJam).length}</div><div class="l">Bawah ${esc(minJam)}j</div></div>
   </div>`;
 
   h += `<table>
     <thead><tr><th>#</th><th>Nama</th><th>Tingkatan</th><th>Kelas</th><th>H+B</th><th>Jam</th><th>Sebab</th></tr></thead><tbody>`;
   bawahPAJSK.slice(0,50).forEach((p,i) => {
     const sebab = [];
-    if(!p.okJumpa) sebab.push(`< ${minJumpa} jumpa`);
-    if(!p.okJam) sebab.push(`< ${minJam}j`);
-    h += `<tr class="warning"><td>${i+1}</td><td><strong>${p.nama}</strong></td><td>${p.tingkatan||'—'}</td><td>${p.kelas||'—'}</td><td>${p.hadirEfektif}</td><td>${p.jam.toFixed(1)}j</td><td>${sebab.join(' · ')}</td></tr>`;
+    if(!p.okJumpa) sebab.push(`&lt; ${esc(minJumpa)} jumpa`);
+    if(!p.okJam) sebab.push(`&lt; ${esc(minJam)}j`);
+    h += `<tr class="warning"><td>${i+1}</td><td><strong>${esc(p.nama)}</strong></td><td>${esc(p.tingkatan||'—')}</td><td>${esc(p.kelas||'—')}</td><td>${p.hadirEfektif}</td><td>${p.jam.toFixed(1)}j</td><td>${sebab.join(' · ')}</td></tr>`;
   });
   h += `</tbody></table>`;
   if(bawahPAJSK.length > 50) h += `<p class="sec-meta">…dan ${bawahPAJSK.length-50} pelajar lagi.</p>`;
@@ -868,7 +873,7 @@ function renderCadangan(){
       count += (t.tambahan||[]).length;
       if(count < min){
         const kat = {beruniform:'Beruniform',kelab:'Kelab/Persatuan',sukan:'Sukan/Permainan'}[k];
-        suggestions.push(`Kategori ${kat} hanya merancang ${count} perjumpaan — di bawah minimum PAJSK ${min} kali. Tambah perjumpaan ad-hoc atau panjangkan tempoh.`);
+        suggestions.push(`Kategori ${kat} hanya merancang ${count} perjumpaan — di bawah minimum PAJSK ${esc(min)} kali. Tambah perjumpaan ad-hoc atau panjangkan tempoh.`);
       }
     });
   }

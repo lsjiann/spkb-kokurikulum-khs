@@ -313,6 +313,10 @@ const MEM={};
 function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
 function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
 
+// Keselamatan (T1): escape data luaran sebelum masuk HTML
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => { const s = String(u ?? '').trim(); return (/^https?:\/\//i.test(s) || (s && !/^[^\/?#]*:/.test(s))) ? s : '#'; };
+
 let currentYear = new Date().getFullYear();
 let currentTab = 0;
 
@@ -491,9 +495,9 @@ function renderPanel(idx){
       const linkTitle = it.link ? 'Pautan: '+it.link.substring(0,40) : 'Pautan fail/Drive';
       h += `<div class="ev-item">`;
       h += `<input type="checkbox" ${it.done?'checked':''} onchange="toggleEv('${a.id}',${f},${i})">`;
-      h += `<span class="ev-text${it.done?' done':''}">${it.text}</span>`;
+      h += `<span class="ev-text${it.done?' done':''}">${esc(it.text)}</span>`;
       h += `<div class="ev-actions">`;
-      h += `<button class="${linkCls}" title="${linkTitle}" onclick="linkEv('${a.id}',${f},${i})"><i class="fas fa-link"></i></button>`;
+      h += `<button class="${linkCls}" title="${esc(linkTitle)}"onclick="linkEv('${a.id}',${f},${i})"><i class="fas fa-link"></i></button>`;
       h += `<button class="ev-del" title="Padam" onclick="delEv('${a.id}',${f},${i})"><i class="fas fa-times"></i></button>`;
       h += `</div></div>`;
     });
@@ -552,7 +556,7 @@ function linkEv(aspekId,fasa,idx){
   if(url === null) return;
   items[idx].link = url;
   saveEvidens(aspekId,fasa,items);
-  if(url) window.open(url,'_blank');
+  if(url) window.open(safeUrl(url),'_blank');
   else render();
 }
 
@@ -671,7 +675,7 @@ async function autoPadan(aspekId){
       diag += `• Skip kerana jenis=Folder: <b>${dg.skippedFolder||0}</b><br>`;
       diag += `• Skip kerana tiada nama: <b>${dg.skippedNoName||0}</b><br><br>`;
       if(dg.sampleFolder){
-        diag += '<b>Sampel folder:</b><br><pre style="background:#fff;padding:6px;border-radius:4px;overflow-x:auto;max-height:120px;">'+JSON.stringify(dg.sampleFolder,null,2)+'</pre>';
+        diag += '<b>Sampel folder:</b><br><pre style="background:#fff;padding:6px;border-radius:4px;overflow-x:auto;max-height:120px;">'+esc(JSON.stringify(dg.sampleFolder,null,2))+'</pre>';
       }
       if(dg.sampleDetail){
         const sd = dg.sampleDetail.data || dg.sampleDetail;
@@ -681,7 +685,7 @@ async function autoPadan(aspekId){
           filesCount: (sd.files||[]).length,
           firstFile: (sd.files||[])[0] || null
         };
-        diag += '<b>Sampel response detail:</b><br><pre style="background:#fff;padding:6px;border-radius:4px;overflow-x:auto;max-height:200px;">'+JSON.stringify(sample,null,2)+'</pre>';
+        diag += '<b>Sampel response detail:</b><br><pre style="background:#fff;padding:6px;border-radius:4px;overflow-x:auto;max-height:200px;">'+esc(JSON.stringify(sample,null,2))+'</pre>';
       }
       diag += '<br><i style="font-family:inherit;color:var(--mute);">Salin maklumat di atas dan hantar kepada pembangun untuk debug.</i></div>';
       list.innerHTML = '<div style="text-align:center;padding:20px 30px;color:var(--err);"><i class="fas fa-exclamation-circle" style="font-size:32px;"></i><div style="margin-top:10px;font-weight:600;">Tiada fail dapat diekstrak dari folder SK@S.</div>'+diag+'</div>';
@@ -736,12 +740,12 @@ async function autoPadan(aspekId){
     list.innerHTML = padanan.map((p,i)=>{
       const cls = p.score >= 0.7 ? 'match-hi' : 'match-mid';
       const pct = Math.round(p.score*100);
-      const folderTag = p.folderNama ? `<div style="font-size:10px;color:var(--mute);margin-top:2px;"><i class="fas fa-folder" style="color:var(--acc);"></i> ${p.folderNama}${p.standardId?' · '+p.standardId:''}</div>` : '';
+      const folderTag = p.folderNama ? `<div style="font-size:10px;color:var(--mute);margin-top:2px;"><i class="fas fa-folder" style="color:var(--acc);"></i> ${esc(p.folderNama)}${p.standardId?' · '+esc(p.standardId):''}</div>` : '';
       return `<div class="padan-row ${cls}">
         <input type="checkbox" class="ev-check" id="pd-${i}" ${p.score>=0.7?'checked':''}>
-        <label for="pd-${i}" class="ev-name" style="cursor:pointer;">${p.evText}</label>
+        <label for="pd-${i}" class="ev-name" style="cursor:pointer;">${esc(p.evText)}</label>
         <div class="ev-match" style="display:flex;flex-direction:column;">
-          <span>→ ${p.fileName}</span>
+          <span>→ ${esc(p.fileName)}</span>
           ${folderTag}
         </div>
         <span class="ev-score">${pct}%</span>
@@ -750,7 +754,7 @@ async function autoPadan(aspekId){
     applyBtn.disabled = false;
 
   } catch(e){
-    list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--err);"><i class="fas fa-exclamation-triangle" style="font-size:32px;"></i><div style="margin-top:10px;">Ralat: ${e.message}</div></div>`;
+    list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--err);"><i class="fas fa-exclamation-triangle" style="font-size:32px;"></i><div style="margin-top:10px;">Ralat: ${esc(e.message)}</div></div>`;
   }
 }
 

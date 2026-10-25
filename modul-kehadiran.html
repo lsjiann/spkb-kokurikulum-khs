@@ -274,6 +274,10 @@ let kehadiranData = {};   // {tarikh|unit: {pelajar_no: status}}
 // ID unik pelajar — utamakan student_no (yg benar unik), fallback no_urut
 function pid(p){return p && (p.student_no || p.no_urut) || ''}
 
+// Escape data luaran (API / localStorage) sebelum masuk innerHTML — cegah XSS
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function safeUrl(u){ u = String(u ?? '').trim(); return (/^https?:\/\//i.test(u) || !/^[^\/?#]*:/.test(u)) ? u : '#'; }
+
 // State untuk sort jadual rekod: {col: 'nama'|'kelas'|'status', dir: 1|-1}
 let sortState = { col: 'kelas', dir: 1 };
 
@@ -464,7 +468,7 @@ function showDataNotice(mode, pelajarCount, unitCount, errMsg){
       const breakdown = expectedTk.map(e => {
         const found = tks.find(k => k.indexOf(e.split(' ')[1]) !== -1);
         const c = found ? dg.tingkatanCount[found] : 0;
-        return `${e.replace('Tingkatan ','T')}: <strong>${c}</strong>`;
+        return `${e.replace('Tingkatan ','T')}: <strong>${esc(c)}</strong>`;
       }).join(' · ');
       tingkatanWarn = `<details style="margin-top:8px;font-size:11px;cursor:pointer;">
         <summary style="color:#922b21;font-weight:700;">⚠️ ${missingTk.length} tingkatan tiada (${missingTk.map(t=>t.replace('Tingkatan ','T')).join(', ')}) — klik untuk butiran</summary>
@@ -489,13 +493,13 @@ function showDataNotice(mode, pelajarCount, unitCount, errMsg){
         <div style="background:#fff;border-radius:6px;padding:8px;margin-top:6px;font-family:monospace;font-size:10px;line-height:1.5;">
           API berjaya: ✅ &nbsp; | Pelajar mentah: ${dg.rawCount||0} &nbsp; | Position fallback: ${dg.usedPositionFallback?'cuba (gagal)':'tidak'}<br>
           <strong>Key sampel rekod pertama:</strong><br>
-          ${(dg.rawSampleKeys||[]).slice(0,12).map(k=>`<code style="background:#f0f0f0;padding:1px 4px;border-radius:3px;margin-right:3px;">${k}</code>`).join('')}
+          ${(dg.rawSampleKeys||[]).slice(0,12).map(k=>`<code style="background:#f0f0f0;padding:1px 4px;border-radius:3px;margin-right:3px;">${esc(k)}</code>`).join('')}
           ${(dg.rawSampleKeys||[]).length>12?'... +'+((dg.rawSampleKeys||[]).length-12)+' lagi':''}
           <br><br><em>Masalah:</em> nama field tidak padan (nama / kelab / uniform / sukan). Sheet anda mungkin tiada baris header. Penyelesaian: tambah baris header di baris 1 sheet SPKB_Data_Pelajar.
         </div>
       </details>`;
     }
-    notice.innerHTML = `<div style="flex:1;min-width:0;"><i class="fas fa-flask" style="color:var(--warn);"></i> <strong>Mod Demo</strong> — Data sebenar tidak tersedia (${errMsg||'API gagal'}). Menggunakan ${pelajarCount} pelajar simulasi dengan ${unitCount} unit.${diagHtml}</div><button class="btn btn-pri btn-sm" onclick="retryFetch()" style="font-size:11px;flex-shrink:0;"><i class="fas fa-redo"></i> Cuba Live</button>`;
+    notice.innerHTML = `<div style="flex:1;min-width:0;"><i class="fas fa-flask" style="color:var(--warn);"></i> <strong>Mod Demo</strong> — Data sebenar tidak tersedia (${esc(errMsg||'API gagal')}). Menggunakan ${pelajarCount} pelajar simulasi dengan ${unitCount} unit.${diagHtml}</div><button class="btn btn-pri btn-sm" onclick="retryFetch()" style="font-size:11px;flex-shrink:0;"><i class="fas fa-redo"></i> Cuba Live</button>`;
   }
 }
 
@@ -606,8 +610,8 @@ function populateSelectors(){
     units.forEach(u=>{ if(!groups[u.kategori])groups[u.kategori]=[]; groups[u.kategori].push(u); });
     let h = firstOpt;
     Object.keys(groups).forEach(g=>{
-      h += `<optgroup label="${g}">`;
-      groups[g].forEach(u=>{ h += `<option value="${u.kod}">${u.nama} (${u.ahli.length})</option>`; });
+      h += `<optgroup label="${esc(g)}">`;
+      groups[g].forEach(u=>{ h += `<option value="${esc(u.kod)}">${esc(u.nama)} (${u.ahli.length})</option>`; });
       h += '</optgroup>';
     });
     return h;
@@ -617,7 +621,7 @@ function populateSelectors(){
   // Tingkatan filter
   const tings = [...new Set(pelajarAll.map(p=>p.tingkatan).filter(Boolean))].sort();
   let tingHTML = '<option value="">Semua</option>';
-  tings.forEach(t=>{ tingHTML += `<option value="${t}">${t}</option>`; });
+  tings.forEach(t=>{ tingHTML += `<option value="${esc(t)}">${esc(t)}</option>`; });
   document.getElementById('tingkatanFilter').innerHTML = tingHTML;
 }
 
@@ -672,7 +676,7 @@ function loadPelajar(){
   };
 
   let h = '<div class="bulk-bar">';
-  h += `<div class="info"><i class="fas fa-info-circle"></i> ${ahli.length} ahli daftar | ${u.kategori} | ${u.nama}</div>`;
+  h += `<div class="info"><i class="fas fa-info-circle"></i> ${ahli.length} ahli daftar | ${esc(u.kategori)} | ${esc(u.nama)}</div>`;
   h += '<div class="bulk-actions">';
   h += `<button class="btn btn-ok btn-sm" onclick="bulkSet('H')"><i class="fas fa-check-double"></i> Semua Hadir</button>`;
   h += `<button class="btn btn-err btn-sm" onclick="bulkSet('TH')"><i class="fas fa-times-circle"></i> Reset (TH)</button>`;
@@ -688,11 +692,11 @@ function loadPelajar(){
     const s = status[pid(p)] || '';
     h += `<tr>`;
     h += `<td class="pelajar-no">${i+1}</td>`;
-    h += `<td class="pelajar-nama">${p.nama||'?'}</td>`;
-    h += `<td class="pelajar-tk">${p.tingkatan||''} · ${p.kelas||''}</td>`;
+    h += `<td class="pelajar-nama">${esc(p.nama||'?')}</td>`;
+    h += `<td class="pelajar-tk">${esc(p.tingkatan||'')} · ${esc(p.kelas||'')}</td>`;
     h += `<td class="status-cell">`;
     STATUS.forEach(st=>{
-      h += `<button class="btn-status ${s===st?'active':''}" data-s="${st}" onclick="setStatus('${pid(p)}','${st}')">${st}</button>`;
+      h += `<button class="btn-status ${s===st?'active':''}" data-s="${st}" data-pid="${esc(pid(p))}">${st}</button>`;
     });
     h += `</td></tr>`;
   });
@@ -910,15 +914,15 @@ function renderAnalisisUnit(){
     const pct = r.total ? Math.round(r.hadir/r.total*100) : 0;
     const cls = pct>=target?'text-ok':pct>=60?'':'text-err';
     if(r._belumRekod){
-      h += `<tr style="opacity:0.55;background:#fafafa;"><td>${r.tarikh}</td><td>${u?u.nama:r.unit}</td>`;
+      h += `<tr style="opacity:0.55;background:#fafafa;"><td>${esc(r.tarikh)}</td><td>${esc(u?u.nama:r.unit)}</td>`;
       h += `<td colspan="4" style="text-align:center;font-style:italic;color:var(--mute);">Belum Direkod</td>`;
       h += `<td style="color:var(--mute);">—</td><td></td></tr>`;
     } else {
-      h += `<tr><td>${r.tarikh}</td><td>${u?u.nama:r.unit}</td>`;
+      h += `<tr><td>${esc(r.tarikh)}</td><td>${esc(u?u.nama:r.unit)}</td>`;
       h += `<td class="text-ok">${r.hadir}</td><td class="text-err">${r.th}</td>`;
       h += `<td>${r.mc}</td><td>${r.b}</td>`;
       h += `<td class="${cls}" style="font-weight:800;">${pct}%</td>`;
-      h += `<td><button onclick="deleteRekod('${r.unit}','${r.tarikh}')" title="Padam rekod ini" style="background:#fde;color:var(--err);border:none;border-radius:4px;padding:3px 7px;cursor:pointer;font-size:11px;"><i class="fas fa-trash"></i></button></td></tr>`;
+      h += `<td><button class="btn-del-rekod" data-unit="${esc(r.unit)}" data-tarikh="${esc(r.tarikh)}" title="Padam rekod ini" style="background:#fde;color:var(--err);border:none;border-radius:4px;padding:3px 7px;cursor:pointer;font-size:11px;"><i class="fas fa-trash"></i></button></td></tr>`;
     }
   });
   h += '</tbody></table>';
@@ -933,6 +937,16 @@ function deleteRekod(unitKod, tarikh){
   saveKehadiran();
   renderAnalisisUnit();
 }
+
+// Delegasi klik (ganti onclick inline yang membenam data API/localStorage)
+document.getElementById('rekodContent').addEventListener('click', function(ev){
+  const b = ev.target.closest('.btn-status[data-pid]');
+  if(b) setStatus(b.dataset.pid, b.dataset.s);
+});
+document.getElementById('anaUnitContent').addEventListener('click', function(ev){
+  const b = ev.target.closest('.btn-del-rekod');
+  if(b) deleteRekod(b.dataset.unit, b.dataset.tarikh);
+});
 
 // =============================================================
 // ANALISIS PELAJAR
@@ -1016,8 +1030,8 @@ function renderAnalisisPelajar(){
       ? `<span title="Bawah minimum PAJSK" style="background:#fdedec;color:var(--err);font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;margin-right:6px;">⚠ PAJSK</span>`
       : '';
     h += `<div class="analisis-pelajar-row ${cls}">`;
-    h += `<span class="name">${flagPAJSK}${r.p.nama}</span>`;
-    h += `<span class="kls">${r.p.kelas||''}</span>`;
+    h += `<span class="name">${flagPAJSK}${esc(r.p.nama)}</span>`;
+    h += `<span class="kls">${esc(r.p.kelas||'')}</span>`;
     h += `<div class="bar-wrap"><div class="bar" style="width:${r.pct}%;background:${barColor}"></div></div>`;
     h += `<span class="pct">${r.pct}%</span>`;
     h += `<span style="font-size:11px;color:var(--mute);min-width:55px;text-align:right;">${r.hadir}/${r.total}<br><span style="font-size:10px;color:${r.okJam?'var(--ok)':'var(--err)'};font-weight:700;">${r.jamTerkumpul.toFixed(1)}j</span></span>`;
@@ -1099,7 +1113,7 @@ function renderLaporan(){
     const totalJamKat = (totalPerjumpaanKat * durasi) / 60;
 
     h += '<div class="laporan-section">';
-    h += `<h3><i class="fas fa-folder"></i> ${kat} (${grpStats.length} unit)</h3>`;
+    h += `<h3><i class="fas fa-folder"></i> ${esc(kat)} (${grpStats.length} unit)</h3>`;
     if(takwimDates.length){
       h += `<div style="background:#eef4fb;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:11.5px;color:var(--pri);">
         <strong>Takwim:</strong> ${takwimDates.length} perjumpaan dirancang · ${takwimJam.toFixed(1)} jam · Durasi: ${durasi} minit setiap satu
@@ -1110,7 +1124,7 @@ function renderLaporan(){
     grpStats.forEach((s,i)=>{
       const cls = s.purata>=80?'text-ok':s.purata>=60?'':'text-err';
       const unitJam = (s.perjumpaan * durasi) / 60;
-      h += `<tr><td>${i+1}</td><td><strong>${s.nama}</strong></td>`;
+      h += `<tr><td>${i+1}</td><td><strong>${esc(s.nama)}</strong></td>`;
       h += `<td>${s.perjumpaan}</td>`;
       h += `<td><strong>${unitJam.toFixed(1)}j</strong></td>`;
       h += `<td>${s.totalAhli}</td>`;
@@ -1144,7 +1158,7 @@ function renderLaporan(){
       const masalah = [];
       if(!s.okJumpa) masalah.push(`< ${minJumpa} jumpa`);
       if(!s.okJam) masalah.push(`< ${minJam}j`);
-      h += `<tr><td>${i+1}</td><td><strong>${s.p.nama}</strong></td><td>${s.p.tingkatan||'-'}</td><td>${s.p.kelas||'-'}</td>`;
+      h += `<tr><td>${i+1}</td><td><strong>${esc(s.p.nama)}</strong></td><td>${esc(s.p.tingkatan||'-')}</td><td>${esc(s.p.kelas||'-')}</td>`;
       h += `<td>${s.hadir+s.b}</td><td class="${s.okJam?'text-ok':'text-err'}" style="font-weight:700;">${s.jamTerkumpul.toFixed(1)}j</td>`;
       h += `<td class="text-err" style="font-size:10.5px;">${masalah.join(' · ')}</td></tr>`;
     });
@@ -1158,7 +1172,7 @@ function renderLaporan(){
     h += `<h3 style="color:var(--warn);"><i class="fas fa-chart-line"></i> Pelajar Kehadiran < 80% (${bermasalah.length} pelajar)</h3>`;
     h += '<table class="pelajar-table"><thead><tr><th>#</th><th>Nama</th><th>Tingkatan</th><th>Kelas</th><th>Hadir/Total</th><th>%</th></tr></thead><tbody>';
     bermasalah.slice(0,30).forEach((s,i)=>{
-      h += `<tr><td>${i+1}</td><td><strong>${s.p.nama}</strong></td><td>${s.p.tingkatan||'-'}</td><td>${s.p.kelas||'-'}</td><td>${s.hadir}/${s.total}</td><td class="text-err" style="font-weight:800;">${s.pct}%</td></tr>`;
+      h += `<tr><td>${i+1}</td><td><strong>${esc(s.p.nama)}</strong></td><td>${esc(s.p.tingkatan||'-')}</td><td>${esc(s.p.kelas||'-')}</td><td>${s.hadir}/${s.total}</td><td class="text-err" style="font-weight:800;">${s.pct}%</td></tr>`;
     });
     h += '</tbody></table>';
     if(bermasalah.length>30) h += `<p style="font-size:11px;color:var(--mute);margin-top:8px;">…dan ${bermasalah.length-30} pelajar lagi.</p>`;
@@ -1296,11 +1310,11 @@ function renderTakwimUI(){
         </div>
         <div>
           <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Mula</label>
-          <input type="date" id="tk-${k.key}-mula" value="${t.mula||''}" onchange="onTakwimFieldChange()" style="width:100%;padding:6px;margin-top:3px;border-radius:5px;border:1.5px solid var(--bdr);font-size:12px;">
+          <input type="date" id="tk-${k.key}-mula" value="${esc(t.mula||'')}" onchange="onTakwimFieldChange()" style="width:100%;padding:6px;margin-top:3px;border-radius:5px;border:1.5px solid var(--bdr);font-size:12px;">
         </div>
         <div>
           <label style="font-size:10px;font-weight:700;color:var(--mute);text-transform:uppercase;">Tamat</label>
-          <input type="date" id="tk-${k.key}-tamat" value="${t.tamat||''}" onchange="onTakwimFieldChange()" style="width:100%;padding:6px;margin-top:3px;border-radius:5px;border:1.5px solid var(--bdr);font-size:12px;">
+          <input type="date" id="tk-${k.key}-tamat" value="${esc(t.tamat||'')}" onchange="onTakwimFieldChange()" style="width:100%;padding:6px;margin-top:3px;border-radius:5px;border:1.5px solid var(--bdr);font-size:12px;">
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
@@ -1335,12 +1349,12 @@ function renderKategoriLists(kKey){
   const tList = document.getElementById('tk-'+kKey+'-tambahan-list');
   if(kList){
     kList.innerHTML = t.kecuali.length ? t.kecuali.map((d,i)=>
-      `<div style="display:flex;justify-content:space-between;align-items:center;background:#fdedec;padding:3px 7px;border-radius:4px;font-size:10.5px;margin-bottom:2px;"><span>${d}</span><button onclick="removeKecuali('${kKey}',${i})" style="background:transparent;border:none;color:var(--err);cursor:pointer;font-size:12px;line-height:1;">×</button></div>`
+      `<div style="display:flex;justify-content:space-between;align-items:center;background:#fdedec;padding:3px 7px;border-radius:4px;font-size:10.5px;margin-bottom:2px;"><span>${esc(d)}</span><button onclick="removeKecuali('${kKey}',${i})" style="background:transparent;border:none;color:var(--err);cursor:pointer;font-size:12px;line-height:1;">×</button></div>`
     ).join('') : '<div style="font-size:10px;color:var(--mute);font-style:italic;">Tiada</div>';
   }
   if(tList){
     tList.innerHTML = t.tambahan.length ? t.tambahan.map((d,i)=>
-      `<div style="display:flex;justify-content:space-between;align-items:center;background:#eafaf1;padding:3px 7px;border-radius:4px;font-size:10.5px;margin-bottom:2px;"><span>${d}</span><button onclick="removeTambahan('${kKey}',${i})" style="background:transparent;border:none;color:var(--err);cursor:pointer;font-size:12px;line-height:1;">×</button></div>`
+      `<div style="display:flex;justify-content:space-between;align-items:center;background:#eafaf1;padding:3px 7px;border-radius:4px;font-size:10.5px;margin-bottom:2px;"><span>${esc(d)}</span><button onclick="removeTambahan('${kKey}',${i})" style="background:transparent;border:none;color:var(--err);cursor:pointer;font-size:12px;line-height:1;">×</button></div>`
     ).join('') : '<div style="font-size:10px;color:var(--mute);font-style:italic;">Tiada</div>';
   }
 }
@@ -1486,7 +1500,7 @@ function populateTarikhTakwim(){
   if(!dates.length){ sel.innerHTML = '<option value="">— Tiada tarikh takwim (set di tab Takwim) —</option>'; return; }
   const today = new Date().toISOString().substring(0,10);
   let h = '<option value="">— Pilih tarikh perjumpaan —</option>';
-  dates.forEach(d => { h += `<option value="${d}">${fmtTarikhOpt(d)}${d===today?' • hari ini':''}</option>`; });
+  dates.forEach(d => { h += `<option value="${esc(d)}">${esc(fmtTarikhOpt(d))}${d===today?' • hari ini':''}</option>`; });
   sel.innerHTML = h;
   // Jika hari ini ialah tarikh perjumpaan, auto-pilih
   if(dates.indexOf(today) >= 0){ sel.value = today; document.getElementById('tarikhSel').value = today; }
@@ -1549,7 +1563,7 @@ function renderPukalDates(){
   if(!dates.length){ sel.innerHTML = '<option value="">— Tiada tarikh takwim —</option>'; pukalTarikh = ''; return; }
   const today = new Date().toISOString().substring(0,10);
   if(!pukalTarikh || dates.indexOf(pukalTarikh) < 0) pukalTarikh = (dates.indexOf(today) >= 0 ? today : dates[0]);
-  sel.innerHTML = dates.map(d=>`<option value="${d}"${d===pukalTarikh?' selected':''}>${fmtTarikhOpt(d)}${d===today?' • hari ini':''}</option>`).join('');
+  sel.innerHTML = dates.map(d=>`<option value="${esc(d)}"${d===pukalTarikh?' selected':''}>${esc(fmtTarikhOpt(d))}${d===today?' • hari ini':''}</option>`).join('');
 }
 function renderPukalList(){
   const wrap = document.getElementById('pukalList'); if(!wrap) return;
@@ -1569,8 +1583,8 @@ function renderPukalList(){
       badge = `<span style="color:var(--ok);font-weight:700;">${hadir} hadir</span> <span style="color:var(--mute);">· ${ditanda}/${total} ditanda</span>`;
     }
     h += `<label class="card" style="display:flex;align-items:center;gap:10px;padding:9px 12px;margin:0;cursor:pointer;box-shadow:none;border:1px solid var(--bdr);">
-      <input type="checkbox" class="pukalUnit" value="${u.kod}" checked>
-      <span style="flex:1;font-weight:700;font-size:13px;">${u.nama}</span>
+      <input type="checkbox" class="pukalUnit" value="${esc(u.kod)}" checked>
+      <span style="flex:1;font-weight:700;font-size:13px;">${esc(u.nama)}</span>
       <span style="font-size:11.5px;">${badge}</span>
       <span style="font-size:11px;color:var(--mute);white-space:nowrap;">${total} ahli</span>
     </label>`;
@@ -1644,7 +1658,7 @@ function renderTakwimPreview(){
         const day = HARI_LABEL[dateObj.getDay()];
         const isAdhoc = (takwimData[k.key].tambahan||[]).indexOf(d) !== -1;
         h += `<div style="background:${isAdhoc?'#eafaf1':'#fff'};border:1px solid ${isAdhoc?'var(--ok)':'#eee'};border-radius:4px;padding:4px 6px;font-size:10px;">
-          <strong>${i+1}.</strong> ${d.substring(5)}<br><span style="color:var(--mute);font-size:9px;">${day}${isAdhoc?' · *':''}</span>
+          <strong>${i+1}.</strong> ${esc(d.substring(5))}<br><span style="color:var(--mute);font-size:9px;">${day}${isAdhoc?' · *':''}</span>
         </div>`;
       });
       h += '</div></div>';

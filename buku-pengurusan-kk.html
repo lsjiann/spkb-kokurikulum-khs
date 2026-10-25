@@ -2882,6 +2882,10 @@
     function sget(k){ try { return localStorage.getItem(k); } catch(e){ return MEM[k]||null; } }
     function sset(k,v){ try { localStorage.setItem(k,v); } catch(e){ MEM[k]=v; } }
 
+    // Escape HTML untuk data luaran/pengguna (T1 XSS)
+    function esc(s){ return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function safeUrl(u){ u = String(u ?? '').trim(); return (/^https?:\/\//i.test(u) || (u && !/^[^\/?#]*:/.test(u))) ? u : '#'; }
+
     // TAHUN aktif: dari tetapan SPKB → else tahun semasa → else 2026
     const TAHUN = (function(){
       const t = sget('spkb_tahun_aktif');
@@ -3510,7 +3514,7 @@
           teachersListHtml += `
             <div style="padding:8px 12px; background-color: var(--slate-50); border-radius: 8px; font-size: 13px; font-weight:600; display:flex; align-items:center; gap:8px; border-left:3px solid var(--teal-600);">
               <span style="color:var(--teal-700); font-weight:800;">${idx + 1}</span>
-              <span>${t}</span>
+              <span>${esc(t)}</span>
             </div>
           `;
         });
@@ -3520,15 +3524,15 @@
 
       output.innerHTML = `
         <div style="background-color: var(--teal-50); padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1.5px dashed var(--teal-100);">
-          <h5 style="font-size: 14px; font-weight: 800; color: var(--teal-700); margin-bottom: 10px;">${data.title}</h5>
+          <h5 style="font-size: 14px; font-weight: 800; color: var(--teal-700); margin-bottom: 10px;">${esc(data.title)}</h5>
           <div class="grid-container-2" style="gap:12px; margin-bottom: 0;">
             <div style="background-color: #fff; padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold-500);">
               <span style="font-size:10px; text-transform:uppercase; font-weight:800; color:#64748b;">Ketua Unit / Guru Kanan</span>
-              <p style="font-size:14px; font-weight:700; color:var(--slate-900); margin-top:2px;">${data.ketua || '—'}</p>
+              <p style="font-size:14px; font-weight:700; color:var(--slate-900); margin-top:2px;">${esc(data.ketua || '—')}</p>
             </div>
             <div style="background-color: #fff; padding: 12px; border-radius: 8px; border-left: 4px solid var(--slate-700);">
               <span style="font-size:10px; text-transform:uppercase; font-weight:800; color:#64748b;">Penolong Ketua</span>
-              <p style="font-size:14px; font-weight:700; color:var(--slate-900); margin-top:2px;">${data.penolong || '—'}</p>
+              <p style="font-size:14px; font-weight:700; color:var(--slate-900); margin-top:2px;">${esc(data.penolong || '—')}</p>
             </div>
           </div>
         </div>
@@ -3647,10 +3651,10 @@
 
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td><strong>${event.date}</strong></td>
-          <td>${event.day}</td>
-          <td>${event.title}</td>
-          <td><span class="status-badge ${badgeClass}">${event.type}</span></td>
+          <td><strong>${esc(event.date)}</strong></td>
+          <td>${esc(event.day)}</td>
+          <td>${esc(event.title)}</td>
+          <td><span class="status-badge ${badgeClass}">${esc(event.type)}</span></td>
         `;
         tbody.appendChild(row);
       });
@@ -3826,7 +3830,7 @@
         items.forEach((t,i) => {
           const bdg = t.j==='KG' ? ' <span class="status-badge status-badge-danger" style="font-size:9px;padding:1px 6px;">KG</span>'
                     : t.j==='PK' ? ' <span class="status-badge status-badge-warning" style="font-size:9px;padding:1px 6px;">PK</span>' : '';
-          h += `<tr><td>${i+1}</td><td><strong>${t.nama}</strong></td><td>${t.kod} · ${t.unit}</td><td>${JAW[t.j]||'Guru Penasihat'}${bdg}</td></tr>`;
+          h += `<tr><td>${i+1}</td><td><strong>${esc(t.nama)}</strong></td><td>${esc(t.kod)} · ${esc(t.unit)}</td><td>${JAW[t.j]||'Guru Penasihat'}${bdg}</td></tr>`;
         });
         h += `</tbody></table>`;
       });
@@ -3887,7 +3891,7 @@
         t += `<table class="custom-table"><thead><tr><th>Bil</th><th>Kod</th><th>Nama Unit</th><th>Bil. Ahli</th></tr></thead><tbody>`;
         arr.forEach((u,i) => {
           const z = u.ahli===0 ? ' style="color:#94a3b8;"' : '';
-          t += `<tr><td>${i+1}</td><td>${u.kod}</td><td${z}><strong>${u.nama}</strong></td><td${z}>${u.ahli}</td></tr>`;
+          t += `<tr><td>${i+1}</td><td>${esc(u.kod)}</td><td${z}><strong>${esc(u.nama)}</strong></td><td${z}>${esc(u.ahli)}</td></tr>`;
         });
         return t + `</tbody></table>`;
       };

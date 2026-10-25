@@ -344,6 +344,17 @@ function toast(msg, type){
   setTimeout(()=>{ t.style.display = 'none'; }, 2500);
 }
 
+// Escape data luaran (API / localStorage) sebelum masuk innerHTML
+function esc(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function safeUrl(u){
+  const s = String(u ?? '').trim();
+  if(/^https?:\/\//i.test(s)) return s;
+  if(s && !/^[^\/?#]*:/.test(s) && !s.startsWith('//')) return s;
+  return '#';
+}
+
 function rm(n){ return 'RM ' + Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
 const BULAN = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
@@ -395,8 +406,8 @@ function renderSidebar(){
     h += `<div class="sb-section"><h3><i class="fas ${ICON[kat]}"></i> ${kat} (${arr.length})</h3>`;
     arr.forEach(u => {
       const hasData = hasUnitData(u.kod);
-      h += `<div class="unit-item ${hasData?'has-data':''} ${currentUnit===u.kod?'active':''}" data-kod="${u.kod}" data-nama="${u.nama.toLowerCase()}" onclick="selectUnit('${u.kod}')">
-        <span><strong>${u.kod}</strong> · ${u.nama}</span>
+      h += `<div class="unit-item ${hasData?'has-data':''} ${currentUnit===u.kod?'active':''}" data-kod="${esc(u.kod)}" data-nama="${esc(u.nama.toLowerCase())}" data-act="selectUnit">
+        <span><strong>${esc(u.kod)}</strong> · ${esc(u.nama)}</span>
         ${hasData ? '<span class="badge">●</span>' : ''}
       </div>`;
     });
@@ -481,9 +492,9 @@ function renderMain(){
 
   let h = `<div class="unit-header">
     <div class="unit-info">
-      <h2><i class="fas fa-${u.kategori==='Beruniform'?'shield-alt':u.kategori==='Sukan/Permainan'?'futbol':'book'}"></i> ${u.kod} · ${u.nama}</h2>
+      <h2><i class="fas fa-${u.kategori==='Beruniform'?'shield-alt':u.kategori==='Sukan/Permainan'?'futbol':'book'}"></i> ${esc(u.kod)} · ${esc(u.nama)}</h2>
       <div class="meta">
-        <span><i class="fas fa-tags"></i>${u.kategori}</span> &nbsp;&middot;&nbsp;
+        <span><i class="fas fa-tags"></i>${esc(u.kategori)}</span> &nbsp;&middot;&nbsp;
         <span><i class="fas fa-calendar"></i>Sesi ${currentYear}</span>
         <span class="ev-tag" title="Evidens SK@S 3.2 - Buku Tunai & Inventori">3.2.1 b</span>
       </div>
@@ -558,17 +569,17 @@ function renderKewanganTable(kew){
   sorted.forEach((t, i) => {
     if(t.jenis === 'in') runBaki += t.jumlah;
     else runBaki -= t.jumlah;
-    h += `<tr class="${t.jenis}">
+    h += `<tr class="${esc(t.jenis)}">
       <td>${i+1}</td>
-      <td>${fmtTarikh(t.tarikh)}</td>
-      <td><strong>${t.butiran}</strong>${t.catatan?'<br><small style="color:#666;">'+t.catatan+'</small>':''}</td>
-      <td>${t.resit||'—'}</td>
+      <td>${esc(fmtTarikh(t.tarikh))}</td>
+      <td><strong>${esc(t.butiran)}</strong>${t.catatan?'<br><small style="color:#666;">'+esc(t.catatan)+'</small>':''}</td>
+      <td>${esc(t.resit||'—')}</td>
       <td class="tx-num in" style="text-align:right;">${t.jenis==='in'?rm(t.jumlah):'—'}</td>
       <td class="tx-num out" style="text-align:right;">${t.jenis==='out'?rm(t.jumlah):'—'}</td>
       <td class="tx-num baki" style="text-align:right;">${rm(runBaki)}</td>
       <td class="no-print"><div class="actions">
-        <button class="ico-btn" onclick="editTrans('${t.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-        <button class="ico-btn del" onclick="deleteTrans('${t.id}')" title="Padam"><i class="fas fa-trash"></i></button>
+        <button class="ico-btn" data-act="editTrans" data-id="${esc(t.id)}" title="Edit"><i class="fas fa-pen"></i></button>
+        <button class="ico-btn del" data-act="deleteTrans" data-id="${esc(t.id)}" title="Padam"><i class="fas fa-trash"></i></button>
       </div></td>
     </tr>`;
   });
@@ -596,16 +607,16 @@ function renderInventoriTable(inv){
     const jumlah = (it.kuantiti||0) * (it.nilai_seunit||0);
     h += `<tr>
       <td>${i+1}</td>
-      <td><strong>${it.nama}</strong>${it.tindakan?'<br><small style="color:#666;">'+it.tindakan+'</small>':''}${it.tarikh_perolehan?'<br><small style="color:#888;">Perolehan: '+fmtTarikh(it.tarikh_perolehan)+'</small>':''}</td>
-      <td>${it.kategori}</td>
-      <td style="text-align:center;">${it.kuantiti} ${it.unit||''}</td>
+      <td><strong>${esc(it.nama)}</strong>${it.tindakan?'<br><small style="color:#666;">'+esc(it.tindakan)+'</small>':''}${it.tarikh_perolehan?'<br><small style="color:#888;">Perolehan: '+esc(fmtTarikh(it.tarikh_perolehan))+'</small>':''}</td>
+      <td>${esc(it.kategori)}</td>
+      <td style="text-align:center;">${esc(it.kuantiti)} ${esc(it.unit||'')}</td>
       <td style="text-align:right;">${rm(it.nilai_seunit)}</td>
       <td style="text-align:right;font-weight:700;">${rm(jumlah)}</td>
-      <td>${it.lokasi||'—'}</td>
-      <td><span class="badge-kead kead-${it.keadaan}">${it.keadaan}</span></td>
+      <td>${esc(it.lokasi||'—')}</td>
+      <td><span class="badge-kead kead-${esc(it.keadaan)}">${esc(it.keadaan)}</span></td>
       <td class="no-print"><div class="actions">
-        <button class="ico-btn" onclick="editInv('${it.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-        <button class="ico-btn del" onclick="deleteInv('${it.id}')" title="Padam"><i class="fas fa-trash"></i></button>
+        <button class="ico-btn" data-act="editInv" data-id="${esc(it.id)}" title="Edit"><i class="fas fa-pen"></i></button>
+        <button class="ico-btn del" data-act="deleteInv" data-id="${esc(it.id)}" title="Padam"><i class="fas fa-trash"></i></button>
       </div></td>
     </tr>`;
   });
@@ -841,6 +852,18 @@ function changeYear(y){
     bg.addEventListener('click', e => { if(e.target === bg) bg.classList.remove('show'); });
   });
 })();
+
+// Delegasi klik untuk elemen yang membawa data (ganti onclick inline)
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if(!b) return;
+  const act = b.dataset.act;
+  if(act === 'selectUnit') selectUnit(b.dataset.kod);
+  else if(act === 'editTrans') editTrans(b.dataset.id);
+  else if(act === 'deleteTrans') deleteTrans(b.dataset.id);
+  else if(act === 'editInv') editInv(b.dataset.id);
+  else if(act === 'deleteInv') deleteInv(b.dataset.id);
+});
 </script>
 </body>
 </html>

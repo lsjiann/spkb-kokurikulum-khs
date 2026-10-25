@@ -174,6 +174,10 @@ let currentFormData = {};
 const MEM = {};
 function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
 
+// Keselamatan (T1): escape data luaran sebelum masuk HTML
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => { const s = String(u ?? '').trim(); return (/^https?:\/\//i.test(s) || (s && !/^[^\/?#]*:/.test(s))) ? s : '#'; };
+
 function toast(msg, type){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -259,13 +263,13 @@ const BULAN = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','Se
 function fmtTarikh(iso){
   if(!iso) return '...........................';
   const d = new Date(iso);
-  if(isNaN(d)) return iso;
+  if(isNaN(d)) return esc(iso);
   return d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear();
 }
 
-// Sekolah maklumat dgn fallback
+// Sekolah maklumat dgn fallback (output sudah di-escape; hanya digunakan dalam HTML)
 function S(field, fallback){
-  return (SEKOLAH && SEKOLAH[field] && String(SEKOLAH[field]).trim()) || fallback || '— ' + field.replace(/_/g,' ').toUpperCase() + ' —';
+  return esc((SEKOLAH && SEKOLAH[field] && String(SEKOLAH[field]).trim()) || fallback || '— ' + field.replace(/_/g,' ').toUpperCase() + ' —');
 }
 
 // Kop sekolah HTML
@@ -462,7 +466,7 @@ function renderField(f){
     const guru = getGuruList();
     input = `<select id="f_${f.id}" onchange="onFieldChange('${f.id}',this.value);updatePreview()">
       <option value="">— Pilih guru —</option>
-      ${guru.map(g => `<option value="${g.id}" ${val===g.id?'selected':''}>${g.nama}</option>`).join('')}
+      ${guru.map(g => `<option value="${esc(g.id)}" ${val===g.id?'selected':''}>${esc(g.nama)}</option>`).join('')}
     </select>`;
   } else if(f.type === 'select-unit'){
     const units = getUnitList();
@@ -470,7 +474,7 @@ function renderField(f){
     units.forEach(u => { (byKat[u.kategori] ||= []).push(u); });
     input = `<select id="f_${f.id}" onchange="onFieldChange('${f.id}',this.value);updatePreview()">
       <option value="">— Pilih unit —</option>
-      ${Object.entries(byKat).map(([k,arr]) => arr.length?`<optgroup label="${k}">${arr.map(u=>`<option value="${u.kod}" ${val===u.kod?'selected':''}>${u.kod} · ${u.nama}</option>`).join('')}</optgroup>`:'').join('')}
+      ${Object.entries(byKat).map(([k,arr]) => arr.length?`<optgroup label="${k}">${arr.map(u=>`<option value="${esc(u.kod)}" ${val===u.kod?'selected':''}>${esc(u.kod)} · ${esc(u.nama)}</option>`).join('')}</optgroup>`:'').join('')}
     </select>`;
   } else if(f.type === 'select'){
     input = `<select id="f_${f.id}" onchange="onFieldChange('${f.id}',this.value);updatePreview()">
@@ -478,9 +482,9 @@ function renderField(f){
       ${(f.options||[]).map(o => `<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('')}
     </select>`;
   } else if(f.type === 'textarea'){
-    input = `<textarea id="f_${f.id}" oninput="onFieldChange('${f.id}',this.value)" onchange="updatePreview()">${val}</textarea>`;
+    input = `<textarea id="f_${f.id}" oninput="onFieldChange('${f.id}',this.value)" onchange="updatePreview()">${esc(val)}</textarea>`;
   } else {
-    input = `<input type="${f.type}" id="f_${f.id}" value="${val}" oninput="onFieldChange('${f.id}',this.value)" onchange="updatePreview()">`;
+    input = `<input type="${f.type}" id="f_${f.id}" value="${esc(val)}"oninput="onFieldChange('${f.id}',this.value)" onchange="updatePreview()">`;
   }
   return `<div class="fld"><label>${f.label}${req}${auto}</label>${input}${hint}</div>`;
 }
@@ -505,7 +509,7 @@ function updatePreview(){
   try {
     wrap.innerHTML = t.render(currentFormData);
   } catch(e){
-    wrap.innerHTML = '<div class="loading" style="color:var(--err);">Ralat: ' + e.message + '</div>';
+    wrap.innerHTML = '<div class="loading" style="color:var(--err);">Ralat: ' + esc(e.message) + '</div>';
   }
 }
 
@@ -545,14 +549,14 @@ function generateBulk(){
 
 function renderSuratLantikan(d, bulkMode){
   const guru = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.guru_id);
-  const namaGuru = guru ? guru.n : '— Nama Guru —';
+  const namaGuru = esc(guru ? guru.n : '— Nama Guru —');
   const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
   const ul = UL[d.unit_kod] || ['','— Unit —'];
-  const namaUnit = ul[1] || d.unit_kod;
+  const namaUnit = esc(ul[1] || d.unit_kod);
   const KAT = {'B':'Badan Beruniform','K':'Kelab / Persatuan','S':'Sukan / Permainan'};
   const kategori = KAT[ul[0]] || 'Unit Kokurikulum';
-  const tahun = (d.tarikh_kuatkuasa || '').substring(0,4) || currentYear;
-  const ruj = d.rujukan || ('KK/'+tahun+'/001');
+  const tahun = esc((d.tarikh_kuatkuasa || '').substring(0,4) || currentYear);
+  const ruj = d.rujukan ? esc(d.rujukan) : ('KK/'+tahun+'/001');
 
   const inner = `
     ${kopSekolah()}
@@ -566,9 +570,9 @@ function renderSuratLantikan(d, bulkMode){
 
     <p>Tuan/Puan,</p>
 
-    <h2 class="title">SURAT PELANTIKAN SEBAGAI<br>${(d.jawatan||'').toUpperCase()} ${namaUnit.toUpperCase()}<br>SESI ${tahun}</h2>
+    <h2 class="title">SURAT PELANTIKAN SEBAGAI<br>${esc((d.jawatan||'').toUpperCase())} ${namaUnit.toUpperCase()}<br>SESI ${tahun}</h2>
 
-    <p>Adalah saya merujuk perkara di atas dan dengan ini ingin memaklumkan bahawa <strong>tuan/puan telah dilantik</strong> sebagai <strong>${d.jawatan}</strong> bagi <strong>${namaUnit}</strong> (Kategori: ${kategori}) di ${S('nama_penuh','sekolah ini')} bagi sesi persekolahan tahun <strong>${tahun}</strong>.</p>
+    <p>Adalah saya merujuk perkara di atas dan dengan ini ingin memaklumkan bahawa <strong>tuan/puan telah dilantik</strong> sebagai <strong>${esc(d.jawatan)}</strong> bagi <strong>${namaUnit}</strong> (Kategori: ${kategori}) di ${S('nama_penuh','sekolah ini')} bagi sesi persekolahan tahun <strong>${tahun}</strong>.</p>
 
     <p>2. Pelantikan ini berkuat kuasa mulai <strong>${fmtTarikh(d.tarikh_kuatkuasa)}</strong> sehingga <strong>${fmtTarikh(d.tarikh_tamat)}</strong>.</p>
 
@@ -606,17 +610,17 @@ function renderSuratLantikan(d, bulkMode){
 function renderMinit(d){
   const peng = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.pengerusi_id);
   const setu = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.setiausaha_id);
-  const namaPeng = peng ? peng.n : '— Nama Pengerusi —';
-  const namaSetu = setu ? setu.n : '— Nama Setiausaha —';
-  const masaTotal = d.masa_mula + (d.masa_tamat?' – ' + d.masa_tamat:'');
-  const tahun = (d.tarikh_mesyuarat||'').substring(0,4) || currentYear;
+  const namaPeng = esc(peng ? peng.n : '— Nama Pengerusi —');
+  const namaSetu = esc(setu ? setu.n : '— Nama Setiausaha —');
+  const masaTotal = esc(d.masa_mula + (d.masa_tamat?' – ' + d.masa_tamat:''));
+  const tahun = esc((d.tarikh_mesyuarat||'').substring(0,4) || currentYear);
   const agendaTambahan = (d.agenda_tambahan||'').split('\n').filter(x=>x.trim());
 
   let agendaList = `
     <li>Ucapan Aluan Pengerusi</li>
     <li>Pengesahan Minit Mesyuarat Yang Lepas</li>
     <li>Perkara Berbangkit</li>`;
-  agendaTambahan.forEach((a,i) => { agendaList += `<li>${a.trim()}</li>`; });
+  agendaTambahan.forEach((a,i) => { agendaList += `<li>${esc(a.trim())}</li>`; });
   agendaList += `
     <li>Laporan Pencapaian Unit (Beruniform, Kelab, Sukan)</li>
     <li>Status Pelaksanaan SKPMg2 Standard 3.2</li>
@@ -625,12 +629,12 @@ function renderMinit(d){
 
   return `<div class="doc">
     ${kopSekolah()}
-    <h2 class="title">MINIT MESYUARAT<br>JAWATANKUASA PENGURUSAN KOKURIKULUM<br>BIL. ${d.bil_mesyuarat}/${tahun}</h2>
+    <h2 class="title">MINIT MESYUARAT<br>JAWATANKUASA PENGURUSAN KOKURIKULUM<br>BIL. ${esc(d.bil_mesyuarat)}/${tahun}</h2>
 
     <table style="width:auto;border:none;margin:14px 0;">
       <tr><td style="border:none;padding:2px 8px;"><strong>Tarikh</strong></td><td style="border:none;padding:2px 8px;">: ${fmtTarikh(d.tarikh_mesyuarat)}</td></tr>
       <tr><td style="border:none;padding:2px 8px;"><strong>Masa</strong></td><td style="border:none;padding:2px 8px;">: ${masaTotal}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${d.tempat}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.tempat)}</td></tr>
       <tr><td style="border:none;padding:2px 8px;"><strong>Pengerusi</strong></td><td style="border:none;padding:2px 8px;">: ${namaPeng}</td></tr>
       <tr><td style="border:none;padding:2px 8px;"><strong>Setiausaha</strong></td><td style="border:none;padding:2px 8px;">: ${namaSetu}</td></tr>
     </table>
@@ -672,28 +676,28 @@ function renderMinit(d){
 function renderKertasKerja(d){
   const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
   const ul = UL[d.unit_kod] || ['','— Unit —'];
-  const namaUnit = ul[1] || d.unit_kod;
-  const tujuanList = (d.tujuan||'').split('\n').filter(x=>x.trim()).map(t => `<li>${t.trim()}</li>`).join('') || '<li>—</li>';
-  const tahun = (d.tarikh_program||'').substring(0,4) || currentYear;
+  const namaUnit = esc(ul[1] || d.unit_kod);
+  const tujuanList = (d.tujuan||'').split('\n').filter(x=>x.trim()).map(t => `<li>${esc(t.trim())}</li>`).join('') || '<li>—</li>';
+  const tahun = esc((d.tarikh_program||'').substring(0,4) || currentYear);
 
   return `<div class="doc">
     ${kopSekolah()}
-    <h2 class="title">KERTAS KERJA<br>${(d.nama_program||'').toUpperCase()}<br>SESI ${tahun}</h2>
+    <h2 class="title">KERTAS KERJA<br>${esc((d.nama_program||'').toUpperCase())}<br>SESI ${tahun}</h2>
 
     <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">1.0 PENGENALAN</h3>
-    <p>Kertas kerja ini disediakan bagi melaksanakan program <strong>${d.nama_program}</strong> oleh unit ${namaUnit} di ${S('nama_penuh','sekolah ini')}. Program ini adalah selaras dengan objektif pendidikan kokurikulum yang berasaskan <em>Falsafah Pendidikan Kebangsaan</em> dan keperluan PAJSK serta SKPMg2 Standard 3.2.</p>
+    <p>Kertas kerja ini disediakan bagi melaksanakan program <strong>${esc(d.nama_program)}</strong> oleh unit ${namaUnit} di ${S('nama_penuh','sekolah ini')}. Program ini adalah selaras dengan objektif pendidikan kokurikulum yang berasaskan <em>Falsafah Pendidikan Kebangsaan</em> dan keperluan PAJSK serta SKPMg2 Standard 3.2.</p>
 
     <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">2.0 OBJEKTIF</h3>
     <ol>${tujuanList}</ol>
 
     <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">3.0 BUTIRAN PROGRAM</h3>
     <table style="width:auto;border:none;">
-      <tr><td style="border:none;padding:2px 8px;"><strong>Nama Program</strong></td><td style="border:none;padding:2px 8px;">: ${d.nama_program}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Nama Program</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.nama_program)}</td></tr>
       <tr><td style="border:none;padding:2px 8px;"><strong>Unit Penganjur</strong></td><td style="border:none;padding:2px 8px;">: ${namaUnit}</td></tr>
       <tr><td style="border:none;padding:2px 8px;"><strong>Tarikh</strong></td><td style="border:none;padding:2px 8px;">: ${fmtTarikh(d.tarikh_program)}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${d.tempat_program}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Sasaran</strong></td><td style="border:none;padding:2px 8px;">: ${d.sasaran}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Bilangan Peserta</strong></td><td style="border:none;padding:2px 8px;">: ${d.bil_peserta||'—'} orang</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.tempat_program)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Sasaran</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.sasaran)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Bilangan Peserta</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.bil_peserta||'—')} orang</td></tr>
     </table>
 
     <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">4.0 AHLI JAWATANKUASA</h3>
@@ -717,15 +721,15 @@ function renderKertasKerja(d){
         <tr><td>____________________</td><td></td><td></td></tr>
         <tr><td>____________________</td><td></td><td></td></tr>
         <tr><td>____________________</td><td></td><td></td></tr>
-        <tr style="background:#e8eaed;"><td colspan="2" style="text-align:right;font-weight:700;">JUMLAH KESELURUHAN</td><td style="font-weight:700;">RM ${d.kos_anggaran||'500.00'}</td></tr>
+        <tr style="background:#e8eaed;"><td colspan="2" style="text-align:right;font-weight:700;">JUMLAH KESELURUHAN</td><td style="font-weight:700;">RM ${esc(d.kos_anggaran||'500.00')}</td></tr>
       </tbody>
     </table>
-    <p><strong>Sumber Dana:</strong> ${d.sumber_dana}</p>
+    <p><strong>Sumber Dana:</strong> ${esc(d.sumber_dana)}</p>
 
     <h3 style="font-size:11pt;font-weight:700;margin-top:14px;">6.0 IMPLIKASI</h3>
     <ol>
-      <li><strong>Kewangan:</strong> Anggaran RM ${d.kos_anggaran||'500.00'} dari ${d.sumber_dana}</li>
-      <li><strong>Tenaga Manusia:</strong> ${d.bil_peserta||'30'} peserta dan AJK</li>
+      <li><strong>Kewangan:</strong> Anggaran RM ${esc(d.kos_anggaran||'500.00')} dari ${esc(d.sumber_dana)}</li>
+      <li><strong>Tenaga Manusia:</strong> ${esc(d.bil_peserta||'30')} peserta dan AJK</li>
       <li><strong>Masa:</strong> ${fmtTarikh(d.tarikh_program)}</li>
     </ol>
 
@@ -750,7 +754,7 @@ function renderKertasKerja(d){
 function renderSuratIbuBapa(d){
   const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
   const ul = UL[d.unit_kod] || ['',''];
-  const namaUnit = ul[1] || '';
+  const namaUnit = esc(ul[1] || '');
 
   return `<div class="doc">
     ${kopSekolah()}
@@ -763,20 +767,20 @@ function renderSuratIbuBapa(d){
 
     <p>Tuan/Puan,</p>
 
-    <h2 class="title">PERMOHONAN KEBENARAN PENYERTAAN MURID DALAM<br>${(d.nama_aktiviti||'').toUpperCase()}</h2>
+    <h2 class="title">PERMOHONAN KEBENARAN PENYERTAAN MURID DALAM<br>${esc((d.nama_aktiviti||'').toUpperCase())}</h2>
 
     <p>Dengan segala hormatnya saya merujuk kepada perkara di atas.</p>
 
-    <p>2. Pihak sekolah akan menganjurkan aktiviti <strong>${d.nama_aktiviti}</strong>${namaUnit?' anjuran '+namaUnit:''}. Penyertaan murid dalam aktiviti ini adalah <em>sebahagian daripada penilaian PAJSK</em> dan boleh memberi pendedahan yang bermanfaat kepada perkembangan kemahiran insaniah serta jaringan sosial murid.</p>
+    <p>2. Pihak sekolah akan menganjurkan aktiviti <strong>${esc(d.nama_aktiviti)}</strong>${namaUnit?' anjuran '+namaUnit:''}. Penyertaan murid dalam aktiviti ini adalah <em>sebahagian daripada penilaian PAJSK</em> dan boleh memberi pendedahan yang bermanfaat kepada perkembangan kemahiran insaniah serta jaringan sosial murid.</p>
 
     <p>3. Butiran aktiviti adalah seperti berikut:</p>
     <table style="width:auto;border:none;">
       <tr><td style="border:none;padding:2px 8px;"><strong>Tarikh</strong></td><td style="border:none;padding:2px 8px;">: ${fmtTarikh(d.tarikh_aktiviti)}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Masa</strong></td><td style="border:none;padding:2px 8px;">: ${d.masa_aktiviti}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${d.tempat_aktiviti}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Pengangkutan</strong></td><td style="border:none;padding:2px 8px;">: ${d.pengangkutan}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Yuran</strong></td><td style="border:none;padding:2px 8px;">: ${d.yuran}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Guru Pengiring</strong></td><td style="border:none;padding:2px 8px;">: ${d.guru_pengiring}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Masa</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.masa_aktiviti)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempat</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.tempat_aktiviti)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Pengangkutan</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.pengangkutan)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Yuran</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.yuran)}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Guru Pengiring</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.guru_pengiring)}</td></tr>
     </table>
 
     <p>4. Sehubungan dengan itu, pihak sekolah memohon kebenaran tuan/puan untuk anak jagaan tuan/puan menyertai aktiviti ini. Sila lengkapkan dan pulangkan borang kebenaran di bawah <strong>sebelum atau pada tarikh ${fmtTarikh(d.tarikh_balas)}</strong> kepada Guru Pengiring.</p>
@@ -801,7 +805,7 @@ function renderSuratIbuBapa(d){
 
     <p>Membenarkan/Tidak membenarkan*** anak jagaan saya:</p>
     <p>Nama Murid: ........................................................ Kelas: ................. No. K.P.: ...........................</p>
-    <p>Menyertai aktiviti <strong>${d.nama_aktiviti}</strong> pada ${fmtTarikh(d.tarikh_aktiviti)} di ${d.tempat_aktiviti}.</p>
+    <p>Menyertai aktiviti <strong>${esc(d.nama_aktiviti)}</strong> pada ${fmtTarikh(d.tarikh_aktiviti)} di ${esc(d.tempat_aktiviti)}.</p>
 
     <p style="margin-top:20px;">Saya juga memahami bahawa pihak sekolah akan mengambil langkah keselamatan sewajarnya, tetapi sebarang kemalangan / kecederaan yang berlaku adalah di luar tanggungjawab pihak sekolah.</p>
 
@@ -818,14 +822,14 @@ function renderSuratIbuBapa(d){
 
 function renderLaporanKokum(d){
   const guru = GURU_DATA && GURU_DATA.guru.find(g => g.id === d.guru_id);
-  const namaGuru = guru ? guru.n : '____________________';
+  const namaGuru = esc(guru ? guru.n : '____________________');
   const UL = (GURU_DATA && GURU_DATA.unit_lookup) || {};
   const ul = UL[d.unit_kod] || ['','— Unit —'];
-  const namaUnit = ul[1] || d.unit_kod;
+  const namaUnit = esc(ul[1] || d.unit_kod);
   const KAT = {'B':'Badan Beruniform','K':'Kelab/Persatuan','S':'Sukan/Permainan'};
   const kategori = KAT[ul[0]] || 'Kokurikulum';
   const bulanIdx = parseInt(d.bulan)-1;
-  const bulanLabel = BULAN[bulanIdx] || d.bulan;
+  const bulanLabel = BULAN[bulanIdx] || esc(d.bulan);
 
   // Ambil data dari modul Kehadiran (localStorage)
   let perjumpaan = 0, totalH = 0, totalTH = 0, totalMC = 0, totalB = 0, totalAll = 0;
@@ -856,19 +860,19 @@ function renderLaporanKokum(d){
   } catch(e){}
 
   const puratHadirPct = totalAll ? Math.round(totalH/totalAll*100) : 0;
-  const aktivitiList = (d.aktiviti_dilaksana||'').split('\n').filter(x=>x.trim()).map(a => `<li>${a.trim()}</li>`).join('') || '<li>—</li>';
-  const pencapaianList = (d.pencapaian||'').split('\n').filter(x=>x.trim()).map(a => `<li>${a.trim()}</li>`).join('') || '<li>Tiada pencapaian dicatat untuk bulan ini</li>';
-  const masalahText = d.masalah || 'Tiada masalah yang dicatat.';
+  const aktivitiList = (d.aktiviti_dilaksana||'').split('\n').filter(x=>x.trim()).map(a => `<li>${esc(a.trim())}</li>`).join('') || '<li>—</li>';
+  const pencapaianList = (d.pencapaian||'').split('\n').filter(x=>x.trim()).map(a => `<li>${esc(a.trim())}</li>`).join('') || '<li>Tiada pencapaian dicatat untuk bulan ini</li>';
+  const masalahText = esc(d.masalah || 'Tiada masalah yang dicatat.');
 
   return `<div class="doc">
     ${kopSekolah()}
-    <h2 class="title">LAPORAN AKTIVITI KOKURIKULUM BULANAN<br>${bulanLabel.toUpperCase()} ${d.tahun}</h2>
+    <h2 class="title">LAPORAN AKTIVITI KOKURIKULUM BULANAN<br>${bulanLabel.toUpperCase()} ${esc(d.tahun)}</h2>
 
     <table style="width:auto;border:none;margin:14px 0;">
-      <tr><td style="border:none;padding:2px 8px;"><strong>Unit</strong></td><td style="border:none;padding:2px 8px;">: ${d.unit_kod} · ${namaUnit}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Unit</strong></td><td style="border:none;padding:2px 8px;">: ${esc(d.unit_kod)} · ${namaUnit}</td></tr>
       <tr><td style="border:none;padding:2px 8px;"><strong>Kategori</strong></td><td style="border:none;padding:2px 8px;">: ${kategori}</td></tr>
       <tr><td style="border:none;padding:2px 8px;"><strong>Guru Penasihat</strong></td><td style="border:none;padding:2px 8px;">: ${namaGuru}</td></tr>
-      <tr><td style="border:none;padding:2px 8px;"><strong>Tempoh Laporan</strong></td><td style="border:none;padding:2px 8px;">: ${bulanLabel} ${d.tahun}</td></tr>
+      <tr><td style="border:none;padding:2px 8px;"><strong>Tempoh Laporan</strong></td><td style="border:none;padding:2px 8px;">: ${bulanLabel} ${esc(d.tahun)}</td></tr>
     </table>
 
     <h3 style="font-size:11pt;font-weight:700;margin-top:18px;">1.0 RINGKASAN KEHADIRAN ${(perjumpaan===0)?' (Tiada Rekod)':''}</h3>

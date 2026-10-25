@@ -131,6 +131,9 @@
   const MEM={};
   function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
   function sset(k,v){try{localStorage.setItem(k,v)}catch(e){MEM[k]=v}}
+  // Escape data luaran sebelum dimasukkan ke HTML (T1 XSS)
+  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function safeUrl(u){const s=String(u??'').trim();return (/^https?:\/\//i.test(s)||(s&&!/^[^\/?#]*:/.test(s)))?s:'#';}
   const TAHUN=(function(){const t=sget('spkb_tahun_aktif');if(t&&/^\d{4}$/.test(t))return parseInt(t,10);const y=new Date().getFullYear();return (y>=2024&&y<=2099)?y:2026;})();
 
   // ===== Sumber data =====
@@ -295,19 +298,19 @@
     if(!list.length){ el.innerHTML='<div class="empty"><i class="fa-solid fa-folder-open" style="font-size:30px;opacity:.4;"></i><br><br>Tiada program sepadan.</div>'; return; }
     el.innerHTML=list.map((p,i)=>{
       const pdf = p.pdf
-        ? `<a class="pdfbtn" href="${p.pdf}" target="_blank" rel="noopener"><i class="fa-solid fa-file-pdf"></i> Lihat PDF</a>`
+        ? `<a class="pdfbtn" href="${esc(safeUrl(p.pdf))}" target="_blank" rel="noopener"><i class="fa-solid fa-file-pdf"></i> Lihat PDF</a>`
         : `<span class="pdfbtn disabled"><i class="fa-solid fa-file-circle-xmark"></i> Tiada PDF</span>`;
-      const masa = (p.masa && p.masa!=='-') ? `<span><i class="fa-solid fa-clock"></i> ${p.masa}</span>` : '';
+      const masa = (p.masa && p.masa!=='-') ? `<span><i class="fa-solid fa-clock"></i> ${esc(p.masa)}</span>` : '';
       return `<div class="pcard">
         <div class="idx">${i+1}</div>
         <div class="body">
           <div class="tags">
             <span class="ktag" style="background:${p.kat.color};"><i class="fa-solid ${p.kat.icon}"></i> ${p.kat.label}</span>
             <span class="skas-tag">SK@S ${p.kat.skas}</span>
-            <span class="date-tag"><i class="fa-solid fa-calendar-day"></i> ${tarikhCantik(p.tarikh)}</span>
+            <span class="date-tag"><i class="fa-solid fa-calendar-day"></i> ${esc(tarikhCantik(p.tarikh))}</span>
           </div>
-          <div class="nm">${p.nama}</div>
-          <div class="meta"><span><i class="fa-solid fa-location-dot"></i> ${p.tempat||'—'}</span>${masa}</div>
+          <div class="nm">${esc(p.nama)}</div>
+          <div class="meta"><span><i class="fa-solid fa-location-dot"></i> ${esc(p.tempat||'—')}</span>${masa}</div>
         </div>
         ${pdf}
       </div>`;

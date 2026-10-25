@@ -343,6 +343,17 @@ function toast(msg, type){
   setTimeout(()=>{ t.style.display='none'; }, 2500);
 }
 
+// Escape data luaran (localStorage / import JSON / awan) sebelum masuk innerHTML
+function esc(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function safeUrl(u){
+  const s = String(u ?? '').trim();
+  if(/^https?:\/\//i.test(s)) return s;
+  if(s && !/^[^\/?#]*:/.test(s) && !s.startsWith('//')) return s;
+  return '#';
+}
+
 const HARI = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
 const HARI_SHORT = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
 const BULAN_FULL = ['JANUARI','FEBRUARI','MAC','APRIL','MEI','JUN','JULAI','OGOS','SEPTEMBER','OKTOBER','NOVEMBER','DISEMBER'];
@@ -629,7 +640,7 @@ function renderPAJSKStatus(ber, kel, suk){
     const ok = count >= minJ && jam >= minH;
     return `<div style="background:#f8fafc;border:1px solid var(--bdr);border-left:4px solid ${color};border-radius:6px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
       <div><strong style="color:${color};">${label}</strong> · ${count} perjumpaan · ${jam} jam</div>
-      <div style="padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;background:${ok?'var(--ok)':'var(--err)'};color:#fff;">${ok?'✓ Cukup PAJSK':'⚠ Bawah Minimum ('+minJ+' jumpa / '+minH+'j)'}</div>
+      <div style="padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;background:${ok?'var(--ok)':'var(--err)'};color:#fff;">${ok?'✓ Cukup PAJSK':'⚠ Bawah Minimum ('+esc(minJ)+' jumpa / '+esc(minH)+'j)'}</div>
     </div>`;
   };
   wrap.innerHTML = stat(ber, 'Beruniform', 'var(--beruniform)') + stat(kel, 'Kelab/Persatuan', 'var(--kelab)') + stat(suk, 'Sukan/Permainan', 'var(--sukan)');
@@ -687,7 +698,7 @@ function renderKategori(katKey){
       const wd = new Date(d).getDay();
       return `<div class="date-chip ${katKey}">
         <div class="info"><div class="d">#${i+1} · ${fmtTarikh(d)}</div><div class="meta">${HARI[wd]}</div></div>
-        <button class="del" onclick="removeKatDate('${katKey}','${d}')" title="Padam"><i class="fas fa-times"></i></button>
+        <button class="del" data-act="removeKatDate" data-kat="${katKey}" data-d="${esc(d)}" title="Padam"><i class="fas fa-times"></i></button>
       </div>`;
     }).join('')}</div>
     ${dates.length === 0 ? '<p style="color:var(--mute);font-style:italic;text-align:center;padding:20px;">Tiada tarikh. Tambah di bawah atau gunakan "Auto-Generate".</p>' : ''}
@@ -807,9 +818,9 @@ function renderEvents(){
       <td>${i+1}</td>
       <td><strong>${fmtTarikh(e.tarikh)}</strong></td>
       <td>${HARI[wd]}</td>
-      <td><span class="badge-kat badge-${e.kategori}">${e.kategori.toUpperCase()}</span></td>
-      <td>${e.nama}</td>
-      <td>${e.masa || '—'}</td>
+      <td><span class="badge-kat badge-${esc(e.kategori)}">${esc(e.kategori.toUpperCase())}</span></td>
+      <td>${esc(e.nama)}</td>
+      <td>${esc(e.masa || '—')}</td>
       <td>
         <button class="btn btn-outline btn-sm" onclick="editEvent(${i})" title="Edit"><i class="fas fa-pen"></i></button>
         <button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err);" onclick="deleteEvent(${i})" title="Padam"><i class="fas fa-trash"></i></button>
@@ -908,8 +919,8 @@ function renderCuti(){
       <td>${i+1}</td>
       <td><strong>${fmtTarikh(c.tarikh)}</strong></td>
       <td>${HARI[wd]}</td>
-      <td>${c.nama}</td>
-      <td><button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err);" onclick="deleteCuti('${c.tarikh}','${c.nama.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></td>
+      <td>${esc(c.nama)}</td>
+      <td><button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err);" data-act="deleteCuti" data-tarikh="${esc(c.tarikh)}" data-nama="${esc(c.nama)}"><i class="fas fa-trash"></i></button></td>
     </tr>`;
   });
   h += `</tbody></table>`;
@@ -1053,7 +1064,7 @@ function generateMonthTable(monthIdx){
       <td>${day}</td>
       <td class="${dayClass}">${HARI[wd]}${isSabtu ? ' '+sabtuNo : ''}</td>
       <td class="${kokuClass}">${kokuTxt}</td>
-      <td class="${catatanClass}">${catatanTxt}</td>
+      <td class="${catatanClass}">${esc(catatanTxt)}</td>
     </tr>`;
   }
 
@@ -1401,6 +1412,13 @@ async function cloudMuat(auto){
   if(getCloudURL()) cloudMuat(true);   // auto-muat semasa buka (dengan pengesahan jika berbeza)
   // Close modal on background click
   document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if(e.target === bg) bg.classList.remove('show'); }));
+  // Delegasi klik untuk butang yang membawa data (ganti onclick inline)
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]');
+    if(!b) return;
+    if(b.dataset.act === 'removeKatDate') removeKatDate(b.dataset.kat, b.dataset.d);
+    else if(b.dataset.act === 'deleteCuti') deleteCuti(b.dataset.tarikh, b.dataset.nama);
+  });
 })();
 </script>
 </body>

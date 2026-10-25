@@ -269,6 +269,10 @@
   const GURU_API = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
   const MEM={};
   function sget(k){try{return localStorage.getItem(k)}catch(e){return MEM[k]||null}}
+  // Escape data luaran sebelum masuk ke innerHTML (cegah XSS).
+  function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  // Benarkan http(s), laluan relatif, atau data:image (thumbnail arkib); selainnya '#'.
+  function safeUrl(u){ u=String(u ?? '').trim(); if(/^https?:\/\//i.test(u) || /^data:image\//i.test(u) || !/^[^\/?#]*:/.test(u)) return u; return '#'; }
   const TAHUN=(function(){const t=sget('spkb_tahun_aktif');if(t&&/^\d{4}$/.test(t))return parseInt(t,10);const y=new Date().getFullYear();return (y>=2024&&y<=2099)?y:2026;})();
 
   // ===== Keadaan =====
@@ -366,9 +370,16 @@
       const list=await arkibList();
       badge.textContent=(ARKIB_API?'kongsi · ':'peranti · ')+list.length+' templat';
       if(!list.length){ g.innerHTML='<div class="empty-g">Tiada templat tersimpan lagi. Muat naik & susun atur, kemudian klik <b>Simpan ke Arkib</b>.</div>'; return; }
-      g.innerHTML=list.map(t=>'<div class="g-wrap"><button class="g-del" onclick="event.stopPropagation();padamArkib(\''+t.id+'\')"><i class="fa-solid fa-trash"></i></button><div class="g-card" onclick="pilihTemplat(\''+t.id+'\')"><img class="g-thumb" src="'+(t.thumb||t.img||'')+'" onerror="this.style.visibility=\'hidden\'"><div class="g-meta"><div class="g-nama">'+t.nama+'</div><div class="g-jenis">Sijil '+t.jenis+'</div></div></div></div>').join('');
+      g.innerHTML=list.map(t=>'<div class="g-wrap"><button class="g-del" data-del-id="'+esc(t.id)+'"><i class="fa-solid fa-trash"></i></button><div class="g-card" data-tpl-id="'+esc(t.id)+'"><img class="g-thumb" src="'+esc(safeUrl(t.thumb||t.img||''))+'" onerror="this.style.visibility=\'hidden\'"><div class="g-meta"><div class="g-nama">'+esc(t.nama)+'</div><div class="g-jenis">Sijil '+esc(t.jenis)+'</div></div></div></div>').join('');
     }catch(e){ badge.textContent='gagal muat'; g.innerHTML='<div class="empty-g">Gagal memuat arkib templat.</div>'; }
   }
+  // Delegasi klik galeri arkib (ganti onclick inline yang membenam id).
+  document.getElementById('galeri').addEventListener('click',function(ev){
+    const del=ev.target.closest('[data-del-id]');
+    if(del){ ev.stopPropagation(); padamArkib(del.dataset.delId); return; }
+    const card=ev.target.closest('[data-tpl-id]');
+    if(card) pilihTemplat(card.dataset.tplId);
+  });
   async function pilihTemplat(id){
     const list=await arkibList(); const t=list.find(x=>x.id===id); if(!t){ toast('Templat tidak dijumpai.'); return; }
     const img=await arkibGetImg(t); if(!img){ toast('Imej templat tidak dapat dimuat.'); return; }
@@ -483,7 +494,7 @@
       if(f.types && !f.types.includes(S.type)) return;
       const disabledImg = f.kind==='img' && !(f.src==='logo'?S.logoDataUrl:S.ttdDataUrl);
       const row=document.createElement('div'); row.className='field-row'+(selField===key?' sel':'');
-      row.innerHTML='<input type="checkbox" '+(f.on?'checked':'')+(disabledImg?' disabled':'')+'><span class="fn">'+f.label+'</span>'+(disabledImg?'<span style="font-size:10px;color:#94a3b8;">(muat naik dulu)</span>':'');
+      row.innerHTML='<input type="checkbox" '+(f.on?'checked':'')+(disabledImg?' disabled':'')+'><span class="fn">'+esc(f.label)+'</span>'+(disabledImg?'<span style="font-size:10px;color:#94a3b8;">(muat naik dulu)</span>':'');
       row.querySelector('input').onclick=function(ev){ ev.stopPropagation(); f.on=this.checked; buildEditor(); };
       row.onclick=function(){ if(!disabledImg){ f.on=true; selectField(key); buildEditor(); } };
       fl.appendChild(row);
@@ -554,10 +565,14 @@
     const list=S.guru.filter(g=>!q||g.nama.toLowerCase().includes(q));
     const el=document.getElementById('glist');
     if(!S.guru.length){ el.innerHTML='<div style="padding:24px;text-align:center;color:#94a3b8;">Tiada data guru. Pastikan modul Data Guru SPKB aktif dan sambungan internet ada.</div>'; return; }
-    el.innerHTML=list.map(g=>`<label class="grow"><input type="checkbox" ${S.selected.has(g.id)?'checked':''} onchange="toggleGuru('${g.id}',this.checked)"><span class="gn">${g.nama}</span></label>`).join('') || '<div style="padding:20px;text-align:center;color:#94a3b8;">Tiada guru sepadan.</div>';
+    el.innerHTML=list.map(g=>`<label class="grow"><input type="checkbox" ${S.selected.has(g.id)?'checked':''} data-guru-id="${esc(g.id)}"><span class="gn">${esc(g.nama)}</span></label>`).join('') || '<div style="padding:20px;text-align:center;color:#94a3b8;">Tiada guru sepadan.</div>';
     updateCount();
   }
   function toggleGuru(id,on){ if(on)S.selected.add(id); else S.selected.delete(id); updateCount(); }
+  // Delegasi change senarai guru (ganti onchange inline).
+  document.getElementById('glist').addEventListener('change',function(ev){
+    const cb=ev.target.closest('input[data-guru-id]'); if(cb) toggleGuru(cb.dataset.guruId,cb.checked);
+  });
   function toggleAll(on){ if(on) S.guru.forEach(g=>S.selected.add(g.id)); else S.selected.clear(); renderGuru(); }
   function updateCount(){
     document.getElementById('selCount').textContent=S.selected.size+' dipilih';

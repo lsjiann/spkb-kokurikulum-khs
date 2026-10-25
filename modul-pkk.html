@@ -230,6 +230,9 @@ body.in-spkb .topbar{display:none}
 const MEM = {};
 function sget(k){ try{return localStorage.getItem(k)}catch(e){return MEM[k]||null} }
 function sset(k,v){ try{localStorage.setItem(k,v)}catch(e){MEM[k]=v} }
+/* ---------- HTML escaping (T1 XSS) ---------- */
+function esc(s){ return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function safeUrl(u){ u=String(u ?? '').trim(); return (/^https?:\/\//i.test(u) || (u && !/^[^\/?#]*:/.test(u))) ? u : '#'; }
 
 const YEAR = new Date().getFullYear();
 const K_TAKWIM   = 'takwim_'+YEAR;
@@ -388,14 +391,14 @@ function taskCard(t){
   else if(d<0) cls+=' late'; else if(d===0) cls+=' today'; else if(d<=14) cls+=' soon';
   let tags='';
   if(t.sumber==='manual'){ tags='<span class="tag" style="background:#7f8c8d">Manual</span>'; }
-  else { const w=KATEGORI_WARNA[t.tk]||'#9b59b6'; tags='<span class="tag" style="background:'+w+'">'+(t.kategori||'')+'</span>'; }
-  const prog = t.program ? '<span class="tprog">&#8226; '+t.program+'</span>' : '';
-  const cat = t.catatan ? '<span class="tprog">&#8226; '+t.catatan+'</span>' : '';
-  const link = t.link ? '<button class="tlink" onclick="openLink(\''+t.link+'\')">Buka modul</button>' : '';
-  const del = t.sumber==='manual' ? '<button class="tdel" onclick="delManual(\''+t.id+'\')">Padam</button>' : '';
+  else { const w=KATEGORI_WARNA[t.tk]||'#9b59b6'; tags='<span class="tag" style="background:'+w+'">'+esc(t.kategori||'')+'</span>'; }
+  const prog = t.program ? '<span class="tprog">&#8226; '+esc(t.program)+'</span>' : '';
+  const cat = t.catatan ? '<span class="tprog">&#8226; '+esc(t.catatan)+'</span>' : '';
+  const link = t.link ? '<button class="tlink" data-act="openLink" data-page="'+esc(t.link)+'">Buka modul</button>' : '';
+  const del = t.sumber==='manual' ? '<button class="tdel" data-act="delManual" data-id="'+esc(t.id)+'">Padam</button>' : '';
   return '<div class="'+cls+'">'+
-    '<div class="tick '+(t.status==='selesai'?'done':'')+'" onclick="toggle(\''+t.id+'\',\''+t.sumber+'\')">'+(t.status==='selesai'?'&#10003;':'')+'</div>'+
-    '<div class="tbody"><div class="tname">'+t.nama+'</div>'+
+    '<div class="tick '+(t.status==='selesai'?'done':'')+'" data-act="toggle" data-id="'+esc(t.id)+'" data-sumber="'+esc(t.sumber)+'">'+(t.status==='selesai'?'&#10003;':'')+'</div>'+
+    '<div class="tbody"><div class="tname">'+esc(t.nama)+'</div>'+
       '<div class="tmeta"><span class="'+rel.cls+'">'+rel.txt+'</span><span>&#8226; '+fmtShort(t.tarikh)+'</span>'+tags+prog+cat+'</div></div>'+
     '<div class="tact">'+link+del+'</div></div>';
 }
@@ -410,7 +413,7 @@ function renderHariIni(){
 
   if(!T){
     el.innerHTML =
-      '<div class="card hello"><h2>'+salam+(nama?', '+nama:'')+'</h2><div class="date">'+fmtFull(todayISO())+'</div></div>'+
+      '<div class="card hello"><h2>'+salam+(nama?', '+esc(nama):'')+'</h2><div class="date">'+fmtFull(todayISO())+'</div></div>'+
       '<div class="card"><h2>Takwim belum ditetapkan</h2>'+
       '<div class="desc">Modul ini menjana tugas automatik daripada takwim kokurikulum. Sila tetapkan takwim dahulu melalui modul <b>Pengurusan Takwim</b>, atau lihat paparan dengan data contoh.</div>'+
       '<button class="btn btn-pri" onclick="loadDemo()">Lihat dengan data contoh</button></div>';
@@ -429,7 +432,7 @@ function renderHariIni(){
   const ps=document.getElementById('pill-surat'); const suratBaru=getSurat().filter(s=>s.status==='baru').length;
   if(ps){ if(suratBaru){ ps.style.display='inline-block'; ps.textContent=suratBaru; } else ps.style.display='none'; }
 
-  let h = '<div class="card hello"><h2>'+salam+(nama?', '+nama:'')+'</h2>'+
+  let h = '<div class="card hello"><h2>'+salam+(nama?', '+esc(nama):'')+'</h2>'+
     '<div class="date">'+fmtFull(today)+'</div>'+
     '<div class="chips">'+
       '<div class="chip"><div class="n">'+late.length+'</div><div class="l">Tertunggak</div></div>'+
@@ -460,7 +463,7 @@ function renderHariIni(){
   h += '<div class="card"><h2><span style="color:var(--event)">&#128197;</span> Acara takwim minggu ini (7 hari)</h2>';
   const ev = acaraMinggu(T, 7);
   if(ev.length){
-    h += ev.map(e=>'<div class="evrow"><span class="evdot" style="background:'+e.warna+'"></span><span class="evdate">'+fmtShort(e.tarikh)+'</span><span>'+e.nama+'</span></div>').join('');
+    h += ev.map(e=>'<div class="evrow"><span class="evdot" style="background:'+e.warna+'"></span><span class="evdate">'+fmtShort(e.tarikh)+'</span><span>'+esc(e.nama)+'</span></div>').join('');
   } else { h += '<div class="empty">Tiada acara dalam 7 hari akan datang.</div>'; }
   h += '</div>';
 
@@ -468,7 +471,7 @@ function renderHariIni(){
   const suratBlm = getSurat().filter(s=>s.status==='baru').sort((a,b)=>(b.terima||'').localeCompare(a.terima||''));
   h += '<div class="card"><h2><span style="color:var(--acc)">&#9993;</span> Surat masuk belum diproses</h2>';
   if(suratBlm.length){
-    h += suratBlm.map(s=>'<div class="evrow"><span class="evdot" style="background:var(--acc)"></span><span class="evdate">'+fmtShort(s.terima)+'</span><span>'+s.tajuk+(s.dari?' <span class="tprog">&#8226; '+s.dari+'</span>':'')+'</span></div>').join('');
+    h += suratBlm.map(s=>'<div class="evrow"><span class="evdot" style="background:var(--acc)"></span><span class="evdate">'+fmtShort(s.terima)+'</span><span>'+esc(s.tajuk)+(s.dari?' <span class="tprog">&#8226; '+esc(s.dari)+'</span>':'')+'</span></div>').join('');
     h += '<div style="margin-top:8px"><button class="btn btn-outline btn-sm" onclick="showPage(\'surat\')">Urus surat masuk</button></div>';
   } else { h += '<div class="empty">Tiada surat menunggu tindakan.</div>'; }
   h += '</div>';
@@ -499,7 +502,7 @@ function renderSemua(){
 
   let h='<div class="card"><h2>Semua tugas</h2>'+
     '<div class="filter">'+
-      '<input type="text" id="fq" placeholder="Cari tugas..." value="'+FILTER.q.replace(/"/g,'&quot;')+'" oninput="FILTER.q=this.value;renderSemua()">'+
+      '<input type="text" id="fq" placeholder="Cari tugas..." value="'+esc(FILTER.q)+'" oninput="FILTER.q=this.value;renderSemua()">'+
       '<select onchange="FILTER.status=this.value;renderSemua()">'+
         '<option value="belum"'+(FILTER.status==='belum'?' selected':'')+'>Belum selesai</option>'+
         '<option value="selesai"'+(FILTER.status==='selesai'?' selected':'')+'>Selesai</option>'+
@@ -536,7 +539,7 @@ function renderProgram(){
     const w=KATEGORI_WARNA[tk]||'#9b59b6';
     h+='<div class="card">'+
       '<h2 style="cursor:pointer" onclick="document.getElementById(\'ml'+i+'\').classList.toggle(\'open\')">'+
-        '<span class="tag" style="background:'+w+'">'+ev.kategori+'</span> '+ev.nama+'</h2>'+
+        '<span class="tag" style="background:'+w+'">'+esc(ev.kategori)+'</span> '+esc(ev.nama)+'</h2>'+
       '<div class="desc">'+fmtFull(ev.tarikh)+' &middot; '+done+'/'+miles.length+' langkah selesai</div>'+
       '<div class="progwrap"><div class="progbar" style="width:'+pct+'%"></div></div>'+
       '<div class="miles" id="ml'+i+'">'+rows+'</div></div>';
@@ -550,10 +553,10 @@ function renderTetapan(){
   const t=getTemplat();
   let h='<div class="card"><h2>Tetapan templat tugas</h2><div class="desc">Laras bilangan hari sebelum (negatif) atau selepas (positif) tarikh program untuk setiap tugas auto-jana. Perubahan disimpan dalam pelayar ini.</div></div>';
   Object.keys(t).forEach(k=>{
-    h+='<div class="card"><h2>'+t[k].label+'</h2>';
+    h+='<div class="card"><h2>'+esc(t[k].label)+'</h2>';
     t[k].miles.forEach((m,i)=>{
-      h+='<div class="troww"><span class="nm">'+m.nama+'</span>'+
-         '<input type="number" value="'+m.offset+'" onchange="updOffset(\''+k+'\','+i+',this.value)"><span class="u">hari</span></div>';
+      h+='<div class="troww"><span class="nm">'+esc(m.nama)+'</span>'+
+         '<input type="number" value="'+esc(m.offset)+'" data-k="'+esc(k)+'" onchange="updOffset(this.dataset.k,'+i+',this.value)"><span class="u">hari</span></div>';
     });
     h+='</div>';
   });
@@ -638,13 +641,13 @@ function renderPajsk(){
     '<div class="card"><h2>Penjejak pengisian PAJSK</h2>'+
     '<div class="desc">Tetingkap pentaksiran tahunan. Sistem menjana peringatan pemantauan pada 1 haribulan setiap bulan sepanjang tempoh ini (lihat di "Hari Ini").</div>'+
     '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px">'+
-      '<div><label style="font-size:12px;font-weight:600">Tarikh mula</label><br><input type="date" value="'+c.mula+'" onchange="savePajskField(\'mula\',this.value)" style="border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
-      '<div><label style="font-size:12px;font-weight:600">Tarikh tutup</label><br><input type="date" value="'+c.tamat+'" onchange="savePajskField(\'tamat\',this.value)" style="border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
+      '<div><label style="font-size:12px;font-weight:600">Tarikh mula</label><br><input type="date" value="'+esc(c.mula)+'" onchange="savePajskField(\'mula\',this.value)" style="border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
+      '<div><label style="font-size:12px;font-weight:600">Tarikh tutup</label><br><input type="date" value="'+esc(c.tamat)+'" onchange="savePajskField(\'tamat\',this.value)" style="border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
     '</div>'+
     '<div style="font-weight:600;color:'+warna+';margin-bottom:12px">'+fasa+'</div>'+
-    '<label style="font-size:12px;font-weight:600">Anggaran peratus pengisian semasa: '+c.peratus+'%</label>'+
-    '<input type="range" min="0" max="100" value="'+c.peratus+'" oninput="savePajskField(\'peratus\',+this.value)" style="width:100%;margin-top:6px">'+
-    '<div class="progwrap" style="height:12px;margin-top:6px"><div class="progbar" style="width:'+c.peratus+'%"></div></div>'+
+    '<label style="font-size:12px;font-weight:600">Anggaran peratus pengisian semasa: '+esc(c.peratus)+'%</label>'+
+    '<input type="range" min="0" max="100" value="'+esc(c.peratus)+'" oninput="savePajskField(\'peratus\',+this.value)" style="width:100%;margin-top:6px">'+
+    '<div class="progwrap" style="height:12px;margin-top:6px"><div class="progbar" style="width:'+esc(c.peratus)+'%"></div></div>'+
     '</div>';
 }
 function savePajskField(k,v){ const c=getPajsk(); c[k]=v; setPajsk(c); renderPajsk(); if(k==='peratus') return; renderHariIni(); }
@@ -688,11 +691,11 @@ function renderSurat(){
     const baru = s.status==='baru';
     const jw = s.jenis==='pertandingan'?'#e67e22':(s.jenis==='mesyuarat'?'#34495e':'#7f8c8d');
     h+='<div class="card" style="'+(baru?'border-left:4px solid var(--warn)':'')+'">'+
-      '<h2 style="font-size:14.5px"><span class="tag" style="background:'+jw+'">'+s.jenis+'</span> '+s.tajuk+'</h2>'+
-      '<div class="desc" style="margin-bottom:8px">Daripada: '+(s.dari||'-')+' &middot; Terima: '+fmtShort(s.terima)+(s.program?' &middot; Acara: '+fmtShort(s.program):'')+(s.tindakan?'<br>Tindakan: '+s.tindakan:'')+'</div>'+
+      '<h2 style="font-size:14.5px"><span class="tag" style="background:'+jw+'">'+esc(s.jenis)+'</span> '+esc(s.tajuk)+'</h2>'+
+      '<div class="desc" style="margin-bottom:8px">Daripada: '+esc(s.dari||'-')+' &middot; Terima: '+fmtShort(s.terima)+(s.program?' &middot; Acara: '+fmtShort(s.program):'')+(s.tindakan?'<br>Tindakan: '+esc(s.tindakan):'')+'</div>'+
       '<div style="display:flex;gap:7px;flex-wrap:wrap">'+
-        (baru? '<button class="btn btn-ok btn-sm" onclick="prosesSurat(\''+s.id+'\')">'+(s.program?'Jana acara + tanda diproses':'Tanda diproses')+'</button>' : '<span class="tag" style="background:var(--ok)">Diproses</span>')+
-        '<button class="tdel" onclick="delSurat(\''+s.id+'\')">Padam</button>'+
+        (baru? '<button class="btn btn-ok btn-sm" data-act="prosesSurat" data-id="'+esc(s.id)+'">'+(s.program?'Jana acara + tanda diproses':'Tanda diproses')+'</button>' : '<span class="tag" style="background:var(--ok)">Diproses</span>')+
+        '<button class="tdel" data-act="delSurat" data-id="'+esc(s.id)+'">Padam</button>'+
       '</div></div>';
   });
   el.innerHTML=h;
@@ -745,13 +748,13 @@ function renderPeringatan(){
     '<div class="card"><h2>Peringatan automatik (Telegram / Email)</h2>'+
     '<div class="desc">Hantar ringkasan tugas harian ke Telegram atau email, walaupun anda tidak membuka sistem. Memerlukan projek Apps Script <b>pkk-reminder.gs</b> yang berasingan (lihat fail backend). Tampal URL Web App-nya di bawah.</div>'+
     '<label style="font-size:12px;font-weight:600">URL Web App peringatan (Apps Script)</label>'+
-    '<input type="text" id="rEndpoint" value="'+(c.endpoint||'').replace(/"/g,'&quot;')+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
+    '<input type="text" id="rEndpoint" value="'+esc(c.endpoint||'')+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
     '<label style="font-size:12px;font-weight:600">Telegram Chat ID (pilihan)</label>'+
-    '<input type="text" id="rTele" value="'+(c.telegram||'').replace(/"/g,'&quot;')+'" placeholder="cth. 123456789 atau -100xxxx (kumpulan)" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
+    '<input type="text" id="rTele" value="'+esc(c.telegram||'')+'" placeholder="cth. 123456789 atau -100xxxx (kumpulan)" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
     '<label style="font-size:12px;font-weight:600">Email (pilihan)</label>'+
-    '<input type="text" id="rEmail" value="'+(c.email||'').replace(/"/g,'&quot;')+'" placeholder="nama@email.com" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
+    '<input type="text" id="rEmail" value="'+esc(c.email||'')+'" placeholder="nama@email.com" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 12px">'+
     '<label style="font-size:12px;font-weight:600">Masa hantar harian</label>'+
-    '<input type="time" id="rMasa" value="'+(c.masa||'07:00')+'" style="border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 14px;display:block">'+
+    '<input type="time" id="rMasa" value="'+esc(c.masa||'07:00')+'" style="border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 14px;display:block">'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
       '<button class="btn btn-ok" onclick="saveReminder()">Simpan tetapan</button>'+
       '<button class="btn btn-pri" onclick="hantarSnapshot()">Segerak data ke awan</button>'+
@@ -821,7 +824,7 @@ function renderAI(){
     '<div class="card"><h2><span style="color:#9b59b6">&#10024;</span> Draf dokumen dengan AI</h2>'+
     '<div class="desc">Jana draf One Page Report, minit mesyuarat, atau kertas kerja secara automatik. Memerlukan backend <b>pkk-ai.gs</b> (projek Apps Script berasingan). Draf adalah cadangan — sila semak &amp; edit sebelum guna.</div>'+
     '<label style="font-size:12px;font-weight:600">URL Web App AI (Apps Script)</label>'+
-    '<input type="text" id="aiEndpoint" value="'+ep.replace(/"/g,'&quot;')+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 8px">'+
+    '<input type="text" id="aiEndpoint" value="'+esc(ep)+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:5px 0 8px">'+
     '<button class="btn btn-ok btn-sm" onclick="saveAIEndpoint()">Simpan URL</button>'+
     '</div>'+
     '<div class="card"><h2>Jana draf</h2>'+
@@ -880,6 +883,17 @@ function renderAll(){
 function goBack(){ try{ window.parent.postMessage({action:'spkb-back'}, '*'); }catch(e){} }
 
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2500); }
+
+/* ---------- Delegated actions (replaces data-embedding inline onclick) ---------- */
+document.addEventListener('click', function(e){
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const d=b.dataset;
+  if(d.act==='openLink') openLink(d.page);
+  else if(d.act==='delManual') delManual(d.id);
+  else if(d.act==='toggle') toggle(d.id, d.sumber);
+  else if(d.act==='prosesSurat') prosesSurat(d.id);
+  else if(d.act==='delSurat') delSurat(d.id);
+});
 
 /* ---------- Init ---------- */
 (function(){

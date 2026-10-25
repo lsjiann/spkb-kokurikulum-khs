@@ -1964,7 +1964,7 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
 .dv4-facts dd{margin:0;font-weight:600;color:var(--dv4-ink)}
 
 .dv4-sec-h{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dv4-muted);font-weight:700;margin:26px 0 10px}
-.dv4-quick{display:grid;gap:12px;grid-template-columns:repeat(7,1fr)}
+.dv4-quick{display:grid;gap:12px;grid-template-columns:repeat(8,1fr)}
 .dv4-q{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;border:1px solid var(--dv4-line);background:var(--dv4-surface);cursor:pointer;transition:border-color .15s,transform .15s}
 .dv4-q:hover{border-color:var(--dv4-now);transform:translateY(-1px)}
 .dv4-q i{color:var(--dv4-brand);font-size:16px}
@@ -2138,6 +2138,10 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
       <i class="fas fa-chalkboard-teacher"></i>
       <span class="nav-text">Guru Penasihat</span>
       <span class="badge-nav live">Live</span>
+    </a>
+    <a class="nav-item" data-page="direktori-guru">
+      <i class="fas fa-address-book"></i>
+      <span class="nav-text">Direktori Guru &amp; AJK</span>
     </a>
   </div>
 
@@ -2326,6 +2330,7 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
       <a class="dv4-q" onclick="navigateTo('laporan-program')"><i class="fas fa-folder-open"></i><b>Laporan Program</b><small>Evidens PDF</small></a>
       <a class="dv4-q" onclick="navigateTo('jana-sijil')"><i class="fas fa-award"></i><b>Jana Sijil</b><small>Sijil guru · PDF</small></a>
       <a class="dv4-q" onclick="navigateTo('pengawas-kk')"><i class="fas fa-user-shield"></i><b>Pengawas KK</b><small>Lembaga pengawas</small></a>
+      <a class="dv4-q" onclick="navigateTo('direktori-guru')"><i class="fas fa-address-book"></i><b>Direktori Guru</b><small>Penjana AJK</small></a>
       <a class="dv4-q" onclick="navigateTo('skas')"><i class="fas fa-clipboard-check"></i><b>SK@S 3.2</b><small>Audit-ready</small></a>
     </div>
 
@@ -2643,6 +2648,34 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
   <!-- ============================================================
        END PAGE: PENGAWAS KOKURIKULUM
        ============================================================ -->
+
+  <!-- ============================================================
+       PAGE: DIREKTORI GURU & PENJANA AJK (data dari Google Sheet, perlu kunci pentadbir)
+       ============================================================ -->
+  <section class="page" id="page-direktori-guru">
+    <div class="breadcrumb">
+      <a onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Papan Pemuka</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Direktori Guru &amp; AJK</span>
+    </div>
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <h2><i class="fas fa-address-book"></i> Direktori Guru &amp; Penjana AJK</h2>
+        <p>Cari guru, semak beban tugas, jana cadangan AJK program dan simpan draf</p>
+      </div>
+      <div class="page-actions" style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.open(DIREKTORI_URL,'_blank')" title="Buka dalam tab baharu">
+          <i class="fas fa-external-link-alt"></i> Buka Tab Baru
+        </button>
+      </div>
+    </div>
+    <div style="width:100%;height:calc(100vh - 240px);min-height:600px;border-radius:12px;overflow:hidden;position:relative;background:#f8fafc;border:1px solid #e0e0e0;">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;background:#f8fafc;">
+        <p style="font-size:12px;color:#7f8c8d;">Memuatkan Direktori…</p>
+      </div>
+      <iframe id="direktori-guru-iframe" src="" title="Direktori Guru dan Penjana AJK" style="width:100%;height:100%;border:none;" onload="this.previousElementSibling.style.display='none';" allow="clipboard-write; fullscreen"></iframe>
+    </div>
+  </section>
 
   <!-- ============================================================
        PAGE: GENERATOR DOKUMEN (Fasa C2)
@@ -6005,7 +6038,22 @@ const PKK_URL = 'modul-pkk.html';
 const LAPORAN_PROGRAM_URL = 'laporan-program.html';
 const SIJIL_URL = 'jana-sijil.html';
 const PENGAWAS_KK_URL = 'https://lsjiann.github.io/PKKKHS/';
+const DIREKTORI_URL = 'direktori-guru.html';
 const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+
+/* HELPER (keselamatan): benarkan hanya URL http(s) atau laluan relatif; selain itu '#'.
+   Guna bersama escapeHtml(): href="' + escapeHtml(safeUrl(u)) + '" */
+function safeUrl(u) {
+  if (u === null || u === undefined) return '#';
+  const s = String(u).trim();
+  if (!s) return '#';
+  if (/^https?:\/\//i.test(s)) return s;
+  const cut = s.search(/[\/?#]/);
+  const head = cut === -1 ? s : s.slice(0, cut);
+  if (head.indexOf(':') !== -1) return '#';
+  if (/^\/\//.test(s) || /^[\\\/]{2}/.test(s)) return '#';
+  return s;
+}
 
 /* ============================================================
    SIDEBAR TOGGLE
@@ -6033,6 +6081,7 @@ const pageInfo = {
   'laporan-program':  { title: 'SPKB v3.1 — Laporan Program & Evidens',    label: 'Laporan Program & Evidens',  phase: 'active', icon: '📑' },
   'jana-sijil':       { title: 'SPKB v3.1 — Jana Sijil Guru',              label: 'Jana Sijil Guru',            phase: 'active', icon: '🏅' },
   'pengawas-kk':      { title: 'SPKB v3.1 — Pengawas Kokurikulum',         label: 'Pengawas Kokurikulum',       phase: 'active', icon: '🛡️' },
+  'direktori-guru':   { title: 'SPKB v3.1 — Direktori Guru & AJK',         label: 'Direktori Guru & AJK',       phase: 'active', icon: '📇' },
   'fail':             { title: 'SPKB v3.1 — Pengurusan Fail',              label: 'Pengurusan Fail',            phase: 'phase3', icon: '📂' },
   'jana':             { title: 'SPKB v3.1 — Jana Dokumen',                 label: 'Jana Dokumen',               phase: 'phase3', icon: '📄' },
   'pelajar':          { title: 'SPKB v3.1 — Data Pelajar',                 label: 'Data Pelajar',               phase: 'phase3', icon: '🎓' },
@@ -6144,6 +6193,12 @@ function navigateTo(pageId) {
       if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === 'about:blank')) {
         iframe.src = SIJIL_URL;
       }
+    }, 100);
+  }
+  if (pageId === 'direktori-guru') {
+    setTimeout(function () {
+      var iframe = document.getElementById('direktori-guru-iframe');
+      if (iframe && !iframe.getAttribute('src')) iframe.src = DIREKTORI_URL;
     }, 100);
   }
   if (pageId === 'pengawas-kk') {
@@ -6604,7 +6659,7 @@ async function loadSKASData() {
   } catch (e) {
     console.error('Gagal load SK@S:', e);
     if (loadingEl) {
-      loadingEl.innerHTML = '<div style="color:#e74c3c;"><i class="fas fa-exclamation-triangle" style="font-size:48px;"></i><div style="margin-top:16px;font-weight:600;">Gagal memuatkan data SK@S</div><div style="font-size:12px;margin-top:8px;color:#7f8c8d;">' + e.message + '</div><button class="btn btn-primary" style="margin-top:16px;" onclick="loadSKASData()"><i class="fas fa-redo"></i> Cuba Semula</button></div>';
+      loadingEl.innerHTML = '<div style="color:#e74c3c;"><i class="fas fa-exclamation-triangle" style="font-size:48px;"></i><div style="margin-top:16px;font-weight:600;">Gagal memuatkan data SK@S</div><div style="font-size:12px;margin-top:8px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div><button class="btn btn-primary" style="margin-top:16px;" onclick="loadSKASData()"><i class="fas fa-redo"></i> Cuba Semula</button></div>';
     }
     if (loadingEl) loadingEl.style.display = 'block';
     if (containerEl) containerEl.style.display = 'none';
@@ -6648,6 +6703,12 @@ function renderSKASDashboard() {
   container.innerHTML = html;
 }
 
+// Delegasi klik cip folder SK@S (ganti onclick inline yang membawa data API)
+document.addEventListener('click', function(ev) {
+  const chip = ev.target.closest && ev.target.closest('#skasAspekContainer .skas-folder-chip[data-folder-no]');
+  if (chip) bukaFolderDetail(chip.getAttribute('data-folder-no'));
+});
+
 function renderAspekCard(stdId, info, stdData, folders) {
   const peratus = stdData ? parseInt(String(stdData.peratus || '0%').replace('%','')) : 0;
   const skorSkpm = stdData ? Number(stdData.skor_skpm) || 0 : 0;
@@ -6684,9 +6745,9 @@ function renderAspekCard(stdId, info, stdData, folders) {
   folders.forEach(function(f) {
     const statusColor = getStatusFromStats(f.stats);
     const noPart = String(f.no);
-    folderChipsHtml += '<div style="background:#f8fafc;border:1px solid #e0e0e0;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;" onclick="bukaFolderDetail(\'' + noPart + '\')">' +
-      '<div style="font-size:11px;font-weight:800;color:' + info.warna + ';min-width:32px;">' + noPart + '</div>' +
-      '<div style="font-size:11px;color:#2c3e50;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">' + (f.nama_folder || '') + '</div>' +
+    folderChipsHtml += '<div class="skas-folder-chip" style="background:#f8fafc;border:1px solid #e0e0e0;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;" data-folder-no="' + escapeHtml(noPart) + '">' +
+      '<div style="font-size:11px;font-weight:800;color:' + info.warna + ';min-width:32px;">' + escapeHtml(noPart) + '</div>' +
+      '<div style="font-size:11px;color:#2c3e50;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">' + escapeHtml(f.nama_folder || '') + '</div>' +
       '<div style="width:10px;height:10px;border-radius:50%;background:' + getStatusBgColor(statusColor) + ';flex-shrink:0;"></div>' +
       '</div>';
   });
@@ -6758,8 +6819,8 @@ async function loadStaleFiles() {
     staleFiles.slice(0, 5).forEach(function(item) {
       html += '<div style="background:#fff;padding:10px 12px;border-radius:8px;display:flex;align-items:center;gap:10px;border-left:3px solid #e67e22;">' +
         '<i class="fas fa-clock" style="color:#e67e22;"></i>' +
-        '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:700;color:#2c3e50;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (item.nama_fail || 'Tanpa nama') + '</div><div style="font-size:10px;color:#7f8c8d;">📂 Folder ' + (item.folder_no || '-') + '</div></div>' +
-        (item.url ? '<a href="' + item.url + '" target="_blank" class="btn btn-outline" style="font-size:10px;padding:5px 10px;"><i class="fas fa-edit"></i> Update</a>' : '') +
+        '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:700;color:#2c3e50;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(item.nama_fail || 'Tanpa nama') + '</div><div style="font-size:10px;color:#7f8c8d;">📂 Folder ' + escapeHtml(item.folder_no || '-') + '</div></div>' +
+        (item.url ? '<a href="' + escapeHtml(safeUrl(item.url)) + '" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:10px;padding:5px 10px;"><i class="fas fa-edit"></i> Update</a>' : '') +
         '</div>';
     });
 
@@ -6847,7 +6908,7 @@ async function loadDrillData(folderNo) {
     drillData = result.data;
     renderDrillModal();
   } catch (e) {
-    document.getElementById('drillBody').innerHTML = '<div class="drill-empty" style="color:#e74c3c;"><i class="fas fa-exclamation-triangle"></i><div style="font-weight:600;">Gagal memuatkan data</div><div style="font-size:11px;">' + e.message + '</div></div>';
+    document.getElementById('drillBody').innerHTML = '<div class="drill-empty" style="color:#e74c3c;"><i class="fas fa-exclamation-triangle"></i><div style="font-weight:600;">Gagal memuatkan data</div><div style="font-size:11px;">' + escapeHtml(e.message) + '</div></div>';
   }
 }
 
@@ -6856,7 +6917,7 @@ function renderDrillModal() {
   const folder = drillData.folder || {};
   const files = drillData.files || [];
 
-  document.getElementById('drillTitle').innerHTML = '<i class="fas fa-folder-open"></i> ' + (folder.nama_folder || 'Folder ' + drillCurrentFolderNo);
+  document.getElementById('drillTitle').innerHTML = '<i class="fas fa-folder-open"></i> ' + escapeHtml(folder.nama_folder || 'Folder ' + drillCurrentFolderNo);
   document.getElementById('drillSubtitle').textContent = 'Standard ' + (folder.standard_id || '-') + ' · ' + files.length + ' fail/folder';
 
   let total = 0, green = 0, yellow = 0, orange = 0, red = 0;
@@ -6926,10 +6987,10 @@ function renderDrillFileItem(f) {
   let tarikhDisplay = f.tarikh_modify || '-';
   if (tarikhDisplay && tarikhDisplay.length > 10) tarikhDisplay = tarikhDisplay.substring(0, 10);
 
-  return '<div class="drill-file ' + status + '">' +
-    '<div class="drill-file-icon ' + status + '"><i class="fas ' + iconClass + '"></i></div>' +
-    '<div class="drill-file-info"><div class="drill-file-name">' + (f.nama_fail || 'Tanpa nama') + '</div><div class="drill-file-meta"><span class="drill-file-tag">' + (f.format || 'FILE') + '</span><span class="drill-file-tag">📅 ' + tarikhDisplay + '</span></div></div>' +
-    (f.drive_url ? '<a class="drill-file-btn" href="' + f.drive_url + '" target="_blank"><i class="fas fa-external-link-alt"></i> Buka</a>' : '<span class="drill-file-btn" style="background:#bdc3c7;cursor:not-allowed;">Tiada URL</span>') +
+  return '<div class="drill-file ' + escapeHtml(status) + '">' +
+    '<div class="drill-file-icon ' + escapeHtml(status) + '"><i class="fas ' + iconClass + '"></i></div>' +
+    '<div class="drill-file-info"><div class="drill-file-name">' + escapeHtml(f.nama_fail || 'Tanpa nama') + '</div><div class="drill-file-meta"><span class="drill-file-tag">' + escapeHtml(f.format || 'FILE') + '</span><span class="drill-file-tag">📅 ' + escapeHtml(tarikhDisplay) + '</span></div></div>' +
+    (f.drive_url ? '<a class="drill-file-btn" href="' + escapeHtml(safeUrl(f.drive_url)) + '" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Buka</a>' : '<span class="drill-file-btn" style="background:#bdc3c7;cursor:not-allowed;">Tiada URL</span>') +
     '</div>';
 }
 
@@ -6998,13 +7059,19 @@ function renderNotifications() {
   notifData.slice(0, 10).forEach(function(item) {
     const iconClass = item.status === 'orange' ? 'orange' : 'red';
     const iconType = item.status === 'orange' ? 'fa-clock' : 'fa-exclamation';
-    html += '<div class="notif-item" onclick="window.open(\'' + (item.url || '#') + '\', \'_blank\')">' +
+    html += '<div class="notif-item" data-url="' + escapeHtml(safeUrl(item.url || '#')) + '">' +
       '<div class="notif-item-icon ' + iconClass + '"><i class="fas ' + iconType + '"></i></div>' +
-      '<div class="notif-item-info"><div class="notif-item-title">' + (item.nama_fail || 'Tanpa nama') + '</div><div class="notif-item-desc">📂 Folder ' + (item.folder_no || '-') + '</div></div>' +
+      '<div class="notif-item-info"><div class="notif-item-title">' + escapeHtml(item.nama_fail || 'Tanpa nama') + '</div><div class="notif-item-desc">📂 Folder ' + escapeHtml(item.folder_no || '-') + '</div></div>' +
       '</div>';
   });
   body.innerHTML = html;
 }
+
+// Delegasi klik notifikasi (ganti onclick="window.open('<url>')" inline)
+document.addEventListener('click', function(ev) {
+  const item = ev.target.closest && ev.target.closest('#notifBody .notif-item[data-url]');
+  if (item) window.open(item.getAttribute('data-url'), '_blank');
+});
 
 function updateNotifBadge() {
   const badge = document.getElementById('notifBadgeCount');
@@ -7143,7 +7210,7 @@ async function loadPAJSKDashboard() {
         '<div style="color:#e74c3c;">' +
         '<i class="fas fa-exclamation-triangle" style="font-size:48px;"></i>' +
         '<div style="margin-top:16px;font-weight:600;">Gagal memuatkan data PAJSK</div>' +
-        '<div style="font-size:12px;margin-top:8px;color:#7f8c8d;">' + e.message + '</div>' +
+        '<div style="font-size:12px;margin-top:8px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div>' +
         '<button class="btn btn-primary" style="margin-top:16px;" onclick="loadPAJSKDashboard()">' +
         '<i class="fas fa-redo"></i> Cuba Semula</button>' +
         '</div>';
@@ -7181,7 +7248,7 @@ function renderPAJSKHeroStats(data) {
   if (yearEl) yearEl.textContent = tahun;
   const ratingEl = document.getElementById('pajskHeroRating');
   if (ratingEl && schoolRating) {
-    ratingEl.innerHTML = '<i class="fas fa-star"></i> <span>' + schoolRating + '</span>';
+    ratingEl.innerHTML = '<i class="fas fa-star"></i> <span>' + escapeHtml(schoolRating) + '</span>';
   }
 
   // Card 2: % GPS Sekolah
@@ -7373,17 +7440,17 @@ function renderTrendInsights(history) {
   let insights = [];
 
   if (isImproving) {
-    insights.push('<strong style="color:#27ae60;">✅ Trend Positif:</strong> Pencapaian PAJSK menurun dari ' + firstYear.gps + ' (' + firstYear.tahun + ') ke ' + lastYear.gps + ' (' + lastYear.tahun + ') — improvement ' + Math.abs(overallChange) + ' dalam ' + (lastYear.tahun - firstYear.tahun) + ' tahun.');
+    insights.push('<strong style="color:#27ae60;">✅ Trend Positif:</strong> Pencapaian PAJSK menurun dari ' + escapeHtml(firstYear.gps) + ' (' + escapeHtml(firstYear.tahun) + ') ke ' + escapeHtml(lastYear.gps) + ' (' + escapeHtml(lastYear.tahun) + ') — improvement ' + Math.abs(overallChange) + ' dalam ' + escapeHtml(lastYear.tahun - firstYear.tahun) + ' tahun.');
   } else {
-    insights.push('<strong style="color:#e74c3c;">⚠️ Perlu Perhatian:</strong> Pencapaian PAJSK meningkat dari ' + firstYear.gps + ' ke ' + lastYear.gps + ' — perlu strategi peningkatan.');
+    insights.push('<strong style="color:#e74c3c;">⚠️ Perlu Perhatian:</strong> Pencapaian PAJSK meningkat dari ' + escapeHtml(firstYear.gps) + ' ke ' + escapeHtml(lastYear.gps) + ' — perlu strategi peningkatan.');
   }
 
-  insights.push('<strong style="color:#27ae60;">🏆 Pencapaian Terbaik:</strong> Tahun ' + bestYear.tahun + ' dengan GPS ' + bestYear.gps + (bestYear.catatan ? ' (' + bestYear.catatan + ')' : '') + '.');
+  insights.push('<strong style="color:#27ae60;">🏆 Pencapaian Terbaik:</strong> Tahun ' + escapeHtml(bestYear.tahun) + ' dengan GPS ' + escapeHtml(bestYear.gps) + (bestYear.catatan ? ' (' + escapeHtml(bestYear.catatan) + ')' : '') + '.');
 
   if (targetData.length > 0) {
     const target = targetData[0];
     const gapToTarget = (lastYear.gps - target.gps).toFixed(2);
-    insights.push('<strong style="color:#f39c12;">🎯 Sasaran ' + target.tahun + ':</strong> GPS ' + target.gps + ' — perlu turunkan ' + gapToTarget + ' lagi.');
+    insights.push('<strong style="color:#f39c12;">🎯 Sasaran ' + escapeHtml(target.tahun) + ':</strong> GPS ' + escapeHtml(target.gps) + ' — perlu turunkan ' + escapeHtml(gapToTarget) + ' lagi.');
   }
 
   insightEl.innerHTML = insights.join('<br><br>');
@@ -7425,13 +7492,13 @@ function renderPAJSKUnitCards(data) {
       'onmouseover="this.style.transform=\'translateY(-3px)\'" onmouseout="this.style.transform=\'translateY(0)\'">' +
       '<div style="font-size:32px;margin-bottom:8px;">' + info.icon + '</div>' +
       '<div style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">' + info.nama_full + '</div>' +
-      '<div style="font-size:36px;font-weight:900;color:' + info.color + ';line-height:1;margin-bottom:6px;">' + gps + '</div>' +
+      '<div style="font-size:36px;font-weight:900;color:' + info.color + ';line-height:1;margin-bottom:6px;">' + escapeHtml(gps) + '</div>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;">' +
-      '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;color:#fff;background:' + rating.color + ';">' + rating.label + '</span>' +
+      '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;color:#fff;background:' + escapeHtml(rating.color) + ';">' + escapeHtml(rating.label) + '</span>' +
       '<span style="font-size:11px;font-weight:700;color:' + trendColor + ';display:flex;align-items:center;gap:4px;">' +
       '<i class="fas ' + trendIcon + '"></i> ' + (change !== 0 ? Math.abs(change).toFixed(2) : 'Same') +
       '</span></div>' +
-      (gpsLepas > 0 ? '<div style="font-size:10px;color:#7f8c8d;margin-top:8px;text-align:center;">vs ' + gpsLepas + ' (tahun lepas)</div>' : '') +
+      (gpsLepas > 0 ? '<div style="font-size:10px;color:#7f8c8d;margin-top:8px;text-align:center;">vs ' + escapeHtml(gpsLepas) + ' (tahun lepas)</div>' : '') +
       '</div>';
   });
 
@@ -7738,7 +7805,7 @@ function renderPAJSKHeatMap(data) {
   matrixData.forEach(function(row) {
     const unitName = unitLabels[row.unit] || row.unit;
     html += '<tr>';
-    html += '<td style="background:#f8fafc;color:#2c3e50;padding:14px 12px;font-size:12px;font-weight:700;border-radius:8px;">' + unitName + '</td>';
+    html += '<td style="background:#f8fafc;color:#2c3e50;padding:14px 12px;font-size:12px;font-weight:700;border-radius:8px;">' + escapeHtml(unitName) + '</td>';
     tingkatans.forEach(function(ting) {
       const cellData = row[ting];
       if (!cellData) {
@@ -7746,10 +7813,10 @@ function renderPAJSKHeatMap(data) {
       } else {
         const rating = cellData.rating || { color: '#bdc3c7', label: 'N/A' };
         const bgColor = rating.color || '#bdc3c7';
-        html += '<td style="background:' + bgColor + ';color:#fff;padding:14px 8px;text-align:center;border-radius:8px;font-weight:700;font-size:13px;transition:transform 0.2s;" ' +
+        html += '<td style="background:' + escapeHtml(bgColor) + ';color:#fff;padding:14px 8px;text-align:center;border-radius:8px;font-weight:700;font-size:13px;transition:transform 0.2s;" ' +
           'onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'" ' +
-          'title="' + unitName + ' ' + ting + ': GPS ' + (cellData.gps || 0).toFixed(2) + ' (' + rating.label + ')">';
-        html += (cellData.gps || 0).toFixed(2);
+          'title="' + escapeHtml(unitName) + ' ' + ting + ': GPS ' + escapeHtml(Number(cellData.gps || 0).toFixed(2)) + ' (' + escapeHtml(rating.label) + ')">';
+        html += escapeHtml(Number(cellData.gps || 0).toFixed(2));
         html += '</td>';
       }
     });
@@ -7776,7 +7843,7 @@ async function loadPAJSKSWOT() {
     renderPAJSKSWOT(result.data);
   } catch (e) {
     console.error('Gagal load SWOT:', e);
-    const errorHTML = '<li style="padding:14px;color:#e74c3c;font-size:12px;text-align:center;"><i class="fas fa-exclamation-triangle"></i><br>Gagal memuatkan: ' + e.message + '</li>';
+    const errorHTML = '<li style="padding:14px;color:#e74c3c;font-size:12px;text-align:center;"><i class="fas fa-exclamation-triangle"></i><br>Gagal memuatkan: ' + escapeHtml(e.message) + '</li>';
     ['pajskSWOTKekuatanList', 'pajskSWOTKelemahanList', 'pajskSWOTTindakanList'].forEach(function(id) {
       const el = document.getElementById(id);
       if (el) el.innerHTML = errorHTML;
@@ -7807,7 +7874,7 @@ function renderPAJSKSWOT(swotData) {
       kekuatan.forEach(function(item) {
         html += '<li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#eafaf1;color:#1e8449;border-left:3px solid #27ae60;">' +
           '<span style="flex-shrink:0;font-size:14px;">✅</span>' +
-          '<span><strong>' + (item.kategori || 'Kekuatan') + ':</strong> ' + (item.item || '') + '</span></li>';
+          '<span><strong>' + escapeHtml(item.kategori || 'Kekuatan') + ':</strong> ' + escapeHtml(item.item || '') + '</span></li>';
       });
       kekuatanList.innerHTML = html;
     }
@@ -7823,7 +7890,7 @@ function renderPAJSKSWOT(swotData) {
       kelemahan.forEach(function(item) {
         html += '<li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#fdedec;color:#c0392b;border-left:3px solid #e74c3c;">' +
           '<span style="flex-shrink:0;font-size:14px;">⚠️</span>' +
-          '<span><strong>' + (item.kategori || 'Kelemahan') + ':</strong> ' + (item.item || '') + '</span></li>';
+          '<span><strong>' + escapeHtml(item.kategori || 'Kelemahan') + ':</strong> ' + escapeHtml(item.item || '') + '</span></li>';
       });
       kelemahanList.innerHTML = html;
     }
@@ -7844,8 +7911,8 @@ function renderPAJSKSWOT(swotData) {
         }
         html += '<li style="padding:10px 12px;margin-bottom:8px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px;background:#ebf5fb;color:#1a5276;border-left:3px solid #3498db;">' +
           '<span style="flex-shrink:0;font-size:14px;">🎯</span>' +
-          '<span><span style="display:inline-block;background:' + prioritiBg + ';color:' + prioritiColor + ';border:1px solid ' + prioritiBorder + ';padding:1px 8px;border-radius:8px;font-size:9px;font-weight:800;margin-right:6px;">' + prioriti + '</span>' +
-          (item.cadangan || '') + '</span></li>';
+          '<span><span style="display:inline-block;background:' + prioritiBg + ';color:' + prioritiColor + ';border:1px solid ' + prioritiBorder + ';padding:1px 8px;border-radius:8px;font-size:9px;font-weight:800;margin-right:6px;">' + escapeHtml(prioriti) + '</span>' +
+          escapeHtml(item.cadangan || '') + '</span></li>';
       });
       tindakanList.innerHTML = html;
     }
@@ -8186,7 +8253,7 @@ tab4FilteredUnits = [];
         '<div style="color:#e74c3c;">' +
         '<i class="fas fa-exclamation-triangle" style="font-size:48px;"></i>' +
         '<div style="margin-top:16px;font-weight:600;">Gagal memuatkan data Pencapaian</div>' +
-        '<div style="font-size:12px;margin-top:8px;color:#7f8c8d;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6;">' + e.message + '</div>' +
+        '<div style="font-size:12px;margin-top:8px;color:#7f8c8d;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6;">' + escapeHtml(e.message) + '</div>' +
         '<button class="btn btn-primary" style="margin-top:16px;background:#f39c12;" onclick="loadPencapaianDashboard()">' +
         '<i class="fas fa-redo"></i> Cuba Semula</button>' +
         '<div style="margin-top:14px;font-size:11px;color:#7f8c8d;">' +
@@ -8312,7 +8379,7 @@ async function loadHallOfFame(tahun) {
         '<div style="color:#e74c3c;">' +
         '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
         '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan Hall of Fame</div>' +
-        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div>' +
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div>' +
         '</div>';
     }
   }
@@ -8553,7 +8620,7 @@ async function loadFeaturedCompetitions(tahun) {
         '<div style="color:#e74c3c;">' +
         '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
         '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan Featured Competitions</div>' +
-        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div>' +
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div>' +
         '</div>';
     }
   }
@@ -8784,7 +8851,7 @@ async function loadAchievementsTab(tahun) {
         '<div style="color:#e74c3c;">' +
         '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
         '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan Achievements</div>' +
-        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div>' +
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div>' +
         '</div>';
     }
     if (tableLoading) tableLoading.style.display = 'none';
@@ -9184,7 +9251,7 @@ async function loadPenyertaanTab(tahun) {
       loading.innerHTML =
         '<div style="color:#e74c3c;"><i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
         '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan Penyertaan</div>' +
-        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div></div>';
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div></div>';
     }
   }
 }
@@ -9454,7 +9521,7 @@ async function loadPrestasiUnitTab(tahun) {
     if (loading) {
       loading.innerHTML = '<div style="color:#e74c3c;"><i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
         '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan Prestasi Unit</div>' +
-        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div></div>';
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div></div>';
     }
   }
 }
@@ -10179,7 +10246,7 @@ async function loadAllCompetitions(tahun) {
       loading.innerHTML = '<div style="color:#e74c3c;">' +
         '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
         '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan</div>' +
-        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div></div>';
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div></div>';
     }
   }
 }
@@ -11097,7 +11164,7 @@ async function openLevelDrill(level) {
       '<div style="text-align:center;padding:40px;color:#e74c3c;">' +
       '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
       '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan</div>' +
-      '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div></div>';
+      '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div></div>';
   }
 }
 
@@ -11417,7 +11484,7 @@ async function loadLaporan2026() {
       loading.innerHTML = '<div style="color:#e74c3c;">' +
         '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
         '<div style="margin-top:14px;font-weight:600;">Gagal memuatkan data semasa</div>' +
-        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + e.message + '</div>' +
+        '<div style="font-size:11px;margin-top:6px;color:#7f8c8d;">' + escapeHtml(e.message) + '</div>' +
         '<div style="font-size:11px;margin-top:8px;color:#7f8c8d;">💡 Pastikan LAPORAN_2026_API_URL betul</div>' +
         '</div>';
     }
@@ -11547,7 +11614,7 @@ async function loadLaporan2026Recent() {
   } catch (e) {
     console.error('Gagal load recent:', e);
     const container = document.getElementById('lap2026Recent');
-    if (container) container.innerHTML = '<div style="color:#e74c3c;padding:20px;text-align:center;">Gagal load: ' + e.message + '</div>';
+    if (container) container.innerHTML = '<div style="color:#e74c3c;padding:20px;text-align:center;">Gagal load: ' + escapeHtml(e.message) + '</div>';
   }
 }
 
@@ -11634,7 +11701,7 @@ function renderLaporan2026ProgramItems(programs) {
           (p.tempat ? '<div style="font-size:10px;color:#7f8c8d;margin-top:2px;"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(p.tempat) + '</div>' : '') +
           (p.maklumat ? '<div style="font-size:10px;color:#95a5a6;margin-top:4px;line-height:1.4;"><i class="fas fa-info"></i> ' + escapeHtml(p.maklumat.substring(0, 150)) + (p.maklumat.length > 150 ? '...' : '') + '</div>' : '') +
         '</div>' +
-        (p.pdfLink ? '<a href="' + escapeHtml(p.pdfLink) + '" target="_blank" style="background:#3498db;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:700;white-space:nowrap;">' +
+        (p.pdfLink ? '<a href="' + escapeHtml(safeUrl(p.pdfLink)) + '" target="_blank" style="background:#3498db;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:700;white-space:nowrap;">' +
           '<i class="fas fa-file-pdf"></i> PDF' +
         '</a>' : '') +
       '</div>' +
@@ -13098,7 +13165,10 @@ console.log('🚀 [DataPelajar] Loading module...');
 <script>
 (function() {
   'use strict';
-  
+
+  // Keselamatan: escape nilai data (Sheets/API/input) sebelum masuk ke innerHTML / atribut
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+
   const API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
   const PAGE_SIZE = 15;
   
@@ -14377,7 +14447,7 @@ console.log('🚀 [DataPelajar] Loading module...');
       if (err) {
         document.getElementById('dp-load').style.display = 'none';
         err.style.display = 'block';
-        err.innerHTML = `<div class="dp-err"><div style="font-size: 32px;">⚠️</div><div><h3 style="margin: 0;">Ralat</h3><p style="margin: 4px 0 0;">${e.message}</p></div></div>`;
+        err.innerHTML = `<div class="dp-err"><div style="font-size: 32px;">⚠️</div><div><h3 style="margin: 0;">Ralat</h3><p style="margin: 4px 0 0;">${esc(e.message)}</p></div></div>`;
       }
     }
   }
@@ -14392,7 +14462,7 @@ console.log('🚀 [DataPelajar] Loading module...');
       { i: '🎖️', v: s.uniform_unik, l: 'Unit Beruniform', sl: 'Pakaian seragam', c: 'c-rose' }
     ];
     document.getElementById('dp-stats').innerHTML = cards.map(c => 
-      `<div class="dp-stat ${c.c}"><div class="dp-stat-i">${c.i}</div><div class="dp-stat-v">${c.v.toLocaleString()}</div><div class="dp-stat-l">${c.l}</div><div class="dp-stat-sl">${c.sl}</div></div>`
+      `<div class="dp-stat ${c.c}"><div class="dp-stat-i">${c.i}</div><div class="dp-stat-v">${esc(c.v.toLocaleString())}</div><div class="dp-stat-l">${c.l}</div><div class="dp-stat-sl">${esc(c.sl)}</div></div>`
     ).join('');
   }
   
@@ -14401,7 +14471,7 @@ console.log('🚀 [DataPelajar] Loading module...');
       const cfg = RUMAH[n];
       const count = state.stats.rumah_sukan[n] || 0;
       const p = state.stats.total > 0 ? ((count / state.stats.total) * 100).toFixed(1) : 0;
-      return `<div class="dp-rumah"><div class="dp-rumah-c" style="background:${cfg.warna};">${n.substring(0,2)}</div><div class="dp-rumah-i"><div class="dp-rumah-n">${cfg.emoji} ${n} <span style="color:${cfg.warna};">(${cfg.label})</span></div><div class="dp-rumah-bc"><div class="dp-rumah-b" style="width:${p}%;background:${cfg.warna};"></div></div><div class="dp-rumah-s"><span><span class="dp-rumah-cn">${count}</span> pelajar</span><span>${p}%</span></div></div></div>`;
+      return `<div class="dp-rumah"><div class="dp-rumah-c" style="background:${cfg.warna};">${n.substring(0,2)}</div><div class="dp-rumah-i"><div class="dp-rumah-n">${cfg.emoji} ${n} <span style="color:${cfg.warna};">(${cfg.label})</span></div><div class="dp-rumah-bc"><div class="dp-rumah-b" style="width:${p}%;background:${cfg.warna};"></div></div><div class="dp-rumah-s"><span><span class="dp-rumah-cn">${esc(count)}</span> pelajar</span><span>${p}%</span></div></div></div>`;
     }).join('');
   }
 
@@ -14579,7 +14649,7 @@ console.log('🚀 [DataPelajar] Loading module...');
         '<div class="dp-ovr-icon">' + c.icon + '</div>' +
         '<div class="dp-ovr-value">' + c.value + '</div>' +
         '<div class="dp-ovr-label">' + c.label + '</div>' +
-        '<div class="dp-ovr-sub">' + c.sub + '</div>' +
+        '<div class="dp-ovr-sub">' + esc(c.sub) + '</div>' +
         '<span class="dp-ovr-tag ' + c.tag.class + '">' + c.tag.label + '</span>' +
         '</div>';
     }).join('');
@@ -14626,7 +14696,7 @@ console.log('🚀 [DataPelajar] Loading module...');
           const barPct = (item.count / maxCount * 100);
           html += '<div class="dp-top-item">' +
             '<div class="dp-top-rank ' + rankCls + '">' + rankIcon + '</div>' +
-            '<div class="dp-top-name" title="' + item.name + '">' + item.name + '</div>' +
+            '<div class="dp-top-name" title="' + esc(item.name) + '">' + esc(item.name) + '</div>' +
             '<div class="dp-top-bar-wrap"><div class="dp-top-bar" style="width: ' + barPct + '%;"></div></div>' +
             '<div class="dp-top-count">' + item.count + '</div>' +
             '</div>';
@@ -14648,7 +14718,7 @@ console.log('🚀 [DataPelajar] Loading module...');
       
       // Bangsa chips
       const bangsaChips = Object.keys(r.bangsa).map(function(b) {
-        return '<span class="dp-rh-chip" title="' + b + '">' + b.substring(0, 8) + (b.length > 8 ? '...' : '') + ': ' + r.bangsa[b] + '</span>';
+        return '<span class="dp-rh-chip" title="' + esc(b) + '">' + esc(b.substring(0, 8)) + (b.length > 8 ? '...' : '') + ': ' + r.bangsa[b] + '</span>';
       }).join('');
       
       // Diversity per rumah
@@ -14723,7 +14793,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
         '<div class="dp-alert-icon">' + al.icon + '</div>' +
         '<div class="dp-alert-content">' +
           '<div class="dp-alert-title">' + al.title + '</div>' +
-          '<div class="dp-alert-msg">' + al.msg + '</div>' +
+          '<div class="dp-alert-msg">' + esc(al.msg) + '</div>' +
         '</div>' +
         '</div>';
     }).join('');
@@ -14834,7 +14904,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     section.classList.remove('empty');
     
     document.getElementById('dp-chips-list').innerHTML = chips.map(function(c) {
-      return '<span class="dp-chip">' + c.label + 
+      return '<span class="dp-chip">' + esc(c.label) +
         '<button class="dp-chip-x" onclick="DataPelajar.removeFilter(\'' + c.key + '\')">✕</button>' +
         '</span>';
     }).join('');
@@ -14896,10 +14966,10 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     if (matches.names.length > 0) {
       html += '<div class="dp-sg-section"><div class="dp-sg-title">👤 PELAJAR</div>';
       matches.names.forEach(function(m) {
-        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + m.text.replace(/'/g, "\\'") + '\')">' +
+        html += '<div class="dp-sg-item" data-sg="' + esc(m.text) + '">' +
           '<span class="dp-sg-icon">👤</span>' +
-          '<span class="dp-sg-text">' + m.text + '</span>' +
-          '<span class="dp-sg-meta">' + m.meta + '</span>' +
+          '<span class="dp-sg-text">' + esc(m.text) + '</span>' +
+          '<span class="dp-sg-meta">' + esc(m.meta) + '</span>' +
           '</div>';
       });
       html += '</div>';
@@ -14908,9 +14978,9 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     if (matches.classes.length > 0) {
       html += '<div class="dp-sg-section"><div class="dp-sg-title">📚 KELAS</div>';
       matches.classes.forEach(function(c) {
-        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + c.text + '\')">' +
+        html += '<div class="dp-sg-item" data-sg="' + esc(c.text) + '">' +
           '<span class="dp-sg-icon">📚</span>' +
-          '<span class="dp-sg-text">Kelas ' + c.text + '</span>' +
+          '<span class="dp-sg-text">Kelas ' + esc(c.text) + '</span>' +
           '<span class="dp-sg-meta">' + c.count + ' pelajar</span>' +
           '</div>';
       });
@@ -14920,7 +14990,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     if (matches.rumah.length > 0) {
       html += '<div class="dp-sg-section"><div class="dp-sg-title">🏠 RUMAH SUKAN</div>';
       matches.rumah.forEach(function(r) {
-        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + r.text + '\')">' +
+        html += '<div class="dp-sg-item" data-sg="' + esc(r.text) + '">' +
           '<span class="dp-sg-icon">' + r.cfg.emoji + '</span>' +
           '<span class="dp-sg-text">' + r.text + ' (' + r.cfg.label + ')</span>' +
           '<span class="dp-sg-meta">' + r.count + ' pelajar</span>' +
@@ -14932,9 +15002,9 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     if (matches.bangsa.length > 0) {
       html += '<div class="dp-sg-section"><div class="dp-sg-title">🌏 BANGSA</div>';
       matches.bangsa.forEach(function(b) {
-        html += '<div class="dp-sg-item" onclick="DataPelajar.selectSuggestion(\'' + b.text + '\')">' +
+        html += '<div class="dp-sg-item" data-sg="' + esc(b.text) + '">' +
           '<span class="dp-sg-icon">🌏</span>' +
-          '<span class="dp-sg-text">' + b.text + '</span>' +
+          '<span class="dp-sg-text">' + esc(b.text) + '</span>' +
           '<span class="dp-sg-meta">' + b.count + ' pelajar</span>' +
           '</div>';
       });
@@ -14944,6 +15014,15 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     sg.innerHTML = html;
     sg.classList.add('show');
   }
+
+  // Delegasi klik (ganti onclick inline yang membawa data pelajar)
+  document.addEventListener('click', function(ev) {
+    if (!ev.target.closest) return;
+    const sgItem = ev.target.closest('#dp-suggestions .dp-sg-item[data-sg]');
+    if (sgItem && window.DataPelajar) { window.DataPelajar.selectSuggestion(sgItem.getAttribute('data-sg')); return; }
+    const row = ev.target.closest('#dp-tb tr[data-sno]');
+    if (row && window.DataPelajar) window.DataPelajar.openProfile(row.getAttribute('data-sno'));
+  });
   
   
     function setupListeners() {
@@ -15082,7 +15161,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
           <div class="ach-empty">
             <div class="ach-empty-icon">⚠️</div>
             <div class="ach-empty-title">Ralat Memuatkan Data</div>
-            <div class="ach-empty-msg">${result.error || 'Tidak dapat memuatkan rekod pencapaian'}</div>
+            <div class="ach-empty-msg">${esc(result.error || 'Tidak dapat memuatkan rekod pencapaian')}</div>
           </div>
         `;
         return;
@@ -15117,8 +15196,8 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
           <div class="ach-info-banner">
             <div class="ach-info-banner-title">ℹ️ Pelajar Baru</div>
             <div style="font-size: 13px;">
-              Pelajar ini memulakan perjalanan kokurikulum di tingkatan 1 (${student.tahun || '2026'}).
-              Rekod pencapaian akan tersedia sebaik sahaja data pencapaian tahun ${student.tahun || '2026'} dikemaskini.
+              Pelajar ini memulakan perjalanan kokurikulum di tingkatan 1 (${esc(student.tahun || '2026')}).
+              Rekod pencapaian akan tersedia sebaik sahaja data pencapaian tahun ${esc(student.tahun || '2026')} dikemaskini.
             </div>
           </div>
           <div class="ach-empty">
@@ -15141,7 +15220,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
             <div class="ach-empty-title">Tiada Rekod Dijumpai</div>
             <div class="ach-empty-msg">
               Tiada rekod pencapaian dijumpai untuk pelajar ini dalam pangkalan data.<br>
-              <strong>${student.nama}</strong> (${student.tingkatan || '-'})
+              <strong>${esc(student.nama)}</strong> (${esc(student.tingkatan || '-')})
             </div>
             <div style="margin-top: 16px; font-size: 12px; color: #94a3b8;">
               💡 Nama mesti match dengan pencapaian database.<br>
@@ -15161,19 +15240,19 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     html += `
       <div class="ach-stats">
         <div class="ach-stat">
-          <div class="ach-stat-v">${b.total}</div>
+          <div class="ach-stat-v">${esc(b.total)}</div>
           <div class="ach-stat-l">Total Pencapaian</div>
         </div>
         <div class="ach-stat">
-          <div class="ach-stat-v">${b.by_rank.champion || 0}</div>
+          <div class="ach-stat-v">${esc(b.by_rank.champion || 0)}</div>
           <div class="ach-stat-l">🏆 Champion</div>
         </div>
         <div class="ach-stat">
-          <div class="ach-stat-v">${b.by_level.international || 0}</div>
+          <div class="ach-stat-v">${esc(b.by_level.international || 0)}</div>
           <div class="ach-stat-l">🌍 International</div>
         </div>
         <div class="ach-stat">
-          <div class="ach-stat-v">${b.by_level.national || 0}</div>
+          <div class="ach-stat-v">${esc(b.by_level.national || 0)}</div>
           <div class="ach-stat-l">🇲🇾 National</div>
         </div>
       </div>
@@ -15185,7 +15264,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       html += `<div class="ach-section-title">📅 Mengikut Tahun</div>`;
       html += `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">`;
       years.forEach(function(yr) {
-        html += `<span class="ach-meta-i ach-meta-year">${yr}: ${b.by_year[yr]}</span>`;
+        html += `<span class="ach-meta-i ach-meta-year">${esc(yr)}: ${esc(b.by_year[yr])}</span>`;
       });
       html += `</div>`;
     }
@@ -15209,13 +15288,13 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
           <div class="ach-card-header">
             <div class="ach-rank-badge ${rankClass}">${rankEmoji}</div>
             <div class="ach-card-info">
-              <div class="ach-competition">${a.competition || '-'}</div>
+              <div class="ach-competition">${esc(a.competition || '-')}</div>
               <div class="ach-meta">
-                ${a.rank ? `<span class="ach-meta-i ach-meta-rank">🏆 ${a.rank}</span>` : ''}
-                ${a.level ? `<span class="ach-meta-i ach-meta-level">📊 ${a.level}</span>` : ''}
-                ${a.category ? `<span class="ach-meta-i ach-meta-category">📂 ${a.category}</span>` : ''}
-                ${a.tahun ? `<span class="ach-meta-i ach-meta-year">📅 ${a.tahun}</span>` : ''}
-                ${a.date ? `<span class="ach-meta-i ach-meta-date">🗓️ ${a.date}</span>` : ''}
+                ${a.rank ? `<span class="ach-meta-i ach-meta-rank">🏆 ${esc(a.rank)}</span>` : ''}
+                ${a.level ? `<span class="ach-meta-i ach-meta-level">📊 ${esc(a.level)}</span>` : ''}
+                ${a.category ? `<span class="ach-meta-i ach-meta-category">📂 ${esc(a.category)}</span>` : ''}
+                ${a.tahun ? `<span class="ach-meta-i ach-meta-year">📅 ${esc(a.tahun)}</span>` : ''}
+                ${a.date ? `<span class="ach-meta-i ach-meta-date">🗓️ ${esc(a.date)}</span>` : ''}
               </div>
             </div>
           </div>
@@ -15240,8 +15319,8 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     } else {
       tbody.innerHTML = page.map((s, i) => {
         const cfg = RUMAH[s.rumah_sukan];
-        const badge = cfg ? `<span class="dp-bg dp-bg-r" style="background:${cfg.warna};">${cfg.emoji} ${s.rumah_sukan}</span>` : `<span class="dp-bg dp-bg-c">-</span>`;
-        return `<tr onclick="DataPelajar.openProfile('${s.student_no}')"><td class="dp-rn">${start+i+1}</td><td><div class="dp-sn">${s.nama||'-'}</div><div style="font-size:11px;color:#64748b;">No: ${s.student_no||'-'} ${s.gender?'• '+s.gender:''}</div></td><td><span class="dp-bg dp-bg-c">${s.kelas||'-'}</span></td><td><span class="dp-bg dp-bg-b">${s.bangsa||'-'}</span></td><td>${badge}</td><td><span class="dp-tr" title="${s.uniform||''}">${s.uniform||'-'}</span></td><td><span class="dp-tr" title="${s.kelab||''}">${s.kelab||'-'}</span></td><td><span class="dp-tr" title="${s.sukan||''}">${s.sukan||'-'}</span></td></tr>`;
+        const badge = cfg ? `<span class="dp-bg dp-bg-r" style="background:${cfg.warna};">${cfg.emoji} ${esc(s.rumah_sukan)}</span>` : `<span class="dp-bg dp-bg-c">-</span>`;
+        return `<tr data-sno="${esc(s.student_no)}"><td class="dp-rn">${start+i+1}</td><td><div class="dp-sn">${esc(s.nama||'-')}</div><div style="font-size:11px;color:#64748b;">No: ${esc(s.student_no||'-')} ${s.gender?'• '+esc(s.gender):''}</div></td><td><span class="dp-bg dp-bg-c">${esc(s.kelas||'-')}</span></td><td><span class="dp-bg dp-bg-b">${esc(s.bangsa||'-')}</span></td><td>${badge}</td><td><span class="dp-tr" title="${esc(s.uniform||'')}">${esc(s.uniform||'-')}</span></td><td><span class="dp-tr" title="${esc(s.kelab||'')}">${esc(s.kelab||'-')}</span></td><td><span class="dp-tr" title="${esc(s.sukan||'')}">${esc(s.sukan||'-')}</span></td></tr>`;
       }).join('');
     }
     document.getElementById('dp-pgi').textContent = `Page ${state.currentPage} of ${pages} • ${total} pelajar`;
@@ -15409,7 +15488,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       
       const toast = document.createElement('div');
       toast.className = 'dp-toast-item t-' + type;
-      toast.innerHTML = '<span class="dp-toast-icon">' + (icons[type] || 'ℹ️') + '</span><span>' + message + '</span>';
+      toast.innerHTML = '<span class="dp-toast-icon">' + (icons[type] || 'ℹ️') + '</span><span>' + esc(message) + '</span>';
       container.appendChild(toast);
       
       setTimeout(function() {
@@ -15546,25 +15625,25 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       document.getElementById('dp-av').textContent = initials;
       document.getElementById('dp-mn').textContent = s.nama || '-';
       const meta = [];
-      if (s.student_no) meta.push(`<span class="m-mt-i">🆔 ${s.student_no}</span>`);
-      if (s.kelas) meta.push(`<span class="m-mt-i">📚 ${s.kelas}</span>`);
-      if (s.umur) meta.push(`<span class="m-mt-i">🎂 ${s.umur} thn</span>`);
-      if (s.bangsa) meta.push(`<span class="m-mt-i">🌏 ${s.bangsa}</span>`);
+      if (s.student_no) meta.push(`<span class="m-mt-i">🆔 ${esc(s.student_no)}</span>`);
+      if (s.kelas) meta.push(`<span class="m-mt-i">📚 ${esc(s.kelas)}</span>`);
+      if (s.umur) meta.push(`<span class="m-mt-i">🎂 ${esc(s.umur)} thn</span>`);
+      if (s.bangsa) meta.push(`<span class="m-mt-i">🌏 ${esc(s.bangsa)}</span>`);
       document.getElementById('dp-mt').innerHTML = meta.join('');
       
       const items = [['👤 Nama', s.nama], ['🆔 No. Pelajar', s.student_no], ['🪪 No. KP', s.no_kp], ['🎂 Tarikh Lahir', s.tarikh_lahir], ['📅 Umur', (s.umur||'-') + ' tahun'], ['⚧ Jantina', s.gender], ['🌏 Bangsa', s.bangsa], ['🙏 Agama', s.agama], ['📍 Alamat', s.alamat], ['📞 Telefon', s.telefon || 'Tiada'], ['📧 Email', s.email || 'Tiada']];
-      document.getElementById('dp-i-p').innerHTML = items.map(it => `<div class="m-ii"><div class="m-il">${it[0]}</div><div class="m-iv">${it[1]||'-'}</div></div>`).join('');
+      document.getElementById('dp-i-p').innerHTML = items.map(it => `<div class="m-ii"><div class="m-il">${it[0]}</div><div class="m-iv">${esc(it[1]||'-')}</div></div>`).join('');
       
       const cfg = RUMAH[s.rumah_sukan];
       let kh = '';
-      if (cfg) kh += `<div class="m-rumah" style="border-color:${cfg.warna};background:linear-gradient(135deg,${cfg.warna}11,white);"><div style="font-size:48px;margin-bottom:12px;">${cfg.emoji}</div><div style="font-size:28px;font-weight:800;color:${cfg.warna};">RUMAH ${s.rumah_sukan}</div><div style="color:#475569;font-weight:600;">Warna ${cfg.label}</div></div>`;
-      if (s.uniform) kh += `<div class="m-koko"><div class="m-koko-i" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">🎖️</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Uniform</div><div style="font-size:15px;font-weight:700;">${s.uniform}</div>${s.position_uniform?`<div style="color:#475569;">${s.position_uniform}</div>`:''}</div></div>`;
-      if (s.kelab) kh += `<div class="m-koko"><div class="m-koko-i" style="background:linear-gradient(135deg,#2563EB,#60a5fa);">📚</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Kelab</div><div style="font-size:15px;font-weight:700;">${s.kelab}</div>${s.position_kelab?`<div style="color:#475569;">${s.position_kelab}</div>`:''}</div></div>`;
-      if (s.sukan) kh += `<div class="m-koko"><div class="m-koko-i" style="background:linear-gradient(135deg,#16A34A,#4ade80);">⚽</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Sukan</div><div style="font-size:15px;font-weight:700;">${s.sukan}</div>${s.position_sukan?`<div style="color:#475569;">${s.position_sukan}</div>`:''}</div></div>`;
+      if (cfg) kh += `<div class="m-rumah" style="border-color:${cfg.warna};background:linear-gradient(135deg,${cfg.warna}11,white);"><div style="font-size:48px;margin-bottom:12px;">${cfg.emoji}</div><div style="font-size:28px;font-weight:800;color:${cfg.warna};">RUMAH ${esc(s.rumah_sukan)}</div><div style="color:#475569;font-weight:600;">Warna ${cfg.label}</div></div>`;
+      if (s.uniform) kh += `<div class="m-koko"><div class="m-koko-i" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">🎖️</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Uniform</div><div style="font-size:15px;font-weight:700;">${esc(s.uniform)}</div>${s.position_uniform?`<div style="color:#475569;">${esc(s.position_uniform)}</div>`:''}</div></div>`;
+      if (s.kelab) kh += `<div class="m-koko"><div class="m-koko-i" style="background:linear-gradient(135deg,#2563EB,#60a5fa);">📚</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Kelab</div><div style="font-size:15px;font-weight:700;">${esc(s.kelab)}</div>${s.position_kelab?`<div style="color:#475569;">${esc(s.position_kelab)}</div>`:''}</div></div>`;
+      if (s.sukan) kh += `<div class="m-koko"><div class="m-koko-i" style="background:linear-gradient(135deg,#16A34A,#4ade80);">⚽</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Sukan</div><div style="font-size:15px;font-weight:700;">${esc(s.sukan)}</div>${s.position_sukan?`<div style="color:#475569;">${esc(s.position_sukan)}</div>`:''}</div></div>`;
       document.getElementById('dp-i-k').innerHTML = kh;
       
       const a = [['🏫 Sekolah', 'SMK Tinggi Kuching'], ['📚 Tingkatan', s.tingkatan], ['🎓 Kelas', s.kelas], ['📅 Tahun', new Date().getFullYear()], ['✅ Status', s.status_aktif || 'Aktif']];
-      document.getElementById('dp-i-a').innerHTML = a.map(it => `<div class="m-ii"><div class="m-il">${it[0]}</div><div class="m-iv">${it[1]||'-'}</div></div>`).join('');
+      document.getElementById('dp-i-a').innerHTML = a.map(it => `<div class="m-ii"><div class="m-il">${it[0]}</div><div class="m-iv">${esc(it[1]||'-')}</div></div>`).join('');
             // ⭐ Load achievements asynchronously
       loadStudentAchievements(s);
       
@@ -15596,7 +15675,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
         if (f.tingkatan) activeFilters.push('Tingkatan: ' + f.tingkatan);
         if (f.rumah_sukan) activeFilters.push('Rumah: ' + f.rumah_sukan);
         if (f.bangsa) activeFilters.push('Bangsa: ' + f.bangsa);
-        filterMsg.innerHTML = '<strong>Filter aktif:</strong> ' + activeFilters.join(' • ') + ' — Export akan terpakai pada ' + state.filteredStudents.length + ' pelajar terfilter.';
+        filterMsg.innerHTML = '<strong>Filter aktif:</strong> ' + esc(activeFilters.join(' • ')) + ' — Export akan terpakai pada ' + state.filteredStudents.length + ' pelajar terfilter.';
         filterStatus.style.display = 'flex';
       } else {
         filterStatus.style.display = 'none';
@@ -15696,7 +15775,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
           <div class="pr-school">🇲🇾 KEMENTERIAN PENDIDIKAN MALAYSIA</div>
           <div class="pr-school">SMK TINGGI KUCHING</div>
           <div class="pr-title">LAPORAN DATA PELAJAR KOKURIKULUM</div>
-          <div class="pr-subtitle">Tahun ${state.stats.tahun || '2026'}</div>
+          <div class="pr-subtitle">Tahun ${esc(state.stats.tahun || '2026')}</div>
         </div>
         <div class="pr-meta">
           <span><strong>Tarikh Cetak:</strong> ${dateStr} ${timeStr}</span>
@@ -15738,7 +15817,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
         Object.keys(RUMAH).forEach(function(rName) {
           const r = a.rumahInsights[rName];
           const bangsaStr = Object.keys(r.bangsa).map(function(b) { return b + ':' + r.bangsa[b]; }).join(', ');
-          html += `<tr><td><strong>${rName}</strong></td><td>${r.total}</td><td>${r.male}</td><td>${r.female}</td><td>${bangsaStr}</td></tr>`;
+          html += `<tr><td><strong>${rName}</strong></td><td>${r.total}</td><td>${r.male}</td><td>${r.female}</td><td>${esc(bangsaStr)}</td></tr>`;
         });
         html += `</tbody></table></div>`;
       }
@@ -15752,7 +15831,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
             <tbody>
       `;
       data.forEach(function(s, i) {
-        html += `<tr><td>${i+1}</td><td>${s.nama || '-'}</td><td>${s.kelas || '-'}</td><td>${s.gender || '-'}</td><td>${s.bangsa || '-'}</td><td>${s.rumah_sukan || '-'}</td><td>${s.uniform || '-'}</td><td>${s.kelab || '-'}</td></tr>`;
+        html += `<tr><td>${i+1}</td><td>${esc(s.nama || '-')}</td><td>${esc(s.kelas || '-')}</td><td>${esc(s.gender || '-')}</td><td>${esc(s.bangsa || '-')}</td><td>${esc(s.rumah_sukan || '-')}</td><td>${esc(s.uniform || '-')}</td><td>${esc(s.kelab || '-')}</td></tr>`;
       });
       html += `</tbody></table></div>`;
       
@@ -15794,8 +15873,8 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
           <div class="pr-school">🇲🇾 KEMENTERIAN PENDIDIKAN MALAYSIA</div>
           <div class="pr-school">SMK TINGGI KUCHING</div>
           <div class="pr-title">SENARAI PELAJAR KELAS</div>
-          <div class="pr-subtitle">${tingkatan} - Kelas ${className}</div>
-          <div class="pr-subtitle">Tahun ${state.stats.tahun || '2026'}</div>
+          <div class="pr-subtitle">${esc(tingkatan)} - Kelas ${esc(className)}</div>
+          <div class="pr-subtitle">Tahun ${esc(state.stats.tahun || '2026')}</div>
         </div>
         <div class="pr-meta">
           <span><strong>Tarikh:</strong> ${dateStr}</span>
@@ -15818,7 +15897,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
             <tbody>
       `;
       students.forEach(function(s, i) {
-        html += `<tr><td>${i+1}</td><td>${s.nama || '-'}</td><td>${s.student_no || '-'}</td><td>${s.gender || '-'}</td><td>${s.bangsa || '-'}</td><td>${s.rumah_sukan || '-'}</td><td></td></tr>`;
+        html += `<tr><td>${i+1}</td><td>${esc(s.nama || '-')}</td><td>${esc(s.student_no || '-')}</td><td>${esc(s.gender || '-')}</td><td>${esc(s.bangsa || '-')}</td><td>${esc(s.rumah_sukan || '-')}</td><td></td></tr>`;
       });
       html += `</tbody></table></div>
         <div class="pr-signatures">
@@ -15875,7 +15954,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
           <div class="pr-school">SMK TINGGI KUCHING</div>
           <div class="pr-title">SENARAI AHLI RUMAH SUKAN</div>
           <div class="pr-subtitle" style="font-size: 26px; color: ${cfg.warna};">${cfg.emoji} RUMAH ${rName} - ${cfg.label.toUpperCase()}</div>
-          <div class="pr-subtitle">Tahun ${state.stats.tahun || '2026'}</div>
+          <div class="pr-subtitle">Tahun ${esc(state.stats.tahun || '2026')}</div>
         </div>
         <div class="pr-meta">
           <span><strong>Tarikh:</strong> ${dateStr}</span>
@@ -15888,7 +15967,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
         const ts = byTingkatan[t];
         html += `
           <div class="pr-section">
-            <div class="pr-section-title">📚 ${t} (${ts.length} pelajar)</div>
+            <div class="pr-section-title">📚 ${esc(t)} (${ts.length} pelajar)</div>
             <table>
               <thead>
                 <tr>
@@ -15903,7 +15982,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
               <tbody>
         `;
         ts.forEach(function(s, i) {
-          html += `<tr><td>${i+1}</td><td>${s.nama || '-'}</td><td>${s.student_no || '-'}</td><td>${s.kelas || '-'}</td><td>${s.gender || '-'}</td><td>${s.bangsa || '-'}</td></tr>`;
+          html += `<tr><td>${i+1}</td><td>${esc(s.nama || '-')}</td><td>${esc(s.student_no || '-')}</td><td>${esc(s.kelas || '-')}</td><td>${esc(s.gender || '-')}</td><td>${esc(s.bangsa || '-')}</td></tr>`;
         });
         html += `</tbody></table></div>`;
       });
@@ -16650,11 +16729,11 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       });
   }
 
-  function renderSource() { const el = document.getElementById('gp-src'); if (el) el.innerHTML = (state.source === 'live' ? '📡 Data Langsung (Sheet)' : '📋 Data Rasmi (terbenam)') + ' · Tahun ' + (state.tahun || '—'); }
+  function renderSource() { const el = document.getElementById('gp-src'); if (el) el.innerHTML = (state.source === 'live' ? '📡 Data Langsung (Sheet)' : '📋 Data Rasmi (terbenam)') + ' · Tahun ' + esc(state.tahun || '—'); }
   function renderYearPicker() {
     const sel = document.getElementById('gp-thn'); if (!sel) return;
     const years = (state.senaraiTahun && state.senaraiTahun.length) ? state.senaraiTahun.slice() : [state.tahun || 2026];
-    sel.innerHTML = years.map(function (y) { return '<option value="' + y + '"' + (Number(y) === Number(state.tahun) ? ' selected' : '') + '>Tahun ' + y + '</option>'; }).join('');
+    sel.innerHTML = years.map(function (y) { return '<option value="' + esc(y) + '"' + (Number(y) === Number(state.tahun) ? ' selected' : '') + '>Tahun ' + esc(y) + '</option>'; }).join('');
     sel.style.display = years.length > 1 ? 'inline-block' : 'none';
   }
   function rebuildFromData() {
@@ -16802,9 +16881,9 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       const scoreInner = (key === 'total')
         ? '<div class="gp-wl-num">' + w.total + '</div><span class="gp-wl-band gp-band-' + t.band.cls + '">' + t.band.label + '</span>'
         : '<div class="gp-wl-num">' + w[key] + '</div><div class="gp-wl-sub">' + metricLbl + '</div><span class="gp-wl-band gp-band-' + t.band.cls + '" title="Jumlah indeks penuh">\u03a3 ' + w.total + '</span>';
-      return '<div class="gp-wl-row" onclick="GuruPenasihat.openProfile(\'' + t.id + '\')">' +
+      return '<div class="gp-wl-row" data-gp-id="' + esc(t.id) + '">' +
         '<div class="gp-wl-rank">' + (i + 1) + '</div>' +
-        '<div class="gp-wl-av" style="background:' + avatarColor(t.nama) + ';">' + initials(t.nama) + '</div>' +
+        '<div class="gp-wl-av" style="background:' + avatarColor(t.nama) + ';">' + esc(initials(t.nama)) + '</div>' +
         '<div class="gp-wl-mid"><div class="gp-wl-name">' + esc(t.nama) + '</div><div class="gp-wl-meta">' + t.bil_unit + ' unit \u00b7 ' + t.bil_jk + ' JK \u00b7 ' + (t.rumah ? t.rumah.replace('RUMAH ', '\ud83c\udfe0') : '\u2014') + '</div>' +
         '<div class="gp-wl-stack"><div class="gp-wl-seg" style="width:' + su + '%;background:#0d9488;"></div><div class="gp-wl-seg" style="width:' + sj + '%;background:#ec4899;"></div><div class="gp-wl-seg" style="width:' + sr + '%;background:#6366f1;"></div></div></div>' +
         '<div class="gp-wl-score">' + scoreInner + '</div>' +
@@ -16852,7 +16931,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     const box = document.getElementById('gp-sug'); if (!box) return; if (!qv) { box.style.display = 'none'; return; }
     const ql = qv.toLowerCase();
     const names = state.teachers.filter(function (t) { return t.nama.toLowerCase().indexOf(ql) >= 0; }).slice(0, 6);
-    let html = names.map(function (t) { return '<div class="gp-sug" onclick="GuruPenasihat.pickSuggestion(\'' + esc(t.nama).replace(/'/g, '') + '\')"><span class="gp-av-sm" style="background:' + avatarColor(t.nama) + ';width:24px;height:24px;font-size:10px;">' + initials(t.nama) + '</span><span>' + esc(t.nama) + '</span></div>'; }).join('');
+    let html = names.map(function (t) { return '<div class="gp-sug" onclick="GuruPenasihat.pickSuggestion(\'' + esc(t.nama).replace(/'/g, '') + '\')"><span class="gp-av-sm" style="background:' + avatarColor(t.nama) + ';width:24px;height:24px;font-size:10px;">' + esc(initials(t.nama)) + '</span><span>' + esc(t.nama) + '</span></div>'; }).join('');
     if (!html) html = '<div class="gp-sug" style="color:#94a3b8;">Tiada padanan</div>';
     box.innerHTML = html; box.style.display = 'block';
   }
@@ -16882,9 +16961,9 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     const tb = document.getElementById('gp-tb');
     if (!page.length) tb.innerHTML = '<tr><td colspan="8"><div class="gp-empty">🔍 Tiada guru sepadan</div></td></tr>';
     else tb.innerHTML = page.map(function (t, i) {
-      return '<tr onclick="GuruPenasihat.openProfile(\'' + t.id + '\')">' +
+      return '<tr data-gp-id="' + esc(t.id) + '">' +
         '<td>' + (start + i + 1) + '</td>' +
-        '<td><div class="gp-name-cell"><span class="gp-av-sm" style="background:' + avatarColor(t.nama) + ';">' + initials(t.nama) + '</span><div style="font-weight:600;">' + esc(t.nama) + '</div></div></td>' +
+        '<td><div class="gp-name-cell"><span class="gp-av-sm" style="background:' + avatarColor(t.nama) + ';">' + esc(initials(t.nama)) + '</span><div style="font-weight:600;">' + esc(t.nama) + '</div></div></td>' +
         '<td><span class="gp-sesi ' + (t.sesi === 'Petang' ? 'petang' : 'pagi') + '">' + esc(t.sesi || '—') + '</span></td>' +
         '<td>' + dirUnitCell(t, 'Uniform') + '</td><td>' + dirUnitCell(t, 'Kelab') + '</td><td>' + dirUnitCell(t, 'Sukan') + '</td>' +
         '<td><strong>' + t.bil_jk + '</strong></td>' +
@@ -16910,7 +16989,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       html += '<div class="gp-jk-group"><div class="gp-jk-gh">' + cfg.emoji + ' ' + cfg.label + ' <span style="color:#94a3b8;font-weight:600;">(' + units.length + ' unit)</span></div><div class="gp-unit-grid">';
       units.forEach(function (u) {
         const noKetua = u.ketua === 0, noPetang = u.petang === 0, solo = u.n === 1;
-        html += '<div class="gp-ucard gp-ucard-click" onclick="GuruPenasihat.openUnitStudents(\'' + esc(u.kod) + '\',\'' + kat + '\')"><div class="gp-ucard-h"><div class="gp-ucard-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-ucard-t"><span class="gp-ucode">' + esc(u.kod) + '</span><br>' + esc(u.nama) + '</div></div>' +
+        html += '<div class="gp-ucard gp-ucard-click" data-gp-unit="' + esc(u.kod) + '" data-gp-kat="' + esc(kat) + '"><div class="gp-ucard-h"><div class="gp-ucard-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-ucard-t"><span class="gp-ucode">' + esc(u.kod) + '</span><br>' + esc(u.nama) + '</div></div>' +
           '<div class="gp-ucard-meta">' +
           '<span class="gp-pill ' + (solo ? 'warn' : 'good') + '">👥 ' + u.n + ' guru</span>' +
           '<span class="gp-pill ' + (noKetua ? 'bad' : 'good') + '">' + (noKetua ? '🚩 Tiada Ketua' : '⭐ ' + u.ketua + ' Ketua') + '</span>' +
@@ -16979,7 +17058,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       const j = JAWATAN[u.jawatan] || JAWATAN.GP;
       var sc = state.studentsLoaded ? studentsForCode(u.kod).length : null;
       var scHint = (sc !== null) ? '<span class="gp-stud-hint">👥 ' + sc + ' pelajar · lihat senarai ›</span>' : '<span class="gp-stud-hint">👥 Klik untuk lihat pelajar ›</span>';
-      return '<div class="gp-unit gp-unit-click" onclick="GuruPenasihat.openUnitStudents(\'' + esc(u.kod) + '\',\'' + kat + '\')"><div class="gp-unit-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + ' · ' + esc(u.kod) + '</div><div class="gp-unit-n">' + esc(u.nama_unit) + '</div>' + scHint + '</div><span class="gp-jbadge ' + j.cls + '">' + j.label + '</span></div>';
+      return '<div class="gp-unit gp-unit-click" data-gp-unit="' + esc(u.kod) + '" data-gp-kat="' + esc(kat) + '"><div class="gp-unit-ic" style="background:' + cfg.warna + ';">' + cfg.emoji + '</div><div class="gp-unit-i"><div class="gp-unit-cat">' + cfg.label + ' · ' + esc(u.kod) + '</div><div class="gp-unit-n">' + esc(u.nama_unit) + '</div>' + scHint + '</div><span class="gp-jbadge ' + j.cls + '">' + j.label + '</span></div>';
     }).join('') + '</div>';
 
     // Rumah sukan
@@ -17008,7 +17087,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     let tagHtml = '';
     if (us && us.advisors && us.advisors.length) {
       const lead = us.advisors.filter(function (a) { return a.jawatan === 'KG'; }).map(function (a) { return a.nama.split(/\s+/).slice(0, 2).join(' '); });
-      tagHtml = '<span class="gp-htag">👨‍🏫 ' + us.advisors.length + ' guru penasihat</span>' + (lead.length ? '<span class="gp-htag">⭐ Ketua: ' + lead.join(', ') + '</span>' : '');
+      tagHtml = '<span class="gp-htag">👨‍🏫 ' + us.advisors.length + ' guru penasihat</span>' + (lead.length ? '<span class="gp-htag">⭐ Ketua: ' + esc(lead.join(', ')) + '</span>' : '');
     }
     document.getElementById('gp-su-tags').innerHTML = tagHtml;
     modal.classList.add('active');
@@ -17050,7 +17129,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       const studs = byClass[cls].sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); });
       html += '<div class="gp-su-class"><div class="gp-su-ch">\ud83d\udcda ' + esc(cls) + ' <span style="color:#94a3b8;font-weight:600;">(' + studs.length + ')</span></div>';
       html += studs.map(function (s) {
-        return '<div class="gp-su-row"><span class="gp-av-sm" style="background:' + avatarColor(s.nama) + ';">' + initials(s.nama) + '</span>' +
+        return '<div class="gp-su-row"><span class="gp-av-sm" style="background:' + avatarColor(s.nama) + ';">' + esc(initials(s.nama)) + '</span>' +
           '<div class="gp-su-info"><div class="gp-su-n">' + esc(s.nama) + '</div><div class="gp-su-m">' + (s.gender ? esc(s.gender) + ' \u00b7 ' : '') + (s.bangsa ? esc(s.bangsa) + ' \u00b7 ' : '') + (s.rumah ? '\ud83c\udfe0 ' + esc(String(s.rumah).replace('RUMAH ', '')) : '') + '</div></div></div>';
       }).join('');
       html += '</div>';
@@ -17156,6 +17235,15 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   };
 
   window.loadGuruPenasihat = function () { state.initialized = false; init(); };
+
+  // Delegasi klik (ganti onclick inline yang membawa id guru / kod unit dari data)
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest) return;
+    const u = e.target.closest('[data-gp-unit]');
+    if (u) { openUnitStudents(u.getAttribute('data-gp-unit'), u.getAttribute('data-gp-kat')); return; }
+    const g = e.target.closest('[data-gp-id]');
+    if (g) openProfile(g.getAttribute('data-gp-id'));
+  });
 
   document.addEventListener('click', function (e) {
     const nav = e.target.closest('.nav-item[data-page="guru"]'); if (!nav) return;
@@ -17761,7 +17849,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
 
   function postBox(p, cls) {
     const nm = p.ahli.length ? p.ahli.map(function (a) { return esc(a.nama); }).join(', ') : '';
-    return '<div class="' + cls + '" onclick="ProfilPentadbir.openProfile(\'' + esc(p.post_id) + '\')">' +
+    return '<div class="' + cls + '" data-pt-id="' + esc(p.post_id) + '">' +
       (p.kod ? '<span class="pt-kod">' + esc(p.kod) + '</span>' : '') +
       '<div class="pt-bj">' + esc(p.jawatan) + '</div>' +
       '<div class="pt-bn ' + (nm ? '' : 'kosong') + '">' + (nm || 'Belum diisi') + '</div></div>';
@@ -17769,7 +17857,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   function memberLine(a) { const rc = roleCls(a.peranan); return '<div class="pt-mem"><span class="pt-mdot ' + rc + '"></span>' + esc(a.nama) + (a.peranan ? ' <span class="pt-mrole ' + rc + '">' + esc(a.peranan) + '</span>' : '') + '</div>'; }
   function postCard(p) {
     const mem = p.ahli.length ? p.ahli.map(memberLine).join('') : '<div class="pt-mem-empty">Belum diisi</div>';
-    return '<div class="pt-post" onclick="ProfilPentadbir.openProfile(\'' + esc(p.post_id) + '\')">' +
+    return '<div class="pt-post" data-pt-id="' + esc(p.post_id) + '">' +
       '<div class="pt-post-h">' + (p.kod ? '<span class="pt-kod">' + esc(p.kod) + '</span>' : '') + esc(p.jawatan) + '</div>' + mem + '</div>';
   }
 
@@ -17784,7 +17872,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     html += '<div class="pt-top">';
     top.forEach(function (p) {
       const nm = p.ahli.length ? p.ahli.map(function (a) { return esc(a.nama); }).join(', ') : '';
-      html += '<div class="pt-pengetua" onclick="ProfilPentadbir.openProfile(\'' + esc(p.post_id) + '\')">' +
+      html += '<div class="pt-pengetua" data-pt-id="' + esc(p.post_id) + '">' +
         '<span class="pt-kod">' + esc(p.kod || 'HM01') + '</span><div style="font-size:12px;font-weight:700;margin-top:5px;opacity:.95;">' + esc(p.jawatan) + '</div>' +
         '<div class="pt-bn ' + (nm ? '' : 'kosong') + '" style="color:#fff;">' + (nm || 'Belum diisi') + '</div></div>';
     });
@@ -17801,7 +17889,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       html += '<div class="pt-jkcols">' + jks.map(function (jk) {
         const kids = children(jk.post_id);
         return '<div class="pt-jkcol">' +
-          '<div class="pt-jkhead" onclick="ProfilPentadbir.openProfile(\'' + esc(jk.post_id) + '\')">' + (jk.kod ? '<span class="pt-kod">' + esc(jk.kod) + '</span>' : '') + '<div class="pt-jkn">' + esc(jk.jawatan) + '</div></div>' +
+          '<div class="pt-jkhead" data-pt-id="' + esc(jk.post_id) + '">' + (jk.kod ? '<span class="pt-kod">' + esc(jk.kod) + '</span>' : '') + '<div class="pt-jkn">' + esc(jk.jawatan) + '</div></div>' +
           (kids.length ? kids.map(postCard).join('') : '<div class="pt-mem-empty" style="padding:8px;">Tiada jawatan</div>') +
           '</div>';
       }).join('') + '</div>';
@@ -17819,7 +17907,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     html += '<div class="pt-msec"><div class="pt-msec-t">👥 Ahli / Pegawai (' + p.ahli.length + ')</div>';
     if (p.ahli.length) html += '<div class="pt-mlist">' + p.ahli.map(function (a) {
       const rc = roleCls(a.peranan);
-      return '<div class="pt-mrow"><div class="pt-mrow-av" style="background:' + avatarColor(a.nama) + ';">' + initials(a.nama) + '</div><div class="pt-mrow-n">' + esc(a.nama) + '</div>' + (a.peranan ? '<span class="pt-mrole ' + rc + '">' + esc(a.peranan) + '</span>' : '') + '</div>';
+      return '<div class="pt-mrow"><div class="pt-mrow-av" style="background:' + avatarColor(a.nama) + ';">' + esc(initials(a.nama)) + '</div><div class="pt-mrow-n">' + esc(a.nama) + '</div>' + (a.peranan ? '<span class="pt-mrole ' + rc + '">' + esc(a.peranan) + '</span>' : '') + '</div>';
     }).join('') + '</div>';
     else html += '<div class="pt-mem-empty2">Belum diisi — kemas kini lajur <b>ahli</b> dalam sheet GP_Pentadbir</div>';
     html += '</div>';
@@ -17854,6 +17942,12 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     showToast: toast, _state: state
   };
   window.loadProfilPentadbir = function () { state.initialized = false; init(); };
+
+  // Delegasi klik carta (ganti onclick inline yang membawa post_id dari Sheet)
+  document.addEventListener('click', function (e) {
+    const el = e.target.closest && e.target.closest('#pt-chart [data-pt-id]');
+    if (el) openProfile(el.getAttribute('data-pt-id'));
+  });
 
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') ProfilPentadbir.closeProfile(); });
   document.addEventListener('click', function (e) {

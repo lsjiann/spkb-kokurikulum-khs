@@ -668,6 +668,11 @@ function toast(msg, type){
   setTimeout(()=>{ t.style.display = 'none'; }, 2500);
 }
 
+// Escape data luaran (API / localStorage) sebelum masuk innerHTML
+function esc(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function fmtBytes(b){
   if(b < 1024) return b + ' B';
   if(b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
@@ -890,7 +895,7 @@ function showLastBackupInfo(){
   try {
     const s = JSON.parse(raw);
     const d = new Date(s.ts);
-    document.getElementById('lastBackupInfo').innerHTML = `Snapshot terakhir: <strong>${d.toLocaleString('ms-MY')}</strong> · ${s.count} item`;
+    document.getElementById('lastBackupInfo').innerHTML = `Snapshot terakhir: <strong>${d.toLocaleString('ms-MY')}</strong> · ${esc(s.count)} item`;
   } catch(e){}
 }
 
@@ -974,7 +979,7 @@ async function testCloudConnection(){
     const j = await r.json();
     if(j.success){
       document.getElementById('cloudStatus').className = 'note ok';
-      document.getElementById('cloudStatus').innerHTML = `<i class="fas fa-check-circle"></i><strong>Sambungan OK!</strong> Backend timestamp: ${j.ts}`;
+      document.getElementById('cloudStatus').innerHTML = `<i class="fas fa-check-circle"></i><strong>Sambungan OK!</strong> Backend timestamp: ${esc(j.ts)}`;
       toast('✅ Sambungan berjaya', 'ok');
     } else {
       throw new Error(j.error || 'Backend tidak respond');
@@ -983,7 +988,7 @@ async function testCloudConnection(){
     document.getElementById('cloudStatus').className = 'note';
     document.getElementById('cloudStatus').style.background = '#fdedec';
     document.getElementById('cloudStatus').style.borderColor = '#fadbd8';
-    document.getElementById('cloudStatus').innerHTML = '<i class="fas fa-times-circle" style="color:var(--err)"></i><strong>Sambungan gagal:</strong> ' + e.message + '<br><small>Pastikan kod cloud-sync.gs sudah dideploy.</small>';
+    document.getElementById('cloudStatus').innerHTML = '<i class="fas fa-times-circle" style="color:var(--err)"></i><strong>Sambungan gagal:</strong> ' + esc(e.message) + '<br><small>Pastikan kod cloud-sync.gs sudah dideploy.</small>';
     toast('Gagal sambung', 'err');
   }
 }
