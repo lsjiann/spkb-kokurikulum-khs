@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
+<script src="spkb-auth.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pusat Sandar & Tetapan — SPKB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -761,7 +762,7 @@ function showTab(name){
 // ========================================================
 async function runHealthCheck(){
   const apis = [
-    { name:'STUDENT_API', url:STUDENT_API + '?action=data_pelajar_all' },
+    { name:'STUDENT_API', ambil:() => SPKBAuth.ambil(STUDENT_API, 'data_pelajar_all', {}) },
     { name:'GURU_API', url:GURU_API + '?action=maklumat_sekolah' },
   ];
   const cont = document.getElementById('apiHealth');
@@ -770,8 +771,7 @@ async function runHealthCheck(){
   for(const a of apis){
     const t0 = Date.now();
     try {
-      const r = await fetch(a.url + '&_t=' + Date.now());
-      const j = await r.json();
+      const j = a.ambil ? await a.ambil() : await (await fetch(a.url + '&_t=' + Date.now())).json();
       const ms = Date.now() - t0;
       const ok = !!(j && j.success);
       const el = cont.querySelector(`[data-name="${a.name}"]`);
@@ -781,6 +781,12 @@ async function runHealthCheck(){
     } catch(e){
       const el = cont.querySelector(`[data-name="${a.name}"]`);
       el.classList.remove('checking');
+      if(e && e.perluLogMasuk){
+        // Pelayan dicapai tetapi senarai murid dilindungi — bukan kegagalan sambungan
+        el.classList.add('ok');
+        el.querySelector('.status').textContent = `Dilindungi · perlu log masuk · ${Date.now() - t0}ms`;
+        continue;
+      }
       el.classList.add('err');
       el.querySelector('.status').textContent = 'Tidak dapat sambung';
     }

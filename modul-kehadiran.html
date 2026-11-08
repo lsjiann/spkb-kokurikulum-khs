@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
+<script src="spkb-auth.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Modul Kehadiran Kokurikulum — SPKB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -305,8 +306,7 @@ function getKey(unit, tarikh){return unit+'|'+tarikh}
 // =============================================================
 async function fetchPelajar(){
   try {
-    const resp = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
-    const json = await resp.json();
+    const json = await SPKBAuth.ambil(STUDENT_API, 'data_pelajar_all', {});
     if(!json.success) throw new Error(json.error || 'Gagal');
     // ⭐ Backend pulangkan json.students (bukan json.data)
     let rawData = json.students || json.data || [];
@@ -364,6 +364,16 @@ async function fetchPelajar(){
     console.warn('API tidak tersedia atau kosong:', e.message);
     if(!window._kehadiranDiag) window._kehadiranDiag = {};
     window._kehadiranDiag.error = e.message;
+    if(e && e.perluLogMasuk){
+      document.getElementById('statusBadge').textContent = 'Perlu log masuk';
+      document.getElementById('statusBadge').style.background = 'var(--warn)';
+      document.getElementById('statusBadge').style.color = '#333';
+      showDataNotice('demo', 0, 0, e.message);
+      const notice = document.getElementById('dataNotice');
+      notice.innerHTML = '<div style="flex:1;min-width:0;"></div>';
+      SPKBAuth.paparPerluLogMasuk(notice.firstChild, 'Senarai murid memerlukan log masuk DELIMa yang dibenarkan.', retryFetch);
+      return false;
+    }
     loadDemoData();
     const unitCount = Object.keys(unitMap).length;
     document.getElementById('statusBadge').textContent = 'DEMO · ' + pelajarAll.length + ' pelajar';

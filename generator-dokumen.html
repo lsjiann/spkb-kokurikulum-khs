@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
+<script src="spkb-auth.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Generator Dokumen Kokurikulum — SPKB</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -209,8 +210,7 @@ async function fetchGuru(){
 }
 async function fetchPelajar(){
   try {
-    const r = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
-    const j = await r.json();
+    const j = await SPKBAuth.ambil(STUDENT_API, 'data_pelajar_all', {});
     if(j.success){
       const raw = j.students || j.data || [];
       // Dedupe
@@ -221,7 +221,15 @@ async function fetchPelajar(){
       });
       PELAJAR_DATA = Array.from(seen.values());
     }
-  } catch(e){}
+  } catch(e){
+    if(e && e.perluLogMasuk){
+      const wel = document.querySelector('#mainContent .welcome');
+      if(wel){
+        const asal = wel.innerHTML;
+        SPKBAuth.paparPerluLogMasuk(wel, 'Senarai murid memerlukan log masuk DELIMa yang dibenarkan.', () => { wel.innerHTML = asal; fetchPelajar(); });
+      }
+    }
+  }
 }
 
 // Helper: senarai unit dari unit_lookup

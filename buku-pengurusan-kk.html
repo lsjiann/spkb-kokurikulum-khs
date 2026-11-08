@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
   <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <script src="spkb-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Pengurusan Kokurikulum & Portal Audit SKPMg2 — SMK Tinggi Kuching</title>
   
@@ -2897,8 +2898,7 @@
 
     // ---- Data pelajar (LIVE) ----
     async function fetchPelajarData(){
-      const resp = await fetch(STUDENT_API + '?action=data_pelajar_all&_t=' + Date.now());
-      const json = await resp.json();
+      const json = await SPKBAuth.ambil(STUDENT_API, 'data_pelajar_all', {});
       if(!json.success) throw new Error(json.error || 'Gagal muat pelajar');
       return json.students || json.data || [];
     }
@@ -3906,8 +3906,14 @@
     function loadOrgLive(){
       if(_orgLiveLoaded) return;
       _orgLiveLoaded = true;
-      Promise.all([ fetchPelajarData().catch(()=>null), fetchGuruData().catch(()=>null) ])
-        .then(([pel, guru]) => { renderUnitBerdaftarPortal(pel, guru); renderGuruPenasihatPortal(guru); })
+      let perluLogMasuk = false;
+      Promise.all([ fetchPelajarData().catch(e => { if(e && e.perluLogMasuk) perluLogMasuk = true; return null; }), fetchGuruData().catch(()=>null) ])
+        .then(([pel, guru]) => {
+          renderUnitBerdaftarPortal(pel, guru); renderGuruPenasihatPortal(guru);
+          if(perluLogMasuk){
+            SPKBAuth.paparPerluLogMasuk(document.getElementById('unitBerdaftarLive'), 'Senarai murid memerlukan log masuk DELIMa yang dibenarkan.', () => { _orgLiveLoaded = false; loadOrgLive(); });
+          }
+        })
         .catch(() => { renderUnitBerdaftarPortal(null, null); renderGuruPenasihatPortal(null); });
     }
 

@@ -2,11 +2,40 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SPKB — Sistem Pengurusan Kokurikulum Bersepadu</title>
 <base target="_top">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js" integrity="sha384-Emf5ZVIUiarAdhkgtqK+5/Z5qIvM6QoVrS+qAVtfyZVuD5lIHrac0me485+Antp0" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="spkb-auth.js"></script>
+<script>
+/* ===== Audit C1 Fasa 2: log masuk Google untuk data bernama murid ===== */
+var SPKB_KAD_LOG_MASUK = 'Senarai nama murid memerlukan log masuk dengan akaun DELIMa yang dibenarkan.';
+function spkbKadLogMasuk(el, semulaFn) { if (window.SPKBAuth) SPKBAuth.paparPerluLogMasuk(el, SPKB_KAD_LOG_MASUK, semulaFn); }
+function spkbKemasKiniAkaun(u) {
+  var slot = document.getElementById('spkbAuthSlot'), av = document.getElementById('topAvatar');
+  if (!slot || !av) return;
+  if (u) {
+    slot.innerHTML = '';
+    av.title = u.nama + ' (' + u.email + ') — klik untuk log keluar';
+    av.innerHTML = u.gambar ? '<img alt="" referrerpolicy="no-referrer" style="width:100%;height:100%;border-radius:50%;object-fit:cover">' : '<i class="fas fa-user-check"></i>';
+    if (u.gambar) av.querySelector('img').src = u.gambar;
+  } else {
+    av.title = 'Belum log masuk'; av.innerHTML = '<i class="fas fa-user"></i>';
+    if (!slot.childNodes.length && window.SPKBAuth) SPKBAuth.butang(slot, { size: 'medium', text: 'signin', shape: 'pill' }).catch(function () {});
+  }
+}
+function spkbMenuAkaun() {
+  var u = window.SPKBAuth && SPKBAuth.pengguna();
+  if (!u) { var b = document.querySelector('#spkbAuthSlot div[role=button]'); if (b) b.click(); return; }
+  if (confirm('Log keluar daripada ' + u.email + '?')) { SPKBAuth.keluar(); location.reload(); }
+}
+document.addEventListener('DOMContentLoaded', function () {
+  if (!window.SPKBAuth) return;
+  SPKBAuth.apabilaBerubah(spkbKemasKiniAkaun);
+  spkbKemasKiniAkaun(SPKBAuth.pengguna());
+});
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
 <style>
@@ -2236,7 +2265,8 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
     <button class="topbar-icon" title="Carian">
       <i class="fas fa-search"></i>
     </button>
-    <div class="user-avatar" id="topAvatar" title="Pentadbir"><i class="fas fa-user"></i></div>
+    <div id="spkbAuthSlot" class="spkb-auth-slot" aria-live="polite"></div>
+    <div class="user-avatar" id="topAvatar" title="Belum log masuk" role="button" tabindex="0" onclick="spkbMenuAkaun()"><i class="fas fa-user"></i></div>
   </div>
 </header>
 
@@ -6823,9 +6853,9 @@ function dv4Render() {
   dv4Set('dv4Greet', (hr < 12 ? 'Selamat pagi' : hr < 14 ? 'Selamat tengah hari' : hr < 19 ? 'Selamat petang' : 'Selamat malam') + (nm ? ', ' + dv4Esc(nm) : ''));
   // Avatar bar atas: inisial nama sebenar (S12 — bukan "KA" tertanam)
   const av = document.getElementById('topAvatar');
-  if (av && nm) {
+  if (av && nm && !(window.SPKBAuth && SPKBAuth.pengguna())) { // log masuk Google: avatar diurus spkbKemasKiniAkaun
     const ini = nm.replace(/^(Tn\.|Pn\.|En\.|Cik|Dr\.|Hj\.|Hjh\.)\s+/i, '').split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
-    av.textContent = ini || '?'; av.title = nm;
+    av.textContent = ini || '?'; av.title = nm + ' — belum log masuk Google';
   }
   if (DV4.loadedAt) dv4Set('dv4Updated', 'data langsung · dimuat ' + DV4.loadedAt.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }));
   dv4Set('topbarSesi', sesiSemasaTeks());
@@ -8683,11 +8713,7 @@ async function loadHallOfFame(tahun) {
   if (emptyEl) emptyEl.style.display = 'none';
 
   try {
-    const url = PENCAPAIAN_API_URL + '?action=pencapaian_hof&tahun=' + tahun + '&limit=10&_t=' + Date.now();
-    console.log('⭐ Fetching Hall of Fame:', url);
-
-    const response = await fetch(url);
-    const result = await response.json();
+    const result = await SPKBAuth.ambil(PENCAPAIAN_API_URL, 'pencapaian_hof', { tahun: tahun, limit: 10 });
 
     if (!result.success) throw new Error(result.error || 'Unknown error');
 
@@ -8714,6 +8740,7 @@ async function loadHallOfFame(tahun) {
 
   } catch (e) {
     console.error('⭐ Gagal load Hall of Fame:', e);
+    if (e.perluLogMasuk && loadingEl) { spkbKadLogMasuk(loadingEl, function () { loadHallOfFame(tahun); }); return; }
     if (loadingEl) {
       loadingEl.innerHTML =
         '<div style="color:#e74c3c;">' +
@@ -9147,11 +9174,7 @@ async function loadAchievementsTab(tahun) {
   if (tableEmpty) tableEmpty.style.display = 'none';
 
   try {
-    const url = PENCAPAIAN_API_URL + '?action=pencapaian_achievements&tahun=' + tahun + '&_t=' + Date.now();
-    console.log('📊 Fetching Achievements:', url);
-
-    const response = await fetch(url);
-    const result = await response.json();
+    const result = await SPKBAuth.ambil(PENCAPAIAN_API_URL, 'pencapaian_achievements', { tahun: tahun });
 
     if (!result.success) throw new Error(result.error || 'Unknown error');
 
@@ -9186,6 +9209,11 @@ async function loadAchievementsTab(tahun) {
 
   } catch (e) {
     console.error('📊 Gagal load Achievements:', e);
+    if (e.perluLogMasuk && chartLoading) {
+      spkbKadLogMasuk(chartLoading, function () { loadAchievementsTab(tahun); });
+      if (tableLoading) tableLoading.style.display = 'none';
+      return;
+    }
     if (chartLoading) {
       chartLoading.innerHTML =
         '<div style="color:#e74c3c;">' +
@@ -10084,11 +10112,7 @@ let tab2ViewMode = 'all'; // 'all', 'achievement', 'participation'
 
 async function loadStudentInvolvement(tahun) {
   try {
-    const url = PENCAPAIAN_API_URL + '?action=student_involvement&tahun=' + tahun + '&_t=' + Date.now();
-    console.log('👥 Fetching Student Involvement:', url);
-
-    const response = await fetch(url);
-    const result = await response.json();
+    const result = await SPKBAuth.ambil(PENCAPAIAN_API_URL, 'student_involvement', { tahun: tahun });
 
     if (!result.success) throw new Error(result.error);
 
@@ -10117,6 +10141,8 @@ async function loadStudentInvolvement(tahun) {
 
   } catch (e) {
     console.error('Gagal load student involvement:', e);
+    var slEl = document.getElementById('studentListContainer');
+    if (e.perluLogMasuk && slEl) spkbKadLogMasuk(slEl, function () { loadStudentInvolvement(tahun); });
   }
 }
 
@@ -11475,9 +11501,7 @@ async function openLevelDrill(level) {
     if (_levelDrillCache[tahun]) {
       achievements = _levelDrillCache[tahun];
     } else {
-      const url = PENCAPAIAN_API_URL + '?action=pencapaian_achievements&tahun=' + tahun + '&_t=' + Date.now();
-      const response = await fetch(url);
-      const result = await response.json();
+      const result = await SPKBAuth.ambil(PENCAPAIAN_API_URL, 'pencapaian_achievements', { tahun: tahun });
       if (!result.success) throw new Error(result.error);
       achievements = result.data.achievements || [];
       _levelDrillCache[tahun] = achievements;
@@ -11500,6 +11524,7 @@ async function openLevelDrill(level) {
     renderLevelDrillWithControls();
 
   } catch (e) {
+    if (e.perluLogMasuk) { spkbKadLogMasuk(document.getElementById('levelDrillBody')); return; }
     document.getElementById('levelDrillBody').innerHTML =
       '<div style="text-align:center;padding:40px;color:#e74c3c;">' +
       '<i class="fas fa-exclamation-triangle" style="font-size:36px;"></i>' +
@@ -13352,10 +13377,7 @@ function hydrateDashboardLive() {
   };
   fetch(STUDENT + '?action=data_pelajar_ringkasan&tahun=' + tahunAktif() + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
     if (res && res.success && typeof res.total === 'number') return paparRingkasanPelajar(res);
-    return fetch(STUDENT + '?action=data_pelajar_all&tahun=' + tahunAktif() + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res2) {
-      if (!res2 || !res2.success || !Array.isArray(res2.students)) return dv4Gagal('pelajar');
-      paparRingkasanPelajar(kiraRingkasanDariSenarai(res2.students));
-    });
+    dv4Gagal('pelajar');
   }).catch(function () { dv4Gagal('pelajar'); });
 }
 
@@ -14716,12 +14738,15 @@ console.log('🚀 [DataPelajar] Loading module...');
   
     async function api(action) {
     // R-5: data pelajar & statistik ikut tahun aktif dashboard
+    // C1: data bernama melalui SPKBAuth.ambil (POST bertoken jika log masuk)
+    if (action === 'data_pelajar_all') return SPKBAuth.ambil(API_URL, action, typeof tahunAktif === 'function' ? { tahun: tahunAktif() } : {});
     const res = await fetch(API_URL + '?action=' + action + (typeof tahunAktif === 'function' ? '&tahun=' + tahunAktif() : ''));
     return res.json();
   }
   
   // ⭐ ADD THIS NEW FUNCTION
   async function apiWithParams(action, params) {
+    if (action === 'student_achievements' || action === 'data_pelajar_profile') return SPKBAuth.ambil(API_URL, action, params || {});
     const url = new URL(API_URL);
     url.searchParams.append('action', action);
     if (params) {
@@ -14790,6 +14815,12 @@ console.log('🚀 [DataPelajar] Loading module...');
       state.loading = false;
       console.error('❌ [DataPelajar]:', e);
       const err = document.getElementById('dp-err');
+      if (err && e.perluLogMasuk) {
+        document.getElementById('dp-load').style.display = 'none';
+        err.style.display = 'block';
+        spkbKadLogMasuk(err, function () { err.style.display = 'none'; document.getElementById('dp-load').style.display = ''; init(); });
+        return;
+      }
       if (err) {
         document.getElementById('dp-load').style.display = 'none';
         err.style.display = 'block';
@@ -15517,6 +15548,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       
     } catch (err) {
       console.error('Error loading achievements:', err);
+      if (err.perluLogMasuk) { spkbKadLogMasuk(container); return; }
       container.innerHTML = `
         <div class="ach-empty">
           <div class="ach-empty-icon">⚠️</div>
@@ -16460,8 +16492,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     if (state.studentsLoaded) { if (cb) cb(true); return; }
     if (state.studentsLoading) { return; }
     state.studentsLoading = true;
-    fetch(STUDENT_API_URL + '?action=data_pelajar_all&tahun=' + tahunAktif() + '&_t=' + Date.now())
-      .then(function (r) { return r.json(); })
+    SPKBAuth.ambil(STUDENT_API_URL, 'data_pelajar_all', { tahun: tahunAktif() })
       .then(function (res) {
         if (res && res.success && Array.isArray(res.students)) {
           state.students = res.students;
@@ -17624,7 +17655,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     if (state.statsLoaded) { renderStats(); return; }
     Promise.all([
       api(GURU_API_URL, 'guru_penasihat_all').catch(function () { return null; }),
-      api(STUDENT_API_URL, 'data_pelajar_all').catch(function () { return null; })
+      SPKBAuth.ambil(STUDENT_API_URL, 'data_pelajar_all', {}).catch(function () { return null; })
     ]).then(function (r) {
       const g = r[0], s = r[1];
       const st = Object.assign({}, DEFAULT_STATS);
@@ -18401,7 +18432,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     setDefaultPage: function (p) { sset('spkb_default_page', p); toast('🏠 Halaman lalai dikemas kini'); },
     test: function (id) {
       const url = id === 'guru' ? GURU_API_URL : STUDENT_API_URL;
-      const action = id === 'guru' ? 'guru_penasihat_all' : 'data_pelajar_all';
+      const action = id === 'guru' ? 'guru_penasihat_all' : 'data_pelajar_ringkasan';
       const el = document.getElementById('ts-st-' + id); if (el) { el.className = 'ts-status run'; el.textContent = 'Menguji…'; }
       const t0 = Date.now();
       fetch(url + '?action=' + action + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {

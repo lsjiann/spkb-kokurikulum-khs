@@ -14,7 +14,9 @@
   'use strict';
 
   var CONFIG = window.SPKB_AUTH_CONFIG = window.SPKB_AUTH_CONFIG || {
-    clientId: '',                 // diisi selepas OAuth Client ID dicipta
+    // OAuth Client ID (projek Google Cloud "SPKB Log Masuk") — bukan rahsia; asal yang dibenarkan
+    // ditetapkan dalam Google Cloud Console (https://lsjiann.github.io, http://localhost:5180).
+    clientId: '99986398736-5sut8ifonen2jd5jm1gffo8cte926s4n.apps.googleusercontent.com',
     domain: 'moe-dl.edu.my'       // petunjuk akaun (bukan kawalan keselamatan — pelayan yang menyemak)
   };
   var KUNCI = 'spkb_id_token';
@@ -115,6 +117,53 @@
 
     /** Daftar fungsi yang dipanggil apabila status log masuk berubah. */
     apabilaBerubah: function (fn) { pendengar.push(fn); },
+
+    /**
+     * Ambil data yang MUNGKIN dilindungi (nama murid dsb.).
+     *  • Sudah log masuk → POST bertoken. Jika backend lama belum mengenali POST untuk tindakan ini,
+     *    jatuh balik kepada GET (tempoh peralihan).
+     *  • Belum log masuk → GET. Jika backend memulangkan PERLU_LOG_MASUK, ralat .perluLogMasuk dilempar.
+     * Pulangkan JSON respons asal (bentuk sama seperti GET sebelum ini).
+     */
+    ambil: function (url, action, params) {
+      params = params || {};
+      var get = function () {
+        var q = new URLSearchParams(Object.assign({ action: action }, params, { _t: Date.now() }));
+        return fetch(url + (url.indexOf('?') === -1 ? '?' : '&') + q.toString())
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            var m = String((j && (j.error || j.ralat)) || '');
+            if (j && j.success === false && /PERLU_LOG_MASUK/.test(m)) {
+              var e = new Error(m.replace(/^PERLU_LOG_MASUK:\s*/, '')); e.perluLogMasuk = true; throw e;
+            }
+            return j;
+          });
+      };
+      if (!tokenSah()) return get();
+      return SPKBAuth.post(url, action, params).then(function (j) {
+        if (j && j.success === false && /Tindakan tidak dikenali|Unknown action/i.test(String(j.error || ''))) return get();
+        return j;
+      });
+    },
+
+    /**
+     * Papar kad "Perlu log masuk" dalam elemen (untuk modul). Selepas log masuk, panggil semulaFn
+     * (lalai: muat semula halaman).
+     */
+    paparPerluLogMasuk: function (el, mesej, semulaFn) {
+      if (!el) return;
+      el.innerHTML = '<div style="max-width:420px;margin:28px auto;padding:22px;border:1px solid #e3e7ee;border-radius:12px;background:#fff;text-align:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif">' +
+        '<div style="font-size:30px;margin-bottom:6px">🔒</div>' +
+        '<b style="display:block;font-size:16px;color:#1a3c6e;margin-bottom:6px">Perlu log masuk</b>' +
+        '<p style="margin:0 0 14px;color:#5b6678;font-size:13.5px;line-height:1.5"></p>' +
+        '<div class="spkb-auth-butang" style="display:inline-block"></div></div>';
+      el.querySelector('p').textContent = mesej || 'Data ini mengandungi maklumat murid. Log masuk dengan akaun DELIMa yang dibenarkan.';
+      SPKBAuth.butang(el.querySelector('.spkb-auth-butang')).catch(function (e) { el.querySelector('p').textContent = e.message; });
+      var sekali = false;
+      SPKBAuth.apabilaBerubah(function (u) {
+        if (u && !sekali) { sekali = true; if (typeof semulaFn === 'function') semulaFn(); else location.reload(); }
+      });
+    },
 
     /**
      * POST ke Apps Script dengan token. Jika pelayan memulangkan PERLU_LOG_MASUK, token dibuang
