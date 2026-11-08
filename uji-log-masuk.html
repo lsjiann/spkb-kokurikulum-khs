@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; frame-src https://accounts.google.com/gsi/; connect-src 'self' https://accounts.google.com/gsi/ https://script.google.com https://script.googleusercontent.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Uji Log Masuk SPKB</title>
+<style>
+  :root { --ink:#0f1b2d; --muted:#5b6678; --line:#e3e7ee; --ok:#0b7a0b; --ok-bg:#e7f6e7; --err:#b42d2d; --err-bg:#fdeaea; --brand:#1a3c6e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: #f4f6f9; padding: 24px 16px; }
+  main { max-width: 620px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 24px; }
+  h1 { font-size: 21px; margin: 0 0 4px; color: var(--brand); }
+  p.sub { color: var(--muted); margin: 0 0 20px; }
+  .langkah { border-top: 1px solid var(--line); padding: 16px 0; }
+  .langkah b { display: block; margin-bottom: 6px; }
+  .hasil { margin-top: 10px; padding: 12px 14px; border-radius: 10px; background: #f4f6f9; font-size: 14px; white-space: pre-wrap; }
+  .hasil.ok { background: var(--ok-bg); color: var(--ok); }
+  .hasil.err { background: var(--err-bg); color: var(--err); }
+  input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+  button { margin-top: 8px; background: var(--brand); color: #fff; border: 0; border-radius: 8px; padding: 9px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  code { background: #eef1f6; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Uji Log Masuk Google — SPKB</h1>
+  <p class="sub">Halaman ujian Fasa 0. Tiada data murid dibaca di sini.</p>
+
+  <div class="langkah">
+    <b>1. OAuth Client ID</b>
+    <div id="cid" class="hasil">—</div>
+  </div>
+
+  <div class="langkah">
+    <b>2. Log masuk dengan akaun DELIMa anda</b>
+    <div id="butang"></div>
+    <div id="hasilLogMasuk" class="hasil">Belum log masuk.</div>
+  </div>
+
+  <div class="langkah">
+    <b>3. (Selepas backend dideploy) Pengesahan di pelayan</b>
+    <input id="urlPelayan" placeholder="URL Apps Script Pelajar (…/exec)" value="https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec">
+    <button id="semakPelayan" type="button">Semak di pelayan</button>
+    <div id="hasilPelayan" class="hasil">—</div>
+  </div>
+
+  <div class="langkah">
+    <button id="keluar" type="button" style="background:#fff;color:var(--brand);border:1px solid var(--line)">Log keluar</button>
+  </div>
+</main>
+
+<script>
+  // Client ID dihantar melalui URL untuk ujian: uji-log-masuk.html?client_id=XXXX.apps.googleusercontent.com
+  window.SPKB_AUTH_CONFIG = {
+    clientId: (new URLSearchParams(location.search).get('client_id') || '').trim(),
+    domain: 'moe-dl.edu.my'
+  };
+</script>
+<script src="spkb-auth.js"></script>
+<script>
+(function () {
+  function papar(id, teks, kelas) { var e = document.getElementById(id); e.textContent = teks; e.className = 'hasil' + (kelas ? ' ' + kelas : ''); }
+  var cid = SPKBAuth.config.clientId;
+  if (!/\.apps\.googleusercontent\.com$/.test(cid)) {
+    papar('cid', 'Tiada Client ID yang sah dalam URL.\nBuka halaman ini dengan: ?client_id=XXXX.apps.googleusercontent.com', 'err');
+    return;
+  }
+  papar('cid', cid, 'ok');
+
+  function kemasKini(u) {
+    if (!u) { papar('hasilLogMasuk', 'Belum log masuk.'); return; }
+    var domainOk = u.hd === 'moe-dl.edu.my';
+    papar('hasilLogMasuk',
+      '✓ Log masuk berjaya\nNama: ' + u.nama + '\nE-mel: ' + u.email + '\nDomain (hd): ' + (u.hd || '(tiada — akaun peribadi)') +
+      '\n\n' + (domainOk ? '✓ Akaun DELIMa disahkan. Fasa 0 LULUS bagi akaun ini.' : '⚠ Bukan akaun DELIMa (@moe-dl.edu.my).'),
+      domainOk ? 'ok' : 'err');
+  }
+  SPKBAuth.apabilaBerubah(kemasKini);
+  kemasKini(SPKBAuth.pengguna());
+  SPKBAuth.butang(document.getElementById('butang')).catch(function (e) { papar('hasilLogMasuk', 'Ralat: ' + e.message, 'err'); });
+
+  document.getElementById('semakPelayan').onclick = function () {
+    papar('hasilPelayan', 'Menyemak…');
+    SPKBAuth.post(document.getElementById('urlPelayan').value.trim(), 'auth_semak', {})
+      .then(function (j) {
+        if (j && j.success) papar('hasilPelayan', '✓ Pelayan mengesahkan: ' + j.pengguna.email + ' (peranan: ' + j.pengguna.peranan + ')', 'ok');
+        else papar('hasilPelayan', '✗ ' + ((j && (j.error || j.ralat)) || 'Respons tidak dijangka'), 'err');
+      })
+      .catch(function (e) { papar('hasilPelayan', '✗ ' + e.message, 'err'); });
+  };
+  document.getElementById('keluar').onclick = function () { SPKBAuth.keluar(); };
+})();
+</script>
+</body>
+</html>
