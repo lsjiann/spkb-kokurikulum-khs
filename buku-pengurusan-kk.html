@@ -2,6 +2,7 @@
 <html lang="ms">
 <head>
   <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Pengurusan Kokurikulum & Portal Audit SKPMg2 — SMK Tinggi Kuching</title>
   
@@ -9,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <style>
     :root {
@@ -749,7 +750,7 @@
           <input type="text" class="nav-search-input" id="searchBox" placeholder="Cari akta, pekeliling, atau terma tugas..." oninput="searchManual()">
         </div>
         <div class="navbar-actions">
-          <button class="action-btn" id="btnBackSpkb" style="display:none;background:var(--slate-100);color:var(--slate-700);" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+          <button class="action-btn" id="btnBackSpkb" style="display:none;background:var(--slate-100);color:var(--slate-700);" onclick="parent.postMessage({action:'spkb-back'}, location.origin)"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
           <button class="action-btn" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Cetak / Simpan Laporan</button>
         </div>
       </header>
@@ -3946,7 +3947,7 @@
         try {
           if(window.parent && typeof window.parent.navigateTo === 'function'){ window.parent.navigateTo('laporan-program'); return; }
         } catch(e){}
-        parent.postMessage({ action:'spkb-open', page:'laporan-program' }, '*');
+        parent.postMessage({ action:'spkb-open', page:'laporan-program' }, location.origin);
       } else {
         window.location.href = LAPORAN_PROGRAM_FILE;
       }
@@ -3963,7 +3964,7 @@
           }
         } catch(e){}
         // Sandaran: postMessage untuk shell yang mengendalikannya
-        parent.postMessage({ action:'spkb-open', page:'skas' }, '*');
+        parent.postMessage({ action:'spkb-open', page:'skas' }, location.origin);
       } else {
         window.location.href = INSTRUMEN_FILE;
       }

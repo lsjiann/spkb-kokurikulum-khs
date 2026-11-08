@@ -2,6 +2,7 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Direktori Guru &amp; Penjana AJK — SPKB</title>
 <style>
@@ -554,6 +555,7 @@ td.nm{font-weight:700}
 <div class="toast" id="toast"></div>
 
 <script>
+function csvSelamat(csv){return String(csv).replace(/(^|,)("?)([=+\-@\t\r])(?![\d.]+"?(,|$))/gm,function(m,a,q,c){return a+q+"'"+c;});} // L1
 function mulaDirektori(DATA){
 // R-6: tahun/sesi Direktori daripada data (bukan "2026" tertanam)
 const SESI = String(DATA.sesi || new Date().getFullYear());
@@ -820,7 +822,7 @@ $('#fReset').onclick=()=>{['#fNama','#fGred','#fOps','#fBid','#fUtama'].forEach(
 function dl(name,txt){const b=new Blob(['\ufeff'+txt],{type:'text/csv;charset=utf-8'}),
   a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();
   URL.revokeObjectURL(a.href);toast('Fail dimuat turun: '+name);}
-const csvq=v=>'"'+(v||'').toString().replace(/"/g,'""')+'"';
+const csvq=v=>{let s=(v==null?'':v).toString();if(/^[=+\-@\t\r]/.test(s)&&!/^[+-]?[\d.]+$/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}; // L1
 $('#dlCsv').onclick=()=>{
   const head=['Bil','Nama','Gred','Jantina','Opsyen 1','Opsyen 2','Jawatan Utama',
     'Pengurusan','Kurikulum','HEM','Kokurikulum','Beban','Catatan'];

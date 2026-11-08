@@ -2,9 +2,10 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Instrumen SK@S Standard 3.2 — Edisi 2026</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
 :root{--pri:#1a3c6e;--sec:#2e86c1;--acc:#f39c12;--ok:#27ae60;--err:#e74c3c;--warn:#f1c40f;--purp:#8e44ad;--teal:#1abc9c;--bg:#f0f2f5;--card:#fff;--txt:#2c3e50;--mute:#7f8c8d;--bdr:#e0e0e0;--r:12px;--sh:0 2px 12px rgba(0,0,0,.08);--yellow:#f5b800;--dark:#1a1a1a;--red-hl:#c0392b;--blue-hl:#2980b9;--green-hl:#16a085;--purple-hl:#8e44ad}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -139,14 +140,14 @@ body.in-spkb .spkb-back-btn{display:flex}
 </style>
 </head>
 <body>
-<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> SPKB</div>
+<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'}, location.origin)"><i class="fas fa-arrow-left"></i> SPKB</div>
 <div class="top">
   <h1><i class="fas fa-clipboard-check"></i> Instrumen SK@S Standard 3.2 — Pengurusan Kokurikulum <span style="background:rgba(255,255,255,0.2);font-size:10px;padding:3px 8px;border-radius:8px;margin-left:4px;">Edisi 2026</span></h1>
   <div class="top-r">
     <label style="font-size:12px;font-weight:600;">Tahun:</label>
     <select id="yearSelect" onchange="switchYear(this.value)"></select>
     <span class="badge" id="skorBadge">—</span>
-    <button class="btn btn-back" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</button>
+    <button class="btn btn-back" onclick="parent.postMessage({action:'spkb-back'}, location.origin)"><i class="fas fa-arrow-left"></i> Kembali</button>
   </div>
 </div>
 <div class="wrap">

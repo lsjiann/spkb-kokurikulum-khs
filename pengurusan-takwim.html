@@ -2,9 +2,10 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pengurusan Takwim Kokurikulum — SPKB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
 :root{
   --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60; --warn:#f39c12; --err:#c0392b;
@@ -186,7 +187,7 @@ body.in-spkb .sidebar{height:calc(100vh - 20px);top:0}
   <div class="top-r">
     <select class="year-sel" id="yearSel" onchange="changeYear(this.value)"></select>
     <button class="btn-top primary" onclick="saveAll()"><i class="fas fa-save"></i> Simpan</button>
-    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</a>
+    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'}, location.origin)"><i class="fas fa-arrow-left"></i> Kembali</a>
   </div>
 </div>
 
@@ -1364,15 +1365,26 @@ function setCloudURLPrompt(){
   toast(v.trim() ? '✅ URL Awan disimpan' : 'URL Awan dikosongkan');
   updateCloudStatus();
 }
+// M2: simpan ke awan memerlukan kunci pentadbir (disemak oleh takwim-cloud.gs)
+function kunciTakwim(){
+  let k=''; try{ k=sessionStorage.getItem('spkb_kunci_tulis')||''; }catch(e){}
+  if(!k){ k=(prompt('Masukkan kunci pentadbir untuk menyimpan takwim ke awan:')||'').trim(); if(k) try{ sessionStorage.setItem('spkb_kunci_tulis',k); }catch(e){} }
+  return k;
+}
 async function cloudSimpan(){
   const url = getCloudURL();
   if(!url){ toast('Sila tetapkan URL Awan dahulu'); return; }
   if(!DATA){ toast('Tiada data takwim untuk disimpan'); return; }
   try{
     const res = await fetch(url, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({ action:'simpan', tahun:currentYear, data:DATA }) });
+      body: JSON.stringify({ action:'simpan', tahun:currentYear, data:DATA, kunci:kunciTakwim() }) });
     const r = await res.json();
-    if(r && r.ok){ toast('☁️ Disimpan ke awan'); } else { toast('Gagal simpan ke awan'); }
+    if(r && r.ok){ toast('☁️ Disimpan ke awan'); }
+    else {
+      const m = (r && (r.ralat || r.error)) || '';
+      if(/kunci/i.test(m)) try{ sessionStorage.removeItem('spkb_kunci_tulis'); }catch(e){}
+      toast('Gagal simpan ke awan' + (m ? ': ' + m : ''));
+    }
   }catch(e){ toast('Gagal hubungi awan — semak URL'); }
 }
 async function cloudMuat(auto){

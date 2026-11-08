@@ -2,9 +2,10 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pusat Sandar & Tetapan — SPKB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
 :root{
   --pri:#1e3a5f; --pri2:#2c5282; --acc:#e67e22; --ok:#27ae60; --warn:#f39c12; --err:#c0392b;
@@ -146,7 +147,7 @@ body.in-spkb .sidebar{height:calc(100vh - 20px)}
 <div class="top">
   <h1><i class="fas fa-cogs"></i> Pusat Sandar & Tetapan SPKB</h1>
   <div class="top-r">
-    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</a>
+    <a class="btn-top" onclick="parent.postMessage({action:'spkb-back'}, location.origin)"><i class="fas fa-arrow-left"></i> Kembali</a>
   </div>
 </div>
 
@@ -271,6 +272,12 @@ body.in-spkb .sidebar{height:calc(100vh - 20px)}
           <div class="hint" style="font-size:11px;color:var(--mute);margin-top:4px;">Salin tampal URL projek Apps Script BARU yang anda cipta khas (langkah 1 di bawah)</div>
         </div>
 
+        <div class="fld">
+          <label>Token Sync (rahsia — sama seperti SYNC_TOKEN dalam Script Properties projek sync)</label>
+          <input type="password" id="syncToken" placeholder="Token rahsia anda" oninput="saveSyncEndpoint()" autocomplete="off">
+          <div class="hint" style="font-size:11px;color:var(--mute);margin-top:4px;">Token disimpan dalam pelayar ini sahaja dan tidak pernah dieksport atau disync.</div>
+        </div>
+
         <div class="row-btns">
           <button class="btn btn-pri" onclick="testCloudConnection()"><i class="fas fa-wifi"></i> Uji Sambungan</button>
           <button class="btn btn-ok" onclick="syncPush()" id="syncPushBtn" disabled><i class="fas fa-cloud-upload-alt"></i> Push Semua ke Cloud</button>
@@ -285,43 +292,64 @@ body.in-spkb .sidebar{height:calc(100vh - 20px)}
           <li>Beri nama: <code>SPKB Cloud Sync</code>.</li>
           <li>Padam kod default dalam <code>Code.gs</code> → salin SEMUA kod di bawah ke fail itu.</li>
           <li>Klik <strong>Save</strong> (Ctrl+S) → kemudian klik <strong>Run</strong> → pilih <code>testInit</code> → authorize bila diminta (auto-cipta spreadsheet sandar).</li>
-          <li>Klik <strong>Deploy → New deployment → Web app</strong> → Execute as: <em>Me</em>, Access: <em>Anyone</em> → Deploy.</li>
+          <li>Klik <strong>Deploy → New deployment → Web app</strong> → Execute as: <em>Me</em>, Access: <em>Anyone</em> → Deploy. <strong>Kemudian</strong> Project Settings → Script Properties → tambah <code>SYNC_TOKEN</code> (rentetan rawak panjang) dan masukkan token yang sama di medan "Token Sync".</li>
           <li>Salin <strong>Web app URL</strong> → tampal ke kotak "URL Endpoint Sync" di atas → Uji Sambungan.</li>
         </ol>
 
         <div class="code-block">
 <button class="copy-btn" onclick="copyToClipboard('cloudSyncCode')"><i class="fas fa-copy"></i> Salin</button>
 <pre id="cloudSyncCode">// ====================================================
-// SPKB CLOUD SYNC — Backend Module
+// SPKB CLOUD SYNC — Backend Module (versi token, H1)
 // Letak fail ini sebagai 'cloud-sync.gs' dalam projek Apps Script
+// 1. Project Settings → Script Properties → SYNC_TOKEN = rentetan rawak panjang (cth. 32 aksara)
+// 2. Masukkan token yang SAMA dalam medan "Token Sync" di Pusat Sandar
+// Data dikenal pasti oleh token (pemilik projek), BUKAN oleh e-mel yang dihantar pelayar.
 // ====================================================
 const SYNC_SHEET_NAME = 'spkb_sync';
+const SYNC_PEMILIK = 'pemilik';
+const SYNC_AWALAN = ['takwim_','kehadiran_','instrumen32_','kewangan_','inventori_','lat_','spkb_'];
+const SYNC_RAHSIA = /^(spkb_pin|spkb_kunci_|spkb_sync_|spkb_backup_)|token|secret|rahsia|apikey|api_key|password/i;
 
 function doGet(e) {
-  const action = e.parameter.action || '';
-  if (action === 'sync_get_all') return _resp({ success: true, data: _getAllSyncData(e.parameter.user || 'default') });
-  if (action === 'sync_get')     return _resp({ success: true, value: _getSyncValue(e.parameter.user || 'default', e.parameter.key) });
-  if (action === 'sync_ping')    return _resp({ success: true, ts: new Date().toISOString() });
-  return _resp({ success: false, error: 'Unknown action' });
+  return _resp({ success: false, error: 'Gunakan POST dengan token' }); // tiada bacaan tanpa token
 }
 
 function doPost(e) {
   try {
     const body = JSON.parse(e.postData.contents);
+    const ralat = _semakToken(body.token);
+    if (ralat) return _resp({ success: false, error: ralat });
+    if (body.action === 'sync_ping') return _resp({ success: true, ts: new Date().toISOString() });
+    if (body.action === 'sync_get_all') return _resp({ success: true, data: _getAllSyncData(SYNC_PEMILIK) });
     if (body.action === 'sync_set') {
-      _setSyncValue(body.user || 'default', body.key, body.value);
+      if (!_kunciSah(body.key)) return _resp({ success: false, error: 'Kunci tidak dibenarkan' });
+      _setSyncValue(SYNC_PEMILIK, body.key, body.value);
       return _resp({ success: true });
     }
     if (body.action === 'sync_set_bulk') {
       const items = body.items || {};
-      Object.keys(items).forEach(k => _setSyncValue(body.user || 'default', k, items[k]));
-      return _resp({ success: true, count: Object.keys(items).length });
+      const sah = Object.keys(items).filter(_kunciSah).slice(0, 2000);
+      sah.forEach(k => _setSyncValue(SYNC_PEMILIK, k, items[k]));
+      return _resp({ success: true, count: sah.length });
     }
     return _resp({ success: false, error: 'Unknown action' });
   } catch (err) {
-    return _resp({ success: false, error: String(err) });
+    console.error(err);
+    return _resp({ success: false, error: 'Permintaan tidak sah' });
   }
 }
+
+function _semakToken(token) {
+  const cache = CacheService.getScriptCache();
+  const gagal = Number(cache.get('sync_gagal') || 0);
+  if (gagal >= 10) return 'Terlalu banyak cubaan gagal. Cuba lagi selepas 15 minit.';
+  const sah = PropertiesService.getScriptProperties().getProperty('SYNC_TOKEN');
+  if (!sah) return 'SYNC_TOKEN belum ditetapkan dalam Script Properties';
+  if (!token || String(token) !== sah) { cache.put('sync_gagal', String(gagal + 1), 900); return 'Token tidak sah'; }
+  return '';
+}
+
+function _kunciSah(k) { k = String(k || ''); return SYNC_AWALAN.some(p => k.indexOf(p) === 0) && !SYNC_RAHSIA.test(k); }
 
 function _sheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -702,6 +730,12 @@ function getAllSPKBKeys(){
   return keys;
 }
 
+// H1: kunci yang TIDAK PERNAH dihantar ke cloud, dimasukkan dalam fail eksport, atau ditulis dari cloud/fail.
+// PIN skrin kunci, kunci pentadbir, URL endpoint, token sync dan apa-apa yang menyerupai rahsia.
+const KUNCI_RAHSIA = /^(spkb_pin|spkb_pin_|spkb_kunci_|spkb_sync_|spkb_backup_)|token|secret|rahsia|apikey|api_key|password|kata_laluan/i;
+function bolehDisandar(k){ return SPKB_PREFIXES.some(p => k.indexOf(p) === 0) && !KUNCI_RAHSIA.test(k); }
+function getBackupKeys(){ return getAllSPKBKeys().filter(bolehDisandar); }
+
 function getKeyModule(key){
   for(const pfx in MODULE_MAP){
     if(key.indexOf(pfx) === 0) return { prefix:pfx, ...MODULE_MAP[pfx] };
@@ -790,7 +824,7 @@ async function runHealthCheck(){
 // EXPORT / IMPORT
 // ========================================================
 function exportAllData(){
-  const keys = getAllSPKBKeys();
+  const keys = getBackupKeys(); // H1: tanpa PIN/kunci/endpoint
   if(!keys.length){ toast('Tiada data SPKB untuk dieksport', 'err'); return; }
 
   const data = {};
@@ -831,7 +865,7 @@ function handleFileImport(file){
       }
       const keys = Object.keys(backup.data);
       if(!confirm(`Pulihkan ${keys.length} item dari sandaran ini?\n\nDieksport pada: ${backup.exported_at}\n\nData sedia ada untuk kunci yang sama AKAN DIGANTI.`)) return;
-      keys.forEach(k => { sset(k, backup.data[k]); });
+      keys.filter(bolehDisandar).forEach(k => { sset(k, backup.data[k]); }); // H1: abaikan kunci asing/rahsia
       toast(`✅ ${keys.length} item dipulihkan`, 'ok');
       runHealthCheck();
     } catch(err){
@@ -877,7 +911,7 @@ function startAutoBackup(){
 function stopAutoBackup(){ if(autoBackupTimer) clearInterval(autoBackupTimer); }
 
 function manualBackup(){
-  const keys = getAllSPKBKeys().filter(k => k.indexOf('spkb_backup_') !== 0); // jangan backup the backups
+  const keys = getBackupKeys(); // H1: tanpa snapshot lain dan tanpa rahsia
   const data = {};
   keys.forEach(k => data[k] = sget(k));
   const snapshot = {
@@ -905,7 +939,7 @@ function restoreLastBackup(){
   try {
     const s = JSON.parse(raw);
     if(!confirm(`Pulihkan ${s.count} item dari snapshot ${new Date(s.ts).toLocaleString('ms-MY')}?\n\nData semasa akan diganti.`)) return;
-    Object.keys(s.data).forEach(k => sset(k, s.data[k]));
+    Object.keys(s.data).filter(bolehDisandar).forEach(k => sset(k, s.data[k])); // H1
     toast(`✅ ${s.count} item dipulihkan`, 'ok');
     runHealthCheck();
   } catch(e){ toast('Ralat: ' + e.message, 'err'); }
@@ -951,11 +985,23 @@ function resetAllSPKB(){
 // ========================================================
 function saveSyncEndpoint(){
   sset('spkb_sync_endpoint', document.getElementById('syncEndpoint').value.trim());
+  const tk = document.getElementById('syncToken'); if (tk) sset('spkb_sync_token', tk.value.trim());
+}
+// H1: semua panggilan sync melalui POST dengan token; pelayan mengenal pasti pemilik daripada token, bukan e-mel
+async function syncPanggil(body){
+  const ep = sget('spkb_sync_endpoint'), token = sget('spkb_sync_token');
+  if(!ep) throw new Error('URL endpoint belum diisi');
+  if(!token) throw new Error('Token Sync belum diisi');
+  const r = await fetch(ep, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ token }, body)) });
+  let j; try { j = await r.json(); } catch(e){ throw new Error('Respons tidak sah — pastikan kod sync terkini (versi token) sudah dideploy'); }
+  return j;
 }
 
 function updateCloudStatus(){
   const ep = sget('spkb_sync_endpoint');
   document.getElementById('syncEndpoint').value = ep || '';
+  const tkEl = document.getElementById('syncToken'); if (tkEl) tkEl.value = sget('spkb_sync_token') || '';
   const status = document.getElementById('cloudStatus');
   const pushBtn = document.getElementById('syncPushBtn');
   const pullBtn = document.getElementById('syncPullBtn');
@@ -975,8 +1021,7 @@ async function testCloudConnection(){
   if(!ep){ toast('Sila isi URL endpoint dahulu', 'err'); return; }
   toast('Memeriksa sambungan…');
   try {
-    const r = await fetch(ep + '?action=sync_ping&_t=' + Date.now());
-    const j = await r.json();
+    const j = await syncPanggil({ action:'sync_ping' });
     if(j.success){
       document.getElementById('cloudStatus').className = 'note ok';
       document.getElementById('cloudStatus').innerHTML = `<i class="fas fa-check-circle"></i><strong>Sambungan OK!</strong> Backend timestamp: ${esc(j.ts)}`;
@@ -997,17 +1042,13 @@ async function syncPush(){
   const ep = sget('spkb_sync_endpoint');
   if(!ep){ return; }
   if(!confirm('Push SEMUA data SPKB ke cloud? Data lama di cloud akan ditindih.')) return;
-  const keys = getAllSPKBKeys().filter(k => k.indexOf('spkb_backup_') !== 0);
+  const keys = getBackupKeys(); // H1
   const items = {};
   keys.forEach(k => items[k] = sget(k));
   const user = sget('spkb_profile_email') || 'default';
   toast(`Menghantar ${keys.length} item ke cloud…`);
   try {
-    const r = await fetch(ep, {
-      method:'POST',
-      body: JSON.stringify({ action:'sync_set_bulk', user, items })
-    });
-    const j = await r.json();
+    const j = await syncPanggil({ action:'sync_set_bulk', items });
     if(j.success){
       sset('spkb_last_push', new Date().toISOString());
       toast(`✅ ${j.count} item disync ke cloud`, 'ok');
@@ -1022,12 +1063,12 @@ async function syncPull(){
   const user = sget('spkb_profile_email') || 'default';
   toast('Mengambil data dari cloud…');
   try {
-    const r = await fetch(ep + '?action=sync_get_all&user=' + encodeURIComponent(user) + '&_t=' + Date.now());
-    const j = await r.json();
+    const j = await syncPanggil({ action:'sync_get_all' });
     if(j.success && j.data){
       const items = j.data;
-      const count = Object.keys(items).length;
-      Object.keys(items).forEach(k => sset(k, items[k]));
+      const selamat = Object.keys(items).filter(bolehDisandar); // H1: jangan tulis kunci asing/rahsia dari cloud
+      const count = selamat.length;
+      selamat.forEach(k => sset(k, items[k]));
       sset('spkb_last_pull', new Date().toISOString());
       toast(`✅ ${count} item dipulih dari cloud`, 'ok');
     } else throw new Error(j.error || 'Tiada data');
@@ -1068,11 +1109,7 @@ async function syncReminderConfig(){
   const cfg = sget('spkb_email_config') || '{}';
   const user = sget('spkb_profile_email') || 'default';
   try {
-    const r = await fetch(ep, {
-      method:'POST',
-      body: JSON.stringify({ action:'sync_set', user, key:'spkb_reminder_config', value:cfg })
-    });
-    const j = await r.json();
+    const j = await syncPanggil({ action:'sync_set', key:'spkb_reminder_config', value:cfg });
     if(j.success) toast('✅ Konfigurasi disync', 'ok');
     else throw new Error(j.error);
   } catch(e){ toast('Sync gagal: ' + e.message, 'err'); }

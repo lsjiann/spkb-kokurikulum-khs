@@ -3,9 +3,10 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SPKB v3 — Sistem Teguh Berasaskan Data</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
 :root{
   --primary:#1a3c6e; --secondary:#2e86c1; --accent:#f39c12;
@@ -443,7 +444,7 @@ body.in-spkb .data-banner{display:none;}
 <body>
 
 <!-- Butang Kembali ke SPKB (iframe mode) -->
-<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'},'*')">
+<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'}, location.origin)">
   <i class="fas fa-arrow-left"></i> Kembali ke SPKB
 </div>
 

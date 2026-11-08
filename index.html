@@ -2,11 +2,12 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SPKB — Sistem Pengurusan Kokurikulum Bersepadu</title>
 <base target="_top">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js" integrity="sha384-Emf5ZVIUiarAdhkgtqK+5/Z5qIvM6QoVrS+qAVtfyZVuD5lIHrac0me485+Antp0" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
 <style>
 /* ============================================================
@@ -2257,7 +2258,6 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
       </div>
       <span class="dv4-pill" id="dv4Sem">Semester sedang berjalan</span>
       <div class="dv4-grow"></div>
-      <a class="dv4-btn" href="papan-pemuka-lama.html" target="_blank" rel="noopener" title="Buka papan pemuka versi lama (rujukan sementara) dalam tab baharu"><i class="fas fa-clock-rotate-left"></i><span>Versi lama</span></a>
       <button class="dv4-btn" onclick="hydrateDashboardLive()" title="Muat semula data"><i class="fas fa-rotate"></i><span>Muat semula</span></button>
       <button class="dv4-btn" onclick="window.print()"><i class="fas fa-print"></i><span>Cetak</span></button>
       <button class="dv4-btn primary" onclick="navigateTo('skas')"><i class="fas fa-clipboard-check"></i><span>SK@S 3.2</span></button>
@@ -6092,6 +6092,7 @@ html[data-theme="dark"] .dv4-hero{background:linear-gradient(160deg,#173455,#0f2
 </div>
 
 <script>
+function csvSelamat(csv){return String(csv).replace(/(^|,)("?)([=+\-@\t\r])(?![\d.]+"?(,|$))/gm,function(m,a,q,c){return a+q+"'"+c;});} // L1
 /* ============================================================
    API CONFIGURATION
    ============================================================ */
@@ -6114,6 +6115,9 @@ const PENCAPAIAN_API_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAf
 
 /* HELPER (keselamatan): benarkan hanya URL http(s) atau laluan relatif; selain itu '#'.
    Guna bersama escapeHtml(): href="' + escapeHtml(safeUrl(u)) + '" */
+// M3: warna daripada data mesti kod hex — elak suntikan CSS melalui atribut style
+function warnaSah(c, lalai) { return /^#[0-9a-fA-F]{3,8}$/.test(String(c || '')) ? String(c) : (lalai || '#bdc3c7'); }
+
 function safeUrl(u) {
   if (u === null || u === undefined) return '#';
   const s = String(u).trim();
@@ -6245,123 +6249,123 @@ function tahunAktifBerubah() {
   window.__dpPerluMuatSemula = true; // Data Pelajar dimuat semula untuk tahun baharu apabila dibuka
 }
 
-// ============================================================
-// R-7: WIZARD ROLL OVER — senarai semak sandaran + roll over tahun
-// Tanda manual disimpan dalam localStorage 'spkb_rollover_<tahun>'.
-// Langkah "auto" dikesan daripada API / pelayar.
-// ============================================================
-const RO_INDUK_URL = 'https://script.google.com/macros/s/AKfycbwJiZmd2fsUnfQz62WVxgxN1KCC3HxS_6dRvP-5gIskZxMaPEdE8cIRyx3gFLKnCX5QAQ/exec';
-const RO_GURU_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
-const RO_PELAJAR_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
-let RO_AUTO = {}, RO_AUTO_TAHUN = null;
-
-/** Okt–Dis: sediakan tahun depan; Jan–Sep: tahun semasa. */
-function rolloverSasaran() { const d = new Date(); return d.getMonth() >= 9 ? d.getFullYear() + 1 : d.getFullYear(); }
-
-function rolloverLangkah(T) {
-  const L = T - 1;
-  return [
-    { fasa: 'A. Sandaran data ' + L + ' (cadangan 14–20 Disember)' },
-    { id: 'lengkap', t: 'Lengkapkan data ' + L, s: 'PAJSK ' + L + ', Laporan Akhir Tahun ' + L + ', rekod pencapaian terakhir, dan Refresh SK@S.', btn: [['PAJSK', 'pajsk'], ['Laporan Akhir', 'laporan-akhir']] },
-    { id: 'pelayar', t: 'Eksport data pelayar pada SETIAP komputer', s: 'Pusat Sandar → Eksport. Takwim, Kehadiran, Kewangan, Inventori, Instrumen SK@S dan Laporan Akhir hanya disimpan dalam pelayar.', btn: [['Pusat Sandar', 'pusat-sandar']] },
-    { id: 'sandar', t: 'Sandar semua Google Sheet', s: 'script.google.com → projek SandaranTahunan → jalankan sandarSPKB. Hasil: folder SPKB_Arkib_' + L + '.' },
-    { id: 'semak', t: 'Semak folder SPKB_Arkib_' + L, s: 'Buka 2–3 salinan secara rawak. Masukkan fail JSON dari Pusat Sandar ke folder yang sama.' },
-    { fasa: 'B. Roll over ke ' + T + ' (cadangan 28 Disember – 10 Januari)' },
-    { id: 'aktif', auto: 'aktif', t: 'Tetapkan Tahun aktif kepada ' + T, s: 'Semua modul dan kad mengikut ' + T + '. Tahun ' + L + ' masih boleh dibuka melalui pemilih tahun di bar atas.', tahun: T },
-    { id: 'guru', auto: 'guru', t: 'Roll over Guru Penasihat', s: 'Apps Script projek Guru Penasihat → jalankan rolloverTahunBaharu. Kemudian kemas kini pertukaran guru.', btn: [['Guru Penasihat', 'guru']] },
-    { id: 'direktori', t: 'Kemas kini Direktori Guru', s: 'Tab "Kemas kini data" → Simpan semua ke Google Sheet → butang "Tukar sesi Direktori".', btn: [['Direktori', 'direktori-guru']] },
-    { id: 'induk', auto: 'induk', t: 'Tambah Sesi ' + T + ' dalam Pengawas KK', s: 'Log masuk Admin → Tambah Sesi ' + T + '. Sesi ' + L + ' menjadi baca-sahaja.', btn: [['Pengawas KK', 'pengawas-kk']] },
-    { id: 'takwim', auto: 'takwim', t: 'Jana Takwim ' + T, s: 'Takwim → Wizard Tahun Baru, kemudian sesuaikan dengan takwim KPM / JPN Sarawak ' + T + '.', btn: [['Takwim', 'takwim']] },
-    { id: 'pelajar', auto: 'pelajar', t: 'Senarai murid ' + T, s: 'Tambah lajur TAHUN dalam Sheet "Maklumat KK Murid" dan masukkan murid ' + T + ' selepas kemas kini APDM.', btn: [['Data Pelajar', 'pelajar']] },
-    { id: 'skas', t: 'SK@S ' + T, s: 'Cipta folder eviden ' + T + ' dalam Fail Induk Master → jalankan tetapTahunSKAS(' + T + ') → Refresh SK@S.', btn: [['SK@S', 'skas']] },
-    { id: 'pajsk', auto: 'pajsk', t: 'GPS PAJSK sebenar ' + L, s: 'Masukkan GPS ' + L + ' dalam tab GPS History apabila keputusan dimuktamadkan. Sasaran ' + T + ' dikira automatik.', btn: [['PAJSK', 'pajsk']] },
-    { id: 'pencapaian', t: 'Sheet pencapaian ' + T, s: 'Sheet sumber baharu dengan sel C2 = ' + T + '.', btn: [['Pencapaian', 'pencapaian']] },
-    { id: 'kunci', t: 'Tukar kunci pentadbir', s: 'SPKB_WRITE_KEY dalam projek Master DB dan Guru Penasihat (nilai yang sama).' }
-  ];
-}
-
-function roTanda(T) { try { return JSON.parse(localStorage.getItem('spkb_rollover_' + T) || '{}'); } catch (e) { return {}; } }
-function roSimpanTanda(T, o) { try { localStorage.setItem('spkb_rollover_' + T, JSON.stringify(o)); } catch (e) {} }
-
-/** Semakan pantas tanpa rangkaian (untuk "Perlu tindakan" di papan pemuka). */
-function rolloverRingkas() {
-  const T = rolloverSasaran(), m = new Date().getMonth();
-  const langkah = rolloverLangkah(T).filter(function (l) { return l.id; });
-  const tanda = roTanda(T);
-  let takwimAda = false; try { takwimAda = !!localStorage.getItem('takwim_' + T); } catch (e) {}
-  const siap = langkah.filter(function (l) {
-    return tanda[l.id] || (l.auto === 'aktif' && tahunAktif() === T) || (l.auto === 'takwim' && takwimAda) ||
-      (RO_AUTO_TAHUN === T && RO_AUTO[l.auto]);
-  }).length;
-  return { tahun: T, siap: siap, jumlah: langkah.length, perlu: m >= 9 || m === 0, mendesak: m === 11 || m === 0 };
-}
-
-async function rolloverSemakAuto(T) {
-  const hasil = { aktif: tahunAktif() === T };
-  try { hasil.takwim = !!localStorage.getItem('takwim_' + T); } catch (e) { hasil.takwim = false; }
-  const ambil = function (u) { return fetch(u).then(function (r) { return r.json(); }).catch(function () { return null; }); };
-  const [g, s, p, h] = await Promise.all([
-    ambil(RO_GURU_URL + '?action=guru_penasihat_all&tahun=' + T + '&_t=' + Date.now()),
-    ambil(RO_INDUK_URL + '?action=sesiList&_t=' + Date.now()),
-    ambil(RO_PELAJAR_URL + '?action=data_pelajar_years&_t=' + Date.now()),
-    ambil(SKAS_API_URL + '?action=pajsk_history&_t=' + Date.now())
-  ]);
-  hasil.guru = !!(g && g.success && g.data && (g.data.senaraiTahun || []).map(Number).indexOf(T) !== -1);
-  hasil.induk = !!(s && s.ok && s.data && String(s.data.semasa) === String(T));
-  // Tanpa lajur TAHUN, API melaporkan tahun kalendar — itu BUKAN tanda roll over selesai
-  hasil.pelajar = !!(p && p.success && !/tiada column/i.test(p.message || '') && (p.years || []).map(String).indexOf(String(T)) !== -1);
-  hasil.pajsk = !!(h && h.success && h.data && (h.data.history || []).some(function (x) { return Number(x.tahun) === T - 1 && !x.isTarget && x.gps != null; }));
-  RO_AUTO = hasil; RO_AUTO_TAHUN = T;
-  return hasil;
-}
-
-async function rolloverRender(semakSemula) {
-  const T = rolloverSasaran();
-  const el = document.getElementById('roKandungan'); if (!el) return;
-  dv4Set('roTajuk', 'Roll Over ' + (T - 1) + ' → ' + T);
-  const lukis = function () {
-    const tanda = roTanda(T), langkah = rolloverLangkah(T);
-    const item = langkah.filter(function (l) { return l.id; });
-    let siap = 0, html = '';
-    langkah.forEach(function (l) {
-      if (l.fasa) { html += (html ? '</ul>' : '') + '<div class="ro-fasa">' + dv4Esc(l.fasa) + '</div><ul class="ro-senarai">'; return; }
+// ============================================================
+// R-7: WIZARD ROLL OVER — senarai semak sandaran + roll over tahun
+// Tanda manual disimpan dalam localStorage 'spkb_rollover_<tahun>'.
+// Langkah "auto" dikesan daripada API / pelayar.
+// ============================================================
+const RO_INDUK_URL = 'https://script.google.com/macros/s/AKfycbwJiZmd2fsUnfQz62WVxgxN1KCC3HxS_6dRvP-5gIskZxMaPEdE8cIRyx3gFLKnCX5QAQ/exec';
+const RO_GURU_URL = 'https://script.google.com/macros/s/AKfycbw3xO1gAy5bc0EOcYKZTaqfLOn2O4af2Q5pXCUEsGsHX53nQHoK7K2CCQIOwOGPFI2E/exec';
+const RO_PELAJAR_URL = 'https://script.google.com/macros/s/AKfycbyx0MhIIjaAfvkoC_oiw-k9urxPk70SGsoRLP1Dd5mK41oh7y3xteFOiv08NzbsaLhjyQ/exec';
+let RO_AUTO = {}, RO_AUTO_TAHUN = null;
+
+/** Okt–Dis: sediakan tahun depan; Jan–Sep: tahun semasa. */
+function rolloverSasaran() { const d = new Date(); return d.getMonth() >= 9 ? d.getFullYear() + 1 : d.getFullYear(); }
+
+function rolloverLangkah(T) {
+  const L = T - 1;
+  return [
+    { fasa: 'A. Sandaran data ' + L + ' (cadangan 14–20 Disember)' },
+    { id: 'lengkap', t: 'Lengkapkan data ' + L, s: 'PAJSK ' + L + ', Laporan Akhir Tahun ' + L + ', rekod pencapaian terakhir, dan Refresh SK@S.', btn: [['PAJSK', 'pajsk'], ['Laporan Akhir', 'laporan-akhir']] },
+    { id: 'pelayar', t: 'Eksport data pelayar pada SETIAP komputer', s: 'Pusat Sandar → Eksport. Takwim, Kehadiran, Kewangan, Inventori, Instrumen SK@S dan Laporan Akhir hanya disimpan dalam pelayar.', btn: [['Pusat Sandar', 'pusat-sandar']] },
+    { id: 'sandar', t: 'Sandar semua Google Sheet', s: 'script.google.com → projek SandaranTahunan → jalankan sandarSPKB. Hasil: folder SPKB_Arkib_' + L + '.' },
+    { id: 'semak', t: 'Semak folder SPKB_Arkib_' + L, s: 'Buka 2–3 salinan secara rawak. Masukkan fail JSON dari Pusat Sandar ke folder yang sama.' },
+    { fasa: 'B. Roll over ke ' + T + ' (cadangan 28 Disember – 10 Januari)' },
+    { id: 'aktif', auto: 'aktif', t: 'Tetapkan Tahun aktif kepada ' + T, s: 'Semua modul dan kad mengikut ' + T + '. Tahun ' + L + ' masih boleh dibuka melalui pemilih tahun di bar atas.', tahun: T },
+    { id: 'guru', auto: 'guru', t: 'Roll over Guru Penasihat', s: 'Apps Script projek Guru Penasihat → jalankan rolloverTahunBaharu. Kemudian kemas kini pertukaran guru.', btn: [['Guru Penasihat', 'guru']] },
+    { id: 'direktori', t: 'Kemas kini Direktori Guru', s: 'Tab "Kemas kini data" → Simpan semua ke Google Sheet → butang "Tukar sesi Direktori".', btn: [['Direktori', 'direktori-guru']] },
+    { id: 'induk', auto: 'induk', t: 'Tambah Sesi ' + T + ' dalam Pengawas KK', s: 'Log masuk Admin → Tambah Sesi ' + T + '. Sesi ' + L + ' menjadi baca-sahaja.', btn: [['Pengawas KK', 'pengawas-kk']] },
+    { id: 'takwim', auto: 'takwim', t: 'Jana Takwim ' + T, s: 'Takwim → Wizard Tahun Baru, kemudian sesuaikan dengan takwim KPM / JPN Sarawak ' + T + '.', btn: [['Takwim', 'takwim']] },
+    { id: 'pelajar', auto: 'pelajar', t: 'Senarai murid ' + T, s: 'Tambah lajur TAHUN dalam Sheet "Maklumat KK Murid" dan masukkan murid ' + T + ' selepas kemas kini APDM.', btn: [['Data Pelajar', 'pelajar']] },
+    { id: 'skas', t: 'SK@S ' + T, s: 'Cipta folder eviden ' + T + ' dalam Fail Induk Master → jalankan tetapTahunSKAS(' + T + ') → Refresh SK@S.', btn: [['SK@S', 'skas']] },
+    { id: 'pajsk', auto: 'pajsk', t: 'GPS PAJSK sebenar ' + L, s: 'Masukkan GPS ' + L + ' dalam tab GPS History apabila keputusan dimuktamadkan. Sasaran ' + T + ' dikira automatik.', btn: [['PAJSK', 'pajsk']] },
+    { id: 'pencapaian', t: 'Sheet pencapaian ' + T, s: 'Sheet sumber baharu dengan sel C2 = ' + T + '.', btn: [['Pencapaian', 'pencapaian']] },
+    { id: 'kunci', t: 'Tukar kunci pentadbir', s: 'SPKB_WRITE_KEY dalam projek Master DB dan Guru Penasihat (nilai yang sama).' }
+  ];
+}
+
+function roTanda(T) { try { return JSON.parse(localStorage.getItem('spkb_rollover_' + T) || '{}'); } catch (e) { return {}; } }
+function roSimpanTanda(T, o) { try { localStorage.setItem('spkb_rollover_' + T, JSON.stringify(o)); } catch (e) {} }
+
+/** Semakan pantas tanpa rangkaian (untuk "Perlu tindakan" di papan pemuka). */
+function rolloverRingkas() {
+  const T = rolloverSasaran(), m = new Date().getMonth();
+  const langkah = rolloverLangkah(T).filter(function (l) { return l.id; });
+  const tanda = roTanda(T);
+  let takwimAda = false; try { takwimAda = !!localStorage.getItem('takwim_' + T); } catch (e) {}
+  const siap = langkah.filter(function (l) {
+    return tanda[l.id] || (l.auto === 'aktif' && tahunAktif() === T) || (l.auto === 'takwim' && takwimAda) ||
+      (RO_AUTO_TAHUN === T && RO_AUTO[l.auto]);
+  }).length;
+  return { tahun: T, siap: siap, jumlah: langkah.length, perlu: m >= 9 || m === 0, mendesak: m === 11 || m === 0 };
+}
+
+async function rolloverSemakAuto(T) {
+  const hasil = { aktif: tahunAktif() === T };
+  try { hasil.takwim = !!localStorage.getItem('takwim_' + T); } catch (e) { hasil.takwim = false; }
+  const ambil = function (u) { return fetch(u).then(function (r) { return r.json(); }).catch(function () { return null; }); };
+  const [g, s, p, h] = await Promise.all([
+    ambil(RO_GURU_URL + '?action=guru_penasihat_all&tahun=' + T + '&_t=' + Date.now()),
+    ambil(RO_INDUK_URL + '?action=sesiList&_t=' + Date.now()),
+    ambil(RO_PELAJAR_URL + '?action=data_pelajar_years&_t=' + Date.now()),
+    ambil(SKAS_API_URL + '?action=pajsk_history&_t=' + Date.now())
+  ]);
+  hasil.guru = !!(g && g.success && g.data && (g.data.senaraiTahun || []).map(Number).indexOf(T) !== -1);
+  hasil.induk = !!(s && s.ok && s.data && String(s.data.semasa) === String(T));
+  // Tanpa lajur TAHUN, API melaporkan tahun kalendar — itu BUKAN tanda roll over selesai
+  hasil.pelajar = !!(p && p.success && !/tiada column/i.test(p.message || '') && (p.years || []).map(String).indexOf(String(T)) !== -1);
+  hasil.pajsk = !!(h && h.success && h.data && (h.data.history || []).some(function (x) { return Number(x.tahun) === T - 1 && !x.isTarget && x.gps != null; }));
+  RO_AUTO = hasil; RO_AUTO_TAHUN = T;
+  return hasil;
+}
+
+async function rolloverRender(semakSemula) {
+  const T = rolloverSasaran();
+  const el = document.getElementById('roKandungan'); if (!el) return;
+  dv4Set('roTajuk', 'Roll Over ' + (T - 1) + ' → ' + T);
+  const lukis = function () {
+    const tanda = roTanda(T), langkah = rolloverLangkah(T);
+    const item = langkah.filter(function (l) { return l.id; });
+    let siap = 0, html = '';
+    langkah.forEach(function (l) {
+      if (l.fasa) { html += (html ? '</ul>' : '') + '<div class="ro-fasa">' + dv4Esc(l.fasa) + '</div><ul class="ro-senarai">'; return; }
       // Langkah yang boleh disemak terus dalam pelayar dikira semula setiap kali dilukis
       let takwimAda = false; try { takwimAda = !!localStorage.getItem('takwim_' + T); } catch (e) {}
       const auto = l.auto && ((l.auto === 'aktif' && tahunAktif() === T) || (l.auto === 'takwim' && takwimAda) ||
-        (RO_AUTO_TAHUN === T && RO_AUTO[l.auto]));
-      const ok = !!(tanda[l.id] || auto);
-      if (ok) siap++;
-      const tag = auto ? 'dikesan ✓' : l.auto ? (RO_AUTO_TAHUN === T ? 'auto · belum' : 'auto · menyemak…') : (ok ? 'ditanda ✓' : '');
-      const btn = (l.btn || []).map(function (b) {
-        return '<button class="dv4-btn" data-ro-pergi="' + dv4Esc(b[1]) + '"><i class="fas fa-arrow-right"></i>' + dv4Esc(b[0]) + '</button>';
-      }).join('') + (l.tahun && !auto ? '<button class="dv4-btn primary" data-ro-tahun="' + l.tahun + '">Tetapkan ' + l.tahun + '</button>' : '');
-      html += '<li class="ro-item' + (ok ? ' siap' : '') + '"><input type="checkbox" data-ro-id="' + l.id + '"' + (ok ? ' checked' : '') + (auto ? ' disabled title="Dikesan automatik"' : '') + ' aria-label="' + dv4Esc(l.t) + '">' +
-        '<div><b>' + dv4Esc(l.t) + '</b><small>' + dv4Esc(l.s) + '</small></div>' +
-        '<div class="ro-aksi">' + (tag ? '<span class="ro-tag">' + tag + '</span>' : '') + btn + '</div></li>';
-    });
-    el.innerHTML = html + '</ul>';
-    const pct = Math.round(siap / item.length * 100);
-    dv4Set('roKemajuanTeks', siap + ' daripada ' + item.length + ' langkah selesai');
-    dv4Set('roPeratus', pct + '%');
-    const m = document.getElementById('roMeter'); if (m) m.style.width = pct + '%';
-  };
-  lukis();
-  if (semakSemula || RO_AUTO_TAHUN !== T) { await rolloverSemakAuto(T); lukis(); }
-}
-
-document.addEventListener('click', function (e) {
-  const pergi = e.target.closest && e.target.closest('[data-ro-pergi]');
-  if (pergi) { navigateTo(pergi.getAttribute('data-ro-pergi')); return; }
-  const th = e.target.closest && e.target.closest('[data-ro-tahun]');
-  if (th) { tetapTahunAktif(th.getAttribute('data-ro-tahun')); navigateTo('rollover'); }
-});
-document.addEventListener('change', function (e) {
-  const c = e.target.closest && e.target.closest('[data-ro-id]'); if (!c) return;
-  const T = rolloverSasaran(), tanda = roTanda(T);
-  if (c.checked) tanda[c.getAttribute('data-ro-id')] = true; else delete tanda[c.getAttribute('data-ro-id')];
-  roSimpanTanda(T, tanda); rolloverRender(false);
-});
-
+        (RO_AUTO_TAHUN === T && RO_AUTO[l.auto]));
+      const ok = !!(tanda[l.id] || auto);
+      if (ok) siap++;
+      const tag = auto ? 'dikesan ✓' : l.auto ? (RO_AUTO_TAHUN === T ? 'auto · belum' : 'auto · menyemak…') : (ok ? 'ditanda ✓' : '');
+      const btn = (l.btn || []).map(function (b) {
+        return '<button class="dv4-btn" data-ro-pergi="' + dv4Esc(b[1]) + '"><i class="fas fa-arrow-right"></i>' + dv4Esc(b[0]) + '</button>';
+      }).join('') + (l.tahun && !auto ? '<button class="dv4-btn primary" data-ro-tahun="' + l.tahun + '">Tetapkan ' + l.tahun + '</button>' : '');
+      html += '<li class="ro-item' + (ok ? ' siap' : '') + '"><input type="checkbox" data-ro-id="' + l.id + '"' + (ok ? ' checked' : '') + (auto ? ' disabled title="Dikesan automatik"' : '') + ' aria-label="' + dv4Esc(l.t) + '">' +
+        '<div><b>' + dv4Esc(l.t) + '</b><small>' + dv4Esc(l.s) + '</small></div>' +
+        '<div class="ro-aksi">' + (tag ? '<span class="ro-tag">' + tag + '</span>' : '') + btn + '</div></li>';
+    });
+    el.innerHTML = html + '</ul>';
+    const pct = Math.round(siap / item.length * 100);
+    dv4Set('roKemajuanTeks', siap + ' daripada ' + item.length + ' langkah selesai');
+    dv4Set('roPeratus', pct + '%');
+    const m = document.getElementById('roMeter'); if (m) m.style.width = pct + '%';
+  };
+  lukis();
+  if (semakSemula || RO_AUTO_TAHUN !== T) { await rolloverSemakAuto(T); lukis(); }
+}
+
+document.addEventListener('click', function (e) {
+  const pergi = e.target.closest && e.target.closest('[data-ro-pergi]');
+  if (pergi) { navigateTo(pergi.getAttribute('data-ro-pergi')); return; }
+  const th = e.target.closest && e.target.closest('[data-ro-tahun]');
+  if (th) { tetapTahunAktif(th.getAttribute('data-ro-tahun')); navigateTo('rollover'); }
+});
+document.addEventListener('change', function (e) {
+  const c = e.target.closest && e.target.closest('[data-ro-id]'); if (!c) return;
+  const T = rolloverSasaran(), tanda = roTanda(T);
+  if (c.checked) tanda[c.getAttribute('data-ro-id')] = true; else delete tanda[c.getAttribute('data-ro-id')];
+  roSimpanTanda(T, tanda); rolloverRender(false);
+});
+
 // R1/R-1: teks sesi mengikut tahun aktif (Jan–Mei = Semester 1 bagi tahun semasa)
 function sesiSemasaTeks() {
   const y = tahunAktif(), k = tahunKalendar(), d = new Date();
@@ -6475,6 +6479,11 @@ function navigateTo(pageId) {
     else DataPelajar.init(); // idempotent: hanya memuat kali pertama
   }
   if (pageId === 'rollover' && typeof rolloverRender === 'function') rolloverRender(false);
+  // T10: modul yang membina halaman sendiri — mulakan juga apabila dibuka tanpa klik sidebar
+  // (Akses pantas, Wizard Roll Over, pautan dalam modul). init() setiap modul selamat dipanggil berulang.
+  var MODUL_INIT = { guru: 'GuruPenasihat', sekolah: 'MaklumatSekolah', profil: 'ProfilPentadbir' };
+  if (MODUL_INIT[pageId] && window[MODUL_INIT[pageId]]) setTimeout(function () { window[MODUL_INIT[pageId]].init(); }, 60);
+  if (pageId === 'tetapan' && window.TetapanSistem) setTimeout(function () { TetapanSistem.initPage(); }, 60);
   if (pageId === 'direktori-guru') {
     setTimeout(function () {
       var iframe = document.getElementById('direktori-guru-iframe');
@@ -7825,7 +7834,7 @@ function renderPAJSKUnitCards(data) {
       '<div style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">' + info.nama_full + '</div>' +
       '<div style="font-size:36px;font-weight:900;color:' + info.color + ';line-height:1;margin-bottom:6px;">' + escapeHtml(gps) + '</div>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;">' +
-      '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;color:#fff;background:' + escapeHtml(rating.color) + ';">' + escapeHtml(rating.label) + '</span>' +
+      '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;color:#fff;background:' + warnaSah(rating.color) + ';">' + escapeHtml(rating.label) + '</span>' +
       '<span style="font-size:11px;font-weight:700;color:' + trendColor + ';display:flex;align-items:center;gap:4px;">' +
       '<i class="fas ' + trendIcon + '"></i> ' + (change !== 0 ? Math.abs(change).toFixed(2) : 'Same') +
       '</span></div>' +
@@ -8143,7 +8152,7 @@ function renderPAJSKHeatMap(data) {
         html += '<td style="background:#ecf0f1;color:#bdc3c7;padding:14px 8px;text-align:center;border-radius:8px;font-weight:700;">--</td>';
       } else {
         const rating = cellData.rating || { color: '#bdc3c7', label: 'N/A' };
-        const bgColor = rating.color || '#bdc3c7';
+        const bgColor = warnaSah(rating.color);
         html += '<td style="background:' + escapeHtml(bgColor) + ';color:#fff;padding:14px 8px;text-align:center;border-radius:8px;font-weight:700;font-size:13px;transition:transform 0.2s;" ' +
           'onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'" ' +
           'title="' + escapeHtml(unitName) + ' ' + ting + ': GPS ' + escapeHtml(Number(cellData.gps || 0).toFixed(2)) + ' (' + escapeHtml(rating.label) + ')">';
@@ -9503,7 +9512,7 @@ function exportPencapaianCSV() {
     csv += row.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(',') + '\n';
   });
 
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -10440,7 +10449,7 @@ function exportStudentProfileCSV() {
     csv += row.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
   });
 
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -10931,7 +10940,7 @@ function exportCompetitionStudentsCSV() {
     csv += row.map(function(cell) { return '"' + String(cell).replace(/"/g, '""') + '"'; }).join(',') + '\n';
   });
 
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -10954,7 +10963,7 @@ function exportAllCompetitionsCSV() {
     csv += row.map(function(cell) { return '"' + String(cell).replace(/"/g, '""') + '"'; }).join(',') + '\n';
   });
 
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -11365,7 +11374,7 @@ function exportMasterPencapaianCSV() {
     }).join(',') + '\n';
   });
 
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -11747,7 +11756,7 @@ function exportLevelDrillCSV() {
     csv += row.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
   });
 
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -12081,7 +12090,7 @@ function exportLaporan2026CSV() {
     csv += row.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
   });
   
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -13298,55 +13307,55 @@ function hydrateDashboardLive() {
     populateAdminPanel();
   }).catch(function () {});
 
-  // (C) Data Pelajar — kiraan pelajar
-  fetch(STUDENT + '?action=data_pelajar_all&tahun=' + tahunAktif() + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
-    if (!res || !res.success || !Array.isArray(res.students)) return dv4Gagal('pelajar');
-    var n = res.students.length;
-    var aktif = res.students.filter(function (s) { return (s.uniform && String(s.uniform).trim()) || (s.kelab && String(s.kelab).trim()) || (s.sukan && String(s.sukan).trim()); }).length;
+  // (C) Data Pelajar — M4: ringkasan sahaja (jumlah, aktif, unit terbesar). Tiada nama murid dimuat turun.
+  var paparRingkasanPelajar = function (rk) {
+    var n = rk.total, aktif = rk.aktif;
     SCHOOL_INFO.students = n; populateAdminPanel();
     setNum('db-pelajar-aktif', aktif.toLocaleString());
     setNum('banner-pelajar', n.toLocaleString());
     setNum('db-peserta', aktif.toLocaleString());
     setNum('banner-peserta', aktif.toLocaleString());
     DV4.part = { n: n, aktif: aktif }; dv4Render();
-    // RAJAH 4: Top 5 Unit Kokurikulum (uniform + kelab + sukan) ikut bilangan ahli
-    var cmap = {};
-    var katOf = function (kod) {
-      var c = String(kod).charAt(0).toUpperCase();
-      if (c === 'A') return 'Badan Beruniform';
-      if (c === 'S') return 'Sukan & Permainan';
-      return 'Kelab & Persatuan';
-    };
-    res.students.forEach(function (s) {
+    var top = (rk.top || []).slice(0, 5);
+    var body = document.getElementById('topClubsBody');
+    if (!body) return;
+    if (!top.length) { body.innerHTML = '<li class="dv4-loading">Belum ada data keahlian kelab.</li>'; return; }
+    var maxN = top[0].n || 1;
+    var katPendek = { 'Badan Beruniform': 'Beruniform', 'Sukan & Permainan': 'Sukan', 'Kelab & Persatuan': 'Kelab' };
+    body.innerHTML = top.map(function (c, i) {
+      var w = Math.round(c.n / maxN * 100);
+      return '<li title="' + dv4Esc(c.nama) + ' (' + dv4Esc(c.kod) + '): ' + c.n + ' ahli">' +
+        '<span class="rank">' + (i + 1) + '</span>' +
+        '<span class="name">' + dv4Esc(c.nama) + ' <span class="cat">· ' + dv4Esc(katPendek[c.kat] || c.kat) + '</span></span>' +
+        '<span class="n">' + Number(c.n) + '</span>' +
+        '<span></span><span class="bar"><span style="width:' + w + '%"></span></span>' +
+      '</li>';
+    }).join('');
+  };
+  // Sandaran untuk backend lama (sebelum data_pelajar_ringkasan dideploy): kira daripada senarai penuh
+  var kiraRingkasanDariSenarai = function (students) {
+    var katOf = function (kod) { var c = String(kod).charAt(0).toUpperCase(); return c === 'A' ? 'Badan Beruniform' : c === 'S' ? 'Sukan & Permainan' : 'Kelab & Persatuan'; };
+    var cmap = {}, aktif = 0;
+    students.forEach(function (s) {
+      var ada = false;
       ['uniform', 'kelab', 'sukan'].forEach(function (f) {
-        var v = String(s[f] || '').trim(); if (!v) return;
+        var v = String(s[f] || '').trim(); if (!v) return; ada = true;
         var m = v.match(/^([A-Za-z]\d+[A-Za-z]?)\s*(.*)$/);
         var kod = m ? m[1].toUpperCase() : v;
-        var nama = (m && m[2]) ? m[2].trim() : v;
-        if (!cmap[kod]) cmap[kod] = { nama: nama, n: 0, kat: katOf(kod) };
+        if (!cmap[kod]) cmap[kod] = { kod: kod, nama: (m && m[2]) ? m[2].trim() : v, n: 0, kat: katOf(kod) };
         cmap[kod].n++;
       });
+      if (ada) aktif++;
     });
-    var top = Object.keys(cmap).map(function (kod) { return { kod: kod, nama: cmap[kod].nama, n: cmap[kod].n, kat: cmap[kod].kat }; })
-      .sort(function (a, b) { return b.n - a.n; }).slice(0, 5);
-    var body = document.getElementById('topClubsBody');
-    if (body) {
-      if (!top.length) {
-        body.innerHTML = '<li class="dv4-loading">Belum ada data keahlian kelab.</li>';
-      } else {
-        var maxN = top[0].n || 1;
-        var katPendek = { 'Badan Beruniform': 'Beruniform', 'Sukan & Permainan': 'Sukan', 'Kelab & Persatuan': 'Kelab' };
-        body.innerHTML = top.map(function (c, i) {
-          var w = Math.round(c.n / maxN * 100);
-          return '<li title="' + dv4Esc(c.nama) + ' (' + dv4Esc(c.kod) + '): ' + c.n + ' ahli">' +
-            '<span class="rank">' + (i + 1) + '</span>' +
-            '<span class="name">' + dv4Esc(c.nama) + ' <span class="cat">· ' + dv4Esc(katPendek[c.kat] || c.kat) + '</span></span>' +
-            '<span class="n">' + c.n + '</span>' +
-            '<span></span><span class="bar"><span style="width:' + w + '%"></span></span>' +
-          '</li>';
-        }).join('');
-      }
-    }
+    return { total: students.length, aktif: aktif,
+      top: Object.keys(cmap).map(function (k) { return cmap[k]; }).sort(function (a, b) { return b.n - a.n; }).slice(0, 10) };
+  };
+  fetch(STUDENT + '?action=data_pelajar_ringkasan&tahun=' + tahunAktif() + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res) {
+    if (res && res.success && typeof res.total === 'number') return paparRingkasanPelajar(res);
+    return fetch(STUDENT + '?action=data_pelajar_all&tahun=' + tahunAktif() + '&_t=' + Date.now()).then(function (r) { return r.json(); }).then(function (res2) {
+      if (!res2 || !res2.success || !Array.isArray(res2.students)) return dv4Gagal('pelajar');
+      paparRingkasanPelajar(kiraRingkasanDariSenarai(res2.students));
+    });
   }).catch(function () { dv4Gagal('pelajar'); });
 }
 
@@ -16088,7 +16097,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
         csv += row.map(function(c) { return '"' + String(c || '').replace(/"/g,'""') + '"'; }).join(',') + '\n';
       });
       
-      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob(['\ufeff' + csvSelamat(csv)], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = 'SPKB_Data_Pelajar_Analytics_' + new Date().toISOString().split('T')[0] + '.csv';
@@ -17310,7 +17319,7 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   }
 
   /* ============================================================ EKSPORT ============================================================ */
-  function dl(fn, content) { const b = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = fn; a.click(); URL.revokeObjectURL(u); }
+  function dl(fn, content) { const b = new Blob(['\ufeff' + csvSelamat(content)], { type: 'text/csv;charset=utf-8;' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = fn; a.click(); URL.revokeObjectURL(u); }
   function q(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
   function exportWorkload() {
     const keys = ['id_guru', 'nama_guru', 'sesi', 'rumah_sukan', 'bil_tugasan_unit', 'bil_ketua_unit', 'bil_jawatankuasa', 'skor_unit', 'skor_jk', 'skor_rumah', 'indeks_beban', 'band'];
@@ -18246,6 +18255,25 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
   }
 
   /* ============================================================ KUNCI PIN ============================================================ */
+  // M1: PIN disimpan sebagai hash SHA-256 bergaram ("h1$…"), bukan teks biasa. PIN lama ditukar selepas buka kunci berjaya.
+  // Ini SKRIN PRIVASI sahaja — perlindungan data sebenar ialah semakan di pelayan.
+  async function hashPinTempatan(pin) {
+    let g = sget('spkb_pin_garam', '');
+    if (!g) {
+      const r = new Uint8Array(16); crypto.getRandomValues(r);
+      g = Array.from(r, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+      sset('spkb_pin_garam', g);
+    }
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(g + ':' + String(pin)));
+    return 'h1$' + Array.from(new Uint8Array(buf), function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  async function pinBetul(input) {
+    const s = sget('spkb_pin', ''); if (!s || !input) return false;
+    if (s.indexOf('h1$') === 0) return s === await hashPinTempatan(input);
+    if (s !== String(input)) return false;
+    sset('spkb_pin', await hashPinTempatan(input)); // naik taraf PIN lama kepada hash
+    return true;
+  }
   function showLock() {
     if (unlocked) return;
     const pin = sget('spkb_pin', '');
@@ -18259,9 +18287,14 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
     try { document.body.style.overflow = 'hidden'; } catch (e) { }
     const inp = document.getElementById('lkInput'), btn = document.getElementById('lkBtn'), err = document.getElementById('lkErr');
     setTimeout(function () { inp.focus(); }, 100);
-    function tryUnlock() {
-      if (inp.value === sget('spkb_pin', '')) { unlocked = true; d.remove(); try { document.body.style.overflow = ''; } catch (e) { } applyDefaultPage(); }
-      else { err.textContent = '✕ PIN salah'; inp.value = ''; inp.focus(); }
+    let gagalPin = 0, kunciSehingga = 0;
+    async function tryUnlock() {
+      if (Date.now() < kunciSehingga) { err.textContent = '⏳ Tunggu ' + Math.ceil((kunciSehingga - Date.now()) / 1000) + ' saat'; return; }
+      if (await pinBetul(inp.value)) { unlocked = true; d.remove(); try { document.body.style.overflow = ''; } catch (e) { } applyDefaultPage(); }
+      else {
+        gagalPin++; if (gagalPin >= 5) { kunciSehingga = Date.now() + 30000; gagalPin = 0; }
+        err.textContent = '✕ PIN salah'; inp.value = ''; inp.focus();
+      }
     }
     btn.onclick = tryUnlock;
     inp.onkeydown = function (e) { if (e.key === 'Enter') tryUnlock(); };
@@ -18397,25 +18430,25 @@ alerts.push({ type: 'a-info', icon: '🌈', title: 'Limited Diversity', msg: dom
       document.documentElement.setAttribute('data-theme', 'light');
       render(); showPage(); toast('♻️ Tetapan diset semula');
     },
-    setPin: function () {
+    setPin: async function () {
       const a = (document.getElementById('ts-pin1') || {}).value || '', b = (document.getElementById('ts-pin2') || {}).value || '';
       const msg = document.getElementById('ts-pin-msg');
       if (!/^\d{4,6}$/.test(a)) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN mesti 4–6 digit nombor.'; } return; }
       if (a !== b) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN tidak sepadan.'; } return; }
-      sset('spkb_pin', a); unlocked = true;
+      sset('spkb_pin', await hashPinTempatan(a)); unlocked = true;
       document.getElementById('ts-pin-box').innerHTML = pinBox(true); toast('🔒 PIN ditetapkan');
     },
-    changePin: function () {
+    changePin: async function () {
       const cur = (document.getElementById('ts-pin-cur') || {}).value || '', nw = (document.getElementById('ts-pin-new') || {}).value || '';
       const msg = document.getElementById('ts-pin-msg');
-      if (cur !== sget('spkb_pin', '')) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN semasa salah.'; } return; }
+      if (!(await pinBetul(cur))) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN semasa salah.'; } return; }
       if (!/^\d{4,6}$/.test(nw)) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN baharu mesti 4–6 digit.'; } return; }
-      sset('spkb_pin', nw); document.getElementById('ts-pin-box').innerHTML = pinBox(true); toast('🔁 PIN ditukar');
+      sset('spkb_pin', await hashPinTempatan(nw)); document.getElementById('ts-pin-box').innerHTML = pinBox(true); toast('🔁 PIN ditukar');
     },
-    removePin: function () {
+    removePin: async function () {
       const cur = (document.getElementById('ts-pin-cur') || {}).value || '', msg = document.getElementById('ts-pin-msg');
-      if (cur !== sget('spkb_pin', '')) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN semasa salah.'; } return; }
-      sdel('spkb_pin'); document.getElementById('ts-pin-box').innerHTML = pinBox(false); toast('🗑️ PIN dibuang');
+      if (!(await pinBetul(cur))) { if (msg) { msg.className = 'ts-msg err'; msg.textContent = 'PIN semasa salah.'; } return; }
+      sdel('spkb_pin'); sdel('spkb_pin_garam'); document.getElementById('ts-pin-box').innerHTML = pinBox(false); toast('🗑️ PIN dibuang');
     },
     _state: { sget: sget }
   };

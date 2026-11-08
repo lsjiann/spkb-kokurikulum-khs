@@ -2,9 +2,10 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Modul Kehadiran Kokurikulum — SPKB</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
 :root{--pri:#1a3c6e;--sec:#2e86c1;--acc:#f39c12;--ok:#27ae60;--err:#e74c3c;--warn:#f1c40f;--purp:#8e44ad;--teal:#1abc9c;--bg:#f0f2f5;--card:#fff;--txt:#2c3e50;--mute:#7f8c8d;--bdr:#e0e0e0;--r:12px;--sh:0 2px 12px rgba(0,0,0,.08)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -117,7 +118,7 @@ body.in-spkb .spkb-back-btn{display:flex}
 </style>
 </head>
 <body>
-<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> SPKB</div>
+<div class="spkb-back-btn" onclick="parent.postMessage({action:'spkb-back'}, location.origin)"><i class="fas fa-arrow-left"></i> SPKB</div>
 
 <div class="top">
   <h1><i class="fas fa-clipboard-list"></i> Kehadiran Kokurikulum <span style="background:rgba(255,255,255,0.2);font-size:10px;padding:3px 8px;border-radius:8px;margin-left:4px;">BETA</span></h1>
@@ -125,7 +126,7 @@ body.in-spkb .spkb-back-btn{display:flex}
     <label style="font-size:12px;">Tahun:</label>
     <select id="yearSel" onchange="changeYear(this.value)"></select>
     <span class="badge" id="statusBadge">—</span>
-    <button class="btn btn-back" onclick="parent.postMessage({action:'spkb-back'},'*')"><i class="fas fa-arrow-left"></i> Kembali</button>
+    <button class="btn btn-back" onclick="parent.postMessage({action:'spkb-back'}, location.origin)"><i class="fas fa-arrow-left"></i> Kembali</button>
   </div>
 </div>
 
@@ -256,6 +257,7 @@ body.in-spkb .spkb-back-btn{display:flex}
 </div>
 
 <script>
+function csvSelamat(csv){return String(csv).replace(/(^|,)("?)([=+\-@\t\r])(?![\d.]+"?(,|$))/gm,function(m,a,q,c){return a+q+"'"+c;});} // L1
 // =============================================================
 // CONFIG
 // =============================================================
@@ -313,8 +315,7 @@ async function fetchPelajar(){
       apiSuccess: true,
       apiKeys: Object.keys(json),
       rawCount: rawData.length,
-      rawSampleKeys: rawData.length ? Object.keys(rawData[0]) : [],
-      rawSampleObj: rawData[0] || null
+      rawSampleKeys: rawData.length ? Object.keys(rawData[0]) : [] // L3: tiada rekod murid mentah disimpan
     };
 
     // Cuba parse dgn nama field standard
@@ -781,7 +782,7 @@ function exportCSV(){
     if(!p) return;
     csv += `${i+1},"${p.student_no||''}","${p.nama||''}","${p.tingkatan||''}","${p.kelas||''}","${status[no]||''}"\n`;
   });
-  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const blob = new Blob([csvSelamat(csv)],{type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `kehadiran_${u.nama.replace(/\s/g,'_')}_${tarikh}.csv`;
