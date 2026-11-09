@@ -8356,7 +8356,7 @@ function dapatkanKunciTulis() {
   let k = null;
   try { k = sessionStorage.getItem('spkb_kunci_tulis'); } catch (e) {}
   if (!k) {
-    k = (window.prompt('Masukkan kunci pentadbir untuk menyimpan data:') || '').trim();
+    k = (window.prompt('Masukkan kunci pentadbir untuk menyimpan data (atau Batal, kemudian log masuk Google di bar atas):') || '').trim();
     if (k) try { sessionStorage.setItem('spkb_kunci_tulis', k); } catch (e) {}
   }
   return k;
@@ -8392,8 +8392,10 @@ async function submitPAJSKData(event) {
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
   submitBtn.disabled = true;
 
-  const kunci = dapatkanKunciTulis();
-  if (!kunci) { submitBtn.innerHTML = originalHTML; submitBtn.disabled = false; return; }
+  // Fasa 3 (H2): log masuk Google (pentadbir) diutamakan; kunci dikongsi hanya jika belum log masuk
+  const tokenGoogle = window.SPKBAuth ? SPKBAuth.token() : '';
+  const kunci = tokenGoogle ? '' : dapatkanKunciTulis();
+  if (!kunci && !tokenGoogle) { submitBtn.innerHTML = originalHTML; submitBtn.disabled = false; return; }
 
   try {
     // text/plain mengelak preflight CORS, jadi respons Apps Script boleh dibaca (tiada lagi no-cors)
@@ -8402,7 +8404,8 @@ async function submitPAJSKData(event) {
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         action: 'pajsk_save',
-        apiKey: kunci,
+        apiKey: kunci || undefined,
+        idToken: tokenGoogle || undefined,
         oleh: (typeof ADMIN_INFO !== 'undefined' && ADMIN_INFO.name) || 'pentadbir',
         payload: { tahun, unit, tingkatan, bil_murid: bilMurid, A, B, C, D, E }
       })
@@ -8410,7 +8413,7 @@ async function submitPAJSKData(event) {
     const res = await r.json();
     if (!res || res.success !== true) {
       if (/kunci/i.test((res && res.error) || '')) lupaKunciTulis();
-      throw new Error((res && res.error) || 'Respons tidak sah daripada pelayan');
+      throw new Error(SPKBAuth.mesej((res && res.error) || 'Respons tidak sah daripada pelayan'));
     }
 
     alert('✅ Data berjaya disimpan!\n\nDashboard akan refresh dalam 2 saat...');

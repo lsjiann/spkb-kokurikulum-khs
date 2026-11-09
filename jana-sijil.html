@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
+<script src="spkb-auth.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jana Sijil Guru — SPKB</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -360,9 +361,12 @@
   function lupaKunciArkib(){ try{ sessionStorage.removeItem('spkb_kunci_tulis'); }catch(e){} }
   const IMEJ_SAH=/^data:image\/(png|jpe?g);base64,/i, IMEJ_MAKS=4*1024*1024; // ~3 MB fail
   async function arkibPost(body){
-    const kunci=kunciArkib(); if(!kunci) return {success:false,error:'Kunci pentadbir diperlukan'};
-    const r=await fetch(ARKIB_API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({kunci:kunci},body))});
+    // Fasa 3 (H2): log masuk Google (pentadbir) diutamakan; kunci dikongsi hanya jika belum log masuk
+    const tok=window.SPKBAuth?SPKBAuth.token():'';
+    const kunci=tok?'':kunciArkib(); if(!kunci&&!tok) return {success:false,error:'Log masuk Google (akaun pentadbir) atau masukkan kunci pentadbir'};
+    const r=await fetch(ARKIB_API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign(tok?{idToken:tok}:{kunci:kunci},body))});
     let j; try{ j=await r.json(); }catch(e){ return {success:false,error:'Respons pelayan tidak sah'}; }
+    if(j && j.error && window.SPKBAuth) j.error=SPKBAuth.mesej(j.error);
     if(j && j.success!==true && /kunci/i.test(j.error||'')) lupaKunciArkib();
     return j;
   }

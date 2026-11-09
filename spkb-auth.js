@@ -146,6 +146,13 @@
       });
     },
 
+    /** Mesej ralat pelayan yang mesra pengguna (buang awalan kod PERLU_LOG_MASUK / AKSES_DITOLAK). */
+    mesej: function (m) {
+      m = String(m || '');
+      if (/^PERLU_LOG_MASUK:/.test(m)) return m.replace(/^PERLU_LOG_MASUK:\s*/, '') + ' (Log masuk Google melalui butang di bar atas SPKB.)';
+      return m.replace(/^AKSES_DITOLAK:\s*/, '');
+    },
+
     /**
      * Papar kad "Perlu log masuk" dalam elemen (untuk modul). Selepas log masuk, panggil semulaFn
      * (lalai: muat semula halaman).

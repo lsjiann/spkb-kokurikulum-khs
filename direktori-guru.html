@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
+<script src="spkb-auth.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Direktori Guru &amp; Penjana AJK — SPKB</title>
 <style>
@@ -1751,15 +1752,17 @@ function dirLupaKunci(){ try { sessionStorage.removeItem(DIR_KUNCI); } catch (e)
 function dirEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 async function dirApi(action, extra){
-  const kunci = dirAmbilKunci();
-  if (!kunci) throw new Error('Kunci pentadbir diperlukan');
+  // Fasa 3 (H2): log masuk Google (pentadbir) diutamakan; kunci dikongsi hanya jika belum log masuk
+  const tokenGoogle = window.SPKBAuth ? SPKBAuth.token() : '';
+  const kunci = tokenGoogle ? '' : dirAmbilKunci();
+  if (!kunci && !tokenGoogle) throw new Error('Kunci pentadbir diperlukan');
   const olehEl = document.getElementById('cfgOleh');
   let r;
   const henti = new AbortController();
   const pemasa = setTimeout(() => henti.abort(), 90000); // jangan biar skrin "Memuatkan…" selama-lamanya
   try {
     r = await fetch(DIR_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, signal: henti.signal,
-      body: JSON.stringify(Object.assign({ action: action, kunci: kunci, oleh: (olehEl && olehEl.value.trim()) || 'pentadbir' }, extra || {})) });
+      body: JSON.stringify(Object.assign({ action: action, oleh: (olehEl && olehEl.value.trim()) || 'pentadbir' }, tokenGoogle ? { idToken: tokenGoogle } : { kunci: kunci }, extra || {})) });
   } catch (e) {
     throw new Error(e.name === 'AbortError'
       ? 'Pelayan Direktori mengambil masa lebih 90 saat. Cuba lagi; jika berulang, semak Executions dalam Apps Script projek Guru Penasihat.'
@@ -1769,7 +1772,7 @@ async function dirApi(action, extra){
   }
   let j;
   try { j = await r.json(); } catch (e) { throw new Error('Respons pelayan tidak sah. Cuba lagi.'); }
-  if (!j.ok) { if (/kunci/i.test(j.ralat || '')) dirLupaKunci(); throw new Error(j.ralat || 'Ralat tidak diketahui'); }
+  if (!j.ok) { if (/kunci/i.test(j.ralat || '')) dirLupaKunci(); throw new Error(window.SPKBAuth ? SPKBAuth.mesej(j.ralat || 'Ralat tidak diketahui') : (j.ralat || 'Ralat tidak diketahui')); }
   return j.data;
 }
 
@@ -1777,7 +1780,9 @@ function dirPapar(html){ document.getElementById('dirGateKad').innerHTML = html;
 
 function dirBorangKunci(ralat){
   dirPapar('<h2 id="dirGateTajuk">Direktori Guru</h2>' +
-    '<p>Direktori mengandungi maklumat kakitangan dan draf AJK. Masukkan kunci pentadbir untuk membuka.</p>' +
+    '<p>Direktori mengandungi maklumat kakitangan dan draf AJK. Log masuk dengan akaun DELIMa pentadbir untuk membuka.</p>' +
+    '<div id="dirGoogle" style="margin:10px 0 14px"></div>' +
+    '<p class="kecil">atau, semasa tempoh peralihan, guna kunci pentadbir:</p>' +
     '<form id="dirBorang"><label for="dirKunciIn">Kunci pentadbir</label>' +
     '<input id="dirKunciIn" type="password" autocomplete="current-password" required>' +
     '<button type="submit">Buka Direktori</button></form>' +
@@ -1785,7 +1790,12 @@ function dirBorangKunci(ralat){
   const f = document.getElementById('dirBorang');
   document.getElementById('dirKunciIn').focus();
   f.onsubmit = e => { e.preventDefault(); dirSimpanKunci(document.getElementById('dirKunciIn').value.trim()); dirMuat(); };
+  if (window.SPKBAuth) {
+    SPKBAuth.butang(document.getElementById('dirGoogle')).catch(function () {});
+    if (!dirDengarLogMasuk) { dirDengarLogMasuk = true; SPKBAuth.apabilaBerubah(function (u) { if (u && !dirSudahMula) dirMuat(); }); }
+  }
 }
+let dirDengarLogMasuk = false;
 
 function dirBorangImport(ralat){
   dirPapar('<h2 id="dirGateTajuk">Import data awal</h2>' +
@@ -1811,11 +1821,11 @@ function dirBorangImport(ralat){
 
 let dirSudahMula = false;
 async function dirMuat(){
-  if (!dirAmbilKunci()) return dirBorangKunci();
+  if (!dirAmbilKunci() && !(window.SPKBAuth && SPKBAuth.token())) return dirBorangKunci();
   dirPapar('<h2 id="dirGateTajuk">Direktori Guru</h2><p>Memuatkan data dari Google Sheet…</p>');
   let data;
   try { data = await dirApi('direktori_data'); }
-  catch (e) { return /kunci/i.test(e.message) ? dirBorangKunci(e.message) : dirPapar(
+  catch (e) { return /kunci|log masuk|kebenaran/i.test(e.message) ? dirBorangKunci(e.message) : dirPapar(
     '<h2 id="dirGateTajuk">Tidak dapat dimuatkan</h2><p>' + dirEsc(e.message) + '</p><button onclick="dirMuat()">Cuba lagi</button>'); }
   if (!data || !Array.isArray(data.guru) || !data.guru.length) return dirBorangImport();
   // Nilai lalai untuk medan yang mungkin tiada dalam Sheet

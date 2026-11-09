@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://lsjiann.github.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; frame-src 'self' https://lsjiann.github.io https://accounts.google.com/gsi/; object-src 'none'; base-uri 'self'; form-action 'self'">
+<script src="spkb-auth.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tugas Harian PKK — SPKB</title>
 <style>
@@ -774,6 +775,8 @@ function snapshot(){
     pajsk:getPajsk(), nama:sget('spkb_profile_nama')||'', telegram:getReminder().telegram, email:getReminder().email, masa:getReminder().masa };
 }
 // M2: permintaan ke backend peringatan & AI membawa kunci pentadbir (disemak oleh backend — lihat KunciPentadbir_TAMPALAN.gs)
+// Fasa 3 (H2): log masuk Google (pentadbir) diutamakan; kunci dikongsi hanya jika belum log masuk
+function identitiPKK(){ const t=window.SPKBAuth&&SPKBAuth.token(); return t?{idToken:t}:{kunci:kunciPKK()}; }
 function kunciPKK(){
   let k=''; try{ k=sessionStorage.getItem('spkb_kunci_tulis')||''; }catch(e){}
   if(!k){ k=(prompt('Masukkan kunci pentadbir:')||'').trim(); if(k) try{ sessionStorage.setItem('spkb_kunci_tulis',k); }catch(e){} }
@@ -784,7 +787,7 @@ async function postReminder(action){
   if(!c.endpoint){ toast('Sila isi URL Web App dahulu'); return; }
   try{
     const res=await fetch(c.endpoint, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({action, payload:snapshot(), kunci:kunciPKK()}) });
+      body: JSON.stringify(Object.assign({action, payload:snapshot()}, identitiPKK())) });
     const txt=await res.text();
     toast(action==='uji'?'Peringatan ujian dihantar':'Data disegerak ke awan');
     return txt;
@@ -802,7 +805,7 @@ async function callAI(action, payload){
   const url=getAIEndpoint();
   if(!url) throw new Error('no-endpoint');
   const res=await fetch(url, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify({action, payload, kunci:kunciPKK()}) });
+    body: JSON.stringify(Object.assign({action, payload}, identitiPKK())) });
   return await res.json();
 }
 async function cungkilSuratAI(){
